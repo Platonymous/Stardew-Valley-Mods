@@ -68,7 +68,7 @@ namespace TheHarpOfYoba
         private void SaveEvents_AfterSave(object sender, EventArgs e)
         {
             LoadAndReplace(savstring);
-               this.Monitor.Log("Loading: " + savstring);
+        //this.Monitor.Log("Loading: " + savstring);
         }
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
@@ -87,8 +87,9 @@ namespace TheHarpOfYoba
 
         private void SaveEvents_BeforeSave(object sender, EventArgs e)
         {
-
-            this.Monitor.Log("Saving: " + dataLoader.saveSavStringToFile(this.RemoveAndSave(), Game1.uniqueIDForThisGame, Game1.player.name));
+            checkProcess();
+            dataLoader.saveSavStringToFile(this.RemoveAndSave(), Game1.uniqueIDForThisGame, Game1.player.name);
+            // this.Monitor.Log("Saving: " + dataLoader.saveSavStringToFile(this.RemoveAndSave(), Game1.uniqueIDForThisGame, Game1.player.name));
 
 
         }
@@ -452,7 +453,9 @@ namespace TheHarpOfYoba
                         else if(Game1.player.items[index] is HarpOfYoba)
                         {
                             HarpOfYoba temp = (HarpOfYoba) Game1.player.items[index];
+                            if(temp.sheet != null) { 
                             SheetMusic.owned[temp.sheet.pos] = true;
+                            }
                         }
                     }
                 }
