@@ -294,7 +294,7 @@ namespace TheHarpOfYoba
                     sheet_storage += $"-{sm.pos}/items/{index}";
                     SheetMusic.owned[sm.pos] = false;
                     
-                    Game1.player.items.RemoveAt(index);
+                    Game1.player.items[index] = new Hat(1);
                     }
                 }
             }
@@ -324,7 +324,7 @@ namespace TheHarpOfYoba
                                         sheet_storage += $"-{sm.pos}/chest/{gl.name}/{KeyV.X}/{KeyV.Y}/{index}";
                                         SheetMusic.owned[sm.pos] = false;
                                         
-                                        c.items.RemoveAt(index);
+                                        c.items[index] = new Hat(1);
                                     }
                                 }
                             }
@@ -370,7 +370,6 @@ namespace TheHarpOfYoba
         {
             if (e.KeyPressed.ToString() == "P")
             {
-                this.Monitor.Log(Game1.player.uniqueMultiplayerID.ToString());
                 this.Monitor.Log(this.RemoveAndSave());
             }
 
@@ -448,7 +447,12 @@ namespace TheHarpOfYoba
                         if (Game1.player.items[index] is SheetMusic)
                         {
                             SheetMusic temp = (SheetMusic)Game1.player.items[index];
-                            SheetMusic.owned[temp.pos] = true; ;
+                            SheetMusic.owned[temp.pos] = true;
+                        }
+                        else if(Game1.player.items[index] is HarpOfYoba)
+                        {
+                            HarpOfYoba temp = (HarpOfYoba) Game1.player.items[index];
+                            SheetMusic.owned[temp.sheet.pos] = true;
                         }
                     }
                 }
