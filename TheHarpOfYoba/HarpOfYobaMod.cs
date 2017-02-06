@@ -8,6 +8,8 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
+using StardewValley.Locations;
+using StardewValley.Buildings;
 
 using Microsoft.Xna.Framework;
 
@@ -39,9 +41,9 @@ namespace TheHarpOfYoba
 
 
         private LoadData dataLoader;
-        public static string savstring;
+        public static string savstring = "";
         private static int numSheets = 6;
-        private static List<SheetMusic> sheetList = new List<SheetMusic>();
+        private static List<SheetMusic> sheetList = new List<SheetMusic>(numSheets);
 
 
         public override void Entry(IModHelper helper)
@@ -52,7 +54,6 @@ namespace TheHarpOfYoba
             this.next_letter = 0;
             this.playedAllSongsForFisherman = false;
             this.once = true;
-            sheetList = new List<SheetMusic>(numSheets);
 
 
             //ControlEvents.KeyPressed += ControlEvents_KeyPressed;
@@ -67,8 +68,11 @@ namespace TheHarpOfYoba
 
         private void SaveEvents_AfterSave(object sender, EventArgs e)
         {
-            LoadAndReplace(savstring);
-        //this.Monitor.Log("Loading: " + savstring);
+            loadObjects();
+            //LoadAndReplace(savstring);
+            if (savstring != "") { 
+            this.Monitor.Log("Loading: " + LoadAndReplace(savstring));
+            }
         }
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
@@ -77,7 +81,6 @@ namespace TheHarpOfYoba
             if (dataLoader.doesSavFileExist(Game1.uniqueIDForThisGame, Game1.player.name)) { 
             savstring = dataLoader.loadSavStringFromFile(Game1.uniqueIDForThisGame, Game1.player.name);
             if (savstring != "") {
-
                 LoadAndReplace(savstring);
             }
             }
@@ -87,9 +90,10 @@ namespace TheHarpOfYoba
 
         private void SaveEvents_BeforeSave(object sender, EventArgs e)
         {
+            loadObjects();
             checkProcess();
-            dataLoader.saveSavStringToFile(this.RemoveAndSave(), Game1.uniqueIDForThisGame, Game1.player.name);
-            // this.Monitor.Log("Saving: " + dataLoader.saveSavStringToFile(this.RemoveAndSave(), Game1.uniqueIDForThisGame, Game1.player.name));
+            //dataLoader.saveSavStringToFile(this.RemoveAndSave(), Game1.uniqueIDForThisGame, Game1.player.name);
+           this.Monitor.Log("Saving: " + dataLoader.saveSavStringToFile(this.RemoveAndSave(), Game1.uniqueIDForThisGame, Game1.player.name));
 
 
         }
@@ -123,76 +127,74 @@ namespace TheHarpOfYoba
         private string LoadAndReplace(string save)
         {
 
-            loadObjects();
-
             string[] savedata = Regex.Split(save,"-S-");
 
-            string[] saveHarpDataSet = Regex.Split(savedata[0], "-");
-            string saveHarp = saveHarpDataSet[1];
-            string saveHarpAttachement = saveHarpDataSet[2];
+            string[] saveHarpDataSet = Regex.Split(savedata[1], "-");
+            string saveHarpAttachement = savedata[2];
 
-            if (saveHarp != "none")
+            if (saveHarpAttachement != "none")
             {
+                newHarp.sheet = sheetList[int.Parse(saveHarpAttachement)];
+                SheetMusic.owned[int.Parse(saveHarpAttachement)] = true;
+            }
+
+            foreach (string saveHarp in saveHarpDataSet) { 
                 string[] saveHarpPlacement = Regex.Split(saveHarp,"/");
 
-                if (saveHarpPlacement[0] == "items")
+               
+                if (saveHarpPlacement[2] == "items")
                 {
-                   
-                    Game1.player.items[int.Parse(saveHarpPlacement[1])] = newHarp;
-                    HarpOfYoba.owned = true;
-                    if (saveHarpAttachement != "none")
+                    if (saveHarpPlacement[0] == "harp")
                     {
-                        newHarp.sheet = sheetList[int.Parse(saveHarpAttachement)];
+                        Game1.player.items[int.Parse(saveHarpPlacement[3])] = this.newHarp;
+                        HarpOfYoba.owned = true;
+                    }
+                    else if (saveHarpPlacement[0] == "sheet")
+                    {
+                        Game1.player.items[int.Parse(saveHarpPlacement[3])] = sheetList[int.Parse(saveHarpPlacement[1])];
+                        SheetMusic.owned[int.Parse(saveHarpPlacement[1])] = true;
                     }
 
-                } else if(saveHarpPlacement[0] == "chest")
+                    } else if(saveHarpPlacement[2] == "chest")
                 {
-                    GameLocation gl = Game1.getLocationFromName(saveHarpPlacement[1]);
-                   Chest che = (Chest) gl.objects[new Vector2(int.Parse(saveHarpPlacement[2]), int.Parse(saveHarpPlacement[3]))];
-                    che.items[int.Parse(saveHarpPlacement[4])] = newHarp;
-                   HarpOfYoba.owned = true;
-                    if(saveHarpAttachement != "none")
+                    GameLocation gl;
+
+                    if (saveHarpPlacement[3] == "GL")
                     {
-                        newHarp.sheet = sheetList[int.Parse(saveHarpAttachement)];
+                        gl = Game1.getLocationFromName(saveHarpPlacement[4]);
+                       
                     }
-                }
-                
-
-            }
-
-            if (savedata[1] != "none") {
-
-                string[] saveSheetDataSet = Regex.Split(savedata[1], "-");
-
-                foreach (string saveSheetData in saveSheetDataSet)
-                {
-                    string[] saveSheetPlacement = Regex.Split(saveSheetData, "/");
-
-                    if (saveSheetPlacement[1] == "items")
+                    else if (saveHarpPlacement[3] == "BGL")
                     {
-                        if (saveHarpAttachement != saveSheetPlacement[0]) { 
-                        Game1.player.items[int.Parse(saveSheetPlacement[2])] = sheetList[int.Parse(saveSheetPlacement[0])];
-                        }
-                        SheetMusic.owned[int.Parse(saveSheetPlacement[0])] = true;
-                    }
-                    else if (saveSheetPlacement[1] == "chest")
-                    {
-                        if (saveHarpAttachement != saveSheetPlacement[0])
-                        {
-                            GameLocation gl = Game1.getLocationFromName(saveSheetPlacement[2]);
-                        Chest che = (Chest)gl.objects[new Vector2(int.Parse(saveSheetPlacement[3]), int.Parse(saveSheetPlacement[4]))];
-                        che.items[int.Parse(saveSheetPlacement[5])] = sheetList[int.Parse(saveSheetPlacement[0])];
-                        }
-                        SheetMusic.owned[int.Parse(saveSheetPlacement[0])] = true;
+                        BuildableGameLocation bgl = (BuildableGameLocation)Game1.getLocationFromName(saveHarpPlacement[4]);
+                        gl = bgl.buildings[int.Parse(saveHarpPlacement[5])].indoors;
 
                     }
+                    else
+                    {
+                        gl = new GameLocation();
+                    }
+
+                    Chest che = (Chest)gl.objects[new Vector2(int.Parse(saveHarpPlacement[6]), int.Parse(saveHarpPlacement[7]))];
+
+                    if (saveHarpPlacement[0] == "harp")
+                    {
+                        che.items[int.Parse(saveHarpPlacement[8])] = this.newHarp;
+                        HarpOfYoba.owned = true;
+                    }
+                    else if (saveHarpPlacement[0] == "sheet")
+                    {
+                        che.items[int.Parse(saveHarpPlacement[8])] = sheetList[int.Parse(saveHarpPlacement[1])];
+                        SheetMusic.owned[int.Parse(saveHarpPlacement[1])] = true;
+                    }
+
 
                 }
 
-
             }
 
-            string[] processData = Regex.Split(savedata[2],"-");
+
+            string[] processData = Regex.Split(savedata[3],"-");
 
             for (int i = 0; i < processData.Length; i++)
             {
@@ -215,120 +217,71 @@ namespace TheHarpOfYoba
             savstring = Game1.player.name;
 
 
-            bool harp_saved = false;
-            string harp_storage = "none";
+            string harp_storage = "";
 
             string harp_attachement = "none";
 
-            if (!HarpOfYoba.owned)
-            {
-                harp_saved = true;
-            }
-
+            
             if (this.newHarp.sheet != null)
             {
                 harp_attachement = this.newHarp.sheet.pos.ToString();
-                
+                SheetMusic.owned[this.newHarp.sheet.pos] = false;
+                this.newHarp.sheet = null;
             }
-
-            if (!harp_saved)
-            {
-                for (int index = 0; index < Game1.player.items.Count; ++index)
-                {
-                    if (Game1.player.items[index] is HarpOfYoba)
-                    {
-                        harp_storage = $"items/{index}";
-                        harp_saved = true;
-                        HarpOfYoba.owned = false;
-                        Game1.player.items[index] = new Hat(1); ;
-                        break;
-                    }
-                }
-            }
-            if (!harp_saved)
-            {
-                foreach (GameLocation gl in Game1.locations)
-                {
-                    if (harp_saved) { break; }
-                    foreach (Vector2 KeyV in gl.objects.Keys)
-                    {
-                        if (harp_saved) { break; }
-                        if (gl.objects[KeyV] is Chest)
-                        {
-                            Chest c = (Chest)gl.objects[KeyV];
-                            for (int index = 0; index < c.items.Count; ++index)
-                            {
-                                if (c.items[index] is HarpOfYoba)
-                                {
-                                    harp_storage = $"chest/{gl.name}/{KeyV.X}/{KeyV.Y}/{index}";
-                                    harp_saved = true;
-                                    HarpOfYoba.owned = false;
-                                    c.items[index] = new Hat(1);
-                                    break;
-                                }
-                            }
-                        }
-
-                    }
-
-                }
-
-
-            }
-
-            savstring += "-" + harp_storage + "-" + harp_attachement;
-
-
-            int nSheets = numSheets;
-            string sheet_storage = "-S";
 
 
             for (int index = 0; index < Game1.player.items.Count; ++index)
             {
-                if (nSheets == 0) { break; }
-                if (Game1.player.items[index] is SheetMusic)
+                if (Game1.player.items[index] is HarpOfYoba)
                 {
-                    SheetMusic sm = (SheetMusic)Game1.player.items[index];
-                    nSheets--;
-                    if(sm.pos.ToString() != harp_attachement)
-                    { 
-                    sheet_storage += $"-{sm.pos}/items/{index}";
+                    harp_storage += $"-harp/0/items/{index}";
+
+                    HarpOfYoba.owned = false;
+                    Game1.player.items[index] = new Hat(1); ;
+
+                }
+                else if (Game1.player.items[index] is SheetMusic)
+                {
+                    SheetMusic sm = (SheetMusic) Game1.player.items[index];
+                    harp_storage += $"-sheet/{sm.pos}/items/{index}";
                     SheetMusic.owned[sm.pos] = false;
-                    
                     Game1.player.items[index] = new Hat(1);
-                    }
                 }
             }
-
-            if (nSheets > 0)
-            {
+          
                 foreach (GameLocation gl in Game1.locations)
                 {
-                    if (nSheets == 0) { break; }
+                    
 
                     foreach (Vector2 KeyV in gl.objects.Keys)
                     {
-                        if (nSheets == 0) { break; }
-
+                       
                         if (gl.objects[KeyV] is Chest)
                         {
                             Chest c = (Chest)gl.objects[KeyV];
-                            for (int index = 0; index < c.items.Count; ++index)
+                        for (int index = 0; index < c.items.Count; ++index)
+                        {
+                            if (c.items[index] is HarpOfYoba)
                             {
-                                if (nSheets == 0) { break; }
-                                if (c.items[index] is SheetMusic)
-                                {
-                                    SheetMusic sm = (SheetMusic)c.items[index];
-                                    nSheets--;
-                                    if (sm.pos.ToString() != harp_attachement)
-                                    {
-                                        sheet_storage += $"-{sm.pos}/chest/{gl.name}/{KeyV.X}/{KeyV.Y}/{index}";
-                                        SheetMusic.owned[sm.pos] = false;
-                                        
-                                        c.items[index] = new Hat(1);
-                                    }
-                                }
+                                harp_storage += $"-harp/0/chest/GL/{gl.name}/0/{KeyV.X}/{KeyV.Y}/{index}";
+
+                                HarpOfYoba.owned = false;
+
+                                c.items[index] = new Hat(1);
+
                             }
+                            else if (c.items[index] is SheetMusic)
+                            {
+                                SheetMusic sm = (SheetMusic)c.items[index];
+                                if (sm.pos.ToString() != harp_attachement)
+                                {
+                                    harp_storage += $"-sheet/{sm.pos}/chest/GL/{gl.name}/0/{KeyV.X}/{KeyV.Y}/{index}";
+                                    c.items[index] = new Hat(1);
+                                }
+                                SheetMusic.owned[sm.pos] = false;
+
+                            }
+                        }
                         }
 
                     }
@@ -336,16 +289,65 @@ namespace TheHarpOfYoba
                 }
 
 
-            }
 
-            if (sheet_storage == "-S")
+
+            foreach (GameLocation gl in Game1.locations)
             {
 
-                sheet_storage = "-S-none";
+                if (gl is BuildableGameLocation)
+                {
 
+                    BuildableGameLocation bgl = (BuildableGameLocation)gl;
+                    
+                    for (int bIndex = 0; bIndex < bgl.buildings.Count; bIndex++)
+                    {
+
+                        GameLocation bid = bgl.buildings[bIndex].indoors;
+                        if(bid == null ) { continue; }
+                        if (bid.objects == null) { continue; }
+                        foreach (Vector2 KeyV in bid.objects.Keys)
+                        {
+                            if (bid.objects[KeyV] == null) { continue; }
+                            if (bid.objects[KeyV] is Chest)
+                            {
+                                Chest c = (Chest)bid.objects[KeyV];
+                                for (int index = 0; index < c.items.Count; ++index)
+                                {
+                                    if (c.items[index] is HarpOfYoba)
+                                    {
+                                        harp_storage += $"-harp/0/chest/BGL/{gl.name}/{bIndex}/{KeyV.X}/{KeyV.Y}/{index}";
+
+                                        HarpOfYoba.owned = false;
+                                        c.items[index] = new Hat(1);
+
+                                    }
+                                    else if (c.items[index] is SheetMusic)
+                                    {
+                                        SheetMusic sm = (SheetMusic)c.items[index];
+                                        if (sm.pos.ToString() != harp_attachement)
+                                        {
+                                            harp_storage += $"-sheet/{sm.pos}/chest/BGL/{gl.name}/{bIndex}/{KeyV.X}/{KeyV.Y}/{index}";
+                                            c.items[index] = new Hat(1);
+                                        }
+                                        SheetMusic.owned[sm.pos] = false;
+
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+
+                }
             }
-
-            savstring += sheet_storage+"-S";
+            
+            if (harp_storage == "")
+            {
+                harp_storage = "-none";
+            }
+           
+            savstring += "-S" + harp_storage + "-S-" + harp_attachement +"-S";
 
 
             for (int i = 0; i < processIndicators.Length; i++)
