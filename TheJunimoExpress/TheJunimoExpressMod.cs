@@ -10,6 +10,7 @@ using StardewValley.TerrainFeatures;
 
 using Microsoft.Xna.Framework;
 using StardewValley.Objects;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TheJunimoExpress
 {
@@ -205,6 +206,11 @@ namespace TheJunimoExpress
         public void start()
         {
             DataLoader = new LoadData();
+
+            Game1.bigCraftableSpriteSheet = Game1.content.Load<Texture2D>("TileSheets\\Craftables");
+            Game1.objectSpriteSheet = Game1.content.Load<Texture2D>("Maps\\springobjects");
+            Game1.bigCraftablesInformation = Game1.content.Load<Dictionary<int, string>>("Data\\BigCraftablesInformation");
+            Game1.objectInformation = Game1.content.Load<Dictionary<int, string>>("Data\\ObjectInformation");
 
             int i = DataLoader.setTracksTextures();
             this.textureOriginTracks = i;

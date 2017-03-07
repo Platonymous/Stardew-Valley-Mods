@@ -328,7 +328,7 @@ namespace TheJunimoExpress
                 Game1.objectInformation.Remove(craftables[i]);
             }
 
-            Game1.bigCraftableSpriteSheet = Game1.bigCraftableSpriteSheet = Game1.content.Load<Texture2D>("TileSheets\\Craftables");
+            Game1.bigCraftableSpriteSheet = Game1.content.Load<Texture2D>("TileSheets\\Craftables");
             Game1.objectSpriteSheet = Game1.content.Load<Texture2D>("Maps\\springobjects");
             Game1.bigCraftablesInformation = Game1.content.Load<Dictionary<int, string>>("Data\\BigCraftablesInformation");
             Game1.objectInformation = Game1.content.Load<Dictionary<int, string>>("Data\\ObjectInformation");
