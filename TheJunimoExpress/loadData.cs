@@ -41,7 +41,9 @@ namespace TheJunimoExpress
                     if (Game1.getLocationFromName(entry[1]).terrainFeatures.ContainsKey(new Vector2(int.Parse(entry[4]), int.Parse(entry[5])))) { 
                     Game1.getLocationFromName(entry[1]).terrainFeatures.Remove(new Vector2(int.Parse(entry[4]), int.Parse(entry[5])));
                     }
-                    Game1.getLocationFromName(entry[1]).terrainFeatures.Add(new Vector2(int.Parse(entry[4]), int.Parse(entry[5])),new RailroadTrack(row,col));
+                    RailroadTrack rt = new RailroadTrack(row, col);
+                    Game1.getLocationFromName(entry[1]).terrainFeatures.Add(new Vector2(int.Parse(entry[4]), int.Parse(entry[5])),rt);
+                    LoadData.terrainFeatureList.Add(rt);
                     continue;
                 }
 
@@ -198,17 +200,17 @@ namespace TheJunimoExpress
 
             for (int index = 0; index < Game1.player.items.Count; ++index)
             {
-                if(Game1.player.items[index] == null)
+                if(Game1.player.items[index] == null) 
                 {
                     continue;
                 }
-                if (Game1.player.items[index].parentSheetIndex == craftables[0])
+                if (Game1.player.items[index].Name == "Tracks")
                 {
                     save += "--" + "CraftedTracks" + ";;;" + "Inventory" + ";;;" + "-1" + ";;;" + index.ToString() + ";;;" + "0" + ";;;" + "0" + ";;;" + "-1";
                     Game1.player.items[index] = new StardewValley.Object(Vector2.Zero, 24, Game1.player.items[index].Stack);
 
                 }
-                else if (Game1.player.items[index].parentSheetIndex == craftables[1])
+                else if (Game1.player.items[index].Name == "Junimo Helper")
                 {
                     save += "--" + "CraftedJunimo" + ";;;" + "Inventory" + ";;;" + "-1" + ";;;" + index.ToString() + ";;;" + "0" + ";;;" + "0" + ";;;" + "-1";
                     Game1.player.items[index] = new StardewValley.Object(Vector2.Zero, 24, Game1.player.items[index].Stack);
@@ -230,13 +232,13 @@ namespace TheJunimoExpress
                                 continue;
                             }
 
-                            if ((gl.objects[keyV] as Chest).items[i].parentSheetIndex == craftables[0])
+                            if ((gl.objects[keyV] as Chest).items[i].Name == "Tracks")
                             {
                                 save += "--" + "CraftedTracks" + ";;;" + gl.name + "/"+ "-1" + ";;;" + i.ToString() + ";;;" + keyV.X.ToString() + ";;;" + keyV.Y.ToString() + ";;;" + "-1";
                                 (gl.objects[keyV] as Chest).items[i] = new StardewValley.Object(Vector2.Zero, 24, (gl.objects[keyV] as Chest).items[i].Stack);
                             }
 
-                            if ((gl.objects[keyV] as Chest).items[i].parentSheetIndex == craftables[1])
+                            if ((gl.objects[keyV] as Chest).items[i].Name == "Junimo Helper")
                             {
                                 save += "--" + "CraftedJunimo" + ";;;" + gl.name + ";;;" + "-1" + ";;;" + i.ToString() + ";;;" + keyV.X.ToString() + ";;;" + keyV.Y.ToString() + ";;;" + "-1";
                                 (gl.objects[keyV] as Chest).items[i] = new StardewValley.Object(Vector2.Zero, 24, (gl.objects[keyV] as Chest).items[i].Stack);
@@ -268,13 +270,13 @@ namespace TheJunimoExpress
                                         continue;
                                     }
 
-                                    if ((bgl.objects[keyV] as Chest).items[j].parentSheetIndex == craftables[0])
+                                    if ((bgl.objects[keyV] as Chest).items[j].Name == "Tracks")
                                     {
                                         save += "--" + "CraftedTracks" + ";;;" + gl.name + ";;;" + b.ToString() + ";;;" + j.ToString() + ";;;" + keyV.X.ToString() + ";;;" + keyV.Y.ToString() + ";;;" + "-1";
                                         (bgl.objects[keyV] as Chest).items[j] = new StardewValley.Object(Vector2.Zero, 24, (bgl.objects[keyV] as Chest).items[j].Stack);
                                     }
 
-                                    if ((bgl.objects[keyV] as Chest).items[j].parentSheetIndex == craftables[1])
+                                    if ((bgl.objects[keyV] as Chest).items[j].Name == "Junimo Helper")
                                     {
                                         save += "--" + "CraftedJunimo" + ";;;" + gl.name + ";;;" + b.ToString() + ";;;" + j.ToString() + ";;;" + keyV.X.ToString() + ";;;" + keyV.Y.ToString() + ";;;" + "-1";
                                         (bgl.objects[keyV] as Chest).items[j] = new StardewValley.Object(Vector2.Zero, 24, (bgl.objects[keyV] as Chest).items[j].Stack);
@@ -295,9 +297,12 @@ namespace TheJunimoExpress
 
             for (int i = 0; i < terrainFeatureList.Count; i++)
             {
+             
                 Vector2 v = (terrainFeatureList[i] as RailroadTrack).tileLocation;
                 GameLocation l = (terrainFeatureList[i] as RailroadTrack).location;
+                if (l.terrainFeatures.ContainsKey(v) && l.terrainFeatures[v] is RailroadTrack) { 
                 save += "--" + "Tracks;;;"+ l.name + ";;;-1;;;-1;;;" + v.X.ToString() + ";;;" + v.Y.ToString() + ";;;-1";
+                }
                 l.terrainFeatures.Remove(v);
             }
 
@@ -315,6 +320,7 @@ namespace TheJunimoExpress
                 }
             }
             objectlist = new List<StardewValley.Object>();
+            terrainFeatureList = new List<TerrainFeature>();
 
             for (int i = 0; i < recipes.Count; i++)
             {
@@ -333,6 +339,14 @@ namespace TheJunimoExpress
             Game1.bigCraftablesInformation = Game1.content.Load<Dictionary<int, string>>("Data\\BigCraftablesInformation");
             Game1.objectInformation = Game1.content.Load<Dictionary<int, string>>("Data\\ObjectInformation");
             CraftingRecipe.craftingRecipes = Game1.content.Load<Dictionary<string, string>>("Data//CraftingRecipes");
+            if (Game1.player.craftingRecipes.ContainsKey("Tracks"))
+            {
+                Game1.player.craftingRecipes.Remove("Tracks");
+            }
+            if (Game1.player.craftingRecipes.ContainsKey("Junimo Helper"))
+            {
+                Game1.player.craftingRecipes.Remove("Junimo Helper");
+            };
             craftables = new List<int>();
             recipes = new List<string>();
             return saveSavStringToFile(save,GID,PN);

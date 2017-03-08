@@ -38,13 +38,18 @@ namespace TheJunimoExpress
 
         }
 
-        private void SaveEvents_AfterSave(object sender, EventArgs e)
+        private void reloadContent()
         {
             this.started = true;
             start();
 
             string savestring = DataLoader.loadSavStringFromFile(Game1.uniqueIDForThisGame, Game1.player.name);
             DataLoader.LoadFromString(savestring);
+        }
+
+        private void SaveEvents_AfterSave(object sender, EventArgs e)
+        {
+            reloadContent();
         }
 
         private void SaveEvents_BeforeSave(object sender, EventArgs e)
@@ -55,12 +60,7 @@ namespace TheJunimoExpress
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
-            this.started = true;
-            start();
-             
-            string savestring = DataLoader.loadSavStringFromFile(Game1.uniqueIDForThisGame, Game1.player.name);
-            DataLoader.LoadFromString(savestring);
-            
+            reloadContent();
         }
 
         private void TimeEvents_TimeOfDayChanged(object sender, EventArgsIntChanged e)
@@ -136,7 +136,7 @@ namespace TheJunimoExpress
                         vl2.Add(check);
                     }
 
-                    if (allObjects.ContainsKey(check) && allObjects[check] is Chest && (allObjects[check] as Chest).items.Count == 1 && !(allObjects[check] is LinkedChest) && (allObjects[check] as Chest).items.FindIndex( x => x.parentSheetIndex == LoadData.craftables[1]) >= 0)
+                    if (allObjects.ContainsKey(check) && allObjects[check] is Chest && (allObjects[check] as Chest).items.Count == 1 && !(allObjects[check] is LinkedChest) && (allObjects[check] as Chest).items.FindIndex( x => (x is StardewValley.Object) && x.Name == "Junimo Helper") >= 0)
                     {
                         vl4.Add(check);
                     }
@@ -211,6 +211,14 @@ namespace TheJunimoExpress
             Game1.objectSpriteSheet = Game1.content.Load<Texture2D>("Maps\\springobjects");
             Game1.bigCraftablesInformation = Game1.content.Load<Dictionary<int, string>>("Data\\BigCraftablesInformation");
             Game1.objectInformation = Game1.content.Load<Dictionary<int, string>>("Data\\ObjectInformation");
+            if (Game1.player.craftingRecipes.ContainsKey("Tracks"))
+            {
+                Game1.player.craftingRecipes.Remove("Tracks");
+            }
+            if (Game1.player.craftingRecipes.ContainsKey("Junimo Helper"))
+            {
+                Game1.player.craftingRecipes.Remove("Junimo Helper");
+            };
 
             int i = DataLoader.setTracksTextures();
             this.textureOriginTracks = i;
@@ -218,8 +226,9 @@ namespace TheJunimoExpress
             string trackInformation = "Tracks/50/-300/Crafting -24/Driving the train doesn't set its course. The real job is laying the track.";
             Game1.objectInformation.Add(trackObjectID, trackInformation);
             CraftingRecipe.craftingRecipes.Add("Tracks", "388 30 335 2/Home/" + trackObjectID.ToString() + " 10/false/null");
+            
             Game1.player.craftingRecipes.Add("Tracks", 0);
-
+            
             int j = DataLoader.setHelperTextures();
             this.textureOriginHelper = j;
             int helperObjectID = j;
@@ -245,8 +254,10 @@ namespace TheJunimoExpress
 
             if (e.KeyPressed.ToString() == "I")
             {
-                
-
+//                388 30 335 2 268 50;
+                Game1.player.addItemToInventory(new StardewValley.Object(388,300));
+                Game1.player.addItemToInventory(new StardewValley.Object(335, 20));
+                Game1.player.addItemToInventory(new StardewValley.Object(268, 500));
             }
 
 

@@ -85,10 +85,11 @@ namespace TheJunimoExpress
            Game1.playSound("hammer");
 
             trackList[this.location].Remove(this.positon);
-           
+            LoadData.terrainFeatureList.Remove(this);
             location.debris.Add(new Debris((Item)new StardewValley.Object(388, 1, false, -1, 0), tileLocation * (float)Game1.tileSize + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2))));
 
-            return true;
+            location.terrainFeatures.Remove(this.tileLocation);
+            return false;
         }
 
         private bool doesTileCountForDrawing(Vector2 surroundingLocations)
