@@ -10,10 +10,13 @@ SMAPI needs to be installed.
 # 2. Junimo Farm
 Let Junimos help you on the farm.
 
-<<<<<<< HEAD
 Download: [JunimoFarm_1_0_2.zip](https://github.com/Platonymous/Stardew-Valley-Mods/raw/master/TheJunimoExpress/Mod/JunimoFarm_1_0_2.zip)
-=======
-Download: [JunimoFarm_1_0_1.zip](https://github.com/Platonymous/Stardew-Valley-Mods/raw/master/TheJunimoExpress/Mod/JunimoFarm_1_0_1.zip)
->>>>>>> origin/master
+
+SMAPI needs to be installed. 
+
+# 3. Custom Farmimg
+Add Custom Objects via json file, currently only supports simple Machines. 
+
+Download: [ustomFarming_0_4_0.zip](https://github.com/Platonymous/Stardew-Valley-Mods/raw/master/CustomFarming/Mod/CustomFarming_0_4_0.zip)
 
 SMAPI needs to be installed. 
