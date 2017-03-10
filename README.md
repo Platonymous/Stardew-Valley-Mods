@@ -15,7 +15,7 @@ Download: [JunimoFarm_1_0_2.zip](https://github.com/Platonymous/Stardew-Valley-M
 SMAPI needs to be installed. 
 
 # 3. Custom Farmimg
-Add Custom Objects via json file, currently only supports simple Machines. 
+Add Custom Objects via json file, currently only supports simple machines. 
 
 Download: [CustomFarming_0_4_0.zip](https://github.com/Platonymous/Stardew-Valley-Mods/raw/master/CustomFarming/Mod/CustomFarming_0_4_0.zip)
 
