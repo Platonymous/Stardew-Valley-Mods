@@ -97,6 +97,24 @@ namespace CustomFarming
             }
         }
 
+        public Texture2D Texture
+        {
+            get
+            {
+                return tilesheet;
+            }
+
+        }
+
+        public Microsoft.Xna.Framework.Rectangle SourceRectangle
+        {
+            get
+            {
+                return this.sourceRectangle;
+            }
+
+        }
+
         public StardewValley.Object getReplacement()
         {
             StardewValley.Object replacement = new Chest(true);

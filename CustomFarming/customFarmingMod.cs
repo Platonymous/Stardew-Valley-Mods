@@ -9,6 +9,9 @@ using StardewValley;
 using StardewValley.Menus;
 
 using Newtonsoft.Json.Linq;
+using System.Drawing;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace CustomFarming
 {
@@ -17,6 +20,7 @@ namespace CustomFarming
         public string customContentFolder;
         public List<string> customFiles = new List<string>();
         public List<Item> customItems = new List<Item>();
+        public List<CustomRecipe> recipes = new List<CustomRecipe>();
         public string key;
 
         public override void Entry(IModHelper helper)
@@ -49,7 +53,7 @@ namespace CustomFarming
         {
             string key = e.KeyPressed.ToString();
 
-            if ( key == "F" && this.key == "C")
+            if ( key == "V" && this.key == "V")
             {
 
                 showMachineList();
@@ -64,32 +68,42 @@ namespace CustomFarming
         public void showMachineList()
         {
             buildMaschines();
+            Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, 0, 0);
+            Game1.activeClickableMenu = (IClickableMenu)new CustomCraftingPage((int)centeringOnScreen.X, (int)centeringOnScreen.Y, 800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, recipes, true);
 
-            Game1.activeClickableMenu = new ItemGrabMenu(customItems);
 
         }
 
         public void buildMaschines()
         {
+            recipes = new List<CustomRecipe>();
+            customItems = new List<Item>();
+
             foreach (string file in customFiles)
             {
-                customItems = new List<Item>();
+                Monitor.Log("Adding:" + file);
 
                 dynamic loadJson = JObject.Parse(File.ReadAllText(file));
                 string type = (string)loadJson.Type;
                 string name = (string)loadJson.Name;
-
+                
                 string filename = Path.GetFileName(file);
                 string modFolder = Path.GetDirectoryName(file);
-
+                string crafting = (string)loadJson.CraftingString;
+               
                 Type T = Type.GetType(type);
+
                 ICustomFarmingObject newMachine = (ICustomFarmingObject)Activator.CreateInstance(T);
                 newMachine.build(modFolder, filename);
+
+                recipes.Add(new CustomRecipe(newMachine));
 
                 customItems.Add((Item)newMachine);
             }
   
         }
+
+     
 
         private void ParseDir(string path)
         {
@@ -106,9 +120,15 @@ namespace CustomFarming
                 {
                     string filePath = Path.Combine(path, Path.GetDirectoryName(file), Path.GetFileName(file));
                     customFiles.Add(filePath);
+                    Monitor.Log(filePath);
                 }
                   
             }
+        }
+
+        private void addObjectInformation()
+        {
+
         }
 
     }
