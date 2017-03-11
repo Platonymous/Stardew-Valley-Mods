@@ -68,6 +68,9 @@ namespace CustomFarming
         public void showMachineList()
         {
             buildMaschines();
+
+            Game1.activeClickableMenu = new ItemGrabMenu(this.customItems);
+                return;
             Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, 0, 0);
             Game1.activeClickableMenu = (IClickableMenu)new CustomCraftingPage((int)centeringOnScreen.X, (int)centeringOnScreen.Y, 800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, recipes, true);
 

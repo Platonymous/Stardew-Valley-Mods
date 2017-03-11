@@ -152,7 +152,7 @@ namespace CustomFarming
             this.animationFrame = 0;
             this.animationFrames = 1;
             this.animationSpeed = 300;
-            this.workAnimationOffset = 1;
+            
             this.isWorking = false;
             this.parentSheetIndex = -1;
             this.readyForHarvest = false;
@@ -165,7 +165,7 @@ namespace CustomFarming
             this.tilesheet = Bitmap2Texture(new Bitmap(tilesheetImage));
 
             this.tilesheetWidth = (int)(tilesheet.Width / tileSize.X);
-            this.sourceRectangle = new Microsoft.Xna.Framework.Rectangle((this.tileindex % tilesheetWidth) * (int)tileSize.X, (int)Math.Floor(this.tilesheetindex / this.tileSize.Y), (int)this.tileSize.X, (int)this.tileSize.Y);
+
             this.boundingBox = new Microsoft.Xna.Framework.Rectangle((int)tileLocation.X * Game1.tileSize, (int)tileLocation.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize);
             this.workAnimationFrames = 0;
             if (loadJson.WorkAnimationFrames != null)
@@ -173,11 +173,15 @@ namespace CustomFarming
                 this.workAnimationFrames = (int)loadJson.WorkAnimationFrames;
             }
 
+            this.workAnimationOffset = (this.workAnimationFrames > 0) ? 1 : 0;
+
             this.animate = (this.animationFrames > 1) ? true : false;
             this.animateWork = (this.workAnimationFrames > 1) ? true : false;
 
             this.tilesheetindex = (int)loadJson.TileIndex;
             this.tileindex = tilesheetindex;
+
+            this.sourceRectangle = new Microsoft.Xna.Framework.Rectangle((this.tileindex % tilesheetWidth) * (int)tileSize.X, (int)Math.Floor(this.tilesheetindex / this.tileSize.Y), (int)this.tileSize.X, (int)this.tileSize.Y);
 
             this.name = (string)loadJson.Name;
             this.categoryName = (string)loadJson.CategoryName;
@@ -620,13 +624,13 @@ namespace CustomFarming
             this.specialPrefix = false;
             this.isSpecial = false;
 
-            if (this.specialProduce.Count > 0)
+            if (this.specialProduce != null && this.specialProduce.Count > 0)
             {
 
                 foreach (dynamic p in this.specialProduce)
                 {
                     int m = (int)p.Material;
-                    if (this.lastDropIn.parentSheetIndex == m)
+                    if (this.lastDropIn.parentSheetIndex == m || this.lastDropIn.category == m)
                     {
                         this.heldObject.Name = (string)p.Name;
                         this.specialPrefix = (bool)p.usePrefix;
