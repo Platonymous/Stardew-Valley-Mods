@@ -34,11 +34,10 @@ namespace CustomFarming
         public Microsoft.Xna.Framework.Rectangle sourceRectangle;
         public int tilesheetWidth;
         public int animationFrames;
-        public float animationSpeed;
+        public int animationSpeed;
         public int animationFrame;
         public int workAnimationOffset;
         public int workAnimationFrames;
-        public float workAnimationSpeed;
         public bool animateWork;
         public bool animate;
         public bool isWorking;
@@ -54,6 +53,7 @@ namespace CustomFarming
         public bool specialPrefix;
         public string filename;
         public bool useColor;
+        public int mil;
 
         private bool inStorage;
         private GameLocation environment;
@@ -146,13 +146,13 @@ namespace CustomFarming
 
             this.tileSize = new Vector2(16, 32);
             this.category = -8;
+            this.mil = 0;
             this.bigCraftable = true;
             this.isRecipe = false;
             this.animationFrame = 0;
             this.animationFrames = 1;
-            this.animationSpeed = 400.00f;
+            this.animationSpeed = 300;
             this.workAnimationOffset = 1;
-            this.workAnimationSpeed = 400.0f;
             this.isWorking = false;
             this.parentSheetIndex = -1;
             this.readyForHarvest = false;
@@ -167,8 +167,12 @@ namespace CustomFarming
             this.tilesheetWidth = (int)(tilesheet.Width / tileSize.X);
             this.sourceRectangle = new Microsoft.Xna.Framework.Rectangle((this.tileindex % tilesheetWidth) * (int)tileSize.X, (int)Math.Floor(this.tilesheetindex / this.tileSize.Y), (int)this.tileSize.X, (int)this.tileSize.Y);
             this.boundingBox = new Microsoft.Xna.Framework.Rectangle((int)tileLocation.X * Game1.tileSize, (int)tileLocation.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize);
+            this.workAnimationFrames = 0;
+            if (loadJson.WorkAnimationFrames != null)
+            {
+                this.workAnimationFrames = (int)loadJson.WorkAnimationFrames;
+            }
 
-            this.workAnimationFrames = (int)((tilesheetImage.Width / tileSize.X) * (tilesheetImage.Height / tileSize.Y)) - 1;
             this.animate = (this.animationFrames > 1) ? true : false;
             this.animateWork = (this.workAnimationFrames > 1) ? true : false;
 
@@ -708,16 +712,23 @@ namespace CustomFarming
                     this.health = 10;
             }
 
-            if ((!this.isWorking && this.animate && time.TotalGameTime.TotalMilliseconds % this.animationSpeed <= 10.0) || (this.isWorking && this.animateWork && time.TotalGameTime.TotalMilliseconds % this.workAnimationSpeed <= 10.0))
+       
+            if (!(time.TotalGameTime.TotalMilliseconds % this.animationSpeed <= 10.0))
+            {
+                return;
+            }
+
+
+            if (this.isWorking && this.animateWork)
             {
                 this.animationFrame++;
-                if ((!this.isWorking && this.animationFrame >= this.animationFrames) || (this.isWorking && this.animationFrame >= this.workAnimationFrames))
+                if (this.animationFrame >= this.workAnimationFrames)
                 {
                     this.animationFrame = 0;
                 }
 
-
-            }else
+            }
+            else if (!this.isWorking || !this.animateWork)
             {
                 this.animationFrame = 0;
                 this.tileindex = this.tilesheetindex;
@@ -725,11 +736,11 @@ namespace CustomFarming
             
             if (!this.isWorking)
             {
-                this.tileindex += this.tilesheetindex + this.animationFrame;
+                this.tileindex = this.tilesheetindex + this.animationFrame;
             }
             else
             {
-                this.tileindex += this.tilesheetindex + this.workAnimationOffset + this.animationFrame;
+                this.tileindex = this.tilesheetindex + this.workAnimationOffset + this.animationFrame;
             }
 
             this.sourceRectangle = new Microsoft.Xna.Framework.Rectangle((this.tileindex % tilesheetWidth) * (int)tileSize.X, (int)Math.Floor(this.tilesheetindex / this.tileSize.Y), (int)this.tileSize.X, (int)this.tileSize.Y);
