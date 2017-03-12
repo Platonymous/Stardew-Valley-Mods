@@ -52,10 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomCraftingPage.cs" />
     <Compile Include="customNamedObject.cs" />
     <Compile Include="customFarmingMod.cs" />
-    <Compile Include="CustomRecipe.cs" />
     <Compile Include="ICustomFarmingObject.cs" />
     <Compile Include="ISaveObject.cs" />
     <Compile Include="SaveHandler.cs" />

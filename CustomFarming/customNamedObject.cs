@@ -25,6 +25,7 @@ namespace CustomFarming
         private bool inStorage;
         private GameLocation environment;
 
+
         public bool InStorage
         {
             get
@@ -68,6 +69,7 @@ namespace CustomFarming
         {
             StardewValley.Object replacement = new Chest(true);
             return replacement;
+      
         }
 
 

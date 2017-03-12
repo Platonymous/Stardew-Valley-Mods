@@ -187,12 +187,16 @@ namespace CustomFarming
             this.categoryName = (string)loadJson.CategoryName;
 
             this.description = (string)loadJson.Description;
-
-            string produceTilesheetFile = Path.Combine(modFolder, (string)loadJson.Produce.Tilesheet);
- 
+           
+            if (loadJson.Produce.Tilesheet != null && (string)loadJson.Produce.Tilesheet != "")
+            {
+                string produceTilesheetFile = Path.Combine(modFolder, (string)loadJson.Produce.Tilesheet);
+         
             this.produce = new customNamedObject((int)loadJson.Produce.ProduceID, Path.Combine(modFolder, (string)loadJson.Produce.Tilesheet), (int)loadJson.Produce.TileIndex, (int)loadJson.Produce.Stack, (string)loadJson.Produce.Name, (string)loadJson.Produce.Description, Microsoft.Xna.Framework.Color.White);
 
             this.produceName = (string)loadJson.Produce.Name;
+            }
+
             this.usePrefix = (bool)loadJson.Produce.usePrefix;
 
             this.useColor = (bool)loadJson.Produce.useColor;
@@ -353,7 +357,25 @@ namespace CustomFarming
 
         public override bool checkForAction(Farmer who, bool justCheckingForActivity = false)
         {
-           if (this.heldObject == null)
+
+            if (this.name.Contains("arecrow") && this.produce == null)
+            {
+                if (justCheckingForActivity) { return true; }
+                this.shakeTimer = 100;
+                
+                if (this.specialVariable == 0)
+                {
+                    Game1.drawObjectDialogue("I haven't encountered any crows yet.");
+                }
+                else
+                {
+                    Game1.drawObjectDialogue("I've scared off " + (object)this.specialVariable + " crow" + (this.specialVariable == 1 ? "." : "s."));
+                }
+                    
+                return true;
+            }
+
+            if (this.heldObject == null)
             {
               
                 bool check = (this.materials.FindIndex(x => (who.ActiveObject is StardewValley.Object) && x.parentSheetIndex == who.ActiveObject.parentSheetIndex) == -1) ? false : true;
@@ -387,9 +409,10 @@ namespace CustomFarming
             Vector2 vector2 = this.getScale() * (float)Game1.pixelZoom;
             Vector2 local = Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize), (float)(y * Game1.tileSize - Game1.tileSize)));
             Microsoft.Xna.Framework.Rectangle destinationRectangle = new Microsoft.Xna.Framework.Rectangle((int)((double)local.X - (double)vector2.X / 2.0) + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((double)local.Y - (double)vector2.Y / 2.0) + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((double)Game1.tileSize + (double)vector2.X), (int)((double)(Game1.tileSize * 2) + (double)vector2.Y / 2.0));
-            spriteBatch.Draw(this.tilesheet, destinationRectangle, new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), Microsoft.Xna.Framework.Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)((double)Math.Max(0.0f, (float)((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + (double)x * 9.99999974737875E-06));
 
             
+            spriteBatch.Draw(this.tilesheet, destinationRectangle, new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), Microsoft.Xna.Framework.Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)((double)Math.Max(0.0f, (float)((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + (double)x * 9.99999974737875E-06));
+
             if (this.readyForHarvest && this.heldObject != null) {
                     customNamedObject cno = (this.heldObject as customNamedObject);
                     float num = (float)(4.0 * Math.Round(Math.Sin(DateTime.Now.TimeOfDay.TotalMilliseconds / 250.0), 2));
@@ -462,6 +485,12 @@ namespace CustomFarming
                     this.isWorking = false;
             }
 
+            if (!this.readyForHarvest && this.materials.Count == 0 && !this.isWorking)
+            {
+
+                this.startWorking();
+            }
+
                 return false;
         }
        
@@ -474,6 +503,7 @@ namespace CustomFarming
 
             return false;
         }
+
 
         public override bool performObjectDropInAction(StardewValley.Object dropIn, bool probe, Farmer who)
         {
@@ -651,6 +681,12 @@ namespace CustomFarming
             this.heldObject = produce.getOne();
             this.heldObject.Stack = produce.Stack;
             this.heldObject.Name = this.produceName;
+
+            if (this.materials.Count == 0)
+            {
+                return;
+            }
+
             checkForSpecialProduce();
 
 
@@ -663,7 +699,17 @@ namespace CustomFarming
         public void startWorking()
         {
 
+            if (this.produce == null) { this.isWorking = true; return; }
+
             buildProduce();
+
+            this.minutesUntilReady = this.productionTime;
+            this.isWorking = true;
+
+            if (this.materials.Count == 0)
+            {
+                return;
+            }
 
 
             if (this.heldObject != null && this.lastDropIn != null)
@@ -678,8 +724,7 @@ namespace CustomFarming
 
             }
 
-            this.minutesUntilReady = this.productionTime;
-            this.isWorking = true;
+            
         }
       
         public override bool placementAction(GameLocation location, int x, int y, Farmer who = null)
@@ -696,9 +741,11 @@ namespace CustomFarming
 
             location.objects[index1] = placeObject;
 
+           
+
             if (this.materials.Count == 0)
             {
-                this.startWorking();
+                (placeObject as simpleMachine).startWorking();
             }
              
             

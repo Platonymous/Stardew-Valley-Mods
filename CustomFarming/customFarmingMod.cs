@@ -20,7 +20,6 @@ namespace CustomFarming
         public string customContentFolder;
         public List<string> customFiles = new List<string>();
         public List<Item> customItems = new List<Item>();
-        public List<CustomRecipe> recipes = new List<CustomRecipe>();
         public string key;
 
         public override void Entry(IModHelper helper)
@@ -43,6 +42,7 @@ namespace CustomFarming
 
         private void load()
         {
+            customFiles = new List<string>();
             ParseDir(customContentFolder);
             SaveHandler.loadFromFile("CustomFarmingMod");
             Monitor.Log("Loading: " + SaveHandler.saveString);
@@ -60,6 +60,16 @@ namespace CustomFarming
 
             }
 
+            if (key == "I")
+            {
+               
+            }
+
+            if (key == "O")
+            {
+              
+            }
+
             this.key = e.KeyPressed.ToString();
 
         }
@@ -68,18 +78,13 @@ namespace CustomFarming
         public void showMachineList()
         {
             buildMaschines();
-
+            Game1.activeClickableMenu = null;
             Game1.activeClickableMenu = new ItemGrabMenu(this.customItems);
-                return;
-            Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, 0, 0);
-            Game1.activeClickableMenu = (IClickableMenu)new CustomCraftingPage((int)centeringOnScreen.X, (int)centeringOnScreen.Y, 800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, recipes, true);
-
-
+ 
         }
 
         public void buildMaschines()
         {
-            recipes = new List<CustomRecipe>();
             customItems = new List<Item>();
 
             foreach (string file in customFiles)
@@ -92,14 +97,11 @@ namespace CustomFarming
                 
                 string filename = Path.GetFileName(file);
                 string modFolder = Path.GetDirectoryName(file);
-                string crafting = (string)loadJson.CraftingString;
                
                 Type T = Type.GetType(type);
 
                 ICustomFarmingObject newMachine = (ICustomFarmingObject)Activator.CreateInstance(T);
                 newMachine.build(modFolder, filename);
-
-                recipes.Add(new CustomRecipe(newMachine));
 
                 customItems.Add((Item)newMachine);
             }
