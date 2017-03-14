@@ -59,6 +59,8 @@ namespace CustomFarming
         public int displayItemY;
         public bool takeAll;
         double displayItemZoom;
+        int produceID;
+        int produceIndex;
 
         private bool inStorage;
         private GameLocation environment;
@@ -129,7 +131,12 @@ namespace CustomFarming
 
         public dynamic getAdditionalSaveData()
         {
-            dynamic additionalData = new { FileName = this.filename, ModFolder = this.modFolder };
+            int lastDropInPSI = 0;
+            if (this.lastDropIn != null)
+            {
+                lastDropInPSI = this.lastDropIn.parentSheetIndex;
+            }
+            dynamic additionalData = new { FileName = this.filename, ModFolder = this.modFolder, LastDropIn = lastDropInPSI, Ready = this.readyForHarvest, Minutes = this.minutesUntilReady, Working = this.isWorking };
             return additionalData;
         }
 
@@ -138,6 +145,29 @@ namespace CustomFarming
             string m = (string)additionalSaveData.ModFolder;
             string f = (string)additionalSaveData.FileName;
             this.build(m, f);
+            if (additionalSaveData.LastDropIn != null && additionalSaveData.Minutes != null && additionalSaveData.Working != null && additionalSaveData.Ready != null)
+            {
+                int lastDropInPSI = (int)additionalSaveData.LastDropIn;
+                if (lastDropInPSI != 0)
+                { 
+                this.lastDropIn = new StardewValley.Object(lastDropInPSI, this.requiredStack);
+                this.prefix = this.lastDropIn.name;
+                }
+
+                if ((bool)additionalSaveData.Working || (bool) additionalSaveData.Ready)
+                {
+                    startWorking();
+                }
+
+                this.minutesUntilReady = (int)additionalSaveData.Minutes - 480;
+                if (this.minutesUntilReady < 1)
+                {
+                    this.minutesUntilReady = 0;
+                }
+
+            }
+
+            
         }
 
         public void build(string modFolder, string filename)
@@ -212,8 +242,10 @@ namespace CustomFarming
             if (loadJson.Produce.Tilesheet != null && (string)loadJson.Produce.Tilesheet != "")
             {
                 string produceTilesheetFile = Path.Combine(modFolder, (string)loadJson.Produce.Tilesheet);
-         
-            this.produce = new customNamedObject((int)loadJson.Produce.ProduceID, Path.Combine(modFolder, (string)loadJson.Produce.Tilesheet), (int)loadJson.Produce.TileIndex, (int)loadJson.Produce.Stack, (string)loadJson.Produce.Name, (string)loadJson.Produce.Description, Microsoft.Xna.Framework.Color.White);
+                this.produceID = (int)loadJson.Produce.ProduceID;
+                this.produceIndex = (int)loadJson.Produce.TileIndex;
+
+                this.produce = new customNamedObject(this.produceID, Path.Combine(modFolder, (string)loadJson.Produce.Tilesheet), this.produceIndex, (int)loadJson.Produce.Stack, (string)loadJson.Produce.Name, (string)loadJson.Produce.Description, Microsoft.Xna.Framework.Color.White);
 
             this.produceName = (string)loadJson.Produce.Name;
             }
@@ -369,6 +401,7 @@ namespace CustomFarming
             }
 
             this.readyForHarvest = false;
+            this.lastDropIn = null;
             this.heldObject = null;
             this.isSpecial = false;
 
@@ -701,6 +734,19 @@ namespace CustomFarming
                     {
                         this.heldObject.Name = (string)p.Name;
                         this.specialPrefix = (bool)p.usePrefix;
+                        if (p.TileIndex != null)
+                        {
+                            (this.heldObject as customNamedObject).tilesheetindex = p.TileIndex;
+                            (this.heldObject as customNamedObject).rebuildSoureceRect();
+                        }
+
+                        if (p.ProduceID != null)
+                        {
+                            (this.heldObject as customNamedObject).parentSheetIndex = p.ProduceID;
+                            this.heldObject = new customNamedObject((this.heldObject as customNamedObject).parentSheetIndex, (this.heldObject as customNamedObject).tilesheetpath, (this.heldObject as customNamedObject).tilesheetindex, (this.heldObject as customNamedObject).Stack, (this.heldObject as customNamedObject).name, (this.heldObject as customNamedObject).description, (this.heldObject as customNamedObject).color);
+
+                        }
+
                         this.isSpecial = true;
                         break;
                     }

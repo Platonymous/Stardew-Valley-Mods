@@ -121,6 +121,13 @@ namespace CustomFarming
   
         }
 
+        public void rebuildSoureceRect()
+        {
+            this.tileSize = new Vector2(16, 16);
+            this.tilesheetWidth = (int)(tilesheet.Width / tileSize.X);
+            this.sourceRectangle = new Microsoft.Xna.Framework.Rectangle((this.tilesheetindex % tilesheetWidth) * (int)tileSize.X, (int)Math.Floor(this.tilesheetindex / this.tileSize.Y), (int)this.tileSize.X, (int)this.tileSize.Y);
+        }
+
         public void loadBaseObjectInformation()
         {
             string str;

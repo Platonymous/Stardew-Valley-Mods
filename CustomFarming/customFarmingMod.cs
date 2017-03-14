@@ -9,9 +9,6 @@ using StardewValley;
 using StardewValley.Menus;
 
 using Newtonsoft.Json.Linq;
-using System.Drawing;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace CustomFarming
 {
