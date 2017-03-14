@@ -17,6 +17,6 @@ SMAPI needs to be installed.
 # 3. Custom Farmimg
 Add Custom Objects via json file, currently only supports simple machines. 
 
-Download: [CustomFarming_0_4_5.zip](https://github.com/Platonymous/Stardew-Valley-Mods/raw/master/CustomFarming/Mod/CustomFarming_0_4_5.zip)
+Download: [CustomFarming_0_4_6.zip](https://github.com/Platonymous/Stardew-Valley-Mods/raw/master/CustomFarming/Mod/CustomFarming_0_4_6.zip)
 
 SMAPI needs to be installed. 

@@ -54,6 +54,11 @@ namespace CustomFarming
         public string filename;
         public bool useColor;
         public int mil;
+        public bool displayItem;
+        public int displayItemX;
+        public int displayItemY;
+        public bool takeAll;
+        double displayItemZoom;
 
         private bool inStorage;
         private GameLocation environment;
@@ -143,7 +148,8 @@ namespace CustomFarming
             this.filename = filename;
             string path = Path.Combine(modFolder, filename);
             this.loadJson = JObject.Parse(File.ReadAllText(path));
-
+            
+            this.takeAll = false;
             this.tileSize = new Vector2(16, 32);
             this.category = -8;
             this.mil = 0;
@@ -152,8 +158,23 @@ namespace CustomFarming
             this.animationFrame = 0;
             this.animationFrames = 1;
             this.animationSpeed = 300;
-            
-            this.isWorking = false;
+
+            this.displayItem = false;
+            this.displayItemX = 0;
+            this.displayItemY = 0;
+            this.displayItemZoom = 1.0;
+
+            if (loadJson.displayItem != null && loadJson.displayItemX != null && loadJson.displayItemY != null && loadJson.displayItemZoom != null)
+            {
+           
+                this.displayItem = (bool)loadJson.displayItem;
+                this.displayItemX = (int)loadJson.displayItemX;
+                this.displayItemY = (int)loadJson.displayItemY;
+                this.displayItemZoom = (double)loadJson.displayItemZoom;
+
+            }
+
+                this.isWorking = false;
             this.parentSheetIndex = -1;
             this.readyForHarvest = false;
             this.prefix = "";
@@ -211,12 +232,19 @@ namespace CustomFarming
 
             JArray loadMaterials = (JArray)loadJson.Materials;
             this.materials = new List<StardewValley.Object>();
+            
 
             if (loadMaterials.Count > 0)
             {
                 foreach (var material in loadMaterials)
                 {
                     int m = (int)material;
+
+                    if (m == -999)
+                    {
+                        this.takeAll = true;
+                    }
+
                     if (m > 0)
                     {
                         materials.Add(new StardewValley.Object(m, 1));
@@ -358,7 +386,7 @@ namespace CustomFarming
         public override bool checkForAction(Farmer who, bool justCheckingForActivity = false)
         {
 
-            if (this.name.Contains("arecrow") && this.produce == null)
+            if (this.description.Contains("arecrow") && this.produce == null)
             {
                 if (justCheckingForActivity) { return true; }
                 this.shakeTimer = 100;
@@ -411,13 +439,22 @@ namespace CustomFarming
             Microsoft.Xna.Framework.Rectangle destinationRectangle = new Microsoft.Xna.Framework.Rectangle((int)((double)local.X - (double)vector2.X / 2.0) + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((double)local.Y - (double)vector2.Y / 2.0) + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((double)Game1.tileSize + (double)vector2.X), (int)((double)(Game1.tileSize * 2) + (double)vector2.Y / 2.0));
 
             
-            spriteBatch.Draw(this.tilesheet, destinationRectangle, new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), Microsoft.Xna.Framework.Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)((double)Math.Max(0.0f, (float)((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + (double)x * 9.99999974737875E-06));
+            spriteBatch.Draw(this.tilesheet, destinationRectangle, new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), Microsoft.Xna.Framework.Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)((double)Math.Max(0.0f, (float)((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + (double) x * 9.99999974737875E-06));
+
+            if (this.displayItem && this.lastDropIn != null)
+            {
+            
+                Microsoft.Xna.Framework.Rectangle displayDestinationRectangle = new Microsoft.Xna.Framework.Rectangle((int)((double)local.X - (double)vector2.X / 2.0)+ this.displayItemX + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((double)local.Y - (double)vector2.Y / 2.0) + this.displayItemY + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)( this.displayItemZoom * ( (int)((double)Game1.tileSize + (double)vector2.X) )), (int) (this.displayItemZoom * ( (int)((double)(Game1.tileSize) + (double)vector2.Y / 2.0))));
+
+                spriteBatch.Draw(Game1.objectSpriteSheet, displayDestinationRectangle, new Microsoft.Xna.Framework.Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, this.lastDropIn.parentSheetIndex, 16, 16)), Microsoft.Xna.Framework.Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)((double)Math.Max(0.0f, (float)((y+1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + (double) (x+1) * 9.99999974737875E-06));
+
+            }
 
             if (this.readyForHarvest && this.heldObject != null) {
                     customNamedObject cno = (this.heldObject as customNamedObject);
                     float num = (float)(4.0 * Math.Round(Math.Sin(DateTime.Now.TimeOfDay.TotalMilliseconds / 250.0), 2));
                     spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize - 8), (float)(y * Game1.tileSize - Game1.tileSize * 3 / 2 - 16) + num)), new Microsoft.Xna.Framework.Rectangle?(new Microsoft.Xna.Framework.Rectangle(141, 465, 20, 24)), Microsoft.Xna.Framework.Color.White * 0.75f, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, (float)((double)((y + 1) * Game1.tileSize) / 10000.0 + 9.99999997475243E-07 + (double)this.tileLocation.X / 10000.0 + (this.parentSheetIndex == 105 ? 0.00150000001303852 : 0.0)));
-                    spriteBatch.Draw(cno.tilesheet, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize + Game1.tileSize / 2), (float)(y * Game1.tileSize - Game1.tileSize - Game1.tileSize / 8) + num)), new Microsoft.Xna.Framework.Rectangle?(cno.sourceRectangle), cno.color * 0.75f, 0.0f, new Vector2(8f, 8f), (float)Game1.pixelZoom, SpriteEffects.None, (float)((double)((y + 1) * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + (double)this.tileLocation.X / 10000.0 + (this.parentSheetIndex == 105 ? 0.00150000001303852 : 0.0)));
+                    spriteBatch.Draw(cno.tilesheet, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize + Game1.tileSize / 2), (float)(y * Game1.tileSize - Game1.tileSize - Game1.tileSize / 8) + num)), new Microsoft.Xna.Framework.Rectangle?(cno.sourceRectangle), cno.color * 0.75f, 0.0f, new Vector2(8f, 8f), (float)Game1.pixelZoom, SpriteEffects.None, (float)((double)((y + 1) * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + (double)this.tileLocation.X / 10000.0 + 0.0));
                 }
 
             SaveHandler.draw(this, new Vector2(x,y));
@@ -513,7 +550,7 @@ namespace CustomFarming
                 return false;
             }
             
-            if (dropIn == null || (dropIn != null & this.materials.FindIndex(x => x.parentSheetIndex == dropIn.parentSheetIndex) == -1))
+            if ((dropIn == null || (dropIn != null & this.materials.FindIndex(x => x.parentSheetIndex == dropIn.parentSheetIndex) == -1)) && !this.takeAll)
             {
                 return false;
             }
