@@ -61,12 +61,26 @@ namespace CustomFarming
                 ISaveObject next = loadObject(type, data);
                 next.Position = position;
                 next.InStorage = false;
+             
+                if (location.Contains("Barn") || location.Contains("Coop") || location.Contains("Shed") || location.Equals("House"))
+                {
+                    location = "Farm";
+                }
 
                 if (location == "Inventory")
                 {
                     next.InStorage = true;
                     next.Environment = Game1.getFarm();
                     Game1.player.items[index] = (Item) next;
+                    continue;
+                }
+
+                if (location == "Fridge")
+                {
+                    next.InStorage = true;
+                    next.Environment = Game1.getLocationFromName("FarmHouse");
+                    (Game1.getLocationFromName("FarmHouse") as FarmHouse).fridge.items[index] = (Item)next;
+            
                     continue;
                 }
 
@@ -90,6 +104,8 @@ namespace CustomFarming
                     (place.objects[position] as Chest).items[index] = (Item) next;
                     continue;
                 }
+
+               
 
                 place.objects[position] = (StardewValley.Object)next;
 
@@ -223,7 +239,7 @@ namespace CustomFarming
 
         private static int getBuilding(ISaveObject obj)
         {
-            if (obj.Environment.GetType().GetMethod("getBuilding") == null) { return -1; }
+            if (!obj.Environment.isStructure) { return -1; }
             return Game1.getFarm().buildings.FindIndex(x => x.indoors == obj.Environment);
         }
 
@@ -243,6 +259,13 @@ namespace CustomFarming
             return new Vector3(-1); ;
         }
 
+        private static int inFridge(ISaveObject obj)
+        {
+            if (!obj.InStorage) { return -1; }
+            
+            return (Game1.getLocationFromName("FarmHouse") as FarmHouse).fridge.items.FindIndex(x => x == obj);
+        }
+
         private static int inInventory(ISaveObject obj)
         {
             if (!obj.InStorage) { return -1; }
@@ -254,6 +277,7 @@ namespace CustomFarming
         private static dynamic getPlacementSaveData(ISaveObject obj)
         {
             int pIndex = inInventory(obj);
+            int fIndex = inFridge(obj);
             string eName = obj.Environment.name;
             Vector2 oPosition = obj.Position;
 
@@ -261,7 +285,15 @@ namespace CustomFarming
             {
                 eName = "Inventory";
             }
-            else
+            
+            if (fIndex >= 0)
+            {
+                pIndex = fIndex;
+                eName = "Fridge";
+            }
+
+            
+            if (pIndex < 0)
             {
                 Vector3 chest = inChest(obj);
                 pIndex = (int) chest.X;
@@ -271,7 +303,14 @@ namespace CustomFarming
                 }
             }
 
-            dynamic placement = new { position = oPosition, building = getBuilding(obj),  location = eName, index = pIndex };
+            int buildingIndex = getBuilding(obj);
+
+            if (buildingIndex != -1)
+            {
+                eName = "Farm";
+            }
+
+            dynamic placement = new { position = oPosition, building = buildingIndex,  location = eName, index = pIndex };
             return placement;
         }
 
@@ -289,7 +328,12 @@ namespace CustomFarming
             if (loaction == "Inventory" && Game1.player.items[index] == obj)
             {
                 Game1.player.items[index] = obj.getReplacement();
-            }else if (index >= 0 && obj.Environment.objects.ContainsKey(oPosition) && obj.Environment.objects[oPosition] is Chest && (obj.Environment.objects[oPosition] as Chest).items[index] == obj)
+            }
+            else if (loaction == "Fridge" && (Game1.getLocationFromName("FarmHouse") as FarmHouse).fridge.items[index] == obj)
+            {
+                (Game1.getLocationFromName("FarmHouse") as FarmHouse).fridge.items[index] = obj.getReplacement();
+            }
+            else if (index >= 0 && obj.Environment.objects.ContainsKey(oPosition) && obj.Environment.objects[oPosition] is Chest && (obj.Environment.objects[oPosition] as Chest).items[index] == obj)
             {
                 (obj.Environment.objects[oPosition] as Chest).items[index] = obj.getReplacement();
             } else if (obj.Environment.objects.ContainsKey(oPosition) && obj.Environment.objects[oPosition] == obj)

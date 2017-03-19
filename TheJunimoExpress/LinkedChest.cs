@@ -211,7 +211,7 @@ namespace TheJunimoExpress
             
         }
 
-        public override bool placementAction(GameLocation l, int x, int y, Farmer who = null)
+        public override bool placementAction(GameLocation l, int x, int y, StardewValley.Farmer who = null)
         {
             Vector2 index1 = new Vector2((float)(x / Game1.tileSize), (float)(y / Game1.tileSize));
             this.tileLocation = index1;

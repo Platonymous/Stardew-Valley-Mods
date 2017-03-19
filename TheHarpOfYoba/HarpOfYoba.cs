@@ -33,8 +33,10 @@ namespace TheHarpOfYoba
 
         public static bool owned = false;
 
+
+
         public HarpOfYoba(Texture2D ht, Texture2D ht2)
-          : base("Harp of Yoba", 0, -1, -1, "Add Sheet Music to play.", false, 1)
+          : base("Harp of Yoba", 0, -1, -1, false, 1)
         {
             this.harpTex = ht;
             this.harpTex2 = ht2;
@@ -130,7 +132,7 @@ namespace TheHarpOfYoba
         }
 
 
-        public override void tickUpdate(GameTime time, Farmer who)
+        public override void tickUpdate(GameTime time, StardewValley.Farmer who)
         {
 
 
@@ -197,7 +199,7 @@ namespace TheHarpOfYoba
 
         }
 
-        public override void DoFunction(GameLocation location, int x, int y, int power, Farmer who)
+        public override void DoFunction(GameLocation location, int x, int y, int power, StardewValley.Farmer who)
         {
             Game1.player.canMove = true;
             if (this.sheet != (SheetMusic)null && this.charger && !isPlaying && this.sheet.music != "none")
@@ -283,6 +285,16 @@ namespace TheHarpOfYoba
                      
             this.sheet.harpEvents.beforePlaying(playedBefore, this);
             
+        }
+
+        protected override string loadDisplayName()
+        {
+            return "Harp of Yoba";
+        }
+
+        protected override string loadDescription()
+        {
+            return "Add Sheet Music to play.";
         }
     }
 }

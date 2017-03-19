@@ -87,7 +87,7 @@ namespace TheHarpOfYoba
             spriteBatch.Draw(this.sheetTex, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize * 0.75 + 8)), new Microsoft.Xna.Framework.Rectangle?(this.textureBounds), Microsoft.Xna.Framework.Color.White * transparency, 0f, new Vector2(8f, 16f), 0.8f * (float)Game1.pixelZoom * (((double)scaleSize < 0.2) ? scaleSize : (scaleSize)), SpriteEffects.None, layerDepth);
         }
 
-        public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, Farmer f)
+        public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, StardewValley.Farmer f)
         {
             spriteBatch.Draw(this.sheetTex, objectPosition, this.textureBounds, Microsoft.Xna.Framework.Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, Math.Max(0f, (float)(f.getStandingY() + 2) / 10000f));
         }

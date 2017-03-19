@@ -5,16 +5,18 @@ using System.Collections.Generic;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 
+
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.Locations;
-using StardewValley.Buildings;
+
 
 using Microsoft.Xna.Framework;
 
-using TheHarpOfYoba.Menus;
+
 using System.Text.RegularExpressions;
+
 
 namespace TheHarpOfYoba
 {
@@ -45,6 +47,11 @@ namespace TheHarpOfYoba
         private static int numSheets = 6;
         private static List<SheetMusic> sheetList = new List<SheetMusic>(numSheets);
 
+        public string currentSwitch;
+        public string currentMail;
+        public bool hasSwitched;
+        public List<Item> items = new List<Item>();
+
 
         public override void Entry(IModHelper helper)
         {
@@ -56,14 +63,138 @@ namespace TheHarpOfYoba
             this.once = true;
 
 
-            //ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+        
             TimeEvents.TimeOfDayChanged += TimeEvents_TimeOfDayChanged;
-            GameEvents.EighthUpdateTick += updateForMail;
+
             GameEvents.OneSecondTick += updateProcess;
             SaveEvents.BeforeSave += SaveEvents_BeforeSave;
             SaveEvents.AfterSave += SaveEvents_AfterSave;
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
+            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
 
+        }
+
+        public void receiveItems(object sender, EventArgsClickableMenuClosed e)
+        {
+            
+            MenuEvents.MenuClosed -= receiveItems;
+            hasSwitched = false;
+            Game1.activeClickableMenu = new ItemGrabMenu(items);
+        }
+
+        public void switchMail(string cMail,string letter)
+        {
+        
+            if (Game1.mailbox.Count > 0)
+            {
+                currentMail = Game1.mailbox.Peek();
+            }
+            if (hasSwitched)
+            {
+                return;
+            }
+
+            hasSwitched = true;
+            Game1.activeClickableMenu = (IClickableMenu)new LetterViewerMenu(letter, cMail);
+
+        }
+
+
+        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        {
+
+            if (Game1.activeClickableMenu is LetterViewerMenu && readyLetter)
+            {
+                if (!this.showLetter && !Game1.mailbox.Contains("robinWell") && currentMail == "robinWell" && !hasSwitched)
+                {
+
+                    items = new List<Item>();
+
+                    if (next_letter == 0)
+                    {
+                        
+                        items.Add(this.newHarp);
+                        items.Add(this.sheetMusic6);
+                        hasSwitched = true;
+                        Game1.activeClickableMenu = new LetterViewerMenu(dataLoader.getLetter(0), "Harp of Yoba and Birthday Song");
+                     
+
+                    }
+
+                    if (next_letter == 10)
+                    {
+                        items.Add(this.newHarp);
+                        hasSwitched = true;
+                        Game1.activeClickableMenu = new LetterViewerMenu(dataLoader.getLetter(0), "Harp of Yoba");
+               
+                    }
+
+                    if (next_letter == 11)
+                    {
+                        items.Add(this.sheetMusic6);
+                        hasSwitched = true;
+                        Game1.activeClickableMenu = new LetterViewerMenu(dataLoader.getLetter(0), "Birthday Song");
+                   
+                    }
+
+                    if (next_letter == 1)
+                    {
+                        items.Add(this.sheetMusic5);
+                        hasSwitched = true;
+                        Game1.activeClickableMenu = new LetterViewerMenu(dataLoader.getLetter(1), "Monster Song");
+                  
+
+                    }
+
+                    if (next_letter == 2)
+                    {
+                        items.Add(this.sheetMusic4);
+                        hasSwitched = true;
+                        Game1.activeClickableMenu = new LetterViewerMenu(dataLoader.getLetter(2), "Wedding Song");
+                  
+
+                    }
+
+                    if (next_letter == 3)
+                    {
+                        items.Add(this.sheetMusic3);
+                        hasSwitched = true;
+                        Game1.activeClickableMenu = new LetterViewerMenu(dataLoader.getLetter(3), "Rain Song");
+                    
+
+                    }
+
+                    if (next_letter == 4)
+                    {
+                        items.Add(this.sheetMusic2);
+                        hasSwitched = true;
+                        Game1.activeClickableMenu = new LetterViewerMenu(dataLoader.getLetter(4), "Wanderer Song");
+                  
+                    }
+
+                    if (next_letter == 5)
+                    {
+                        items.Add(this.sheetMusic1);
+                        hasSwitched = true;
+                        Game1.activeClickableMenu = new LetterViewerMenu(dataLoader.getLetter(5), "Fisher Song");
+                        
+                    }
+                    MenuEvents.MenuClosed += receiveItems;
+                    this.showLetter = true;
+                    this.readyLetter = false;
+                }
+                if (Game1.mailbox.Count >= 1)
+                {
+                    currentMail = Game1.mailbox.Peek();
+                }else
+                {
+                    currentMail = "";
+                }
+            }
+            else
+            {
+                this.showLetter = false;
+            }
         }
 
         private void SaveEvents_AfterSave(object sender, EventArgs e)
@@ -92,7 +223,6 @@ namespace TheHarpOfYoba
         {
             loadObjects();
             checkProcess();
-            //dataLoader.saveSavStringToFile(this.RemoveAndSave(), Game1.uniqueIDForThisGame, Game1.player.name);
            this.Monitor.Log("Saving: " + dataLoader.saveSavStringToFile(this.RemoveAndSave(), Game1.uniqueIDForThisGame, Game1.player.name));
 
 
@@ -373,46 +503,55 @@ namespace TheHarpOfYoba
         {
             if (e.KeyPressed.ToString() == "P")
             {
-                this.Monitor.Log(this.RemoveAndSave());
-            }
+               
+            }   
 
             if (e.KeyPressed.ToString() == "O")
             {
-               LoadAndReplace(savstring);
+            
+                
             }
 
             if (e.KeyPressed.ToString() == "L")
             {
-                this.Monitor.Log("Send Letters");
-                sendLetters();
+            
 
             }
 
             if (e.KeyPressed.ToString() == "R")
             {
-                processIndicators[5] = true;
-                Game1.isRaining = true;
-                this.Monitor.Log("Start Rain");
-
+    
             }
 
             if (e.KeyPressed.ToString() == "I")
             {
-                this.newHarp.charger = true;
-                for (int i = 0; i < processIndicators.Length; i++) { 
-                this.Monitor.Log($"Indicator {i} : {processIndicators[i].ToString()}");
-                }
-
+      
             }
 
         }
- 
+
+      
+
+
         private void TimeEvents_TimeOfDayChanged(object sender, EventArgsIntChanged e)
         {
             if (e.PriorInt == 600 || e.PriorInt == 1200 || e.PriorInt == 1800)
             {
+                if (Game1.activeClickableMenu is LetterViewerMenu)
+                {
+                    return;
+                }
 
                 sendLetters();
+                if (Game1.mailbox.Count >= 1)
+                {
+                    currentMail = Game1.mailbox.Peek();
+                    hasSwitched = false;
+                }
+                else
+                {
+                    currentMail = "";
+                }
 
             }
         }
@@ -466,89 +605,7 @@ namespace TheHarpOfYoba
 
         }
 
-        private void updateForMail(object sender, EventArgs e)
-        {
         
-            if (Game1.activeClickableMenu is LetterViewerMenu && readyLetter)
-            {
-
-
-                if (!this.showLetter && !Game1.mailbox.Contains("robinWell"))
-                {
-
-
-
-                    if (next_letter == 0)
-                    {
-                        List<Item> items = new List<Item>();
-                        items.Add(this.newHarp);
-                        items.Add(this.sheetMusic6);
-                        Game1.activeClickableMenu = new CustomLetterMenu(dataLoader.getLetter(0), "Harp of Yoba and Birthday Song", items);
-
-                    }
-
-                    if (next_letter == 10)
-                    {
-                       
-                        Game1.activeClickableMenu = new CustomLetterMenu(dataLoader.getLetter(0), "Harp of Yoba", this.newHarp);
-
-                    }
-
-                    if (next_letter == 11)
-                    {
-                        Game1.activeClickableMenu = new CustomLetterMenu(dataLoader.getLetter(0), "Birthday Song", this.sheetMusic6);
-
-                    }
-
-                    if (next_letter == 1)
-                    {
-
-                        Game1.activeClickableMenu = new CustomLetterMenu(dataLoader.getLetter(1), "Monster Song", this.sheetMusic5);
-
-
-                    }
-
-                    if (next_letter == 2)
-                    {
-
-                        Game1.activeClickableMenu = new CustomLetterMenu(dataLoader.getLetter(2), "Wedding Song", this.sheetMusic4);
-
-
-                    }
-
-                    if (next_letter == 3)
-                    {
-
-                        Game1.activeClickableMenu = new CustomLetterMenu(dataLoader.getLetter(3), "Rain Song", this.sheetMusic3);
-
-
-                    }
-
-                    if (next_letter == 4)
-                    {
-
-                        Game1.activeClickableMenu = new CustomLetterMenu(dataLoader.getLetter(4), "Wanderer Song", this.sheetMusic2);
-
-                    }
-
-                    if (next_letter == 5)
-                    {
-
-                        Game1.activeClickableMenu = new CustomLetterMenu(dataLoader.getLetter(5), "Fisher Song", this.sheetMusic1);
-
-                    }
-
-                    this.showLetter = true;
-                    this.readyLetter = false;
-                }
-            }
-            else
-            {
-                this.showLetter = false;
-            }
-
-        }
-
 
         private void sendLetters()
         {

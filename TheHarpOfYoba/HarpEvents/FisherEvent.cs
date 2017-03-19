@@ -66,14 +66,14 @@ namespace TheHarpOfYoba
 
         public override void whilePlaying()
         {
-            if (!played_before) { 
-            LuckFisher = new Buff(0, 5, 0, 0, 5000, 0, 0, 0, 0, 0, -3, 0, 2, "");
+            if (!played_before) {
+                LuckFisher = new Buff(0, 5, 0, 0, 5000, 0, 0, 0, 0, 0, -3, 0, 2, "", "");
             LuckFisher.description = "The Fisher King";
             LuckFisher.millisecondsDuration = 65000 + Game1.random.Next(60000);
             }
             else
             {
-            LuckFisher = new Buff(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, "");
+            LuckFisher = new Buff(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, "", "");
             LuckFisher.description = "This Fisherman";
             LuckFisher.millisecondsDuration = 35000 + Game1.random.Next(30000);
             }

@@ -6,13 +6,12 @@ using System.Collections.Generic;
 using StardewValley;
 using StardewValley.Tools;
 using StardewValley.Objects;
+using StardewValley.Menus;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using Newtonsoft.Json.Linq;
-
-
 
 namespace CustomFarming
 {
@@ -51,6 +50,7 @@ namespace CustomFarming
         public JArray specialProduce;
         public bool isSpecial;
         public bool specialPrefix;
+        public bool specialSuffix;
         public string filename;
         public bool useColor;
         public int mil;
@@ -58,9 +58,18 @@ namespace CustomFarming
         public int displayItemX;
         public int displayItemY;
         public bool takeAll;
-        double displayItemZoom;
-        int produceID;
-        int produceIndex;
+        public bool useSuffix;
+        public string suffix;
+        public double displayItemZoom;
+        public int produceID;
+        public int produceIndex;
+        public int tileWidth;
+        public int tileHeight;
+        public int menuTileIndex;
+        public int produceQuality;
+        public int readyTile;
+        public string crafting;
+        public int craftingid;
 
         private bool inStorage;
         private GameLocation environment;
@@ -122,6 +131,19 @@ namespace CustomFarming
 
         }
 
+        public new string Name
+        {
+            get
+            {
+                return base.Name;
+            }
+
+            set
+            {
+                this.name = value;
+            }
+        }
+
         public StardewValley.Object getReplacement()
         {
             StardewValley.Object replacement = new Chest(true);
@@ -132,11 +154,13 @@ namespace CustomFarming
         public dynamic getAdditionalSaveData()
         {
             int lastDropInPSI = 0;
+            int lastDropInQ = 0;
             if (this.lastDropIn != null)
             {
                 lastDropInPSI = this.lastDropIn.parentSheetIndex;
+                lastDropInQ = this.lastDropIn.quality;
             }
-            dynamic additionalData = new { FileName = this.filename, ModFolder = this.modFolder, LastDropIn = lastDropInPSI, Ready = this.readyForHarvest, Minutes = this.minutesUntilReady, Working = this.isWorking };
+            dynamic additionalData = new { FileName = this.filename, ModFolder = this.modFolder, LastDropIn = lastDropInPSI, LastDropInQuality = lastDropInQ, Ready = this.readyForHarvest, Minutes = this.minutesUntilReady, Working = this.isWorking };
             return additionalData;
         }
 
@@ -147,12 +171,25 @@ namespace CustomFarming
             this.build(m, f);
             if (additionalSaveData.LastDropIn != null && additionalSaveData.Minutes != null && additionalSaveData.Working != null && additionalSaveData.Ready != null)
             {
-                int lastDropInPSI = (int)additionalSaveData.LastDropIn;
-                if (lastDropInPSI != 0)
-                { 
-                this.lastDropIn = new StardewValley.Object(lastDropInPSI, this.requiredStack);
-                this.prefix = this.lastDropIn.name;
+
+                if (additionalSaveData.LastDropIn != null)
+                {
+                    int lastDropInPSI = (int)additionalSaveData.LastDropIn;
+                    if (lastDropInPSI != 0)
+                    {
+                        this.lastDropIn = new StardewValley.Object(lastDropInPSI, this.requiredStack);
+                        this.prefix = this.lastDropIn.name;
+                        this.suffix = this.lastDropIn.name;
+                    }
+
+                    if (additionalSaveData.LastDropInQuality != null && this.lastDropIn != null)
+                    {
+                        this.lastDropIn.quality = (int)additionalSaveData.LastDropInQuality;
+                    }
                 }
+                
+
+                
 
                 if ((bool)additionalSaveData.Working || (bool) additionalSaveData.Ready)
                 {
@@ -178,7 +215,6 @@ namespace CustomFarming
             this.filename = filename;
             string path = Path.Combine(modFolder, filename);
             this.loadJson = JObject.Parse(File.ReadAllText(path));
-            
             this.takeAll = false;
             this.tileSize = new Vector2(16, 32);
             this.category = -8;
@@ -189,12 +225,28 @@ namespace CustomFarming
             this.animationFrames = 1;
             this.animationSpeed = 300;
 
+            this.crafting = "388 30";
+
+            if (loadJson.Crafting != null)
+            {
+                this.crafting = (string)loadJson.Crafting;
+            }
+
+            if(loadJson.AnimationSpeed != null)
+            {
+                this.animationSpeed = (100 - (int)loadJson.AnimationSpeed) * 10;
+                if (this.animationSpeed <= 0)
+                {
+                    this.animationSpeed = 1;
+                }
+            }
+
             this.displayItem = false;
             this.displayItemX = 0;
             this.displayItemY = 0;
             this.displayItemZoom = 1.0;
 
-            if (loadJson.displayItem != null && loadJson.displayItemX != null && loadJson.displayItemY != null && loadJson.displayItemZoom != null)
+                if (loadJson.displayItem != null && loadJson.displayItemX != null && loadJson.displayItemY != null && loadJson.displayItemZoom != null)
             {
            
                 this.displayItem = (bool)loadJson.displayItem;
@@ -208,6 +260,7 @@ namespace CustomFarming
             this.parentSheetIndex = -1;
             this.readyForHarvest = false;
             this.prefix = "";
+            this.suffix = "";
             this.type = "Crafting";
             this.isSpecial = false;
 
@@ -215,7 +268,17 @@ namespace CustomFarming
             Image tilesheetImage = Image.FromFile(tilesheetFile);
             this.tilesheet = Bitmap2Texture(new Bitmap(tilesheetImage));
 
-            this.tilesheetWidth = (int)(tilesheet.Width / tileSize.X);
+            this.tileWidth = 16;
+            
+
+            if (loadJson.TileWidth != null)
+            {
+                this.tileWidth = (int)loadJson.TileWidth;
+            }
+
+            this.tileHeight = tileWidth * 2;
+
+            this.tilesheetWidth = (int)(tilesheet.Width / tileWidth);
 
             this.boundingBox = new Microsoft.Xna.Framework.Rectangle((int)tileLocation.X * Game1.tileSize, (int)tileLocation.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize);
             this.workAnimationFrames = 0;
@@ -230,15 +293,31 @@ namespace CustomFarming
             this.animateWork = (this.workAnimationFrames > 1) ? true : false;
 
             this.tilesheetindex = (int)loadJson.TileIndex;
-            this.tileindex = tilesheetindex;
+            this.tileindex = this.tilesheetindex;
+            this.readyTile = this.tileindex;
+            this.menuTileIndex = this.tileindex;
 
-            this.sourceRectangle = new Microsoft.Xna.Framework.Rectangle((this.tileindex % tilesheetWidth) * (int)tileSize.X, (int)Math.Floor(this.tilesheetindex / this.tileSize.Y), (int)this.tileSize.X, (int)this.tileSize.Y);
+
+
+            if (loadJson.MenuTileIndex != null)
+            {
+
+                this.menuTileIndex = (int)loadJson.MenuTileIndex;
+            }
+
+            if (loadJson.ReadyTileIndex != null)
+            {
+
+                this.readyTile = (int)loadJson.ReadyTileIndex;
+            }
+
 
             this.name = (string)loadJson.Name;
             this.categoryName = (string)loadJson.CategoryName;
 
             this.description = (string)loadJson.Description;
-           
+            this.produceQuality = 0;
+
             if (loadJson.Produce.Tilesheet != null && (string)loadJson.Produce.Tilesheet != "")
             {
                 string produceTilesheetFile = Path.Combine(modFolder, (string)loadJson.Produce.Tilesheet);
@@ -247,62 +326,112 @@ namespace CustomFarming
 
                 this.produce = new customNamedObject(this.produceID, Path.Combine(modFolder, (string)loadJson.Produce.Tilesheet), this.produceIndex, (int)loadJson.Produce.Stack, (string)loadJson.Produce.Name, (string)loadJson.Produce.Description, Microsoft.Xna.Framework.Color.White);
 
-            this.produceName = (string)loadJson.Produce.Name;
+                if (loadJson.Produce.Quality != null)
+                {
+                    this.produceQuality = (int)loadJson.Produce.Quality;
+                }
+
+                (this.produce as StardewValley.Object).quality = this.produceQuality;
+
+                    this.produceName = (string)loadJson.Produce.Name;
             }
 
-            this.usePrefix = (bool)loadJson.Produce.usePrefix;
+            this.usePrefix = false;
 
-            this.useColor = (bool)loadJson.Produce.useColor;
+            if (loadJson.Produce.usePrefix != null)
+            {
+                this.usePrefix = (bool)loadJson.Produce.usePrefix;
+            }
 
-            this.productionTime = (int)loadJson.Produce.ProductionTime;
-            this.requiredStack = (int)loadJson.RequieredStack;
+
+
+            this.useSuffix = false;
+
+            if (loadJson.Produce.useSuffix != null) { 
+            this.useSuffix = (bool)loadJson.Produce.useSuffix;
+            }
+
+            this.useColor = false;
+
+            if (loadJson.Produce.useColor != null)
+            {
+                this.useColor = (bool)loadJson.Produce.useColor;
+            }
+
+            this.productionTime = 0;
+
+            if (loadJson.Produce.ProductionTime != null)
+            {
+                this.productionTime = (int)loadJson.Produce.ProductionTime;
+            }
+
+            this.requiredStack = 0;
+            if (loadJson.RequieredStack != null)
+            {
+                this.requiredStack = (int)loadJson.RequieredStack;
+            }
+            
 
             this.specialProduce = (JArray)loadJson.SpecialProduce;
 
+
+            this.starterMaterial = 0;
+            this.starterMaterialStack = 0;
+
+            if(loadJson.StarterMaterial != null && loadJson.StarterMaterialStack != null) { 
             this.starterMaterial = (int)loadJson.StarterMaterial;
             this.starterMaterialStack = (int)loadJson.StarterMaterialStack;
+            }
 
-            JArray loadMaterials = (JArray)loadJson.Materials;
-            this.materials = new List<StardewValley.Object>();
+            updateSourceRectangle();
+
             
 
-            if (loadMaterials.Count > 0)
+            this.materials = new List<StardewValley.Object>();
+
+            if (loadJson.Materials != null)
             {
-                foreach (var material in loadMaterials)
+                JArray loadMaterials = (JArray)loadJson.Materials;
+
+                if (loadMaterials.Count > 0)
                 {
-                    int m = (int)material;
+                    foreach (var material in loadMaterials)
+                    {
+                        int m = (int)material;
 
-                    if (m == -999)
-                    {
-                        this.takeAll = true;
-                    }
-
-                    if (m > 0)
-                    {
-                        materials.Add(new StardewValley.Object(m, 1));
-                    }
-                    else
-                    {
-                        foreach (int keyI in Game1.objectInformation.Keys)
+                        if (m == -999)
                         {
+                            this.takeAll = true;
+                        }
 
-                            string[] splitData = Game1.objectInformation[keyI].Split('/');
-
-                            string[] splitCategory = splitData[3].Split(' ');
-                            if (splitCategory.Length > 1)
+                        if (m > 0)
+                        {
+                            materials.Add(new StardewValley.Object(m, 1));
+                        }
+                        else
+                        {
+                            foreach (int keyI in Game1.objectInformation.Keys)
                             {
-                                int categoryInt = 0;
-                                int.TryParse(splitCategory[1], out categoryInt);
 
-                                if (categoryInt == m)
+                                string[] splitData = Game1.objectInformation[keyI].Split('/');
+
+                                string[] splitCategory = splitData[3].Split(' ');
+                                if (splitCategory.Length > 1)
                                 {
-                                    materials.Add(new StardewValley.Object(keyI, 1));
+                                    int categoryInt = 0;
+                                    int.TryParse(splitCategory[1], out categoryInt);
+
+                                    if (categoryInt == m)
+                                    {
+                                        materials.Add(new StardewValley.Object(keyI, 1));
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+            
         }
 
         public simpleMachine()
@@ -345,9 +474,11 @@ namespace CustomFarming
 
         public override bool canBePlacedHere(GameLocation l, Vector2 tile)
         {
-            if(l.isFarm && !l.objects.ContainsKey(tile))
+            if(!l.objects.ContainsKey(tile))
             {
-                return true;
+            
+                return !l.isTileOccupiedForPlacement(tile, this);
+                
             }
             else
             {
@@ -392,7 +523,7 @@ namespace CustomFarming
         }
         
 
-        public bool deliverProduce(Farmer who)
+        public bool deliverProduce(StardewValley.Farmer who)
         {
             if (who.IsMainPlayer && !who.addItemToInventoryBool((Item)this.heldObject, false))
             {
@@ -416,7 +547,7 @@ namespace CustomFarming
         }
 
 
-        public override bool checkForAction(Farmer who, bool justCheckingForActivity = false)
+        public override bool checkForAction(StardewValley.Farmer who, bool justCheckingForActivity = false)
         {
 
             if (this.description.Contains("arecrow") && this.produce == null)
@@ -471,10 +602,16 @@ namespace CustomFarming
             Vector2 local = Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize), (float)(y * Game1.tileSize - Game1.tileSize)));
             Microsoft.Xna.Framework.Rectangle destinationRectangle = new Microsoft.Xna.Framework.Rectangle((int)((double)local.X - (double)vector2.X / 2.0) + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((double)local.Y - (double)vector2.Y / 2.0) + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((double)Game1.tileSize + (double)vector2.X), (int)((double)(Game1.tileSize * 2) + (double)vector2.Y / 2.0));
 
+            if (this.readyForHarvest)
+            {
+                this.tileindex = this.readyTile;
+                updateSourceRectangle();
+            }
+
             
             spriteBatch.Draw(this.tilesheet, destinationRectangle, new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), Microsoft.Xna.Framework.Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)((double)Math.Max(0.0f, (float)((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + (double) x * 9.99999974737875E-06));
 
-            if (this.displayItem && this.lastDropIn != null)
+            if (this.displayItem && this.lastDropIn != null && !this.readyForHarvest)
             {
             
                 Microsoft.Xna.Framework.Rectangle displayDestinationRectangle = new Microsoft.Xna.Framework.Rectangle((int)((double)local.X - (double)vector2.X / 2.0)+ this.displayItemX + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((double)local.Y - (double)vector2.Y / 2.0) + this.displayItemY + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)( this.displayItemZoom * ( (int)((double)Game1.tileSize + (double)vector2.X) )), (int) (this.displayItemZoom * ( (int)((double)(Game1.tileSize) + (double)vector2.Y / 2.0))));
@@ -503,12 +640,14 @@ namespace CustomFarming
         
         public override void drawInMenu(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
         {
-            spriteBatch.Draw(this.tilesheet, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), Microsoft.Xna.Framework.Color.White * transparency, 0.0f, new Vector2(tileSize.X/2, tileSize.Y/2), (float)Game1.pixelZoom * ((double)scaleSize < 0.2 ? scaleSize : scaleSize / 2.00f), SpriteEffects.None, layerDepth);
+            this.tileindex = this.menuTileIndex;
+            updateSourceRectangle();
+            spriteBatch.Draw(this.tilesheet, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), Microsoft.Xna.Framework.Color.White * transparency, 0.0f, new Vector2(this.tileWidth/2, this.tileWidth), (float)Game1.pixelZoom * ((double)scaleSize < 0.2 ? scaleSize : scaleSize / 2.00f), SpriteEffects.None, layerDepth);
             SaveHandler.drawInMenu(this);
         }
 
 
-        public override void drawWhenHeld(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, Vector2 objectPosition, Farmer f)
+        public override void drawWhenHeld(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, Vector2 objectPosition, StardewValley.Farmer f)
         {
             spriteBatch.Draw(this.tilesheet, objectPosition, new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), Microsoft.Xna.Framework.Color.White, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 2) / 10000f));
         }
@@ -528,12 +667,14 @@ namespace CustomFarming
 
         public override string getDescription()
         {
-
-            return this.description;
+            string text = this.description;
+            SpriteFont smallFont = Game1.smallFont;
+            int width = Game1.tileSize * 4 + Game1.tileSize / 4;
+            return Game1.parseText(text, smallFont, width);
 
         }
 
-        public override bool isActionable(Farmer who)
+        public override bool isActionable(StardewValley.Farmer who)
         {
             return this.checkForAction(who, true);
         }
@@ -564,7 +705,7 @@ namespace CustomFarming
                 return false;
         }
        
-        public override bool performDropDownAction(Farmer who)
+        public override bool performDropDownAction(StardewValley.Farmer who)
         {
           if(this.materials.Count == 0)
             {
@@ -575,7 +716,7 @@ namespace CustomFarming
         }
 
 
-        public override bool performObjectDropInAction(StardewValley.Object dropIn, bool probe, Farmer who)
+        public override bool performObjectDropInAction(StardewValley.Object dropIn, bool probe, StardewValley.Farmer who)
         {
 
             if (dropIn != null && dropIn.bigCraftable || this.heldObject != null)
@@ -621,7 +762,8 @@ namespace CustomFarming
             {
                 this.lastDropIn = dropIn;
                 this.prefix = dropIn.name;
-              
+                this.suffix = dropIn.name;
+
 
                 if (this.starterMaterial != 0 && dropIn.parentSheetIndex == this.starterMaterial)
                 {
@@ -696,23 +838,22 @@ namespace CustomFarming
             {
                 return false;
             }
-          
-            if (this.heldObject != null)
-            {
-                return false;
-            }
 
-            if (this.heldObject == null)
-            {
-                Game1.playSound("hammer");
-                Game1.currentLocation.objects.Remove(this.tileLocation);
-                Game1.createItemDebris(this, this.tileLocation * (float)Game1.tileSize, -1, (GameLocation)null);
-                return false;
-            }
-                
+            this.tileindex = this.menuTileIndex;
+          
+            this.isWorking = false;
+            this.lastDropIn = (StardewValley.Object)null;
             this.heldObject = (StardewValley.Object)null;
             this.readyForHarvest = false;
             this.minutesUntilReady = -1;
+
+
+            Game1.playSound("hammer");
+            Game1.currentLocation.objects.Remove(this.tileLocation);
+            Game1.createItemDebris(this, this.tileLocation * (float)Game1.tileSize, -1, (GameLocation)null);
+
+
+            
             return false;
 
         }
@@ -732,8 +873,25 @@ namespace CustomFarming
                     int m = (int)p.Material;
                     if (this.lastDropIn.parentSheetIndex == m || this.lastDropIn.category == m)
                     {
-                        this.heldObject.Name = (string)p.Name;
+                        if (p.MaterialQuality != null && this.lastDropIn.quality != (int) p.MaterialQuality)
+                        {
+                            continue;
+                        }
+
+                        if (p.Name != null)
+                        {
+                            (this.heldObject as customNamedObject).Name = (string)p.Name;
+                        }
+
+                        if (p.usePrefix != null) { 
                         this.specialPrefix = (bool)p.usePrefix;
+                        }
+
+                        if (p.useSuffix != null)
+                        {
+                            this.specialSuffix = (bool)p.useSuffix;
+                        }
+
                         if (p.TileIndex != null)
                         {
                             (this.heldObject as customNamedObject).tilesheetindex = p.TileIndex;
@@ -747,8 +905,13 @@ namespace CustomFarming
 
                         }
 
+                        if (p.Quality != null)
+                        {
+                            (this.heldObject as StardewValley.Object).quality = (int)p.Quality;
+                        }
+
                         this.isSpecial = true;
-                        break;
+                      
                     }
 
                 }
@@ -763,7 +926,8 @@ namespace CustomFarming
 
             this.heldObject = produce.getOne();
             this.heldObject.Stack = produce.Stack;
-            this.heldObject.Name = this.produceName;
+            (this.heldObject as customNamedObject).Name = this.produceName;
+            (this.heldObject as StardewValley.Object).quality = this.produceQuality;
 
             if (this.materials.Count == 0)
             {
@@ -772,10 +936,19 @@ namespace CustomFarming
 
             checkForSpecialProduce();
 
+            if((this.heldObject as StardewValley.Object).quality == -1)
+            {
+                (this.heldObject as StardewValley.Object).quality = this.lastDropIn.quality;
+            }
 
             if ((this.usePrefix && !this.isSpecial) || (this.isSpecial && this.specialPrefix))
             {
-                this.heldObject.Name = this.prefix + " " + this.heldObject.Name;
+                (this.heldObject as customNamedObject).Name = this.prefix + " " + this.heldObject.Name;
+            }
+
+            if ((this.useSuffix && !this.isSpecial) || (this.isSpecial && this.specialSuffix))
+            {
+                (this.heldObject as customNamedObject).Name = this.heldObject.Name + " " + this.suffix;
             }
         }
 
@@ -810,10 +983,10 @@ namespace CustomFarming
             
         }
       
-        public override bool placementAction(GameLocation location, int x, int y, Farmer who = null)
+        public override bool placementAction(GameLocation location, int x, int y, StardewValley.Farmer who = null)
         {
             Vector2 index1 = new Vector2((float)(x / Game1.tileSize), (float)(y / Game1.tileSize));
-
+            this.tileindex = this.tilesheetindex;
             if (location.objects.ContainsKey(index1))
             {
                 return false;
@@ -834,7 +1007,13 @@ namespace CustomFarming
             
             return true;
         }
-        
+
+        public void updateSourceRectangle()
+        {
+            this.sourceRectangle = new Microsoft.Xna.Framework.Rectangle((this.tileindex % this.tilesheetWidth) * this.tileWidth, (int)Math.Floor((double)this.tilesheetindex / this.tileHeight), (int)this.tileWidth, (int)this.tileHeight);
+
+        }
+
 
         public override void updateWhenCurrentLocation(GameTime time)
         {
@@ -877,10 +1056,10 @@ namespace CustomFarming
                 this.tileindex = this.tilesheetindex + this.workAnimationOffset + this.animationFrame;
             }
 
-            this.sourceRectangle = new Microsoft.Xna.Framework.Rectangle((this.tileindex % tilesheetWidth) * (int)tileSize.X, (int)Math.Floor(this.tilesheetindex / this.tileSize.Y), (int)this.tileSize.X, (int)this.tileSize.Y);
+            updateSourceRectangle();
 
         }
 
-       
+
     }
 }

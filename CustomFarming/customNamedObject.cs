@@ -65,6 +65,19 @@ namespace CustomFarming
             }
         }
 
+        public new string Name
+        {
+            get
+            {
+                return base.Name;
+            }
+
+            set
+            {
+                this.name = value;
+            }
+        }
+
         public StardewValley.Object getReplacement()
         {
             StardewValley.Object replacement = new Chest(true);
@@ -75,13 +88,17 @@ namespace CustomFarming
 
         public dynamic getAdditionalSaveData()
         {
-            dynamic additionalData = new { stack = this.stack, baseID = this.parentSheetIndex, color = this.color, name = this.name, description = this.description, tilesheet = this.tilesheetpath, tilesheetindex = this.tilesheetindex };
+            dynamic additionalData = new { stack = this.stack, quality = this.quality, baseID = this.parentSheetIndex, color = this.color, name = this.name, description = this.description, tilesheet = this.tilesheetpath, tilesheetindex = this.tilesheetindex };
             return additionalData;
         }
 
         public void rebuildFromSave(dynamic additionalSaveData)
         {
             build((int)additionalSaveData.baseID, (string)additionalSaveData.tilesheet, (int)additionalSaveData.tilesheetindex, (int)additionalSaveData.stack, (string)additionalSaveData.name, (string)additionalSaveData.description, (Microsoft.Xna.Framework.Color)additionalSaveData.color);
+            if (additionalSaveData.quality != null)
+            {
+                this.quality = (int)additionalSaveData.quality;
+            }
         }
 
         public void build(int produceBaseIndex, string produceTilesheetPath, int produceTilesheetindex, int initialStack, string name, string description, Microsoft.Xna.Framework.Color color)
@@ -235,19 +252,28 @@ namespace CustomFarming
 
             if (drawStackNumber && this.maximumStackSize() > 1 && ((double)scaleSize > 0.3 && this.Stack != int.MaxValue) && this.Stack > 1)
             {
-                if (!Game1.options.useCrisperNumberFont)
+                if (true)
                 {
                     float scale = 0.5f + scaleSize;
                     Game1.drawWithBorder(string.Concat((object)this.stack), Microsoft.Xna.Framework.Color.Black, Microsoft.Xna.Framework.Color.White, location + new Vector2((float)Game1.tileSize - Game1.tinyFont.MeasureString(string.Concat((object)this.stack)).X * scale, (float)Game1.tileSize - (float)((double)Game1.tinyFont.MeasureString(string.Concat((object)this.stack)).Y * 3.0 / 4.0) * scale), 0.0f, scale, 1f, true);
                 }
                 else
+                {
                     Utility.drawTinyDigits(this.stack, spriteBatch, location + new Vector2((float)(Game1.tileSize - Utility.getWidthOfTinyDigitString(this.stack, 3f * scaleSize)) + 3f * scaleSize, (float)((double)Game1.tileSize - 18.0 * (double)scaleSize + 2.0)), 3f * scaleSize, 1f, Microsoft.Xna.Framework.Color.White);
+                }
+
+            }
+
+            if (drawStackNumber && this.quality > 0)
+            {
+                float num = this.quality < 4 ? 0.0f : (float)((Math.Cos((double)Game1.currentGameTime.TotalGameTime.Milliseconds * Math.PI / 512.0) + 1.0) * 0.0500000007450581);
+                spriteBatch.Draw(Game1.mouseCursors, location + new Vector2(12f, (float)(Game1.tileSize - 12) + num), new Microsoft.Xna.Framework.Rectangle?(this.quality < 4 ? new Microsoft.Xna.Framework.Rectangle(338 + (this.quality - 1) * 8, 400, 8, 8) : new Microsoft.Xna.Framework.Rectangle(346, 392, 8, 8)), Microsoft.Xna.Framework.Color.White * transparency, 0.0f, new Vector2(4f, 4f), (float)(3.0 * (double)scaleSize * (1.0 + (double)num)), SpriteEffects.None, layerDepth);
             }
 
         }
 
 
-        public override void drawWhenHeld(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, Vector2 objectPosition, Farmer f)
+        public override void drawWhenHeld(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, Vector2 objectPosition, StardewValley.Farmer f)
         {
             spriteBatch.Draw(this.tilesheet, objectPosition, new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), this.color, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 2) / 10000f));
         }

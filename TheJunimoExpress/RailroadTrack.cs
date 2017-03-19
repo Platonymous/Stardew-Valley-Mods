@@ -56,9 +56,9 @@ namespace TheJunimoExpress
         public override void doCollisionAction(Rectangle positionOfCollider, int speedOfCollision, Vector2 tileLocation, Character who, GameLocation location)
         {
             base.doCollisionAction(positionOfCollider, speedOfCollision, tileLocation, who, location);
-            if (who == null || !(who is Farmer) || !(location is Farm))
+            if (who == null || !(who is StardewValley.Farmer) || !(location is Farm))
                 return;
-            (who as Farmer).temporarySpeedBuff = 0.1f;
+            (who as StardewValley.Farmer).temporarySpeedBuff = 0.1f;
         }
 
         public override bool isPassable(Character c = null)

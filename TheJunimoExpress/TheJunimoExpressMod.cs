@@ -169,7 +169,7 @@ namespace TheJunimoExpress
             {
                 int row = (int)Math.Floor(this.textureOriginTracks / 24.0);
                 int col = this.textureOriginTracks % 24;
-                Monitor.Log(i.ToString() + ": " + "row: " + row.ToString() + " col: " + col.ToString());
+              
                 
                 if (!gl.terrainFeatures.ContainsKey(vl[i]) && Game1.currentLocation.name == "Farm") {
                 TerrainFeature t = new RailroadTrack(row, col);
@@ -223,8 +223,9 @@ namespace TheJunimoExpress
             int i = DataLoader.setTracksTextures();
             this.textureOriginTracks = i;
             int trackObjectID = i;
-            string trackInformation = "Tracks/50/-300/Crafting -24/Driving the train doesn't set its course. The real job is laying the track.";
-            Game1.objectInformation.Add(trackObjectID, trackInformation);
+            string trackInformation = "Tracks/50/-300/Crafting -24/Tracks/Driving the train doesn't set its course. The real job is laying the track.";
+
+                Game1.objectInformation.Add(trackObjectID, trackInformation);
             CraftingRecipe.craftingRecipes.Add("Tracks", "388 30 335 2/Home/" + trackObjectID.ToString() + " 10/false/null");
             
             Game1.player.craftingRecipes.Add("Tracks", 0);
@@ -233,7 +234,9 @@ namespace TheJunimoExpress
             this.textureOriginHelper = j;
             int helperObjectID = j;
             int helperRecipeID = trackObjectID + 74;
-            string helperInformation = "Junimo Helper/50/-300/Crafting -24/Get by with a little help from your friends.";
+         
+            string helperInformation = "Junimo Helper/50/-300/Crafting -24/Junimo Helper/Get by with a little help from your friends.";          
+
             Game1.objectInformation.Add(helperRecipeID, helperInformation);
             CraftingRecipe.craftingRecipes.Add("Junimo Helper", "268 50/Home/" + helperRecipeID.ToString() + "/false/null");
             Game1.player.craftingRecipes.Add("Junimo Helper", 0);
