@@ -380,6 +380,23 @@ namespace CustomElementHandler
                         }
                     }
                 }
+                else if (elements[i] is StardewValley.Object[])
+                {
+                    StardewValley.Object[] list = (StardewValley.Object[])elements[i];
+                    for (int j = 0; j < list.Length; j++)
+                    {
+                        if (list[j] is ISaveElement)
+                        {
+                            ISaveElement element = (ISaveElement)list[j];
+                            string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+                            string type = element.GetType().AssemblyQualifiedName;
+                            string name = "CEHe/Attachement/" + type + "/" + additionalSaveData;
+                            dynamic replacement = element.getReplacement();
+                            replacement.name = name;
+                            list[j] = (StardewValley.Object)replacement;
+                        }
+                    }
+                }
 
             }
             OnFinishedRemoving(EventArgs.Empty);
@@ -499,7 +516,7 @@ namespace CustomElementHandler
 
                     if ((storage[i] as List<Item>)[j] is Tool && ((storage[i] as List<Item>)[j] as Tool).attachments != null && ((storage[i] as List<Item>)[j] as Tool).attachments.Length > 0)
                     {
-                        attachements.Add(((storage[i] as List<Item>)[j] as Tool).attachments.ToList());
+                        attachements.Add(((storage[i] as List<Item>)[j] as Tool).attachments);
                     }
                 }
 
