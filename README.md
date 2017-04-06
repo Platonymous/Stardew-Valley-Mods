@@ -1,6 +1,6 @@
 # Stardew-Valley-Mods
 
-# 1. The Harp of Yoba
+# 1. The Harp of Yoba (1.0) & Harp of Yoba Redux (2.0)
 Adds the Harp of Yoba to the game.
 
 # 2. Junimo Farm
