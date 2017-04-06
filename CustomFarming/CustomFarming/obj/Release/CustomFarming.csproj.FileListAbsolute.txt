@@ -1,0 +1,6 @@
+C:\Users\David\Documents\Visual Studio 2015\Projects\CustomFarming\customFarming\bin\Release\customFarming.dll
+C:\Users\David\Documents\Visual Studio 2015\Projects\CustomFarming\customFarming\bin\Release\customFarming.pdb
+C:\Users\David\Documents\Visual Studio 2015\Projects\CustomFarming\customFarming\obj\Release\customFarming.dll
+C:\Users\David\Documents\Visual Studio 2015\Projects\CustomFarming\customFarming\obj\Release\customFarming.pdb
+C:\Users\David\Documents\Visual Studio 2015\Projects\CustomFarming\customFarming\obj\Release\CustomFarming.csprojResolveAssemblyReference.cache
+C:\Users\David\Documents\Visual Studio 2015\Projects\CustomFarming\customFarming\bin\Release\Newtonsoft.Json.dll
