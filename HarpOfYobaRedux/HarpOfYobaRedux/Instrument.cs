@@ -5,13 +5,10 @@ using CustomElementHandler;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
+
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using StardewValley.Objects;
+
 
 namespace HarpOfYobaRedux
 {
@@ -53,7 +50,7 @@ namespace HarpOfYobaRedux
         {
             get
             {
-                return loadDisplayName();
+                return getDisplayName();
             }
         }
 
@@ -224,14 +221,27 @@ namespace HarpOfYobaRedux
             return Game1.parseText(text, smallFont, width);
         }
 
+
         protected override string loadDisplayName()
         {
-            return this.name;
+            return name;
+        }
+       
+
+        private string getDisplayName()
+        {
+            return name;
         }
 
         public override void DoFunction(GameLocation location, int x, int y, int power, StardewValley.Farmer who)
         {
-            if (attachments.Length > 0 && attachments[0] is SheetMusic)
+            if (!readyToPlay)
+            {
+                Game1.player.canMove = true;
+                return;
+            }
+
+                if (attachments.Length > 0 && attachments[0] is SheetMusic)
             {
                 int timeOfDay = Game1.timeOfDay;
                 int hours = (int)Math.Floor((double)timeOfDay / 100);
@@ -321,7 +331,7 @@ namespace HarpOfYobaRedux
             }
         }
 
-        public override bool beginUsing(GameLocation location, int x, int y, StardewValley.Farmer who)
+        public new bool beginUsing(GameLocation location, int x, int y, StardewValley.Farmer who)
         {
             return false;
         }

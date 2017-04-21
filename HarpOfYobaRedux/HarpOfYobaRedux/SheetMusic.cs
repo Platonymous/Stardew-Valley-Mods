@@ -1,10 +1,6 @@
 ﻿using CustomElementHandler;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
 using StardewValley;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -137,6 +133,11 @@ namespace HarpOfYobaRedux
             {
                 sheet.owned = false;
             }
+        }
+
+        protected override string loadDisplayName()
+        {
+            return name;
         }
 
         public override Item getOne()

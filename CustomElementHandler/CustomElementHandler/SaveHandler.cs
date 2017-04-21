@@ -105,6 +105,46 @@ namespace CustomElementHandler
             elements.AddRange(storage);
             elements.AddRange(attachements);
 
+            if (Game1.player.hat.name.Contains("CEHe"))
+            {
+                string name = Game1.player.hat.name;
+                string[] data = name.Split('/');
+
+                object replacement = rebuildElement(data, Game1.player.hat);
+                Game1.player.hat = (Hat)replacement;
+
+            }
+
+            if (Game1.player.boots.name.Contains("CEHe"))
+            {
+                string name = Game1.player.boots.name;
+                string[] data = name.Split('/');
+
+                object replacement = rebuildElement(data, Game1.player.boots);
+                Game1.player.boots = (Boots)replacement;
+
+            }
+
+            if (Game1.player.leftRing.name.Contains("CEHe"))
+            {
+                string name = Game1.player.leftRing.name;
+                string[] data = name.Split('/');
+
+                object replacement = rebuildElement(data, Game1.player.leftRing);
+                Game1.player.leftRing = (Ring)replacement;
+
+            }
+
+            if (Game1.player.rightRing.name.Contains("CEHe"))
+            {
+                string name = Game1.player.rightRing.name;
+                string[] data = name.Split('/');
+
+                object replacement = rebuildElement(data, Game1.player.rightRing);
+                Game1.player.rightRing = (Ring)replacement;
+
+            }
+
             for (int i = 0; i < elements.Count; i++)
             {
 
@@ -275,9 +315,60 @@ namespace CustomElementHandler
             elements.AddRange(animals);
             elements.AddRange(characters);
             
-            
-            
-            
+            if(Game1.player.hat is ISaveElement)
+            {
+                ISaveElement element = (ISaveElement)Game1.player.hat;
+                string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+                string type = element.GetType().AssemblyQualifiedName;
+                string name = "CEHe/Item/" + type + "/" + additionalSaveData;
+                dynamic replacement = element.getReplacement();
+                replacement.name = name;
+
+                Game1.player.hat = (Hat)replacement;
+                
+            }
+
+            if (Game1.player.boots is ISaveElement)
+            {
+                ISaveElement element = (ISaveElement)Game1.player.boots;
+                string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+                string type = element.GetType().AssemblyQualifiedName;
+                string name = "CEHe/Item/" + type + "/" + additionalSaveData;
+                dynamic replacement = element.getReplacement();
+                replacement.name = name;
+
+                Game1.player.boots = (Boots)replacement;
+
+            }
+
+            if (Game1.player.leftRing is ISaveElement)
+            {
+                ISaveElement element = (ISaveElement)Game1.player.leftRing;
+                string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+                string type = element.GetType().AssemblyQualifiedName;
+                string name = "CEHe/Item/" + type + "/" + additionalSaveData;
+                dynamic replacement = element.getReplacement();
+                replacement.name = name;
+
+                Game1.player.leftRing = (Ring)replacement;
+
+            }
+
+            if (Game1.player.rightRing is ISaveElement)
+            {
+                ISaveElement element = (ISaveElement)Game1.player.rightRing;
+                string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+                string type = element.GetType().AssemblyQualifiedName;
+                string name = "CEHe/Item/" + type + "/" + additionalSaveData;
+                dynamic replacement = element.getReplacement();
+                replacement.name = name;
+
+                Game1.player.rightRing = (Ring)replacement;
+
+            }
+
+
+
 
             for (int i = 0; i < elements.Count; i++)
             {
@@ -299,7 +390,6 @@ namespace CustomElementHandler
                             if (replacement is Tool)
                             {
                                 list[j] = (Tool)replacement;
-                                (replacement as Tool).DisplayName = name;
                                 (replacement as Tool).name = name;
                             }
                             else
@@ -504,9 +594,13 @@ namespace CustomElementHandler
         {
               
             storage.Add(Game1.player.items);
+            storage.Add((Game1.getLocationFromName("SeedShop") as SeedShop).itemsToStartSellingTomorrow);
+            storage.Add((Game1.getLocationFromName("SeedShop") as SeedShop).itemsFromPlayerToSell);
             storage.Add((Game1.getLocationFromName("FarmHouse") as FarmHouse).fridge.items);
             
-            foreach(object dict in objects)
+            
+
+            foreach (object dict in objects)
             {
                 if (dict is SerializableDictionary<Vector2, StardewValley.Object>)
                 {

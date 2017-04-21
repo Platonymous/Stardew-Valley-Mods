@@ -32,7 +32,14 @@ namespace HarpOfYobaRedux
                         HoeDirt hd = (HoeDirt) Game1.currentLocation.terrainFeatures[tile];
                         if (hd.crop == null)
                         {
-                            hd.plant(770,(int)tile.X, (int)tile.Y,Game1.player);
+                            int seeds = 770;
+
+                            if (Game1.IsWinter)
+                            {
+                                seeds = 498;
+                            }
+
+                            hd.plant(seeds,(int)tile.X, (int)tile.Y,Game1.player);
                             if(hd.crop != null)
                             {
                                 hd.crop.newDay(1, 0, (int)tile.X, (int)tile.Y, Game1.currentLocation);

@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StardewValley;
+﻿
 using Microsoft.Xna.Framework;
+using StardewValley;
+using System;
+using System.Collections.Generic;
+using System.Timers;
 
 namespace HarpOfYobaRedux
 {
     class TimeMagic : IMagic
     {
+        private TimeSpan oldTS;
+        int targetTime;
+        int currentTime;
+
 
         public TimeMagic()
         {
@@ -18,56 +21,37 @@ namespace HarpOfYobaRedux
 
         private void moveTimeForward()
         {
-            Game1.playSound("parry");
+
+                Game1.playSound("parry");
             Game1.performTenMinuteClockUpdate();
-        } 
-
-        private void slowDown()
-        {
-           
-            foreach (GameLocation location in Game1.locations)
+            currentTime = Game1.timeOfDay;
+            
+            if(currentTime == targetTime)
             {
-                foreach (NPC ch in location.characters)
-                {
-                    if (ch.isVillager())
-                    {
-                        ch.addedSpeed = 0;
-                    }
-
-                }
+                Program.gamePtr.TargetElapsedTime = oldTS;
             }
-        }
 
+        }
 
         public void doMagic(bool playedToday)
         {
             Game1.player.forceTimePass = true;
             Game1.playSound("stardrop");
-            foreach (GameLocation location in Game1.locations)
-            {
-                foreach (NPC ch in location.characters)
-                {
-                    if (ch.isVillager())
-                    {
-                        ch.addedSpeed = 10;
-                    }
+            targetTime = Game1.timeOfDay + 200;
+            currentTime = Game1.timeOfDay;
+            oldTS = new TimeSpan(Program.gamePtr.TargetElapsedTime.Ticks);
 
-                }
-            }
-            
+            Program.gamePtr.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 1);
+
             for (int i = 0; i < 12; i++)
             {
-                DelayedAction timeAction = new DelayedAction((i + 1) * 1000 / 2);
+                DelayedAction timeAction = new DelayedAction((i + 1) * 1000 / 2 - i*20);
                 timeAction.behavior = new DelayedAction.delayedBehavior(moveTimeForward);
 
                 Game1.delayedActions.Add(timeAction);
             }
 
-            DelayedAction stopAction = new DelayedAction(7000);
-            stopAction.behavior = new DelayedAction.delayedBehavior(slowDown);
-
-            Game1.delayedActions.Add(stopAction);
-
+   
         }
     }
 }
