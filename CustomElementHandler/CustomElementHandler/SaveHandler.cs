@@ -105,7 +105,7 @@ namespace CustomElementHandler
             elements.AddRange(storage);
             elements.AddRange(attachements);
 
-            if (Game1.player.hat.name.Contains("CEHe"))
+            if (Game1.player.hat != null && Game1.player.hat.name.Contains("CEHe"))
             {
                 string name = Game1.player.hat.name;
                 string[] data = name.Split('/');
@@ -114,8 +114,7 @@ namespace CustomElementHandler
                 Game1.player.hat = (Hat)replacement;
 
             }
-
-            if (Game1.player.boots.name.Contains("CEHe"))
+            if (Game1.player.boots != null && Game1.player.boots.name.Contains("CEHe"))
             {
                 string name = Game1.player.boots.name;
                 string[] data = name.Split('/');
@@ -125,7 +124,7 @@ namespace CustomElementHandler
 
             }
 
-            if (Game1.player.leftRing.name.Contains("CEHe"))
+            if (Game1.player.leftRing != null && Game1.player.leftRing.name.Contains("CEHe"))
             {
                 string name = Game1.player.leftRing.name;
                 string[] data = name.Split('/');
@@ -135,7 +134,7 @@ namespace CustomElementHandler
 
             }
 
-            if (Game1.player.rightRing.name.Contains("CEHe"))
+            if (Game1.player.rightRing != null && Game1.player.rightRing.name.Contains("CEHe"))
             {
                 string name = Game1.player.rightRing.name;
                 string[] data = name.Split('/');
