@@ -33,6 +33,7 @@ namespace Speedster
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
 
+
            
         }
 
@@ -42,6 +43,7 @@ namespace Speedster
             ControlEvents.KeyPressed -= ControlEvents_KeyPressed;
             GameEvents.FourthUpdateTick -= GameEvents_FourthUpdateTick;
             MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
+          
 
         }
 
@@ -58,8 +60,14 @@ namespace Speedster
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
             GameEvents.FourthUpdateTick += GameEvents_FourthUpdateTick;
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+            SaveEvents.BeforeSave += SaveEvents_BeforeSave;
 
-            isSpeeding = false;
+          isSpeeding = false;
+        }
+
+        private void SaveEvents_BeforeSave(object sender, EventArgs e)
+        {
+            SpeedsterMask.takeOffCostume();
         }
 
         private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)

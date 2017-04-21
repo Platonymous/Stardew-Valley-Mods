@@ -62,6 +62,7 @@ namespace Speedster
             if (!setup)
             {
                 baseIndex = setTextures(path, 20, 20 * 4);
+                setup = true;
             }
 
             which = baseIndex + index;
