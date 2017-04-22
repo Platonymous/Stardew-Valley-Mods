@@ -40,20 +40,9 @@ namespace NoSoilDecayRedux
             {
                 saveHoeDirt();
                 hoeDirtReplaced = false;
-                //plantFalseCrops(Game1.getFarm());
-                //plantFalseCrops(Game1.getLocationFromName("Greenhouse"));
+               
             }
-            /*
-            if(e.NewLocation is Farm)
-            {
-                removeFalseCrops(Game1.getFarm());
-            }
-
-            if (e.NewLocation.name == "Greenhouse")
-            {
-                removeFalseCrops(Game1.getLocationFromName("Greenhouse"));
-            }
-            */
+          
         }
 
         private void saveHoeDirt()
@@ -78,7 +67,7 @@ namespace NoSoilDecayRedux
 
                     if (terrain is HoeDirt)
                     {
-                        saves.Add(location.name + "-" + keyV.X + "-" + keyV.Y);
+                        saves.Add(location.name + "-" + keyV.X + "-" + keyV.Y + "-|ignore|-NoSoilDecayRedux");
 
                     }
                 }
