@@ -11,7 +11,7 @@ using StardewValley.Objects;
 using StardewValley.Locations;
 using StardewValley.Buildings;
 
-namespace TheJunimoExpress
+namespace JunimoFarm
 {
     class LinkedChest : Chest
     {

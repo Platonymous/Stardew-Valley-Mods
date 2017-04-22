@@ -13,7 +13,7 @@ using StardewValley.Buildings;
 
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TheJunimoExpress
+namespace JunimoFarm
 {
     class JunimoHelper : StardewValley.Object
     {

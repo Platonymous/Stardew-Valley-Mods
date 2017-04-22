@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portraiture", "Portraiture\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Speedster", "Speedster\Speedster.csproj", "{D04B971E-CCAE-4E96-AB10-A6BFBD25303A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheJunimoExpress", "TheJunimoExpress\TheJunimoExpress.csproj", "{FFA58F5D-536B-4D0A-BADA-04BABFEFAAB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JunimoFarm", "JunimoFarm\JunimoFarm.csproj", "{FFA58F5D-536B-4D0A-BADA-04BABFEFAAB1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".metadata", ".metadata", "{D226F84E-C07F-4B0A-BE67-FD606117BCB2}"
 	ProjectSection(SolutionItems) = preProject
