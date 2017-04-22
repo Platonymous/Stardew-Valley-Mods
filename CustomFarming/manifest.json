@@ -1,0 +1,13 @@
+{
+   "Name": "Custom Farming",
+   "Author": "Platonymous",
+   "Version": {
+      "MajorVersion": 0,
+      "MinorVersion": 5,
+      "PatchVersion": 7,
+      "Build": ""
+   },
+   "Description": "Helper Mod for Custom Object creation. For SDV 1.2.",
+   "UniqueID": "Platonymous.CustomFarming",
+   "EntryDll": "CustomFarming.dll"
+}

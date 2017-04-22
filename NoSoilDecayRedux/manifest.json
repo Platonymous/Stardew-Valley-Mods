@@ -1,0 +1,13 @@
+{
+   "Name": "No Soil Decay Redux",
+   "Author": "Platonymous",
+   "Version": {
+      "MajorVersion": 1,
+      "MinorVersion": 1,
+      "PatchVersion": 2,
+      "Build": ""
+   },
+   "Description": "Stops soil from decaying",
+   "UniqueID": "Platonymous.NoSoilDecayRedux",
+   "EntryDll": "NoSoilDecayRedux.dll"
+}
