@@ -1,0 +1,13 @@
+{
+   "Name": "Custom Element Handler",
+   "Author": "Platonymous",
+   "Version": {
+      "MajorVersion": 1,
+      "MinorVersion": 1,
+      "PatchVersion": 1,
+      "Build": ""
+   },
+   "Description": "SaveHandler for Custom Objects",
+   "UniqueID": "Platonymous.CustomElementHandler",
+   "EntryDll": "CustomElementHandler.dll"
+}
