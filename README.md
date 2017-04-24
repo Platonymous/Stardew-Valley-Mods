@@ -9,14 +9,23 @@ Let Junimos help you on the farm.
 # 3. Custom Farmimg
 Add Custom Objects via json file. 
 
-# 4. Portraiture
+# 4. No Soil Decay Redux
+Prevents soil from decaying over night.
+
+# 5. Portraiture
 Allows the use of higher resolution character portraits.
 
-# 5. CustomElementHandler
+# 6. PelicanTTS
+Text-To-Speech Mod
+
+# 7. CustomElementHandler
 Helps with serilization for custom Objects.
 
-# 6. Speedster
+# 8. Speedster
 Adds two masks that spawn speedster outfits and increase speed.
 
+
+
 All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1)
+Or via ModDrop : [Download](https://www.moddrop.com/)
 
