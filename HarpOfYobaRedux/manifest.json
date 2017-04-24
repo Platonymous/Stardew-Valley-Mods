@@ -4,8 +4,8 @@
    "Version": {
       "MajorVersion": 2,
       "MinorVersion": 0,
-      "PatchVersion": 1,
-      "Build": "2"
+      "PatchVersion": 2,
+      "Build": ""
    },
    "Description": "Adds The Harp of Yoba to the game. This is the Version for SDV 1.11 with SMAPI 1.9",
    "UniqueID": "Platonymous.HarpOfYobaRedux",

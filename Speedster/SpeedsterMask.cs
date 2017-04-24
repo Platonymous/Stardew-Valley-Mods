@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Objects;
@@ -6,11 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using CustomElementHandler;
-using System.Runtime.CompilerServices;
+
 
 namespace Speedster
 {
@@ -75,6 +73,9 @@ namespace Speedster
                 name = "Reverse Speedster Mask";
             }
 
+            displayName = name;
+            
+
             description = "Powerful Disguise";
             ignoreHairstyleOffset = true;
             category = -95;
@@ -108,7 +109,7 @@ namespace Speedster
                 if (hyperdrive)
                 {
                     Game1.player.addedSpeed = Math.Max(24, Game1.player.addedSpeed);
-                }
+                }  
                 else
                 {
                     Game1.player.addedSpeed = Math.Max(6, Game1.player.addedSpeed);
@@ -240,18 +241,12 @@ namespace Speedster
             {
                 return name;
             }
-
-            set
-            {
-                name = value;
-            }
-        }
-
-        public override void actionWhenBeingHeld(Farmer who)
-        {
-            base.actionWhenBeingHeld(who);
-        }
  
+        }
+
+        public override string DisplayName { get => name; set => name = value; }
+
+
         public override Item getOne()
         {
             return new SpeedsterMask(index);

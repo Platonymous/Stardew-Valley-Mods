@@ -36,8 +36,8 @@ namespace HarpOfYobaRedux
 
         public void doMagic(bool playedToday)
         {
-            Type type = typeof(Game1).Assembly.GetType("StardewValley.Program", true);
-            gamePtr = (Game1) type.GetField("gamePtr").GetValue(null);
+            
+            gamePtr = Program.gamePtr; 
 
             Game1.player.forceTimePass = true;
             Game1.playSound("stardrop");

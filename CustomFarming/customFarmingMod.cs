@@ -79,6 +79,7 @@ namespace CustomFarming
                 {
                     if (menu is CraftingPage)
                     {
+                        
                         Item heldItem = Helper.Reflection.GetPrivateField<Item>(menu, "heldItem").GetValue();
 
                         if (heldItem != null && heldItem is StardewValley.Object && machinesForCrafting.ContainsKey((heldItem as StardewValley.Object).name))
@@ -125,8 +126,8 @@ namespace CustomFarming
                     if (menu is CraftingPage)
                     {
                         List<ClickableTextureComponent> replaceComponents = new List<ClickableTextureComponent>();
-
-                        List<Dictionary<ClickableTextureComponent, CraftingRecipe>> pagesOfCraftingRecipes = Helper.Reflection.GetPrivateField<List<Dictionary<ClickableTextureComponent, CraftingRecipe>>>(menu, "pagesOfCraftingRecipes").GetValue();
+                        CraftingPage craftingPage = (CraftingPage)menu;
+                        List<Dictionary<ClickableTextureComponent, CraftingRecipe>> pagesOfCraftingRecipes = craftingPage.pagesOfCraftingRecipes;
 
                         foreach (Dictionary<ClickableTextureComponent, CraftingRecipe> dict in pagesOfCraftingRecipes)
                         {

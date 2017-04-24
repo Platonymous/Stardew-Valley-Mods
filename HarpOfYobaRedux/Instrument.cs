@@ -78,6 +78,7 @@ namespace HarpOfYobaRedux
 
             this.animation = animation;
             this.name = name;
+            displayName = name;
             this.description = description;
             this.texture = texture;
             instrumentID = id;
@@ -164,6 +165,8 @@ namespace HarpOfYobaRedux
             return this;
         }
 
+     
+
         public Dictionary<string, string> getAdditionalSaveData()
         {
             Dictionary<string, string> additionalSaveData = new Dictionary<string, string>();
@@ -203,6 +206,8 @@ namespace HarpOfYobaRedux
             }
 
         }
+
+        public override string DisplayName { get => name; set => name = value; }
 
         public override string getDescription()
         {
@@ -379,5 +384,15 @@ namespace HarpOfYobaRedux
             }
         }
 
+        protected override string loadDisplayName()
+        {
+            return name;
+        }
+
+
+        protected override string loadDescription()
+        {
+            return getDescription();
+        }
     }
 }

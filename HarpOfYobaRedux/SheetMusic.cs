@@ -39,6 +39,7 @@ namespace HarpOfYobaRedux
             this.color = color;
             this.music = music;
             this.name = name;
+            displayName = name;
             sheetDescription = description;
             sheetMusicID = id;
 
@@ -59,6 +60,8 @@ namespace HarpOfYobaRedux
                 return name;
             }
         }
+
+        public override string DisplayName { get => name; set => name = value; }
 
         public SheetMusic(string id)
         {
@@ -105,6 +108,7 @@ namespace HarpOfYobaRedux
         {
            return allSheets[id].owned;
         }
+
 
         public override string getDescription()
         {

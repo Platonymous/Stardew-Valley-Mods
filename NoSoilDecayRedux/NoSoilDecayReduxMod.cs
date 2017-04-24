@@ -121,67 +121,12 @@ namespace NoSoilDecayRedux
 
 
             }
-            else
-            {
-                Monitor.Log("Remove False Crops from previous version of NoSoilDecayRedux");
-                removeFalseCrops(Game1.getFarm());
-                removeFalseCrops(Game1.getLocationFromName("Greenhouse"));
-            }
+       
 
         }
 
-        private void removeFalseCrops(GameLocation location)
-        {
-            foreach (Vector2 keyV in location.terrainFeatures.Keys)
-            {
-                if (!location.terrainFeatures.ContainsKey(keyV))
-                {
-                    continue;
-                }
-
-                TerrainFeature terrain = location.terrainFeatures[keyV];
-
-                if (terrain is HoeDirt)
-                {
-                    HoeDirt hoeDirt = (HoeDirt)terrain;
-
-                    if (hoeDirt.crop != null && hoeDirt.crop.dead)
-                    {
-                        hoeDirt.crop = null;
-                    }
-
-                }
-            }
-        }
-
-        private void plantFalseCrops(GameLocation location)
-        {
-            foreach (Vector2 keyV in location.terrainFeatures.Keys)
-            {
-                TerrainFeature terrain = location.terrainFeatures[keyV];
-
-                if (terrain is HoeDirt)
-                {
-                    HoeDirt hoeDirt = (HoeDirt)terrain;
-
-                    if (hoeDirt.crop == null)
-                    {
-                        string season = Game1.currentSeason;
-                        int cropIndex = 770;
-      
-                        if (Game1.IsWinter || (Game1.dayOfMonth == 28 && Game1.currentSeason == "fall"))
-                        {   
-                                cropIndex = 498;
-                        }
-
-                        Crop placeholder = new Crop(cropIndex, (int)keyV.X, (int)keyV.Y);
-                        placeholder.dead = true;
-                        hoeDirt.crop = placeholder;
-                    }
-                    
-                }
-            }
-        }
+        
+       
 
     }
 }

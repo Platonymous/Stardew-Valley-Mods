@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Drawing;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -55,8 +52,7 @@ namespace Speedster
 
         private void start()
         {
-            Type type = typeof(Game1).Assembly.GetType("StardewValley.Program", true);
-            gamePtr = (Game1)type.GetField("gamePtr").GetValue(null);
+            gamePtr = Program.gamePtr;
 
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
             GameEvents.FourthUpdateTick += GameEvents_FourthUpdateTick;
@@ -135,14 +131,21 @@ namespace Speedster
             if (!isSpeeding && Game1.timeOfDay < 2300)
             {
                 Game1.playSound("stardrop");
+                
                 oldTS = new TimeSpan(gamePtr.TargetElapsedTime.Ticks);
                 gamePtr.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 1);
                 isSpeeding = true;
                 speedUpTime();
+ 
+
+               
             }
             else
             {
+                Game1.playSound("thunder");
                 gamePtr.TargetElapsedTime = oldTS;
+
+                Game1.player.forceTimePass = false;
                 isSpeeding = false;
             }
         }
@@ -225,6 +228,15 @@ namespace Speedster
             {
                 Game1.playSound("parry");
                 Game1.performTenMinuteClockUpdate();
+
+                foreach(NPC npc in Game1.currentLocation.characters)
+                {
+                    npc.isCharging = true;
+                }
+
+                Game1.player.forceTimePass = true;
+                Game1.player.freezePause = 1000;
+                Game1.player.jitterStrength = 20f;
 
                 DelayedAction timeAction = new DelayedAction(500);
                 timeAction.behavior = new DelayedAction.delayedBehavior(speedUpTime);
