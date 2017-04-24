@@ -81,10 +81,10 @@ namespace CustomFarming
                     {
                         Item heldItem = Helper.Reflection.GetPrivateField<Item>(menu, "heldItem").GetValue();
 
-                        if (heldItem != null && machinesForCrafting.ContainsKey(heldItem.Name))
+                        if (heldItem != null && heldItem is StardewValley.Object && machinesForCrafting.ContainsKey((heldItem as StardewValley.Object).name))
                         {
-                            heldItem = machinesForCrafting[heldItem.Name].getOne();
-
+                            heldItem = machinesForCrafting[(heldItem as StardewValley.Object).name].getOne();
+                            
                             Helper.Reflection.GetPrivateField<Item>(menu, "heldItem").SetValue(heldItem);
                         }
 
