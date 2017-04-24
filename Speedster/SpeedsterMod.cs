@@ -73,6 +73,19 @@ namespace Speedster
 
         private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
         {
+            if (isSpeeding)
+            {
+                isSpeeding = false;
+            }
+
+            if (Game1.player.hat is SpeedsterMask && SpeedsterMask.hyperdrive)
+            {
+                int index = (Game1.player.hat as SpeedsterMask).index;
+                SpeedsterMask.hyperdrive = false;
+                SpeedsterMask.takeOffCostume();
+                SpeedsterMask.putOnCostume(index);
+            }
+
             if(Game1.activeClickableMenu is ShopMenu)
             {
                 ShopMenu shop = (ShopMenu)Game1.activeClickableMenu;

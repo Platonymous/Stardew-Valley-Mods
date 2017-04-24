@@ -518,7 +518,7 @@ namespace Portraiture
 //Begin changes
         public bool setTexture(string characterName, Texture2D fallBack)
         {
-           
+            
             if (ImageHelper.pTextures.ContainsKey(characterName))
             {
                 if (ImageHelper.pTextures[characterName] == fallBack)
@@ -589,15 +589,24 @@ namespace Portraiture
             int index = this.characterDialogue.getPortraitIndex();
             List<string> variations = new List<string>();
             bool loop = false;
-
+           
             string[] characterParts = characterName.Split('_');
+
             if (characterParts.Length > 1)
             {
                 if (!ImageHelper.doesImageFileExist(characterName + ".xnb") && !ImageHelper.doesImageFileExist(characterName + ".png"))
                 {
+
                     characterName = characterParts[0];
+
                 }
             }
+
+            if (ImageHelper.doesImageFileExist(characterName + '_' + Game1.currentLocation.name + ".xnb") || ImageHelper.doesImageFileExist(characterName + '_' + Game1.currentLocation.name + ".png"))
+            {
+                characterName = characterName + '_' + Game1.currentLocation.name;
+            }
+
 
             if (Game1.isRaining && Game1.currentLocation.isOutdoors)
             {
