@@ -11,7 +11,7 @@ using StardewValley.Objects;
 using StardewValley.Locations;
 using System.Text.RegularExpressions;
 
-namespace JunimoFarm
+namespace TheJunimoExpress
 {
     class LoadData
     {

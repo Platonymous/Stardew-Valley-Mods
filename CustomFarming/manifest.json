@@ -7,7 +7,7 @@
       "PatchVersion": 7,
       "Build": ""
    },
-   "Description": "Helper Mod for Custom Object creation. For SDV 1.2.",
+   "Description": "Helper Mod for Custom Object creation. For SDV 1.11",
    "UniqueID": "Platonymous.CustomFarming",
    "EntryDll": "CustomFarming.dll"
 }

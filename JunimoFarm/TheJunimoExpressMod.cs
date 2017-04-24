@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 using StardewValley.Objects;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace JunimoFarm
+namespace TheJunimoExpress
 {
     public class TheJunimoExpressMod : Mod
     {

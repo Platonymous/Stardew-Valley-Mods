@@ -31,8 +31,7 @@ namespace Portraiture
         public const float transitionRate = 3f;
         public const int characterAdvanceDelay = 30;
         public const int safetyDelay = 750;
-        private int questionFinishPauseTimer;
-        public List<ClickableComponent> responseCC;
+        public static int questionFinishPauseTimer;
         private bool activatedByGamePad;
         private int x;
         private int y;
@@ -58,6 +57,7 @@ namespace Portraiture
         public int nextTick = 0;
         public static int totalTick;
         public Vector2 boxPos;
+        public static string lastLog;
        //End Changes
 
 
@@ -89,39 +89,22 @@ namespace Portraiture
             this.setUpIcons();
         }
 
-        public PortraitureDialogueBoxNew(string dialogue, List<Response> responses, int width = 1200)
+        public PortraitureDialogueBoxNew(string dialogue, List<Response> responses)
         {
             this.activatedByGamePad = Game1.isAnyGamePadButtonBeingPressed();
             this.gamePadIntroTimer = 1000;
             this.dialogues.Add(dialogue);
             this.responses = responses;
             this.isQuestion = true;
-            this.width = width;
+            this.width = 1200;
             this.setUpQuestions();
             this.height = this.heightForQuestions;
-            this.x = (int)Utility.getTopLeftPositionForCenteringOnScreen(width, this.height, 0, 0).X;
+            this.x = (int)Utility.getTopLeftPositionForCenteringOnScreen(this.width, this.height, 0, 0).X;
             this.y = Game1.viewport.Height - this.height - Game1.tileSize;
             this.setUpIcons();
             this.characterIndexInDialogue = dialogue.Length - 1;
-            if (responses == null || !Game1.options.SnappyMenus)
-                return;
-            this.responseCC = new List<ClickableComponent>();
-            int y = this.y - (this.heightForQuestions - this.height) + SpriteText.getHeightOfString(this.getCurrentString(), width - Game1.pixelZoom * 4) + Game1.pixelZoom * 12;
-            for (int index = 0; index < responses.Count; ++index)
-            {
-                List<ClickableComponent> responseCc = this.responseCC;
-                ClickableComponent clickableComponent = new ClickableComponent(new Rectangle(this.x + Game1.pixelZoom * 2, y, width - Game1.pixelZoom * 2, SpriteText.getHeightOfString(responses[index].responseText, width - Game1.pixelZoom * 4) + Game1.pixelZoom * 4), "");
-                clickableComponent.myID = index;
-                int num1 = index < responses.Count - 1 ? index + 1 : -1;
-                clickableComponent.downNeighborID = num1;
-                int num2 = index > 0 ? index - 1 : -1;
-                clickableComponent.upNeighborID = num2;
-                responseCc.Add(clickableComponent);
-                y += SpriteText.getHeightOfString(responses[index].responseText, width) + Game1.pixelZoom * 4;
-            }
-            this.populateClickableComponentList();
-            this.snapToDefaultClickableComponent();
         }
+
 
         public PortraitureDialogueBoxNew(Dialogue dialogue)
         {
@@ -158,13 +141,7 @@ namespace Portraiture
             this.y = Game1.viewport.Height - this.height - Game1.tileSize;
             this.setUpIcons();
         }
-
-        public override void snapToDefaultClickableComponent()
-        {
-            this.currentlySnappedComponent = this.getComponentWithID(0);
-            this.snapCursorToCurrentSnappedComponent();
-        }
-
+     
         public override bool autoCenterMouseCursorForGamepad()
         {
             return false;
@@ -177,6 +154,7 @@ namespace Portraiture
 
         public override void setUpForGamePadMode()
         {
+
             if (!Game1.options.gamepadControls || !this.activatedByGamePad && Game1.lastCursorMotionWasMouse)
                 return;
             this.gamePadControlsImplemented = true;
@@ -186,8 +164,6 @@ namespace Portraiture
                 string currentString = this.getCurrentString();
                 if (currentString != null && currentString.Length > 0)
                     num = SpriteText.getHeightOfString(currentString, 999999);
-                if (Game1.options.snappyMenus)
-                    return;
                 Game1.setMousePosition(this.x + this.width - Game1.tileSize * 2, this.y + num + Game1.tileSize);
             }
             else
@@ -196,6 +172,7 @@ namespace Portraiture
 
         public void closeDialogue()
         {
+
             if (Game1.activeClickableMenu.Equals((object)this))
             {
                 Game1.exitActiveMenu();
@@ -245,6 +222,7 @@ namespace Portraiture
 
         public void beginOutro()
         {
+            
             this.transitioning = true;
             this.transitioningBigger = false;
             Game1.playSound("breathout");
@@ -257,6 +235,7 @@ namespace Portraiture
 
         private void tryOutro()
         {
+            
             if (Game1.activeClickableMenu == null || !Game1.activeClickableMenu.Equals((object)this))
                 return;
             this.beginOutro();
@@ -264,24 +243,21 @@ namespace Portraiture
 
         public override void receiveKeyPress(Keys key)
         {
-            if ((!Game1.options.SnappyMenus || !this.isQuestion) && (Game1.options.doesInputListContain(Game1.options.actionButton, key) || Game1.options.doesInputListContain(Game1.options.menuButton, key)))
+            
+            if (Game1.options.doesInputListContain(Game1.options.actionButton, key))
             {
-                if (!Game1.options.SnappyMenus || Game1.options.doesInputListContain(Game1.options.actionButton, key))
-                    return;
                 this.receiveLeftClick(0, 0, true);
             }
-            else if (this.isQuestion && !Game1.eventUp && this.characterDialogue == null)
+            else
             {
+                if (!this.isQuestion || Game1.eventUp || this.characterDialogue != null)
+                    return;
                 if (Game1.options.doesInputListContain(Game1.options.menuButton, key))
                 {
                     if (this.responses != null && this.responses.Count > 0 && Game1.currentLocation.answerDialogue(this.responses[this.responses.Count - 1]))
                         Game1.playSound("smallSelect");
                     this.selectedResponse = -1;
                     this.tryOutro();
-                }
-                else if (Game1.options.SnappyMenus)
-                {
-                    base.receiveKeyPress(key);
                 }
                 else
                 {
@@ -292,16 +268,11 @@ namespace Portraiture
                     this.tryOutro();
                 }
             }
-            else
-            {
-                if (!Game1.options.SnappyMenus || !this.isQuestion || Game1.options.doesInputListContain(Game1.options.menuButton, key))
-                    return;
-                base.receiveKeyPress(key);
-            }
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
+            
             if (this.transitioning)
                 return;
             if (this.characterIndexInDialogue < this.getCurrentString().Length - 1)
@@ -316,7 +287,7 @@ namespace Portraiture
                 {
                     if (this.selectedResponse == -1)
                         return;
-                    this.questionFinishPauseTimer = Game1.eventUp ? 600 : 200;
+                    PortraitureDialogueBoxNew.questionFinishPauseTimer = Game1.eventUp ? 600 : 200;
                     this.transitioning = true;
                     this.transitionX = -1;
                     this.transitioningBigger = true;
@@ -397,6 +368,7 @@ namespace Portraiture
 
         private void setUpIcons()
         {
+            
             this.dialogueIcon = (TemporaryAnimatedSprite)null;
             if (this.isQuestion)
                 this.setUpQuestionIcon();
@@ -436,15 +408,14 @@ namespace Portraiture
                         Game1.playSound("Cowboy_gunshot");
                 }
             }
-            if (!Game1.eventUp && !this.friendshipJewel.Equals(Rectangle.Empty) && (this.friendshipJewel.Contains(mouseX, mouseY) && this.characterDialogue != null) && (this.characterDialogue.speaker != null && Game1.player.friendships.ContainsKey(this.characterDialogue.speaker.name)))
-                this.hoverText = Game1.player.getFriendshipHeartLevelForNPC(this.characterDialogue.speaker.name).ToString() + "/" + (this.characterDialogue.speaker.name.Equals(Game1.player.spouse) ? "12" : "10") + "<";
-            if (!Game1.options.SnappyMenus || this.currentlySnappedComponent == null)
+            if (Game1.eventUp || this.friendshipJewel.Equals(Rectangle.Empty) || (!this.friendshipJewel.Contains(mouseX, mouseY) || this.characterDialogue == null) || (this.characterDialogue.speaker == null || !Game1.player.friendships.ContainsKey(this.characterDialogue.speaker.name)))
                 return;
-            this.selectedResponse = this.currentlySnappedComponent.myID;
+            this.hoverText = Game1.player.getFriendshipHeartLevelForNPC(this.characterDialogue.speaker.name).ToString() + "/" + (this.characterDialogue.speaker.name.Equals(Game1.player.spouse) ? "12" : "10") + "<";
         }
 
         private void setUpQuestionIcon()
         {
+            
             Vector2 position = new Vector2((float)(this.x + this.width - 10 * Game1.pixelZoom), (float)(this.y + this.height - 11 * Game1.pixelZoom));
             TemporaryAnimatedSprite temporaryAnimatedSprite = new TemporaryAnimatedSprite(Game1.mouseCursors, new Rectangle(330, 357, 7, 13), 100f, 6, 999999, position, false, false, 0.89f, 0.0f, Color.White, (float)Game1.pixelZoom, 0.0f, 0.0f, 0.0f, true);
             temporaryAnimatedSprite.yPeriodic = true;
@@ -464,6 +435,7 @@ namespace Portraiture
 
         private void setUpNextPageIcon()
         {
+           
             Vector2 position = new Vector2((float)(this.x + this.width - 10 * Game1.pixelZoom), (float)(this.y + this.height - 10 * Game1.pixelZoom));
             if (this.isPortraitBox())
                 position.X -= (float)(115 * Game1.pixelZoom + 8 * Game1.pixelZoom);
@@ -477,6 +449,7 @@ namespace Portraiture
 
         private void checkDialogue(Dialogue d)
         {
+            
             this.isQuestion = false;
             string str1 = "";
             if (this.characterDialoguesBrokenUp.Count == 1)
@@ -502,33 +475,17 @@ namespace Portraiture
 
         private void setUpQuestions()
         {
+
             int widthConstraint = this.width - Game1.pixelZoom * 4;
             this.heightForQuestions = SpriteText.getHeightOfString(this.getCurrentString(), widthConstraint);
             foreach (Response response in this.responses)
                 this.heightForQuestions = this.heightForQuestions + (SpriteText.getHeightOfString(response.responseText, widthConstraint) + Game1.pixelZoom * 4);
             this.heightForQuestions = this.heightForQuestions + Game1.pixelZoom * 10;
-            if (this.responses == null || !Game1.options.SnappyMenus)
-                return;
-            this.responseCC = new List<ClickableComponent>();
-            int y = this.y - (this.heightForQuestions - this.height) + SpriteText.getHeightOfString(this.getCurrentString(), this.width - Game1.pixelZoom * 4) + Game1.pixelZoom * 12;
-            for (int index = 0; index < this.responses.Count; ++index)
-            {
-                List<ClickableComponent> responseCc = this.responseCC;
-                ClickableComponent clickableComponent = new ClickableComponent(new Rectangle(this.x + Game1.pixelZoom * 2, y, this.width - Game1.pixelZoom * 2, SpriteText.getHeightOfString(this.responses[index].responseText, this.width - Game1.pixelZoom * 4) + Game1.pixelZoom * 4), "");
-                clickableComponent.myID = index;
-                int num1 = index < this.responses.Count - 1 ? index + 1 : -1;
-                clickableComponent.downNeighborID = num1;
-                int num2 = index > 0 ? index - 1 : -1;
-                clickableComponent.upNeighborID = num2;
-                responseCc.Add(clickableComponent);
-                y += SpriteText.getHeightOfString(this.responses[index].responseText, this.width) + Game1.pixelZoom * 4;
-            }
-            this.populateClickableComponentList();
-            this.snapToDefaultClickableComponent();
         }
 
         public bool isPortraitBox()
         {
+ 
             if (this.characterDialogue != null && this.characterDialogue.speaker != null && (this.characterDialogue.speaker.Portrait != null && this.characterDialogue.showPortrait))
                 return Game1.options.showPortraits;
             return false;
@@ -536,6 +493,7 @@ namespace Portraiture
 
         public void drawBox(SpriteBatch b, int xPos, int yPos, int boxWidth, int boxHeight)
         {
+            
             boxPos = new Vector2(xPos, yPos);
             if (xPos <= 0)
                 return;
@@ -560,7 +518,7 @@ namespace Portraiture
 //Begin changes
         public bool setTexture(string characterName, Texture2D fallBack)
         {
-
+           
             if (ImageHelper.pTextures.ContainsKey(characterName))
             {
                 if (ImageHelper.pTextures[characterName] == fallBack)
@@ -621,6 +579,7 @@ namespace Portraiture
 
         public void drawPortrait(SpriteBatch b)
         {
+           
             string characterName = this.characterDialogue.speaker.name;
             Texture2D texture = this.characterDialogue.speaker.Portrait;
             Texture2D animTexture = this.characterDialogue.speaker.Portrait;
@@ -844,20 +803,27 @@ namespace Portraiture
 
         public string getCurrentString()
         {
-            if (this.characterDialogue != null)
+            
+            if (this.characterDialogue != null && this.characterDialogue.speaker != null && this.characterDialogue.getCurrentDialogue() != null && this.characterDialogue.getCurrentDialogue() != "")
             {
+                
                 string str = this.characterDialoguesBrokenUp.Count <= 0 ? this.characterDialogue.getCurrentDialogue().Trim().Replace(Environment.NewLine, "") : this.characterDialoguesBrokenUp.Peek().Trim().Replace(Environment.NewLine, "");
                 if (!Game1.options.showPortraits)
                     str = this.characterDialogue.speaker.getName() + ": " + str;
+
+                
                 return str;
             }
-            if (this.dialogues.Count > 0)
+            if (this.dialogues != null && this.dialogues.Count > 0 && this.dialogues[0] != null)
+            {
                 return this.dialogues[0].Trim().Replace(Environment.NewLine, "");
+            }
+         
             return "";
         }
 
         public override void update(GameTime time)
-        {
+        { 
             base.update(time);
             Game1.mouseCursorTransparency = Game1.lastCursorMotionWasMouse || this.isQuestion ? 1f : 0.0f;
             if (this.gamePadIntroTimer > 0 && !this.isQuestion)
@@ -867,9 +833,9 @@ namespace Portraiture
             }
             if (this.safetyTimer > 0)
                 this.safetyTimer = this.safetyTimer - time.ElapsedGameTime.Milliseconds;
-            if (this.questionFinishPauseTimer > 0)
+            if (PortraitureDialogueBoxNew.questionFinishPauseTimer > 0)
             {
-                this.questionFinishPauseTimer = this.questionFinishPauseTimer - time.ElapsedGameTime.Milliseconds;
+                PortraitureDialogueBoxNew.questionFinishPauseTimer -= time.ElapsedGameTime.Milliseconds;
             }
             else
             {
@@ -923,7 +889,10 @@ namespace Portraiture
                         this.transitionX = Math.Min(this.x + this.width / 2, this.transitionX);
                         this.transitionY = Math.Min(this.y + this.height / 2, this.transitionY);
                         this.transitionWidth = this.transitionWidth - (int)((double)time.ElapsedGameTime.Milliseconds * 3.0 * 2.0);
-                        this.transitionHeight = this.transitionHeight - (int)((double)time.ElapsedGameTime.Milliseconds * 3.0 * ((double)this.height / (double)this.width) * 2.0);
+                        int transitionHeight = this.transitionHeight;
+                        elapsedGameTime = time.ElapsedGameTime;
+                        int num = (int)((double)elapsedGameTime.Milliseconds * 3.0 * ((double)this.height / (double)this.width) * 2.0);
+                        this.transitionHeight = transitionHeight - num;
                         this.transitionWidth = Math.Max(0, this.transitionWidth);
                         this.transitionHeight = Math.Max(0, this.transitionHeight);
                         if (this.transitionWidth == 0 && this.transitionHeight == 0)
@@ -970,6 +939,7 @@ namespace Portraiture
 
         public override void draw(SpriteBatch b)
         {
+            
             if (this.width < Game1.tileSize / 4 || this.height < Game1.tileSize / 4)
                 return;
             if (this.transitioning)

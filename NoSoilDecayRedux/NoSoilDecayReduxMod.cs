@@ -96,8 +96,9 @@ namespace NoSoilDecayRedux
             savelocation = Game1.getLocationFromName("Town");
             savepoint = new Vector2(2, 0);
 
-            if (savelocation.objects.ContainsKey(savepoint))
+            if (savelocation != null && savelocation.objects.ContainsKey(savepoint) && savelocation.objects[savepoint] is Chest)
             {
+        
                 string[] hoedirttiles = savelocation.objects[savepoint].name.Split('/');
                 
 
@@ -133,6 +134,11 @@ namespace NoSoilDecayRedux
         {
             foreach (Vector2 keyV in location.terrainFeatures.Keys)
             {
+                if (!location.terrainFeatures.ContainsKey(keyV))
+                {
+                    continue;
+                }
+
                 TerrainFeature terrain = location.terrainFeatures[keyV];
 
                 if (terrain is HoeDirt)

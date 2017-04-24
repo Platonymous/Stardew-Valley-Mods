@@ -27,6 +27,7 @@ namespace Speedster
         public int index;
         public static int baseIndex;
         public static bool setup = false;
+        public static bool hyperdrive = false;
 
 
         public SpeedsterMask()
@@ -102,18 +103,34 @@ namespace Speedster
                 wearing = true;
             }
 
+            if (wearing)
+            {
+                if (hyperdrive)
+                {
+                    Game1.player.addedSpeed = Math.Max(24, Game1.player.addedSpeed);
+                }
+                else
+                {
+                    Game1.player.addedSpeed = Math.Max(6, Game1.player.addedSpeed);
+                }
+               
+            }
+
         }
 
         public static void takeOffCostume()
         {
-            if (wearing) { 
-            Game1.player.hair = oldHair;
-            FarmerRenderer.shirtsTexture = oldShirtTexture;
-            Game1.player.changePants(oldPants);
-            Game1.player.FarmerRenderer.changeShirt(oldShirt);
-            Game1.player.shirt = oldShirt;
-            Game1.player.FarmerRenderer.recolorShoes(oldShoes);
-            wearing = false;
+        
+                if (wearing)
+            {
+                Game1.player.hair = oldHair;
+                FarmerRenderer.shirtsTexture = oldShirtTexture;
+                Game1.player.changePants(oldPants);
+                Game1.player.FarmerRenderer.changeShirt(oldShirt);
+                Game1.player.shirt = oldShirt;
+                Game1.player.FarmerRenderer.recolorShoes(oldShoes);
+                wearing = false;
+                Game1.player.addedSpeed = 0;
             }
         }
 

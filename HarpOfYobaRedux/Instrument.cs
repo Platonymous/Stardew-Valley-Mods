@@ -206,13 +206,8 @@ namespace HarpOfYobaRedux
 
         public override string getDescription()
         {
-            return loadDescription();
-        }
-
-        protected override string loadDescription()
-        {
             string text = this.description;
-            if(attachments.Length > 0 && attachments[0] is SheetMusic)
+            if (attachments.Length > 0 && attachments[0] is SheetMusic)
             {
                 text = (attachments[0] as SheetMusic).name;
             }
@@ -220,13 +215,6 @@ namespace HarpOfYobaRedux
             int width = Game1.tileSize * 4 + Game1.tileSize / 4;
             return Game1.parseText(text, smallFont, width);
         }
-
-
-        protected override string loadDisplayName()
-        {
-            return name;
-        }
-       
 
         private string getDisplayName()
         {

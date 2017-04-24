@@ -7,7 +7,7 @@
       "PatchVersion": 1,
       "Build": "2"
    },
-   "Description": "Adds The Harp of Yoba to the game. This is the Version for SDV 1.2+ with SMAPI 1.10+",
+   "Description": "Adds The Harp of Yoba to the game. This is the Version for SDV 1.11 with SMAPI 1.9",
    "UniqueID": "Platonymous.HarpOfYobaRedux",
    "EntryDll": "HarpOfYobaRedux.dll"
 }

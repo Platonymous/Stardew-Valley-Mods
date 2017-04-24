@@ -11,6 +11,7 @@ using StardewValley.Locations;
 
 using Newtonsoft.Json.Linq;
 
+using CustomElementHandler;
 
 namespace CustomFarming
 {
@@ -18,9 +19,8 @@ namespace CustomFarming
     {
 
 
-        private static List<ISaveObject> registry = new List<ISaveObject>();
         public static string saveString = "";
-      
+        private static List<ISaveObject> registry = new List<ISaveObject>();
 
         public SaveHandler()
         {
@@ -59,8 +59,7 @@ namespace CustomFarming
                 int building = (int)obj.placement.building;
      
                 ISaveObject next = loadObject(type, data);
-                next.Position = position;
-                next.InStorage = false;
+
              
                 if (location.Contains("Barn") || location.Contains("Coop") || location.Contains("Shed") || location.Equals("House"))
                 {
@@ -69,16 +68,14 @@ namespace CustomFarming
 
                 if (location == "Inventory")
                 {
-                    next.InStorage = true;
-                    next.Environment = Game1.getFarm();
+
                     Game1.player.items[index] = (Item) next;
                     continue;
                 }
 
                 if (location == "Fridge")
                 {
-                    next.InStorage = true;
-                    next.Environment = Game1.getLocationFromName("FarmHouse");
+        
                     (Game1.getLocationFromName("FarmHouse") as FarmHouse).fridge.items[index] = (Item)next;
             
                     continue;
@@ -96,11 +93,11 @@ namespace CustomFarming
                     place = g;
                 }
 
-                next.Environment = place;
+
 
                 if (index >= 0)
                 {
-                    next.InStorage = true;
+
                     (place.objects[position] as Chest).items[index] = (Item) next;
                     continue;
                 }
@@ -117,6 +114,20 @@ namespace CustomFarming
         public static void loadFromFile(string modSaveName)
         {
             saveString = loadSavStringFromFile(modSaveName, Game1.uniqueIDForThisGame, Game1.player.name);
+            if(saveString != "")
+            {
+                string filename = modSaveName + "_" + Game1.player.name + "_" + Game1.uniqueIDForThisGame + ".sav";
+                string str = Game1.player.name;
+                foreach (char c in str)
+                {
+                    if (!char.IsLetterOrDigit(c))
+                        str = str.Replace(c.ToString() ?? "", "");
+                }
+                string path2 = Path.Combine(str + "_" + (object)Game1.uniqueIDForThisGame, filename);
+                string path = Path.Combine(Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "StardewValley"), "Saves"), path2);
+                File.Copy(path, path+".old");
+                File.Delete(path);
+            }
         }
 
         private static string loadSavStringFromFile(string name, ulong GID, string PN)
@@ -135,24 +146,8 @@ namespace CustomFarming
             }
         }
 
-        public static void saveToFile(string modSaveName)
-        {
-            saveSavStringToFile(modSaveName, saveString, Game1.uniqueIDForThisGame, Game1.player.name);
-            saveString = "";
-        }
+       
 
-        private static void saveSavStringToFile(string name, string savstring, ulong GID, string PN)
-        {
-            string filename = name + "_" + PN + "_" + GID + ".sav";
-            FileInfo fi = ensureFolderStructureExists(PN, GID, filename);
-
-
-            using (StreamWriter sw = fi.CreateText())
-            {
-                sw.WriteLine(savstring);
-            }
-
-        }
 
         private static FileInfo ensureFolderStructureExists(string PN, ulong GID, string tmpString)
         {
@@ -191,32 +186,6 @@ namespace CustomFarming
             }
         }
 
-        public static void SaveAndRemove()
-        {
-            List<object> save = new List<object>();
-
-            int c = 0;
-
-            foreach(ISaveObject s in registry)
-            {
-                if (s != null) { 
-                dynamic item = removeObject(s);
-                if (item != null)
-                {
-                    save.Add((object)item);
-                    c++;
-                }
-                }
-            }
-
-            object[] saveobjects = save.ToArray();
-
-            saveString = Newtonsoft.Json.JsonConvert.SerializeObject(saveobjects);
-
-            registry = new List<ISaveObject>();
-            
-        }
-
         public static void register(ISaveObject obj)
         {
             registry.Add(obj);
@@ -248,11 +217,11 @@ namespace CustomFarming
             if (!obj.InStorage) { return new Vector3(-1); }
             foreach (Vector2 keyV in obj.Environment.objects.Keys)
             {
-                if ((obj.Environment.objects[keyV] is Chest) && (obj.Environment.objects[keyV] as Chest).items.Contains((Item) obj))
+                if ((obj.Environment.objects[keyV] is Chest) && (obj.Environment.objects[keyV] as Chest).items.Contains((Item)obj))
                 {
 
                     return new Vector3((obj.Environment.objects[keyV] as Chest).items.FindIndex(x => x == obj), keyV.X, keyV.Y);
-                    
+
                 }
             }
 
@@ -262,7 +231,7 @@ namespace CustomFarming
         private static int inFridge(ISaveObject obj)
         {
             if (!obj.InStorage) { return -1; }
-            
+
             return (Game1.getLocationFromName("FarmHouse") as FarmHouse).fridge.items.FindIndex(x => x == obj);
         }
 
@@ -274,83 +243,7 @@ namespace CustomFarming
         }
 
 
-        private static dynamic getPlacementSaveData(ISaveObject obj)
-        {
-            int pIndex = inInventory(obj);
-            int fIndex = inFridge(obj);
-            string eName = obj.Environment.name;
-            Vector2 oPosition = obj.Position;
 
-            if (pIndex >= 0)
-            {
-                eName = "Inventory";
-            }
-            
-            if (fIndex >= 0)
-            {
-                pIndex = fIndex;
-                eName = "Fridge";
-            }
-
-            
-            if (pIndex < 0)
-            {
-                Vector3 chest = inChest(obj);
-                pIndex = (int) chest.X;
-                if (pIndex >= 0)
-                {
-                    oPosition = new Vector2(chest.Y, chest.Z);
-                }
-            }
-
-            int buildingIndex = getBuilding(obj);
-
-            if (buildingIndex != -1)
-            {
-                eName = "Farm";
-            }
-
-            dynamic placement = new { position = oPosition, building = buildingIndex,  location = eName, index = pIndex };
-            return placement;
-        }
-
-
-
-        private static dynamic removeObject(ISaveObject obj)
-        {
-            dynamic placementSaveData = getPlacementSaveData(obj);
-            dynamic additionalSaveData = obj.getAdditionalSaveData();
-
-            int index = (int)placementSaveData.index;
-            string loaction = (string)placementSaveData.location;
-            Vector2 oPosition = (Vector2)placementSaveData.position;
-
-            if (loaction == "Inventory" && Game1.player.items[index] == obj)
-            {
-                Game1.player.items[index] = obj.getReplacement();
-            }
-            else if (loaction == "Fridge" && (Game1.getLocationFromName("FarmHouse") as FarmHouse).fridge.items[index] == obj)
-            {
-                (Game1.getLocationFromName("FarmHouse") as FarmHouse).fridge.items[index] = obj.getReplacement();
-            }
-            else if (index >= 0 && obj.Environment.objects.ContainsKey(oPosition) && obj.Environment.objects[oPosition] is Chest && (obj.Environment.objects[oPosition] as Chest).items[index] == obj)
-            {
-                (obj.Environment.objects[oPosition] as Chest).items[index] = obj.getReplacement();
-            } else if (obj.Environment.objects.ContainsKey(oPosition) && obj.Environment.objects[oPosition] == obj)
-            {
-                obj.Environment.objects[oPosition] = obj.getReplacement();
-            } else
-            {
-                return null;
-            }
-
-            string type = obj.GetType().FullName;
-
-            dynamic saveObject = new { type = type, placement = placementSaveData, data = additionalSaveData };
-
-            return saveObject;
-
-        }
 
     }
 }

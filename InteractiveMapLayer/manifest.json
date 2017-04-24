@@ -1,0 +1,13 @@
+{
+  "Name": "Interactive Map Layer",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 0,
+    "MinorVersion": 1,
+    "PatchVersion": 0,
+    "Build": ""
+  },
+  "Description": "Adds more interactivity to maps",
+  "UniqueID": "Platonymous.InteractiveMapLayer",
+  "EntryDll": "InteractiveMapLayer.dll"
+}

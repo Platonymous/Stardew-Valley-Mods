@@ -135,11 +135,6 @@ namespace HarpOfYobaRedux
             }
         }
 
-        protected override string loadDisplayName()
-        {
-            return name;
-        }
-
         public override Item getOne()
         {
             return new SheetMusic(sheetMusicID);

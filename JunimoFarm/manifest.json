@@ -7,7 +7,7 @@
       "PatchVersion": 0,
       "Build": ""
    },
-   "Description": "Let Junimos help you on the farm. For SDV 1.2",
+   "Description": "Let Junimos help you on the farm. For SDV 1.11",
    "UniqueID": "Platonymous.JunimoFarm",
-   "EntryDll": "TheJunimoExpress.dll"
+   "EntryDll": "JunimoFarm.dll"
 }

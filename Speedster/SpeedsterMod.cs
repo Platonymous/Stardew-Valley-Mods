@@ -25,6 +25,7 @@ namespace Speedster
         internal Game1 gamePtr;
         private TimeSpan oldTS;
         private bool isSpeeding;
+        private int phase = 0;
  
 
         public override void Entry(IModHelper helper)
@@ -101,39 +102,86 @@ namespace Speedster
         {
             if (Game1.player.hat != null && Game1.player.hat is SpeedsterMask)
             {
+              
                 SpeedsterMask.putOnCostume((Game1.player.hat as SpeedsterMask).index);
-                Game1.player.addedSpeed = Math.Max(6,Game1.player.addedSpeed);
+                
                 
 
             }
             else
             {
+                
                 SpeedsterMask.takeOffCostume();
-                Game1.player.addedSpeed = 0;
+                
             }
         }
 
+        private void timeSpeed()
+        {
+
+            if (!isSpeeding && Game1.timeOfDay < 2300)
+            {
+                Game1.playSound("stardrop");
+                oldTS = new TimeSpan(gamePtr.TargetElapsedTime.Ticks);
+                gamePtr.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 1);
+                isSpeeding = true;
+                speedUpTime();
+            }
+            else
+            {
+                gamePtr.TargetElapsedTime = oldTS;
+                isSpeeding = false;
+            }
+        }
+
+        private void speedUp()
+        {
+            if (SpeedsterMask.hyperdrive)
+            {
+                SpeedsterMask.hyperdrive = false;
+            }
+            else
+            {
+                SpeedsterMask.hyperdrive = true;
+            }
+
+            if (Game1.player.hat is SpeedsterMask)
+            {
+                int index = (Game1.player.hat as SpeedsterMask).index;
+                SpeedsterMask.takeOffCostume();
+                SpeedsterMask.putOnCostume(index);
+            }
+        }
 
         private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
         {
    
             if(e.KeyPressed == Microsoft.Xna.Framework.Input.Keys.Space && Game1.player.hat is SpeedsterMask)
             {
-                if (!isSpeeding && Game1.timeOfDay < 2300)
+
+                if (phase == 0)
                 {
-                    Game1.playSound("stardrop");
-                    oldTS = new TimeSpan(gamePtr.TargetElapsedTime.Ticks);
-                    gamePtr.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 1);
-                    isSpeeding = true;
-                    speedUpTime();
+                    speedUp();
                 }
-                else
+
+                if (phase == 1)
                 {
-                    gamePtr.TargetElapsedTime = oldTS;
-                    isSpeeding = false;
+                    timeSpeed();
                 }
+
+                if (phase == 2)
+                {
+                    timeSpeed();
+                    speedUp();
+                    phase = -1;
+                }
+
+                phase++;
+
                 
+
             }
+
 
 
         }

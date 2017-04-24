@@ -17,9 +17,11 @@ using xTile.Tiles;
 using xTile.Dimensions;
 using xTile;
 
+using CustomElementHandler;
+
 namespace CustomFarming
 {
-    class simpleMachine : StardewValley.Object , ISaveObject, ICustomFarmingObject
+    public class simpleMachine : StardewValley.Object , ISaveElement, ICustomFarmingObject, ISaveObject
     {
 
         public Texture2D tilesheet;
@@ -78,6 +80,8 @@ namespace CustomFarming
 
         private bool inStorage;
         private GameLocation environment;
+
+        public static List<simpleMachine> allMachines;
 
         public bool InStorage
         {
@@ -149,25 +153,7 @@ namespace CustomFarming
             }
         }
 
-        public StardewValley.Object getReplacement()
-        {
-            StardewValley.Object replacement = new Chest(true);
-            return replacement;
-        }
-
-
-        public dynamic getAdditionalSaveData()
-        {
-            int lastDropInPSI = 0;
-            int lastDropInQ = 0;
-            if (this.lastDropIn != null)
-            {
-                lastDropInPSI = this.lastDropIn.parentSheetIndex;
-                lastDropInQ = this.lastDropIn.quality;
-            }
-            dynamic additionalData = new { FileName = this.filename, ModFolder = this.modFolder, LastDropIn = lastDropInPSI, LastDropInQuality = lastDropInQ, Ready = this.readyForHarvest, Minutes = this.minutesUntilReady, Working = this.isWorking };
-            return additionalData;
-        }
+       
 
         public void rebuildFromSave(dynamic additionalSaveData)
         {
@@ -215,6 +201,15 @@ namespace CustomFarming
         public void build(string modFolder, string filename)
         {
             SaveHandler.register(this);
+            if (allMachines == null)
+            {
+                allMachines = new List<simpleMachine>();
+            }
+
+            if (!allMachines.Contains(this))
+            {
+                allMachines.Add(this);
+            }
             this.tileLocation = Vector2.Zero;
             this.modFolder = modFolder;
             this.filename = filename;
@@ -452,10 +447,41 @@ namespace CustomFarming
            
         }
 
+        public bool canBeAutomated()
+        {
+            return (this.produce != null);
+
+
+        }
+    
+
         public simpleMachine(string modFolder, string filename)
         {
             this.build(modFolder, filename);
 
+        }
+
+
+        public List<StardewValley.Object> getMaterials()
+        {
+
+            return this.materials;
+
+        }
+
+        public int getRequiredStack()
+        {
+            return this.requiredStack;
+        }
+
+        public int getStarterMaterial()
+        {
+            return this.starterMaterial;
+        }
+
+        public int getStarterMaterialStack()
+        {
+            return this.starterMaterialStack;
         }
 
         public Texture2D Bitmap2Texture(Bitmap bmp)
@@ -534,6 +560,49 @@ namespace CustomFarming
            
         }
         
+        public void resetForAutomation()
+        {
+
+            this.readyForHarvest = false;
+            this.lastDropIn = null;
+            this.heldObject = null;
+            this.isSpecial = false;
+
+            if (this.materials.Count == 0)
+            {
+                this.startWorking();
+            }
+        }
+
+        public string DisplayName
+        {
+            get
+            {
+                return this.name;
+            }
+
+            set
+            {
+                this.name = value;
+            }
+        }
+
+        protected string loadDisplayName()
+        {
+            return this.name;
+        }
+        
+        public Item deliverProduceForAutomation()
+        {
+            if (lastDropIn != null)
+            {
+                (this.heldObject as StardewValley.Object).price += (lastDropIn.price * requiredStack) / (this.heldObject as StardewValley.Object).Stack;
+            }
+
+            
+            return this.heldObject;
+
+        }
 
         public bool deliverProduce(StardewValley.Farmer who)
         {
@@ -669,14 +738,14 @@ namespace CustomFarming
                     spriteBatch.Draw(cno.tilesheet, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize + Game1.tileSize / 2), (float)(y * Game1.tileSize - Game1.tileSize - Game1.tileSize / 8) + num)), new Microsoft.Xna.Framework.Rectangle?(cno.sourceRectangle), cno.color * 0.75f, 0.0f, new Vector2(8f, 8f), (float)Game1.pixelZoom, SpriteEffects.None, (float)((double)((y + 1) * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + (double)this.tileLocation.X / 10000.0 + 0.0));
                 }
 
-            if (this.categoryName == "Mailbox" && Game1.mailbox.Count > 0 && this.inStorage == false && this.animateWork == false)
+            if (this.categoryName == "Mailbox" && Game1.mailbox.Count > 0 && this.animateWork == false)
             {
                 float num = (float)(4.0 * Math.Round(Math.Sin(DateTime.Now.TimeOfDay.TotalMilliseconds / 250.0), 2));
                 spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(this.tileLocation.X * Game1.tileSize), (float)(this.tileLocation.Y * Game1.tileSize - Game1.tileSize * 3 / 2 - 48) + num)), new Microsoft.Xna.Framework.Rectangle?(new Microsoft.Xna.Framework.Rectangle(141, 465, 20, 24)), Microsoft.Xna.Framework.Color.White * 0.75f, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, (float)((double)(17 * Game1.tileSize) / 10000.0 + 9.99999997475243E-07 + 0.00680000009015203));
                 spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(this.tileLocation.X * Game1.tileSize + Game1.tileSize / 2 + Game1.pixelZoom), (float)(this.tileLocation.Y * Game1.tileSize - Game1.tileSize - 24 - Game1.tileSize / 8) + num)), new Microsoft.Xna.Framework.Rectangle?(new Microsoft.Xna.Framework.Rectangle(189, 423, 15, 13)), Microsoft.Xna.Framework.Color.White, 0.0f, new Vector2(7f, 6f), 4f, SpriteEffects.None, (float)((double)(17 * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + 0.00680000009015203));
             }
 
-            SaveHandler.draw(this, new Vector2(x,y));
+            SaveHandler.draw(this, new Vector2(x, y));
         }
 
 
@@ -773,6 +842,88 @@ namespace CustomFarming
             return false;
         }
 
+        public bool pullFromChestForAutomation(Chest[] chests)
+        {
+
+            if (this.heldObject != null)
+            {
+                return false;
+            }
+
+            Item nextDropIn = null;
+            int foundStarterIndex = -1;
+            bool foundStarter = false;
+            Item starterItem = null;
+
+            if(this.starterMaterialStack != 0) { 
+
+            for (int i = 0; i < chests.Length; i++)
+            {
+                for (int j = 0; j < chests[i].items.Count; j++)
+                {
+                    starterItem = chests[i].items[j];
+                    if (starterItem == null) { continue; }
+                    if (starterItem.parentSheetIndex == this.starterMaterial && starterItem.Stack >= this.starterMaterialStack)
+                    {
+                        foundStarter = true;
+                        foundStarterIndex = i;
+                        break;
+                    }
+
+                }
+            }
+            }
+            else
+            {
+                foundStarter = true;
+            }
+
+            if (!foundStarter) { return false; }
+
+            for (int i = 0; i < chests.Length; i++)
+            {
+                for (int j = 0; j < chests[i].items.Count; j++)
+                {
+                    Item item = chests[i].items[j];
+                    if (item == null) { continue; }
+                    if (materials.FindIndex(x => x.parentSheetIndex == item.parentSheetIndex) != -1 && item.Stack >= this.requiredStack)
+                    {
+                        nextDropIn = item.getOne();
+                        item.Stack -= requiredStack;
+                        if (item.Stack <= 0)
+                        {
+                            chests[i].items.Remove(item);
+                        }
+
+                        if(starterItem != null && starterMaterialStack > 0)
+                        { 
+                        starterItem.Stack -= starterMaterialStack;
+                        if (starterItem.Stack <= 0)
+                        {
+                            chests[foundStarterIndex].items.Remove(starterItem);
+                        }
+                        }
+
+                        break;
+                    }
+
+
+                }
+            }
+
+            if(nextDropIn == null) { return false; }
+
+            this.lastDropIn = (StardewValley.Object) nextDropIn;
+            this.prefix = nextDropIn.Name;
+            this.suffix = nextDropIn.Name;
+
+
+            startWorking();
+
+            return true;
+
+        }
+
 
         public override bool performObjectDropInAction(StardewValley.Object dropIn, bool probe, StardewValley.Farmer who)
         {
@@ -790,7 +941,7 @@ namespace CustomFarming
             if (dropIn.stack < this.requiredStack)
             {
                 if (!probe) { 
-                Game1.showRedMessage("Requieres " + this.requiredStack + " " + dropIn.name);
+                Game1.showRedMessage("Requires " + this.requiredStack + " " + dropIn.name);
                 }
                 return false;
             }
@@ -799,7 +950,7 @@ namespace CustomFarming
             {
                 if (!probe)
                 {
-                    Game1.showRedMessage("Requieres " + this.starterMaterialStack + " " + new StardewValley.Object(this.starterMaterial, 1).name);
+                    Game1.showRedMessage("Requires " + this.starterMaterialStack + " " + new StardewValley.Object(this.starterMaterial, 1).name);
                 }
                 return false;
             }
@@ -810,7 +961,7 @@ namespace CustomFarming
             {
                 if (!probe)
                 { 
-                    Game1.showRedMessage("Requieres " + sum + " " + new StardewValley.Object(this.starterMaterial, 1).name);
+                    Game1.showRedMessage("Requires " + sum + " " + new StardewValley.Object(this.starterMaterial, 1).name);
                 }
                 return false;
             }
@@ -1141,6 +1292,50 @@ namespace CustomFarming
 
         }
 
+        dynamic ISaveElement.getReplacement()
+        {
+            Chest chest = new Chest();
 
+            if (this.lastDropIn != null)
+            {
+                chest.items.Add(lastDropIn);
+            }
+
+            return chest;
+        }
+
+        Dictionary<string, string> ISaveElement.getAdditionalSaveData()
+        {
+          
+            Dictionary<string, string> saveData = new Dictionary<string, string>();
+            saveData.Add("filename", filename);
+            saveData.Add("modfolder", modFolder);
+            saveData.Add("ready", readyForHarvest.ToString());
+            saveData.Add("minutes", minutesUntilReady.ToString());
+            saveData.Add("working", isWorking.ToString());
+
+            return saveData;
+        }
+
+        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
+        {
+            int lastDropInPSI = 0;
+            int lastDropInQ = 0;
+            if ((replacement as Chest).items.Count > 0)
+            {
+                lastDropInPSI = (replacement as Chest).items[0].parentSheetIndex;
+                lastDropInQ = ((replacement as Chest).items[0] as StardewValley.Object).quality;
+            }
+
+            bool isReady = (additionalSaveData["ready"].ToLower() == "true");
+            bool working = (additionalSaveData["working"].ToLower() == "true");
+
+            dynamic additionalData = new { FileName = additionalSaveData["filename"], ModFolder = additionalSaveData["modfolder"], LastDropIn = lastDropInPSI, LastDropInQuality = lastDropInQ, Ready = isReady, Minutes = int.Parse(additionalSaveData["minutes"]), Working = working };
+
+            rebuildFromSave(additionalData);
+
+        }
+
+      
     }
 }

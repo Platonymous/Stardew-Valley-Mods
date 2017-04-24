@@ -23,7 +23,13 @@ namespace CustomFarming
 
         public override void Entry(IModHelper helper)
         {
-            this.customContentFolder = Path.Combine(helper.DirectoryPath, "CustomContent");
+            
+            customContentFolder = Path.Combine(helper.DirectoryPath, "CustomContent");
+
+            if (!Directory.Exists(customContentFolder))
+            {
+                Directory.CreateDirectory(customContentFolder);
+            }
 
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
             SaveEvents.BeforeSave += (x,y) => save();
@@ -120,12 +126,14 @@ namespace CustomFarming
                     {
                         List<ClickableTextureComponent> replaceComponents = new List<ClickableTextureComponent>();
 
-                        foreach(Dictionary<ClickableTextureComponent, CraftingRecipe> dict in (menu as CraftingPage).pagesOfCraftingRecipes)
+                        List<Dictionary<ClickableTextureComponent, CraftingRecipe>> pagesOfCraftingRecipes = Helper.Reflection.GetPrivateField<List<Dictionary<ClickableTextureComponent, CraftingRecipe>>>(menu, "pagesOfCraftingRecipes").GetValue();
+
+                        foreach (Dictionary<ClickableTextureComponent, CraftingRecipe> dict in pagesOfCraftingRecipes)
                         {
                             foreach(ClickableTextureComponent ctc in dict.Keys)
                             {
-                                
-                                    if (ctc.sourceRect.X < 0 || ctc.sourceRect.Y < 0)
+
+                                if (ctc.sourceRect.X < 0 || ctc.sourceRect.Y < 0)
                                 {
                                     ctc.name = dict[ctc].name;
                                     replaceComponents.Add(ctc);
@@ -141,7 +149,7 @@ namespace CustomFarming
                             {
                                 replaceComponents[c].texture = machinesForCrafting[replaceComponents[c].name].Texture;
                                 replaceComponents[c].sourceRect = machinesForCrafting[replaceComponents[c].name].sourceRectangle;
-
+                                
                             }
 
                             
@@ -159,9 +167,7 @@ namespace CustomFarming
         private void save()
         {
             removeCraftingPage();
-            SaveHandler.SaveAndRemove();
-            Monitor.Log("Saving: " + SaveHandler.saveString);
-            SaveHandler.saveToFile("CustomFarmingMod");
+           
         }
 
         private void load()
@@ -169,8 +175,11 @@ namespace CustomFarming
             customFiles = new List<string>();
             ParseDir(customContentFolder);
             SaveHandler.loadFromFile("CustomFarmingMod");
-            Monitor.Log("Loading: " + SaveHandler.saveString);
-            SaveHandler.LoadAndReplace();
+            if(SaveHandler.saveString != "")
+            {
+                SaveHandler.LoadAndReplace();
+            }
+            
             buildMaschines();
             buildCraftingPage();
         }
@@ -237,9 +246,9 @@ namespace CustomFarming
 
                 (m as simpleMachine).craftingid = count;
 
-                string craftingInformation = $"{name}/50/-300/Crafting -24/{m.getDescription()}/true/true/0";
+                string craftingInformation = $"{name}/50/-300/Crafting -24/{m.getDescription()}/true/true/0/{name}";
                 Game1.bigCraftablesInformation.Add(count, craftingInformation);
-                CraftingRecipe.craftingRecipes.Add($"{name}", $"{(m as simpleMachine).crafting}/Home/{count.ToString()}/true/null");
+                CraftingRecipe.craftingRecipes.Add($"{name}", $"{(m as simpleMachine).crafting}/Home/{count.ToString()}/true/{name}");
                 Game1.player.craftingRecipes.Add($"{name}", 0);
                 if (!machinesForCrafting.ContainsKey(name))
                 {

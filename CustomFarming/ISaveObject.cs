@@ -6,6 +6,7 @@ namespace CustomFarming
 {
     public interface ISaveObject
     {
+
         bool InStorage
         {
             get;
@@ -24,8 +25,7 @@ namespace CustomFarming
             set;
         }
 
-        StardewValley.Object getReplacement();
-        dynamic getAdditionalSaveData();
+
         void rebuildFromSave(dynamic additionalSaveData);
 
 

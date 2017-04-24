@@ -23,3 +23,8 @@ _ReSharper*/
 **/packages/*
 *.nuget.props
 *.nuget.targets
+
+# Hidden config
+*.hidden.*
+
+**/TTS/

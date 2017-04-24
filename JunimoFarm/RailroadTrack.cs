@@ -7,7 +7,7 @@ using StardewValley;
 
 using System.Collections.Generic;
 
-namespace JunimoFarm
+namespace TheJunimoExpress
 {
     class RailroadTrack : TerrainFeature
     {

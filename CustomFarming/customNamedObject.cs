@@ -8,11 +8,12 @@ using System;
 using System.Drawing;
 using System.IO;
 
-
+using CustomElementHandler;
+using System.Collections.Generic;
 
 namespace CustomFarming
 {
-    class customNamedObject : StardewValley.Object, ISaveObject
+    public class customNamedObject : StardewValley.Object, ISaveElement, ISaveObject
     {
         public string description;
         public Texture2D tilesheet;
@@ -24,8 +25,6 @@ namespace CustomFarming
         public string tilesheetpath;
         private bool inStorage;
         private GameLocation environment;
-    
-
 
         public bool InStorage
         {
@@ -66,11 +65,12 @@ namespace CustomFarming
             }
         }
 
+
         public new string Name
         {
             get
             {
-                return base.Name;
+                return this.name;
             }
 
             set
@@ -79,12 +79,6 @@ namespace CustomFarming
             }
         }
         
-        public StardewValley.Object getReplacement()
-        {
-            StardewValley.Object replacement = new Chest(true);
-            return replacement;
-      
-        }
 
         public override string getDescription()
         {
@@ -96,14 +90,10 @@ namespace CustomFarming
         }
 
 
-        public dynamic getAdditionalSaveData()
-        {
-            dynamic additionalData = new { stack = this.stack, quality = this.quality, baseID = this.parentSheetIndex, color = this.color, name = this.name, description = this.description, tilesheet = this.tilesheetpath, tilesheetindex = this.tilesheetindex };
-            return additionalData;
-        }
-
+  
         public void rebuildFromSave(dynamic additionalSaveData)
         {
+
             build((int)additionalSaveData.baseID, (string)additionalSaveData.tilesheet, (int)additionalSaveData.tilesheetindex, (int)additionalSaveData.stack, (string)additionalSaveData.name, (string)additionalSaveData.description, (Microsoft.Xna.Framework.Color)additionalSaveData.color);
             if (additionalSaveData.quality != null)
             {
@@ -111,10 +101,27 @@ namespace CustomFarming
             }
         }
 
+        public string DisplayName
+        {
+            get
+            {
+                return this.name;
+            }
+
+            set
+            {
+                this.name = value;
+            }
+        }
+
+        protected string loadDisplayName()
+        {
+            return this.name;
+        }
+
         public void build(int produceBaseIndex, string produceTilesheetPath, int produceTilesheetindex, int initialStack, string name, string description, Microsoft.Xna.Framework.Color color)
         {
             SaveHandler.register(this);
-
             this.tileLocation = Vector2.Zero;
             this.parentSheetIndex = produceBaseIndex;
             this.loadBaseObjectInformation();
@@ -267,7 +274,7 @@ namespace CustomFarming
 
         public override void drawInMenu(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
         {
-            SaveHandler.drawInMenu(this);
+     
             spriteBatch.Draw(Game1.shadowTexture, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize * 3 / 4)), new Microsoft.Xna.Framework.Rectangle?(Game1.shadowTexture.Bounds), Microsoft.Xna.Framework.Color.White * 0.5f, 0.0f, new Vector2((float)Game1.shadowTexture.Bounds.Center.X, (float)Game1.shadowTexture.Bounds.Center.Y), 3f, SpriteEffects.None, layerDepth - 0.0001f);
             spriteBatch.Draw(this.tilesheet, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), this.color * transparency, 0.0f, new Vector2(tileSize.X / 2, tileSize.Y / 2), (float)Game1.pixelZoom * ((double)scaleSize < 0.2 ? scaleSize : scaleSize), SpriteEffects.None, layerDepth);
 
@@ -284,7 +291,7 @@ namespace CustomFarming
                 float num = this.quality < 4 ? 0.0f : (float)((Math.Cos((double)Game1.currentGameTime.TotalGameTime.Milliseconds * Math.PI / 512.0) + 1.0) * 0.0500000007450581);
                 spriteBatch.Draw(Game1.mouseCursors, location + new Vector2(12f, (float)(Game1.tileSize - 12) + num), new Microsoft.Xna.Framework.Rectangle?(this.quality < 4 ? new Microsoft.Xna.Framework.Rectangle(338 + (this.quality - 1) * 8, 400, 8, 8) : new Microsoft.Xna.Framework.Rectangle(346, 392, 8, 8)), Microsoft.Xna.Framework.Color.White * transparency, 0.0f, new Vector2(4f, 4f), (float)(3.0 * (double)scaleSize * (1.0 + (double)num)), SpriteEffects.None, layerDepth);
             }
-
+            SaveHandler.drawInMenu(this);
         }
 
 
@@ -298,5 +305,38 @@ namespace CustomFarming
             return base.salePrice();
         }
 
+        dynamic ISaveElement.getReplacement()
+        {
+            Chest chest = new Chest();
+            StardewValley.Object item = new StardewValley.Object(tileLocation, parentSheetIndex);
+            item.name = name;
+            item.stack = stack;
+            item.quality = quality;
+            item.parentSheetIndex = parentSheetIndex;
+            item.tileLocation = tileLocation;
+            chest.items.Add(item);
+            return chest;
+            
+        }
+
+        Dictionary<string, string> ISaveElement.getAdditionalSaveData()
+        {
+            Dictionary<string, string> savedata = new Dictionary<string, string>();
+
+            savedata.Add("color", color.R+"-"+color.G+"-"+color.B+"-"+color.A);
+            savedata.Add("description", description);
+            savedata.Add("tilepath", tilesheetpath);
+            savedata.Add("tileindex", tilesheetindex.ToString());
+
+            return savedata;
+        }
+
+        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
+        {
+            StardewValley.Object item = (StardewValley.Object) (replacement as Chest).items[0];
+            string[] c = additionalSaveData["color"].Split('-');
+            dynamic additionalData = new { stack = item.stack, quality = item.quality, baseID = item.parentSheetIndex, color = new Microsoft.Xna.Framework.Color(int.Parse(c[0]), int.Parse(c[1]), int.Parse(c[2]), int.Parse(c[3])), name = item.name, description = additionalSaveData["description"], tilesheet = additionalSaveData["tilepath"], tilesheetindex = int.Parse(additionalSaveData["tileindex"]) };
+            rebuildFromSave(additionalData);
+        }
     }
 }
