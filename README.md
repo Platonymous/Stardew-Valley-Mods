@@ -26,6 +26,5 @@ Adds two masks that spawn speedster outfits and increase speed.
 
 
 
-All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1)
-Or via ModDrop : [Download](https://www.moddrop.com/)
+All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1)or via ModDrop : [Download](https://www.moddrop.com/)
 
