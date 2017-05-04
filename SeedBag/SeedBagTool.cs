@@ -185,11 +185,18 @@ namespace SeedBag
             Game1.playSound("leafrustle");
             Vector2 vector = new Vector2((float)(x / Game1.tileSize), (float)(y / Game1.tileSize));
             List<Vector2> list = base.tilesAffected(vector, power, who);
+            bool f = false;
+            if (attachments[0].category == -19)
+            {
+                f = true;
+            }
             foreach (Vector2 current in list)
             {
-                if (location.terrainFeatures.ContainsKey(current) && location.terrainFeatures[current] is HoeDirt hd && hd.crop == null)
+                if (location.terrainFeatures.ContainsKey(current) && location.terrainFeatures[current] is HoeDirt hd &&((!f && hd.crop == null) || (f && hd.fertilizer <= 0)))
                 {
-                    hd.plant(attachments[0].ParentSheetIndex, (int) current.X, (int) current.Y,who);
+                    
+                    
+                    hd.plant(attachments[0].ParentSheetIndex, (int) current.X, (int) current.Y,who, f);
                     attachments[0].stack--;
                     if (attachments[0].stack == 0)
                     {
