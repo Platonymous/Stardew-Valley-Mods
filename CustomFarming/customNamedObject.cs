@@ -101,7 +101,7 @@ namespace CustomFarming
             }
         }
 
-        public string DisplayName
+        public override string DisplayName
         {
             get
             {
@@ -114,7 +114,7 @@ namespace CustomFarming
             }
         }
 
-        protected string loadDisplayName()
+        protected override string loadDisplayName()
         {
             return this.name;
         }

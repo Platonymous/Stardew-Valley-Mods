@@ -33,6 +33,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFAutomate", "CFAutomate\CF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PelicanTTS", "PelicanTTS\PelicanTTS.csproj", "{B493A555-899A-451F-802E-53E9CA09C234}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedBag", "SeedBag\SeedBag.csproj", "{C587A2BF-75F6-46F2-AD2A-30FAED3E2AA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewBuilding", "NewBuilding\NewBuilding.csproj", "{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +87,14 @@ Global
 		{B493A555-899A-451F-802E-53E9CA09C234}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B493A555-899A-451F-802E-53E9CA09C234}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B493A555-899A-451F-802E-53E9CA09C234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C587A2BF-75F6-46F2-AD2A-30FAED3E2AA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C587A2BF-75F6-46F2-AD2A-30FAED3E2AA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C587A2BF-75F6-46F2-AD2A-30FAED3E2AA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C587A2BF-75F6-46F2-AD2A-30FAED3E2AA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
