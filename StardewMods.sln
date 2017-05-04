@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedBag", "SeedBag\SeedBag.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewBuilding", "NewBuilding\NewBuilding.csproj", "{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreMapLayers", "MoreMapLayers\MoreMapLayers.csproj", "{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,10 @@ Global
 		{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
