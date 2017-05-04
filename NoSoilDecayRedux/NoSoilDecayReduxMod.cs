@@ -67,13 +67,13 @@ namespace NoSoilDecayRedux
 
                     if (terrain is HoeDirt)
                     {
-                        saves.Add(location.name + "-" + keyV.X + "-" + keyV.Y + "-|ignore|-NoSoilDecayRedux");
+                        saves.Add(location.name + "-" + keyV.X + "-" + keyV.Y);
 
                     }
                 }
             }
 
-            string savestring = string.Join("/", saves);
+            string savestring = string.Join("/", saves) + ">|ignore|-NoSoilDecayRedux";
 
             Chest saveobject = new Chest(true);
             saveobject.name = savestring;
@@ -99,8 +99,12 @@ namespace NoSoilDecayRedux
             if (savelocation != null && savelocation.objects.ContainsKey(savepoint) && savelocation.objects[savepoint] is Chest)
             {
         
-                string[] hoedirttiles = savelocation.objects[savepoint].name.Split('/');
-                
+                string[] hoedirttiles = savelocation.objects[savepoint].name.Split('>')[0].Split('/');
+
+                if(hoedirttiles.Length <= 1)
+                {
+                    return;
+                }
 
                 foreach(string hoedirt in hoedirttiles)
                 {
