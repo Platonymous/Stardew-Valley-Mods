@@ -42,10 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DrawLayerEventArgs.cs" />
-    <Compile Include="DrawMapEvents.cs" />
     <Compile Include="InteractiveMapLayerMod.cs" />
-    <Compile Include="mapDisplayDeviceIntercept.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
