@@ -139,7 +139,7 @@ namespace SeedBag
 
         public override bool canThisBeAttached(StardewValley.Object o)
         {
-            if (o == null || o.name.Contains("Seeds")) { return true; } else { return false; }
+            if (o == null || o.category == -74 || o.category == -19) { return true; } else { return false; }
         }
 
 
