@@ -24,6 +24,9 @@ Helps with serilization for custom Objects.
 # 8. Speedster
 Adds two masks that spawn speedster outfits and increase speed.
 
+# 9. Seed Bag
+Adds a Seed Bag to the game for easier sowing.
+
 
 
 All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1) or via ModDrop : [Download](https://www.moddrop.com/)
