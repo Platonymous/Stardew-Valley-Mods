@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Assets\fertilizerattachment.png" />
     <Content Include="Assets\seedattachment.png" />
     <Content Include="Assets\seedbag.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
