@@ -6,21 +6,11 @@ using StardewValley.Objects;
 using System.Collections.Generic;
 using CustomElementHandler;
 using System;
-using System.Reflection;
 
 namespace CustomTV
 {
     class TVIntercept : Furniture, ISaveElement
     {
-        public const int customChannel = 1;
-
-        public const int weatherChannel = 2;
-
-        public const int fortuneTellerChannel = 3;
-
-        public const int tipsChannel = 4;
-
-        public const int cookingChannel = 5;
 
         public static string weatherString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13105");
         public static string fortuneString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13107");
@@ -33,7 +23,7 @@ namespace CustomTV
         private List<List<Response>> pages = new List<List<Response>>();
         private static Dictionary<string, string> channels = new Dictionary<string, string>();
 
-        private static Dictionary<string, Action<TV, TemporaryAnimatedSprite,StardewValley.Farmer,string>> actions;
+        private static Dictionary<string, Action<TV, TemporaryAnimatedSprite,StardewValley.Farmer,string>> actions = new Dictionary<string, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string>>();
 
         public IPrivateField<TemporaryAnimatedSprite> tvScreen;
         public static TVIntercept activeIntercept;
@@ -55,40 +45,44 @@ namespace CustomTV
           
         }
 
-        public static bool addChannel(string id, string name, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string> action)
+        public static void addChannel(string id, string name, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string> action)
         {
-            if (channels.ContainsKey(id))
+            if (!channels.ContainsKey(id))
             {
-                return false;
+                channels.Add(id, name);
             }
 
-            channels.Add(id, name);
-            actions.Add(id, action);
-            return true;
+            if (!actions.ContainsKey(id))
+            {
+                actions.Add(id, action);
+            }
+
         }
 
-        public static bool changeAction(string id, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string> action)
+        public static void changeAction(string id, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string> action)
         {
             if (actions.ContainsKey(id))
             {
                 actions[id] = action;
-                return true;
+   
             }
-            else
-            {
-                return false;
-            }
+           
         }
 
-        public static bool removeKey(string key)
+        public static void removeKey(string key)
         {
             if (channels.ContainsKey(key))
             {
                 channels.Remove(key);
-                return true;
+       
             }
 
-            return false;
+            if (actions.ContainsKey(key))
+            {
+                actions.Remove(key);
+            }
+
+      
         }
 
         public void showChannels(int page)
@@ -187,12 +181,14 @@ namespace CustomTV
 
         public override bool checkForAction(StardewValley.Farmer who, bool justCheckingForActivity = false)
         {
-          
+
+            
             if (justCheckingForActivity)
             {
                 return true;
             }
 
+            activeIntercept = this;
             showChannels(0);
 
             return true;
@@ -321,6 +317,7 @@ namespace CustomTV
         {
            
             tv = new TV(((TV) replacement).parentSheetIndex, ((TV)replacement).tileLocation);
+            tvScreen = CustomTVMod.Modhelper.Reflection.GetPrivateField<TemporaryAnimatedSprite>(tv, "screen");
 
             tileLocation = tv.tileLocation;
             parentSheetIndex = tv.parentSheetIndex;

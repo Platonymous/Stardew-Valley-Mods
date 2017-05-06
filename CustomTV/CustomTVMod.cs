@@ -68,18 +68,7 @@ namespace CustomTV
             addChannel("land", TVIntercept.landString, showOriginalProgram);
             addChannel("queen", TVIntercept.queenString, showOriginalProgram);
             addChannel("rerun", TVIntercept.rerunString, showOriginalProgram);
-            addChannel("channel4", "Channel 4");
-            addChannel("channel5", "Channel 5");
-            addChannel("channel6", "Channel 6");
-            addChannel("channel7", "Channel 7");
-            addChannel("channel8", "Channel 8");
-            addChannel("channel9", "Channel 9");
-            addChannel("channel10", "Channel 10");
-            addChannel("channel11", "Channel 11");
-            addChannel("channel12", "Channel 12");
-            addChannel("channel13", "Channel 13");
-            addChannel("channel14", "Channel 14");
-
+            
             
         }
 
@@ -104,25 +93,25 @@ namespace CustomTV
             tv.selectChannel(who, a);
         }
 
-        public static bool changeAction(string id, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string> action)
+        public static void changeAction(string id, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string> action)
         {
-            return TVIntercept.changeAction(id, action);
+            TVIntercept.changeAction(id, action);
         }
 
-        public static bool removeChannel(string key)
+        public static void removeChannel(string key)
         {
-            return TVIntercept.removeKey(key);
+           TVIntercept.removeKey(key);
         }
 
 
-        public static bool addChannel(string id, string name, Action<TV,TemporaryAnimatedSprite,StardewValley.Farmer,string> action = null)
+        public static void addChannel(string id, string name, Action<TV,TemporaryAnimatedSprite,StardewValley.Farmer,string> action = null)
         {
             if (action == null)
             {
                 action = defaultAction;
             }
 
-           return TVIntercept.addChannel(id, name, action);
+           TVIntercept.addChannel(id, name, action);
         }
 
         public static void endProgramm()
@@ -133,10 +122,12 @@ namespace CustomTV
             }
         }
 
-        public static void showProgramm(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null)
+        public static void showProgram(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null)
         {
+     
             if(TVIntercept.activeIntercept != null)
             {
+           
                 TVIntercept.showProgramm(sprite, text, afterDialogues);
             }
         }
