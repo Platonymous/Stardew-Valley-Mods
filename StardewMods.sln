@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewBuilding", "NewBuilding\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreMapLayers", "MoreMapLayers\MoreMapLayers.csproj", "{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomTV", "CustomTV\CustomTV.csproj", "{5C694D11-0ADC-4CCD-B58D-1898A067D212}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C694D11-0ADC-4CCD-B58D-1898A067D212}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C694D11-0ADC-4CCD-B58D-1898A067D212}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C694D11-0ADC-4CCD-B58D-1898A067D212}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C694D11-0ADC-4CCD-B58D-1898A067D212}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

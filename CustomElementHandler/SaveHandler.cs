@@ -294,6 +294,20 @@ namespace CustomElementHandler
                         }
                     }
                 }
+                else if (elements[i] is List<Furniture>)
+                {
+                    List<Furniture> list = (List<Furniture>)elements[i];
+                    for (int j = 0; j < list.Count; j++)
+                    {
+                        if (list[j] != null && list[j].name.Contains("CEHe"))
+                        {
+                            string[] data = list[j].name.Split('/');
+
+                            object replacement = rebuildElement(data, list[j]);
+                            list[j] = (Furniture)replacement;
+                        }
+                    }
+                }
 
             }
 
@@ -398,7 +412,29 @@ namespace CustomElementHandler
                             
                         }
                     }
-                }else if (elements[i] is SerializableDictionary<Vector2,StardewValley.Object>)
+                }
+                else if (elements[i] is List<Furniture>)
+                {
+                    List<Furniture> list = (List<Furniture>)elements[i];
+                    for (int j = 0; j < list.Count; j++)
+                    {
+                        if (list[j] is ISaveElement)
+                        {
+                            ISaveElement element = (ISaveElement)list[j];
+                            string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+                            string type = element.GetType().AssemblyQualifiedName;
+                            string name = "CEHe/Item/" + type + "/" + additionalSaveData;
+                            dynamic replacement = element.getReplacement();
+                            replacement.name = name;
+
+                            
+                            list[j] = (Furniture)replacement;
+                            
+                    
+                        }
+                    }
+                }
+                else if (elements[i] is SerializableDictionary<Vector2,StardewValley.Object>)
                 {
                     SerializableDictionary<Vector2, StardewValley.Object> changes = new SerializableDictionary<Vector2, StardewValley.Object>();
                     SerializableDictionary<Vector2, StardewValley.Object> dict = (SerializableDictionary<Vector2, StardewValley.Object>)elements[i];
@@ -534,6 +570,11 @@ namespace CustomElementHandler
                 objects.Add(location.terrainFeatures);
 
                 characters.Add(location.characters);
+
+                if (location is DecoratableLocation dl)
+                {
+                    objects.Add(dl.furniture);
+                }
 
                 if (location is BuildableGameLocation)
                 {
