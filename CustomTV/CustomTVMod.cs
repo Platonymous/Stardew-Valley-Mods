@@ -112,9 +112,14 @@ namespace CustomTV
 
         public static void endProgramm()
         {
+            endProgram();
+        }
+
+        public static void endProgram()
+        {
             if (TVIntercept.activeIntercept != null)
             {
-                TVIntercept.endProgramm();
+                TVIntercept.endProgram();
             }
         }
 
@@ -124,7 +129,7 @@ namespace CustomTV
             if(TVIntercept.activeIntercept != null)
             {
            
-                TVIntercept.showProgramm(sprite, text, afterDialogues);
+                TVIntercept.showProgram(sprite, text, afterDialogues);
             }
         }
 

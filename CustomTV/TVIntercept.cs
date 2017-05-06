@@ -161,11 +161,11 @@ namespace CustomTV
             Game1.player.Halt();
         }
 
-        public static void showProgramm(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null)
+        public static void showProgram(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null)
         {
             if(afterDialogues == null)
             {
-                afterDialogues = endProgramm;
+                afterDialogues = endProgram;
             }
             
             activeIntercept.tvScreen.SetValue(sprite);
@@ -173,7 +173,7 @@ namespace CustomTV
             Game1.afterDialogues = new Game1.afterFadeFunction(afterDialogues);
         }
 
-        public static void endProgramm()
+        public static void endProgram()
         {
             activeIntercept.turnOffTV();
             activeIntercept = null;
