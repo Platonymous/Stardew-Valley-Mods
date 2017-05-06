@@ -110,12 +110,7 @@ namespace CustomTV
            TVIntercept.addChannel(id, name, action);
         }
 
-        public static void endProgramm()
-        {
-            endProgram();
-        }
-
-        public static void endProgram()
+        void endProgram()
         {
             if (TVIntercept.activeIntercept != null)
             {
