@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContentConfig.cs" />
-    <Compile Include="ContentPackMod.cs" />
+    <Compile Include="NewMachinesPackMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

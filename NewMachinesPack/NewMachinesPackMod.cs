@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using System.IO;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
-using Microsoft.Xna.Framework.Input;
-using StardewValley;
 
-namespace ContentPack
+
+namespace NewMachinesPack
 {
-    public class ContentPackMod : Mod, IDisposable
+    public class NewMachinesPackMod : Mod, IDisposable
     {
         private string contentFolder;
         private string contentSource;

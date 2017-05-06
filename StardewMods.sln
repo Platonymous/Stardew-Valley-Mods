@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".metadata", ".metadata", "{
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewMachinesPack", "ContentPack\NewMachinesPack.csproj", "{72A0A431-03E4-47A0-86A8-CDDDAC95DD0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewMachinesPack", "NewMachinesPack\NewMachinesPack.csproj", "{72A0A431-03E4-47A0-86A8-CDDDAC95DD0F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFAutomate", "CFAutomate\CFAutomate.csproj", "{1F3D2062-A619-4F25-9B08-92298311AC7C}"
 EndProject
