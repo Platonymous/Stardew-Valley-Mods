@@ -9,7 +9,7 @@ using System;
 
 namespace CustomTV
 {
-    class TVIntercept : Furniture, ISaveElement
+    public class TVIntercept : Furniture, ISaveElement
     {
 
         public static string weatherString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13105");
