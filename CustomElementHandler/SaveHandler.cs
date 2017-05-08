@@ -29,7 +29,9 @@ namespace CustomElementHandler
         public static event EventHandler BeforeRemoving;
         public static event EventHandler FinishedRemoving;
 
-        
+        public SaveHandler() {
+
+        }
 
         private static void OnFinishedRebuilding(EventArgs e)
         {
@@ -338,6 +340,7 @@ namespace CustomElementHandler
             elements.AddRange(animals);
             elements.AddRange(characters);
 
+
             if (Game1.player.hat is ISaveElement)
             {
                 ISaveElement element = (ISaveElement)Game1.player.hat;
@@ -349,9 +352,8 @@ namespace CustomElementHandler
                 replacement.name = name;
 
                 Game1.player.hat = (Hat)replacement;
-
             }
-
+            
             if (Game1.player.boots is ISaveElement)
             {
                 ISaveElement element = (ISaveElement)Game1.player.boots;
@@ -393,8 +395,6 @@ namespace CustomElementHandler
                 Game1.player.rightRing = (Ring)replacement;
 
             }
-
-
 
 
             for (int i = 0; i < elements.Count; i++)
