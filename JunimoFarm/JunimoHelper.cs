@@ -108,7 +108,7 @@ namespace TheJunimoExpress
 
                     this.building = Game1.getFarm().buildings.IndexOf(building);
                     this.bgl = Game1.getFarm();
-                    
+
                 }
             }
 
