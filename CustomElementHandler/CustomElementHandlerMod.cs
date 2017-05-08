@@ -33,12 +33,16 @@ namespace CustomElementHandler
 
         private void SaveEvents_BeforeSave(object sender, EventArgs e)
         {
-          SaveHandler.removeElements();          
+
+          SaveHandler.removeElements();
+
         }
 
         private void SaveEvents_AfterSave(object sender, EventArgs e)
         {
+
             SaveHandler.placeElements();
+    
         }
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)

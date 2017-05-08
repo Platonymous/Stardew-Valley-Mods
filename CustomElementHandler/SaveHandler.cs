@@ -340,20 +340,21 @@ namespace CustomElementHandler
             elements.AddRange(animals);
             elements.AddRange(characters);
 
+           if (Game1.player.hat is ISaveElement)
+           {
+               ISaveElement element = (ISaveElement)Game1.player.hat;
+               string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+               string type = getTypeName(element);
+               
+               string name = "CEHe/Item/" + type + "/" + additionalSaveData;
+                Hat replacement = (Hat) element.getReplacement();
+               replacement.name = name;
 
-            if (Game1.player.hat is ISaveElement)
-            {
-                ISaveElement element = (ISaveElement)Game1.player.hat;
-                string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                string type = getTypeName(element);
+               Game1.player.hat = (Hat) replacement;
 
-                string name = "CEHe/Item/" + type + "/" + additionalSaveData;
-                dynamic replacement = element.getReplacement();
-                replacement.name = name;
+           }
 
-                Game1.player.hat = (Hat)replacement;
-            }
-            
+
             if (Game1.player.boots is ISaveElement)
             {
                 ISaveElement element = (ISaveElement)Game1.player.boots;
@@ -361,7 +362,7 @@ namespace CustomElementHandler
                 string type = getTypeName(element);
 
                 string name = "CEHe/Item/" + type + "/" + additionalSaveData;
-                dynamic replacement = element.getReplacement();
+                 Boots replacement = (Boots) element.getReplacement();
                 replacement.name = name;
 
                 Game1.player.boots = (Boots)replacement;
@@ -375,7 +376,7 @@ namespace CustomElementHandler
                 string type = getTypeName(element);
 
                 string name = "CEHe/Item/" + type + "/" + additionalSaveData;
-                dynamic replacement = element.getReplacement();
+                 Ring replacement = (Ring) element.getReplacement();
                 replacement.name = name;
 
                 Game1.player.leftRing = (Ring)replacement;
@@ -389,7 +390,7 @@ namespace CustomElementHandler
                 string type = getTypeName(element);
 
                 string name = "CEHe/Item/" + type + "/" + additionalSaveData;
-                dynamic replacement = element.getReplacement();
+                 Ring replacement = (Ring) element.getReplacement();
                 replacement.name = name;
 
                 Game1.player.rightRing = (Ring)replacement;
@@ -411,19 +412,24 @@ namespace CustomElementHandler
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
                             string type = getTypeName(element);
                             string name = "CEHe/Item/" + type + "/" + additionalSaveData;
-                            dynamic replacement = element.getReplacement();
-                            replacement.name = name;
-
-                            if (replacement is Tool)
+                            Item replacement = (Item) element.getReplacement();
+                            
+                            if(replacement is StardewValley.Object obj)
                             {
-                                list[j] = (Tool)replacement;
-                                (replacement as Tool).name = name;
+                                obj.name = name;
+                                list[j] = obj;
+                            }
+                            else if (replacement is Tool tool)
+                            {
+                                tool.name = name;
+                                list[j] = tool;
+                                
                             }
                             else
                             {
-                                list[j] = (Item)replacement;
+                                list[j] = replacement;
                             }
-                            
+
                         }
                     }
                 }
@@ -438,13 +444,13 @@ namespace CustomElementHandler
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
                             string type = getTypeName(element);
                             string name = "CEHe/Item/" + type + "/" + additionalSaveData;
-                            dynamic replacement = element.getReplacement();
+                            StardewValley.Object replacement = (StardewValley.Object) element.getReplacement();
                             replacement.name = name;
 
-                            
+
                             list[j] = (Furniture)replacement;
-                            
-                    
+
+
                         }
                     }
                 }
@@ -452,7 +458,7 @@ namespace CustomElementHandler
                 {
                     SerializableDictionary<Vector2, StardewValley.Object> changes = new SerializableDictionary<Vector2, StardewValley.Object>();
                     SerializableDictionary<Vector2, StardewValley.Object> dict = (SerializableDictionary<Vector2, StardewValley.Object>)elements[i];
-             
+
                     foreach (Vector2 keyV in dict.Keys)
                     {
                         if (dict[keyV] is ISaveElement)
@@ -461,18 +467,18 @@ namespace CustomElementHandler
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
                             string type = getTypeName(element);
                             string name = "CEHe/Object/" + type + "/" + additionalSaveData;
-                            dynamic replacement = element.getReplacement();
+                            StardewValley.Object replacement = (StardewValley.Object) element.getReplacement();
                             replacement.name = name;
                             changes.Add(keyV, (StardewValley.Object) replacement);
                         }
-                     
+
                     }
 
                     foreach(Vector2 keyV in changes.Keys)
                     {
                         dict[keyV] = changes[keyV];
                     } 
-                   
+
                 }
                 else if (elements[i] is SerializableDictionary<Vector2, StardewValley.TerrainFeatures.TerrainFeature>)
                 {
@@ -487,7 +493,7 @@ namespace CustomElementHandler
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
                             string type = getTypeName(element);
                             string name = "CEHe/Terrain/"+ type + "/" + additionalSaveData;
-                            dynamic replacement = element.getReplacement();
+                            StardewValley.Object replacement = (StardewValley.Object) element.getReplacement();
                             replacement.name = name;
                             changes.Add(keyV, (StardewValley.Object)replacement);
                         }
@@ -501,7 +507,7 @@ namespace CustomElementHandler
                         dict[keyV] = new StardewValley.TerrainFeatures.Flooring(0);
                         if (objectLayer.ContainsKey(keyV))
                         {
-                            
+
                             objectLayer[keyV].name = changes[keyV].name + "#"+objectLayer[keyV].name;
                         }
                         else
@@ -523,18 +529,18 @@ namespace CustomElementHandler
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
                             string type = getTypeName(element);
                             string name = "CEHe/Animal/" + type + "/" + additionalSaveData;
-                            dynamic replacement = element.getReplacement();
+                            FarmAnimal replacement = (FarmAnimal) element.getReplacement();
                             replacement.name = name;
 
                             changes.Add(keyL, (FarmAnimal)replacement);
                         }
 
                     }
-                    
+
                     foreach (long keyL in changes.Keys)
                     {
                         dict[keyL] = changes[keyL];
-                    
+
                     }
                 }else if (elements[i] is List<NPC>)
                 {
@@ -547,7 +553,7 @@ namespace CustomElementHandler
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
                             string type = getTypeName(element);
                             string name = "CEHe/NPC/" + type + "/" + additionalSaveData;
-                            dynamic replacement = element.getReplacement();
+                            NPC replacement = (NPC) element.getReplacement();
                             replacement.name = name;
                             list[j] = (NPC) replacement;
                         }
@@ -564,7 +570,7 @@ namespace CustomElementHandler
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
                             string type = getTypeName(element);
                             string name = "CEHe/Attachement/" + type + "/" + additionalSaveData;
-                            dynamic replacement = element.getReplacement();
+                            StardewValley.Object replacement = (StardewValley.Object) element.getReplacement();
                             replacement.name = name;
                             list[j] = (StardewValley.Object)replacement;
                         }
@@ -573,6 +579,7 @@ namespace CustomElementHandler
 
             }
             OnFinishedRemoving(EventArgs.Empty);
+            
         }
 
 

@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using StardewValley;
+using System.Collections.Generic;
 
 namespace CustomElementHandler
 {
     public interface ISaveElement
     {
 
-        dynamic getReplacement();
+        object getReplacement();
 
         Dictionary<string, string> getAdditionalSaveData();
 
