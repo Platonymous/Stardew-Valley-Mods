@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using StardewValley.Objects;
 using StardewValley.Locations;
 using StardewValley.Buildings;
+using StardewModdingAPI;
 
 namespace CustomElementHandler
 {
@@ -14,6 +15,7 @@ namespace CustomElementHandler
     public class SaveHandler
     {
         
+        internal static IMonitor Monitor;
 
         private static List<object> objects;
         private static List<object> storage;
@@ -27,8 +29,11 @@ namespace CustomElementHandler
         public static event EventHandler BeforeRemoving;
         public static event EventHandler FinishedRemoving;
 
+        
+
         private static void OnFinishedRebuilding(EventArgs e)
         {
+           
             FinishedRebuilding?.Invoke(null, e);
 
         }
@@ -55,6 +60,7 @@ namespace CustomElementHandler
 
         private static void findElements()
         {
+          
             storage = new List<object>();
             objects = new List<object>();
             attachements = new List<object>();
@@ -69,8 +75,8 @@ namespace CustomElementHandler
 
         private static object rebuildElement(string[] data, object replacement)
         {
+           
             Type T = Type.GetType(data[2]);
-
             if (T == null)
             {
                 return replacement;
@@ -314,6 +320,10 @@ namespace CustomElementHandler
             OnFinishedRebuilding(EventArgs.Empty);
         }
 
+        private static string getTypeName(object o)
+        {
+                return o.GetType().AssemblyQualifiedName;
+        }
 
         internal static void removeElements()
         {
@@ -327,25 +337,27 @@ namespace CustomElementHandler
             elements.AddRange(objects);
             elements.AddRange(animals);
             elements.AddRange(characters);
-            
-            if(Game1.player.hat is ISaveElement)
+
+            if (Game1.player.hat is ISaveElement)
             {
                 ISaveElement element = (ISaveElement)Game1.player.hat;
                 string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                string type = element.GetType().AssemblyQualifiedName;
+                string type = getTypeName(element);
+
                 string name = "CEHe/Item/" + type + "/" + additionalSaveData;
                 dynamic replacement = element.getReplacement();
                 replacement.name = name;
 
                 Game1.player.hat = (Hat)replacement;
-                
+
             }
 
             if (Game1.player.boots is ISaveElement)
             {
                 ISaveElement element = (ISaveElement)Game1.player.boots;
                 string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                string type = element.GetType().AssemblyQualifiedName;
+                string type = getTypeName(element);
+
                 string name = "CEHe/Item/" + type + "/" + additionalSaveData;
                 dynamic replacement = element.getReplacement();
                 replacement.name = name;
@@ -358,7 +370,8 @@ namespace CustomElementHandler
             {
                 ISaveElement element = (ISaveElement)Game1.player.leftRing;
                 string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                string type = element.GetType().AssemblyQualifiedName;
+                string type = getTypeName(element);
+
                 string name = "CEHe/Item/" + type + "/" + additionalSaveData;
                 dynamic replacement = element.getReplacement();
                 replacement.name = name;
@@ -371,7 +384,8 @@ namespace CustomElementHandler
             {
                 ISaveElement element = (ISaveElement)Game1.player.rightRing;
                 string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                string type = element.GetType().AssemblyQualifiedName;
+                string type = getTypeName(element);
+
                 string name = "CEHe/Item/" + type + "/" + additionalSaveData;
                 dynamic replacement = element.getReplacement();
                 replacement.name = name;
@@ -395,7 +409,7 @@ namespace CustomElementHandler
                         {
                             ISaveElement element = (ISaveElement)list[j];
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                            string type = element.GetType().AssemblyQualifiedName;
+                            string type = getTypeName(element);
                             string name = "CEHe/Item/" + type + "/" + additionalSaveData;
                             dynamic replacement = element.getReplacement();
                             replacement.name = name;
@@ -422,7 +436,7 @@ namespace CustomElementHandler
                         {
                             ISaveElement element = (ISaveElement)list[j];
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                            string type = element.GetType().AssemblyQualifiedName;
+                            string type = getTypeName(element);
                             string name = "CEHe/Item/" + type + "/" + additionalSaveData;
                             dynamic replacement = element.getReplacement();
                             replacement.name = name;
@@ -445,7 +459,7 @@ namespace CustomElementHandler
                         {
                             ISaveElement element = (ISaveElement)dict[keyV];
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                            string type = element.GetType().AssemblyQualifiedName;
+                            string type = getTypeName(element);
                             string name = "CEHe/Object/" + type + "/" + additionalSaveData;
                             dynamic replacement = element.getReplacement();
                             replacement.name = name;
@@ -471,7 +485,7 @@ namespace CustomElementHandler
                         {
                             ISaveElement element = (ISaveElement)dict[keyV];
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                            string type = element.GetType().AssemblyQualifiedName;
+                            string type = getTypeName(element);
                             string name = "CEHe/Terrain/"+ type + "/" + additionalSaveData;
                             dynamic replacement = element.getReplacement();
                             replacement.name = name;
@@ -507,7 +521,7 @@ namespace CustomElementHandler
                         {
                             ISaveElement element = (ISaveElement)dict[keyL];
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                            string type = element.GetType().AssemblyQualifiedName;
+                            string type = getTypeName(element);
                             string name = "CEHe/Animal/" + type + "/" + additionalSaveData;
                             dynamic replacement = element.getReplacement();
                             replacement.name = name;
@@ -531,7 +545,7 @@ namespace CustomElementHandler
                         {
                             ISaveElement element = (ISaveElement)list[j];
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                            string type = element.GetType().AssemblyQualifiedName;
+                            string type = getTypeName(element);
                             string name = "CEHe/NPC/" + type + "/" + additionalSaveData;
                             dynamic replacement = element.getReplacement();
                             replacement.name = name;
@@ -548,7 +562,7 @@ namespace CustomElementHandler
                         {
                             ISaveElement element = (ISaveElement)list[j];
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
-                            string type = element.GetType().AssemblyQualifiedName;
+                            string type = getTypeName(element);
                             string name = "CEHe/Attachement/" + type + "/" + additionalSaveData;
                             dynamic replacement = element.getReplacement();
                             replacement.name = name;

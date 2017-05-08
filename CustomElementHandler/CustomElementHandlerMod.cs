@@ -13,7 +13,7 @@ namespace CustomElementHandler
         public override void Entry(IModHelper helper)
         {
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            
+            SaveHandler.Monitor = Monitor;
             
         }
         
@@ -34,7 +34,8 @@ namespace CustomElementHandler
 
         private void SaveEvents_BeforeSave(object sender, EventArgs e)
         {
-            SaveHandler.removeElements();
+          SaveHandler.removeElements();
+          
         }
 
         private void SaveEvents_AfterSave(object sender, EventArgs e)
