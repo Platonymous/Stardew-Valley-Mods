@@ -298,12 +298,7 @@ namespace CustomTV
             tv.draw(spriteBatch, x, y, alpha);
         }
 
-        public dynamic getReplacement()
-        {
-           
-            return tv;
-        }
-
+        
         public Dictionary<string, string> getAdditionalSaveData()
         {
             
@@ -336,6 +331,11 @@ namespace CustomTV
             updateDrawPosition();
             rotations = tv.rotations;
             price = tv.price;
+        }
+
+        public object getReplacement()
+        {
+            return tv;
         }
     }
 }

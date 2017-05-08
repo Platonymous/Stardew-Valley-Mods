@@ -119,6 +119,7 @@ namespace CustomElementHandler
                 string[] data = name.Split('/');
 
                 object replacement = rebuildElement(data, Game1.player.hat);
+
                 Game1.player.hat = (Hat)replacement;
 
             }
@@ -310,7 +311,7 @@ namespace CustomElementHandler
                         if (list[j] != null && list[j].name.Contains("CEHe"))
                         {
                             string[] data = list[j].name.Split('/');
-
+                            
                             object replacement = rebuildElement(data, list[j]);
                             list[j] = (Furniture)replacement;
                         }
