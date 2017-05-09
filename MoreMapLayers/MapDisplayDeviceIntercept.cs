@@ -1,15 +1,18 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+
+using System.Collections.Generic;
+
 using xTile.Dimensions;
 using xTile.Display;
 using xTile.Tiles;
-
 
 namespace MoreMapLayers
 {
     class MapDisplayDeviceIntercept : IDisplayDevice
     {
-        private XnaDisplayDevice device;
+        public XnaDisplayDevice device;
         private string lastTileLayerID;
+        private Dictionary<TileSheet, Texture2D> textures;
 
         public MapDisplayDeviceIntercept()
         {
@@ -19,6 +22,7 @@ namespace MoreMapLayers
         public MapDisplayDeviceIntercept(XnaDisplayDevice xna)
         {
             device = xna;
+            textures = MoreMapLayers.helper.Reflection.GetPrivateValue<Dictionary<TileSheet, Texture2D>>(device, "m_tileSheetTextures");
         }
 
         public void BeginScene(SpriteBatch b)
@@ -51,9 +55,10 @@ namespace MoreMapLayers
         }
 
         public void LoadTileSheet(TileSheet tileSheet)
-        {
-            
+        {            
             device.LoadTileSheet(tileSheet);
+            
+            DrawMapEvents.OnLoadTileSheet(this, new LoadTilesheetEventArgs(tileSheet,device,textures));
         }
 
         public void SetClippingRegion(Rectangle clippingRegion)

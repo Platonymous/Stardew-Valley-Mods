@@ -1,16 +1,28 @@
 ﻿using System;
+
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+
 using StardewValley;
+
 using xTile.Dimensions;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MoreMapLayers
 {
     public class MoreMapLayers : Mod
     {
 
-        public override void Entry(IModHelper helper)
+        internal static IMonitor monitor;
+        public Texture2D newTexture;
+        internal static IModHelper helper;
+
+        public override void Entry(IModHelper help)
         {
+            helper = help;
+            monitor = Monitor;
+            Game1.mapDisplayDevice = new MapDisplayDeviceIntercept((xTile.Display.XnaDisplayDevice)Game1.mapDisplayDevice);
+
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
         }
@@ -22,7 +34,8 @@ namespace MoreMapLayers
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
-            Game1.mapDisplayDevice = new MapDisplayDeviceIntercept((xTile.Display.XnaDisplayDevice)Game1.mapDisplayDevice);
+            
+            
             DrawMapEvents.DrawMapLayer += DrawMapEvents_DrawMapLayer;
         }
 
