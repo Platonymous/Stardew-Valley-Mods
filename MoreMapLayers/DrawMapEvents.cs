@@ -6,8 +6,8 @@ namespace MoreMapLayers
     public static class DrawMapEvents
     {
 
-        private static event EventHandler<DrawLayerEventArgs> DrawMapLayer;
-        private static event EventHandler<LoadTilesheetEventArgs> LoadTileSheet;
+        public static event EventHandler<DrawLayerEventArgs> DrawMapLayer;
+        public static event EventHandler<LoadTilesheetEventArgs> LoadTileSheet;
 
 
         internal static void OnDrawMapLayer(object sender, DrawLayerEventArgs e)
