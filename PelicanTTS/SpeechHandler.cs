@@ -23,6 +23,7 @@ namespace PelicanTTS
         private static Thread speechThread;
         private static bool runSpeech;
         private static IModHelper Helper;
+        private static IMonitor Monitor;
         private static CultureInfo currentCulture;
         public static string culturelang;
         private static List<string> installedVoices;
@@ -35,8 +36,9 @@ namespace PelicanTTS
 
         }
 
-        public static void start(IModHelper h)
+        public static void start(IModHelper h, IMonitor m)
         {
+            Monitor = m;
             Helper = h;
             synth = new SpeechSynthesizer();
             synth.SetOutputToDefaultAudioDevice();
@@ -180,7 +182,16 @@ namespace PelicanTTS
                     currentText = dialogueBox.getCurrentString();
                     lastDialog = dialogueBox.getCurrentString();
                 }
-            }else if(Game1.hudMessages.Count > 0)
+            }
+            else if (Game1.activeClickableMenu is LetterViewerMenu lvm)
+            {
+                setVoice("default");
+                List<string> mailMessage = Helper.Reflection.GetPrivateValue<List<string>>(lvm, "mailMessage");
+                string letter = mailMessage[Helper.Reflection.GetPrivateValue<int>(lvm, "page")];
+                currentText = letter;
+                lastDialog = letter;
+            }
+            else if(Game1.hudMessages.Count > 0)
             {
                 if(Game1.hudMessages[Game1.hudMessages.Count-1].Message != lastHud)
                 {

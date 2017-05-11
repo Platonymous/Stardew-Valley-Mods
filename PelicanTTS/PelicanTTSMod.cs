@@ -185,7 +185,6 @@ namespace PelicanTTS
             {
                 SpeechHandler.stop();
             }
-            // VoiceControl.stop();
         }
 
         private void checkPollySetup()
@@ -218,7 +217,7 @@ namespace PelicanTTS
             }
             else
             {
-                SpeechHandler.start(Helper);
+                SpeechHandler.start(Helper,Monitor);
             }
             
             GameEvents.OneSecondTick += GameEvents_OneSecondTick;
