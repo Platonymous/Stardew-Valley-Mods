@@ -15,12 +15,17 @@ namespace Portraiture
 
         private Dialogue characterDialogue;
         public static float displayAlpha;
+        private Texture2D orgPortrait;
 
         public PortraitureBox (Dialogue dialogue)
             : base(dialogue)
         {
             displayAlpha = 0;
             characterDialogue = dialogue;
+            orgPortrait = new Texture2D(Game1.graphics.GraphicsDevice, dialogue.speaker.Portrait.Width, dialogue.speaker.Portrait.Height);
+            Color[] c = new Color[orgPortrait.Width * orgPortrait.Height];
+            characterDialogue.speaker.Portrait.GetData<Color>(c);
+            orgPortrait.SetData<Color>(c);
         }
 
         private Texture2D getTexture(string name)
@@ -88,10 +93,10 @@ namespace Portraiture
 
         public override void draw(SpriteBatch b)
         {
+            
             characterDialogue.speaker.Portrait = TextureLoader.getEmptyPortrait();
-            
             base.draw(b);
-            
+            characterDialogue.speaker.Portrait = orgPortrait;
             drawPortraiture(b);
 
         }

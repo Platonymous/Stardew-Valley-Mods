@@ -3,6 +3,7 @@ using StardewModdingAPI.Events;
 
 using StardewValley;
 using StardewValley.Menus;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Portraiture

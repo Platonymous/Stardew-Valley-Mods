@@ -59,7 +59,7 @@ namespace Portraiture
             }
             else
             {
-                return PortraitureMod.helper.Content.Load<Texture2D>(Path.Combine("Portraits",name),ContentSource.GameContent);
+                return Game1.getCharacterFromName(name).Portrait;
             }
             
         }
