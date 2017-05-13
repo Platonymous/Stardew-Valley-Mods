@@ -19,7 +19,13 @@ namespace NoSoilDecayRedux
         {
             LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged; ;
             GameEvents.OneSecondTick += GameEvents_OneSecondTick;
+            SaveEvents.AfterSave += SaveEvents_AfterSave;
             
+        }
+
+        private void SaveEvents_AfterSave(object sender, System.EventArgs e)
+        {
+            hoeDirtReplaced = false;
         }
 
         private void GameEvents_OneSecondTick(object sender, System.EventArgs e)
