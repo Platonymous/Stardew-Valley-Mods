@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using StardewValley.Tools;
-using Microsoft.Xna.Framework.Graphics;
+
 using StardewValley.Menus;
 
 namespace SeedBag
@@ -25,6 +21,7 @@ namespace SeedBag
             SeedBagTool.loadTextures();
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+
         }
 
         private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
@@ -46,7 +43,7 @@ namespace SeedBag
                 Dictionary<Item, int[]> items = Helper.Reflection.GetPrivateValue<Dictionary<Item, int[]>>(shop, "itemPriceAndStock");
                 List<Item> selling = Helper.Reflection.GetPrivateValue<List<Item>>(shop, "forSale");
 
-                if (shop.portraitPerson.name == "Pierre")
+                if (shop.portraitPerson != null && shop.portraitPerson.name == "Pierre")
                 {
                     Dictionary<Item, int> newItemsToSell = new Dictionary<Item, int>();
 

@@ -252,25 +252,29 @@ namespace SeedBag
                 {
                     if (attachments[1] != null && hd.fertilizer <= 0)
                     {
-                        hd.plant(attachments[1].ParentSheetIndex, (int)current.X, (int)current.Y, who, true);
-                        attachments[1].stack--;
-                        if (attachments[1].stack == 0)
+                        if (hd.plant(attachments[1].ParentSheetIndex, (int)current.X, (int)current.Y, who, true))
                         {
-                            attachments[1] = null;
-                            Game1.showRedMessage("Out of fertilizer");
-                            break;
+                            attachments[1].stack--;
+                            if (attachments[1].stack == 0)
+                            {
+                                attachments[1] = null;
+                                Game1.showRedMessage("Out of fertilizer");
+                                break;
+                            }
                         }
                     }
-
+                    
                     if (attachments[0] != null)
                     {
-                        hd.plant(attachments[0].ParentSheetIndex, (int)current.X, (int)current.Y, who, false);
-                        attachments[0].stack--;
-                        if (attachments[0].stack == 0)
+                        if (hd.plant(attachments[0].ParentSheetIndex, (int)current.X, (int)current.Y, who, false))
                         {
-                            attachments[0] = null;
-                            Game1.showRedMessage("Out of seeds");
-                            break;
+                            attachments[0].stack--;
+                            if (attachments[0].stack == 0)
+                            {
+                                attachments[0] = null;
+                                Game1.showRedMessage("Out of seeds");
+                                break;
+                            }
                         }
                     }
 
