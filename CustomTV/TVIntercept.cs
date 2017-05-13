@@ -209,7 +209,7 @@ namespace CustomTV
         {
             
             string a = answer.Split(' ')[0];
-            CustomTVMod.monitor.Log("Select Channel:"+a);
+            CustomTVMod.monitor.Log("Select Channel:"+a,LogLevel.Trace);
           
             if (a == "more")
             {
