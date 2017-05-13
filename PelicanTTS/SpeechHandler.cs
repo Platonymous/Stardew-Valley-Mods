@@ -9,7 +9,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 
-using Portraiture;
+
 
 namespace PelicanTTS
 {
@@ -154,20 +154,6 @@ namespace PelicanTTS
 
                 DialogueBox dialogueBox = (DialogueBox)Game1.activeClickableMenu;
 
-                setVoice("default");
-
-                if (dialogueBox.getCurrentString() != lastDialog)
-                {
-                    currentText = dialogueBox.getCurrentString();
-                    lastDialog = dialogueBox.getCurrentString();
-
-                }
-
-            }
-            else if (Game1.activeClickableMenu is PortraitureDialogueBoxNew)
-            {
-                PortraitureDialogueBoxNew dialogueBox = (PortraitureDialogueBoxNew)Game1.activeClickableMenu;
-
                 if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
                 {
                     setVoice(Game1.currentSpeaker.name);
@@ -181,7 +167,9 @@ namespace PelicanTTS
                 {
                     currentText = dialogueBox.getCurrentString();
                     lastDialog = dialogueBox.getCurrentString();
+
                 }
+
             }
             else if (Game1.activeClickableMenu is LetterViewerMenu lvm)
             {

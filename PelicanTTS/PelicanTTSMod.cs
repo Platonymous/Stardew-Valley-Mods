@@ -145,7 +145,7 @@ namespace PelicanTTS
                     timeInfo = "p.m.";
                 }
 
-                greeting += "Today's festival starts at " + ftHours + "." + ftMinutes + " " + timeInfo + ".";
+                greeting += "Today's festival starts at " + ftHours + " " + timeInfo + ".";
             }
 
 

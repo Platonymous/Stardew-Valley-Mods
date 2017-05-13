@@ -9,14 +9,14 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 
-using Portraiture;
+
 
 using Amazon.Polly;
 using Amazon.Polly.Model;
 
 using Microsoft.Xna.Framework.Media;
 using System.IO;
-using Amazon.Runtime;
+
 using System;
 
 namespace PelicanTTS
@@ -210,20 +210,6 @@ namespace PelicanTTS
 
                 DialogueBox dialogueBox = (DialogueBox)Game1.activeClickableMenu;
 
-                setVoice("default");
-
-                if (dialogueBox.getCurrentString() != lastDialog)
-                {
-                    currentText = dialogueBox.getCurrentString();
-                    lastDialog = dialogueBox.getCurrentString();
-
-                }
-
-            }
-            else if (Game1.activeClickableMenu is PortraitureDialogueBoxNew)
-            {
-                PortraitureDialogueBoxNew dialogueBox = (PortraitureDialogueBoxNew)Game1.activeClickableMenu;
-
                 if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
                 {
                     setVoice(Game1.currentSpeaker.name);
@@ -237,7 +223,9 @@ namespace PelicanTTS
                 {
                     currentText = dialogueBox.getCurrentString();
                     lastDialog = dialogueBox.getCurrentString();
+
                 }
+
             }
             else if (Game1.hudMessages.Count > 0)
             {
@@ -306,7 +294,7 @@ namespace PelicanTTS
                     }
                 }
                 MediaPlayer.Stop();
-                if (Game1.activeClickableMenu is PortraitureDialogueBoxNew || Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
+                if (Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
                 {
                     speak = false;
                     MediaPlayer.Play(Song.FromUri("speech" + hash, new System.Uri(Path.Combine(Path.Combine(Path.Combine("Content", "TTS"), speakerName), "speech" + hash + ".mp3"), System.UriKind.Relative)));
