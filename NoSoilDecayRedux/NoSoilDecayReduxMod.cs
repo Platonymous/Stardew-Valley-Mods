@@ -20,7 +20,13 @@ namespace NoSoilDecayRedux
             LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged; ;
             GameEvents.OneSecondTick += GameEvents_OneSecondTick;
             SaveEvents.AfterSave += SaveEvents_AfterSave;
+            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             
+        }
+
+        private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
+        {
+            loadHoeDirt();
         }
 
         private void SaveEvents_AfterSave(object sender, System.EventArgs e)
@@ -40,15 +46,7 @@ namespace NoSoilDecayRedux
 
         private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
         {
-            
-
-            if (e.PriorLocation is Farm)
-            {
                 saveHoeDirt();
-                hoeDirtReplaced = false;
-               
-            }
-          
         }
 
         private void saveHoeDirt()
@@ -118,9 +116,8 @@ namespace NoSoilDecayRedux
                     GameLocation location = Game1.getLocationFromName(placement[0]);
                     Vector2 position = new Vector2(int.Parse(placement[1]), int.Parse(placement[2]));
 
-                    
-
-                    if(!location.terrainFeatures.ContainsKey(position) || !(location.terrainFeatures[position] is HoeDirt))
+                  
+                    if (!location.terrainFeatures.ContainsKey(position) || !(location.terrainFeatures[position] is HoeDirt))
                     {
                         int state = Game1.isRaining ? 1 : 0;
                         location.terrainFeatures[position] = new HoeDirt(state);
