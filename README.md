@@ -33,6 +33,9 @@ Allows the use of additional layers on maps between Back and Buildings.
 # 11. CustomTV
 Makes it easier for SMAPI mods to add new TV Channels.
 
+# 12. Ring of Fire
+Adds the Ring of Fire to Marlon's shop that let's you channel your lifeforce into a firestorm.
+
 
 All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1) or via ModDrop : [Download](https://www.moddrop.com/)
 
