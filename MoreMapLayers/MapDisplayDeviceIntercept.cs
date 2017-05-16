@@ -14,6 +14,7 @@ namespace MoreMapLayers
         private string lastTileLayerID;
         private Dictionary<TileSheet, Texture2D> textures;
 
+
         public MapDisplayDeviceIntercept()
         {
 
@@ -21,6 +22,7 @@ namespace MoreMapLayers
 
         public MapDisplayDeviceIntercept(XnaDisplayDevice xna)
         {
+            
             device = xna;
             textures = MoreMapLayers.helper.Reflection.GetPrivateValue<Dictionary<TileSheet, Texture2D>>(device, "m_tileSheetTextures");
         }
@@ -45,6 +47,7 @@ namespace MoreMapLayers
                DrawMapEvents.OnDrawMapLayer(this, new DrawLayerEventArgs(lastTileLayerID, tile.Layer.Id));
             }
             lastTileLayerID = tile.Layer.Id;
+               
             device.DrawTile(tile, location, layerDepth);
         }
 
@@ -55,8 +58,13 @@ namespace MoreMapLayers
         }
 
         public void LoadTileSheet(TileSheet tileSheet)
-        {            
-            device.LoadTileSheet(tileSheet);
+        {
+            DrawMapEvents.OnBeforeLoadTileSheet(this, new LoadTilesheetEventArgs(tileSheet, device, textures));
+
+            if (!textures.ContainsKey(tileSheet))
+            {
+                device.LoadTileSheet(tileSheet);
+            }
             
             DrawMapEvents.OnLoadTileSheet(this, new LoadTilesheetEventArgs(tileSheet,device,textures));
         }

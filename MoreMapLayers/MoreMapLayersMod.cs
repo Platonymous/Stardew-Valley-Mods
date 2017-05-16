@@ -7,6 +7,8 @@ using StardewValley;
 
 using xTile.Dimensions;
 using Microsoft.Xna.Framework.Graphics;
+using xTile;
+using xTile.Tiles;
 
 namespace MoreMapLayers
 {
@@ -33,9 +35,7 @@ namespace MoreMapLayers
         }
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
-        {
-            
-            
+        {        
             DrawMapEvents.DrawMapLayer += DrawMapEvents_DrawMapLayer;
         }
 
