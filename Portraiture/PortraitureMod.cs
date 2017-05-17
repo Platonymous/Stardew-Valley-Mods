@@ -110,7 +110,7 @@ namespace Portraiture
                 d.drawMouse(b);
             }
             drawFolderName(b,textureSize,x,y);
-        }
+        }  
 
         private void drawShopkeeper(SpriteBatch b, NPC c)
         {
