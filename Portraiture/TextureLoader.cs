@@ -82,6 +82,20 @@ namespace Portraiture
             
         }
 
+        public static void pushToVanilla(NPC c)
+        {
+            string key = "Vanilla>" + c.name;
+            if (c.Portrait is Texture2D t)
+            {
+                if (!pTextures.ContainsKey(key))
+                {
+                    pTextures.Add(key, t);
+                }
+
+                c.Portrait = pTextures["empty"];
+            }
+        }
+
         public static Texture2D getVanillaPortrait(string name)
         {
             if (pTextures.ContainsKey("Vanilla>" + name))

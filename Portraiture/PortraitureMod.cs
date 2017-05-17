@@ -34,6 +34,20 @@ namespace Portraiture
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
         }
 
+        private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
+        {
+            TextureLoader.loadTextures();
+            GameEvents.FourthUpdateTick += GameEvents_FourthUpdateTick;
+            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+        }
+
+        private void GameEvents_FourthUpdateTick(object sender, System.EventArgs e)
+        {
+            displayAlpha -= 0.05f;
+        }
+
         private void drawFolderName(SpriteBatch b, int textureSize, int x, int y)
         {
             string activeFolderText = TextureLoader.getFolderName();
@@ -90,11 +104,12 @@ namespace Portraiture
                 rectangle = new Rectangle(0, 0, textureSize, textureSize);
             }
 
-            b.Draw(texture, new Rectangle(num3 + 4 * Game1.pixelZoom + num5, num4 + 6 * Game1.pixelZoom, 64 * Game1.pixelZoom, 64 * Game1.pixelZoom), new Rectangle?(rectangle), Color.White);
-
+            b.Draw(texture, new Rectangle(num3 + 4 * Game1.pixelZoom + num5, num4 + 6 * Game1.pixelZoom, 64 * Game1.pixelZoom, 64 * Game1.pixelZoom), new Rectangle?(rectangle), Color.White, 0f,Vector2.Zero,SpriteEffects.None, 0.88f);
+            if (!Game1.options.hardwareCursor)
+            {
+                d.drawMouse(b);
+            }
             drawFolderName(b,textureSize,x,y);
-
-
         }
 
         private void drawShopkeeper(SpriteBatch b, NPC c)
@@ -104,37 +119,6 @@ namespace Portraiture
             int textureSize = Math.Max(texture.Width / 2, 64);
             b.Draw(texture, new Rectangle((activeShop.xPositionOnScreen - 80 * Game1.pixelZoom + Game1.pixelZoom * 5), (activeShop.yPositionOnScreen + Game1.pixelZoom * 5), 64 * Game1.pixelZoom, 64 * Game1.pixelZoom), new Rectangle?(new Rectangle(0, 0, textureSize, textureSize)), Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, 0.92f);
         }
-
-        private void GraphicsEvents_OnPostRenderEvent(object sender, System.EventArgs e)
-        {
-            if (Game1.activeClickableMenu is ShopMenu s && s.portraitPerson is NPC c && c.Portrait is Texture2D && Game1.options.showMerchantPortraits && Game1.viewport.Width > 800)
-            {
-                drawShopkeeper(Game1.spriteBatch, c);
-            }
-
-            if (Game1.activeClickableMenu is DialogueBox d && d.isPortraitBox() && Game1.currentSpeaker is NPC cs)
-            {
-                drawPortraiture(Game1.spriteBatch, d, cs);
-            }
-
-        }
-
-        private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
-        {
-            TextureLoader.loadTextures();
-            GameEvents.FourthUpdateTick += GameEvents_FourthUpdateTick;
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-        }
-
-        private void GameEvents_FourthUpdateTick(object sender, System.EventArgs e)
-        {
-            displayAlpha -= 0.05f;
-        }
-       
-
-       
 
         private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
         {
@@ -155,7 +139,7 @@ namespace Portraiture
         private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
         {
             displayAlpha = 0;
-            GraphicsEvents.OnPostRenderEvent -= GraphicsEvents_OnPostRenderEvent;
+            GraphicsEvents.OnPostRenderGuiEvent -= GraphicsEvents_OnPostRenderGuiEvent;
         }
 
 
@@ -172,19 +156,33 @@ namespace Portraiture
             if (Game1.activeClickableMenu is ShopMenu s && s.portraitPerson is NPC c && c.Portrait is Texture2D t && Game1.options.showMerchantPortraits)
             {
                 activeShop = s;
-
-                GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
-
+                TextureLoader.pushToVanilla(c);
+                GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             }
 
             if (Game1.activeClickableMenu is DialogueBox d && d.isPortraitBox() && Game1.currentSpeaker is NPC ch && ch.Portrait is Texture2D ct)
             {
                 activeDialogueBox = d;
-
-                GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
-
+                
+                TextureLoader.pushToVanilla(ch);
+                GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             }
 
         }
+
+        private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
+        {
+            if (Game1.activeClickableMenu is ShopMenu s && s.portraitPerson is NPC c && c.Portrait is Texture2D && Game1.options.showMerchantPortraits && Game1.viewport.Width > 800)
+            {
+                drawShopkeeper(Game1.spriteBatch, c);
+            }
+
+            if (Game1.activeClickableMenu is DialogueBox d && d.isPortraitBox() && Game1.currentSpeaker is NPC cs)
+            {
+                drawPortraiture(Game1.spriteBatch, d, cs);
+            }
+        }
+
+       
     }
 }
