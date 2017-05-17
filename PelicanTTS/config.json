@@ -1,5 +1,7 @@
 {
   "lang": "en-us",
+  "rate": 0,
+  "volume" : 100,  
   "polly": "on",
   "voices": [
     {

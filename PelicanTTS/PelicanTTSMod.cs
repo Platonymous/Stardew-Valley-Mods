@@ -30,8 +30,7 @@ namespace PelicanTTS
 
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
-            pollySetup = false;
-            checkPollySetup();
+            
 
         }
 
@@ -203,8 +202,9 @@ namespace PelicanTTS
         }
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
+            pollySetup = false;
+            checkPollySetup();
 
-            
             TimeEvents.DayOfMonthChanged += TimeEvents_DayOfMonthChanged;
             ModConfig config = Helper.ReadConfig<ModConfig>();
             if(config.polly == "on" && pollySetup)
@@ -221,7 +221,6 @@ namespace PelicanTTS
             }
             
             GameEvents.OneSecondTick += GameEvents_OneSecondTick;
-            // VoiceControl.start(Monitor);
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
         }
 

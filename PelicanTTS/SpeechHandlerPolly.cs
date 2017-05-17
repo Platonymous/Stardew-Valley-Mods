@@ -189,6 +189,7 @@ namespace PelicanTTS
         public static void setupVoices()
         {
             ModConfig config = Helper.ReadConfig<ModConfig>();
+            
             currentCulture = CultureInfo.CreateSpecificCulture(config.lang);
             culturelang = config.lang.Split('-')[0];
 

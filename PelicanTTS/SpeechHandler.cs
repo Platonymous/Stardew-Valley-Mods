@@ -110,6 +110,8 @@ namespace PelicanTTS
             ModConfig config = Helper.ReadConfig<ModConfig>();
             currentCulture = CultureInfo.CreateSpecificCulture(config.lang);
             culturelang = config.lang.Split('-')[0];
+            synth.Rate = config.rate;
+            synth.Volume = config.volume;
             voices = new Dictionary<string, SpeechProfile>();
 
             foreach (SpeechConfig npc in config.voices)
