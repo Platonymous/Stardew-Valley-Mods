@@ -5,6 +5,7 @@ using StardewValley;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using Microsoft.Xna.Framework;
 
 namespace Portraiture
 {
@@ -47,6 +48,15 @@ namespace Portraiture
 
         }
 
+        public static Texture2D getCopy(Texture2D texture)
+        {
+            Texture2D copy = new Texture2D(Game1.graphics.GraphicsDevice, texture.Width, texture.Height);
+            Color[] col = new Color[texture.Width * texture.Height];
+            texture.GetData<Color>(col);
+            copy.SetData<Color>(col);
+            return copy;
+        }
+
 
         public static Texture2D getEmptyPortrait()
         {
@@ -67,13 +77,27 @@ namespace Portraiture
             }
             else
             {
-                return Game1.getCharacterFromName(name).Portrait;
+                return getVanillaPortrait(name);
             }
             
         }
 
+        public static Texture2D getVanillaPortrait(string name)
+        {
+            if (pTextures.ContainsKey("Vanilla>" + name))
+            {
+                return pTextures["Vanilla>" + name];
+            }
+            else
+            {
+                return Game1.getCharacterFromName(name).Portrait;
+            }
+        }
+
         private static void loadAllPortraits()
         {
+            loadVanillaPortraits();
+
             foreach (string dir in Directory.EnumerateDirectories(contentFolder))
             {
                 string folderName = new DirectoryInfo(dir).Name;
@@ -91,6 +115,29 @@ namespace Portraiture
                     pTextures.Add(folderName + ">" + name, PortraitureMod.helper.Content.Load<Texture2D>(Path.Combine("Portraits",folderName,fileName)));
 
                 }
+            }
+            
+        }
+        
+        public static void loadVanillaPortraits()
+        {
+            foreach(NPC c in Utility.getAllCharacters())
+            {
+                if(c.Portrait is Texture2D t && c.Portrait != pTextures["empty"])
+                {
+                    string key = "Vanilla>" + c.name;
+                    if (pTextures.ContainsKey(key))
+                    {
+                        pTextures[key] = t;
+                    }
+                    else
+                    {
+                        pTextures.Add(key, t);
+                    }
+                   
+                    c.Portrait = pTextures["empty"];
+                }
+                
             }
         }
 
