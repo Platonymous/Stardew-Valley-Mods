@@ -65,7 +65,7 @@ namespace Portraiture
 
         private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
         {
-
+           
             if (Game1.activeClickableMenu is DialogueBox && (!(Game1.activeClickableMenu is PortraitureBox)))
             {
                 DialogueBox oldBox = (DialogueBox)Game1.activeClickableMenu;

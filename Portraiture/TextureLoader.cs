@@ -39,6 +39,12 @@ namespace Portraiture
             }
             activeFolder = folders.FindIndex(f => f == loadConfig);
 
+            if(activeFolder < 0)
+            {
+                activeFolder = folders.Count - 1;
+                saveConfig();
+            }
+
         }
 
 
@@ -49,6 +55,8 @@ namespace Portraiture
 
         public static Texture2D getPortrait(string name)
         {
+            activeFolder = Math.Max(activeFolder, 0);
+
             if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.name))
             {
                 return pTextures[folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.name];
