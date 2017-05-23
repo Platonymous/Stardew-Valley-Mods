@@ -1,0 +1,13 @@
+{
+  "Name": "Aquaponics",
+  "Author": "BashNinja",
+  "Version": {
+    "MajorVersion": 0,
+    "MinorVersion": 1,
+    "PatchVersion": 0,
+    "Build": ""
+  },
+  "Description": "Aquaponics",
+  "UniqueID": "BashNinja.Aquaponics",
+  "EntryDll": "GHAquaponics.dll"
+}
