@@ -51,7 +51,6 @@ namespace NoSoilDecayRedux
 
         private void saveHoeDirt()
         {
-            Monitor.Log("Save Hoedirt");
             savelocation = Game1.getLocationFromName("Town");
             savepoint = new Vector2(2, 0);
 
@@ -96,7 +95,6 @@ namespace NoSoilDecayRedux
 
         private void loadHoeDirt()
         {
-            Monitor.Log("Load Soil");
             savelocation = Game1.getLocationFromName("Town");
             savepoint = new Vector2(2, 0);
 
