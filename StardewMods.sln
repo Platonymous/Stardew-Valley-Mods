@@ -35,7 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PelicanTTS", "PelicanTTS\Pe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedBag", "SeedBag\SeedBag.csproj", "{C587A2BF-75F6-46F2-AD2A-30FAED3E2AA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewBuilding", "NewBuilding\NewBuilding.csproj", "{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aquaponics", "NewBuilding\Aquaponics.csproj", "{B9F74B63-6EFB-4232-9F1E-6AB82F50D24A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreMapLayers", "MoreMapLayers\MoreMapLayers.csproj", "{9EE55DB3-0CFB-4755-ADC8-5F234CEE82AE}"
 EndProject
