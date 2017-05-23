@@ -244,6 +244,9 @@ namespace SeedBag
             Game1.playSound("leafrustle");
             Vector2 vector = new Vector2((float)(x / Game1.tileSize), (float)(y / Game1.tileSize));
             List<Vector2> list = base.tilesAffected(vector, power, who);
+
+            
+            
      
             
             foreach (Vector2 current in list)
