@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 using StardewValley;
 using Microsoft.Xna.Framework;
@@ -23,6 +24,8 @@ namespace CustomElementHandler
         private static List<object> animals;
         private static List<object> characters;
         private static List<object> elements;
+        private static List<object> buildings;
+
 
         public static event EventHandler FinishedRebuilding;
         public static event EventHandler BeforeRebuilding;
@@ -68,6 +71,8 @@ namespace CustomElementHandler
             attachements = new List<object>();
             animals = new List<object>();
             characters = new List<object>();
+            buildings = new List<object>();
+      
 
             findObjects();
             findStorage();
@@ -77,26 +82,36 @@ namespace CustomElementHandler
 
         private static object rebuildElement(string[] data, object replacement)
         {
-           
-            Type T = Type.GetType(data[2]);
-            if (T == null)
-            {
-                return replacement;
-            }
+            
+                Type T = Type.GetType(data[2]);
 
-            ISaveElement newElement = (ISaveElement)Activator.CreateInstance(T);
+                if (T == null)
+                {
+                    Monitor.Log("Couldn't load: " + data[2]);
+                    return replacement;
+                }
 
-            Dictionary<string, string> additionalSaveData = new Dictionary<string, string>();
 
-           for (int i = 3; i < data.Length; i++)
-            {
-                string[] entry = data[i].Split('=');
-                additionalSaveData.Add(entry[0], entry[1]);
-            }
+                ISaveElement newElement = null;
 
-            newElement.rebuild(additionalSaveData,replacement);
+                newElement = (ISaveElement)Activator.CreateInstance(T);
 
-            return newElement;
+
+                Dictionary<string, string> additionalSaveData = new Dictionary<string, string>();
+
+                if (data.Length > 3)
+                {
+                    for (int i = 3; i < data.Length; i++)
+                    {
+                        string[] entry = data[i].Split('=');
+                        additionalSaveData.Add(entry[0], entry[1]);
+                    }
+                }
+
+                newElement.rebuild(additionalSaveData, replacement);
+
+                return newElement;
+            
         }
 
         internal static void placeElements()
@@ -107,11 +122,32 @@ namespace CustomElementHandler
             findElements();
 
             elements = new List<object>();
+ 
+            elements.AddRange(buildings);
             elements.AddRange(characters);
             elements.AddRange(animals);
             elements.AddRange(objects);
             elements.AddRange(storage);
             elements.AddRange(attachements);
+
+            for (int i = 0; i < Game1.locations.Count; i++)
+            {
+                if (Game1.locations[i] is BuildableGameLocation buildable && buildable.buildings is List<Building> lb)
+                {
+                    for (int j = 0; j < lb.Count; j++)
+                    {
+                        if (lb[j].indoors.objects is SerializableDictionary<Vector2, StardewValley.Object> objs && objs.ContainsKey(Vector2.Zero) && objs[Vector2.Zero] is Chest dataobject && dataobject.name.Contains("CEHe"))
+                        {
+                            string name = dataobject.name;
+                            string[] data = name.Split('/');
+                            lb[j].indoors.objects.Remove(Vector2.Zero);
+                            object replacement = rebuildElement(data, lb[j].indoors);
+                            lb[j].indoors = (GameLocation)replacement;
+                        }
+                    }
+                }
+            }
+          
 
             if (Game1.player.hat != null && Game1.player.hat.name.Contains("CEHe"))
             {
@@ -156,7 +192,21 @@ namespace CustomElementHandler
             for (int i = 0; i < elements.Count; i++)
             {
 
-                if (elements[i] is List<Item>)
+                if (elements[i] is List<Building> bl)
+                {
+                    for (int j = 0; j < bl.Count; j++)
+                    {
+                        if (bl[j].nameOfIndoors.Contains("CEHe"))
+                        {
+                            string name = bl[j].nameOfIndoors;
+                            string[] data = name.Split('/');
+                            object replacement = rebuildElement(data, bl[j]);
+                            bl[j] = (Building)replacement;
+                            
+                        }
+                    }
+                } 
+                else if (elements[i] is List<Item>)
                 {
                     List<Item> list = (List<Item>)elements[i];
                     for (int j = 0; j < list.Count; j++)
@@ -195,7 +245,7 @@ namespace CustomElementHandler
 
                     foreach (Vector2 keyV in dict.Keys)
                     {
-                        if (dict[keyV].Name.Contains("CEHe"))
+                        if (dict[keyV].Name.Contains("CEHe") && !dict[keyV].Name.Contains("CEHe/Location/"))
                         {
                             string[] preData = dict[keyV].Name.Split('#');
                             string[] data = preData[0].Split('/');
@@ -340,8 +390,10 @@ namespace CustomElementHandler
             elements.AddRange(objects);
             elements.AddRange(animals);
             elements.AddRange(characters);
+            elements.AddRange(buildings);
 
-           if (Game1.player.hat is ISaveElement)
+
+            if (Game1.player.hat is ISaveElement)
            {
                ISaveElement element = (ISaveElement)Game1.player.hat;
                string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
@@ -401,8 +453,23 @@ namespace CustomElementHandler
 
             for (int i = 0; i < elements.Count; i++)
             {
-
-                if (elements[i] is List<Item>)
+                if (elements[i] is List<Building> bl)
+                {
+                    for (int j = 0; j < bl.Count; j++)
+                    {
+                        if (bl[j] is ISaveElement)
+                        {
+                            ISaveElement element = (ISaveElement)bl[j];
+                            string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+                            string type = getTypeName(element);
+                            string name = "CEHe/Building/" + type + "/" + additionalSaveData;
+                            Building replacement = (Building)element.getReplacement();
+                            replacement.nameOfIndoors = name;
+                            bl[j] = replacement;
+                        }
+                    }
+                }
+                else if (elements[i] is List<Item>)
                 {
                     List<Item> list = (List<Item>) elements[i];
                     for (int j = 0; j < list.Count; j++)
@@ -448,10 +515,7 @@ namespace CustomElementHandler
                             StardewValley.Object replacement = (StardewValley.Object) element.getReplacement();
                             replacement.name = name;
 
-
                             list[j] = (Furniture)replacement;
-
-
                         }
                     }
                 }
@@ -579,6 +643,37 @@ namespace CustomElementHandler
                 }
 
             }
+
+            for (int i = 0; i < Game1.locations.Count; i++)
+            {
+                if (Game1.locations[i] is BuildableGameLocation buildable && buildable.buildings is List<Building> lb)
+                {
+                    for (int j = 0; j < lb.Count; j++)
+                    {
+                        if (lb[j].indoors is GameLocation ind && ind is ISaveElement element)
+                        {
+                            string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+                            string type = getTypeName(element);
+                            string name = "CEHe/Location/" + type + "/" + additionalSaveData;
+                            GameLocation replacement = (GameLocation)element.getReplacement();
+                            Chest dataobject = new Chest(true);
+                            dataobject.name = name;
+
+                            replacement.objects.Add(Vector2.Zero, dataobject);
+                            lb[j].indoors = replacement;
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < Game1.locations.Count; i++)
+            {
+                if (Game1.locations[i] is GameLocation gl && gl is ISaveElement)
+                {
+                    Game1.locations.Remove(gl);
+                }
+            }
+
             OnFinishedRemoving(EventArgs.Empty);
             
         }
@@ -586,6 +681,7 @@ namespace CustomElementHandler
 
         private static void findObjects()
         {
+
             foreach(GameLocation location in Game1.locations)
             {
                 objects.Add(location.objects);
@@ -598,17 +694,20 @@ namespace CustomElementHandler
                     objects.Add(dl.furniture);
                 }
 
-                if (location is BuildableGameLocation)
+                if (location is BuildableGameLocation bgl)
                 {
+         
                     if (location is Farm)
                     {
                         animals.Add((location as Farm).animals);
                     }
 
-                    foreach (Building building in (location as BuildableGameLocation).buildings)
+                    buildings.Add(bgl.buildings);
+
+                    foreach (Building building in bgl.buildings)
                     {
                         if(building.indoors != null)
-                        {
+                        {     
                             objects.Add(building.indoors.objects);
                             objects.Add(building.indoors.terrainFeatures);
                             characters.Add(building.indoors.characters);
