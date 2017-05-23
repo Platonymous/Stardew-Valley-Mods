@@ -40,7 +40,7 @@ namespace Aquaponics
 
             for (int i = 0; i < warps.Count; i++)
             {
-                if (warps[i] is Warp w && w.TargetName == buildAt.name)
+                if (warps[i] is Warp w && w.TargetName == "Farm")
                 {
                     Warp exit = new Warp(w.X, w.Y, buildAt.name, (int)entrance.X, (int)entrance.Y + 1, false);
                     warps[i] = exit;
