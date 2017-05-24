@@ -136,7 +136,7 @@ namespace CustomElementHandler
                 {
                     for (int j = 0; j < lb.Count; j++)
                     {
-                        if (lb[j].indoors.objects is SerializableDictionary<Vector2, StardewValley.Object> objs && objs.ContainsKey(Vector2.Zero) && objs[Vector2.Zero] is Chest dataobject && dataobject.name.Contains("CEHe"))
+                        if (lb[j].indoors is GameLocation bglgl && bglgl.objects is SerializableDictionary<Vector2, StardewValley.Object> objs && objs.ContainsKey(Vector2.Zero) && objs[Vector2.Zero] is Chest dataobject && dataobject.name.Contains("CEHe"))
                         {
                             string name = dataobject.name;
                             string[] data = name.Split('/');
@@ -706,14 +706,26 @@ namespace CustomElementHandler
 
                     foreach (Building building in bgl.buildings)
                     {
-                        if(building.indoors != null)
+                        if(building.indoors is GameLocation bl)
                         {     
-                            objects.Add(building.indoors.objects);
-                            objects.Add(building.indoors.terrainFeatures);
-                            characters.Add(building.indoors.characters);
-                            if (building.indoors is AnimalHouse)
+                            if(bl.objects is SerializableDictionary<Vector2, StardewValley.Object>)
                             {
-                                animals.Add((building.indoors as AnimalHouse).animals);
+                                objects.Add(building.indoors.objects);
+                            }
+
+                            if (bl.terrainFeatures is SerializableDictionary<Vector2, StardewValley.TerrainFeatures.TerrainFeature>)
+                            {
+                                objects.Add(building.indoors.terrainFeatures);
+                            }
+
+                            if (bl.characters is List<NPC>)
+                            {
+                                characters.Add(building.indoors.characters); ;
+                            }
+
+                            if (building.indoors is AnimalHouse ah && ah.animals is SerializableDictionary<long,FarmAnimal>)
+                            {
+                                animals.Add(ah.animals);
                             }
                         }
 
