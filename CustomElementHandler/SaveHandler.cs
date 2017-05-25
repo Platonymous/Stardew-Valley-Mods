@@ -353,9 +353,8 @@ namespace CustomElementHandler
                         }
                     }
                 }
-                else if (elements[i] is List<Furniture>)
+                else if (elements[i] is List<Furniture> list)
                 {
-                    List<Furniture> list = (List<Furniture>)elements[i];
                     for (int j = 0; j < list.Count; j++)
                     {
                         if (list[j] != null && list[j].name.Contains("CEHe"))
@@ -501,21 +500,20 @@ namespace CustomElementHandler
                         }
                     }
                 }
-                else if (elements[i] is List<Furniture>)
+                else if (elements[i] is List<Furniture> elist)
                 {
-                    List<Furniture> list = (List<Furniture>)elements[i];
-                    for (int j = 0; j < list.Count; j++)
+                    for (int j = 0; j < elist.Count; j++)
                     {
-                        if (list[j] is ISaveElement)
+                        if (elist[j] is ISaveElement)
                         {
-                            ISaveElement element = (ISaveElement)list[j];
+                            ISaveElement element = (ISaveElement)elist[j];
                             string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
                             string type = getTypeName(element);
                             string name = "CEHe/Item/" + type + "/" + additionalSaveData;
                             StardewValley.Object replacement = (StardewValley.Object) element.getReplacement();
                             replacement.name = name;
 
-                            list[j] = (Furniture)replacement;
+                            elist[j] = (Furniture)replacement;
                         }
                     }
                 }
