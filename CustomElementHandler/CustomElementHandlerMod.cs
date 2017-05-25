@@ -27,7 +27,6 @@ namespace CustomElementHandler
         {
             SaveEvents.AfterSave -= SaveEvents_AfterSave;
             SaveEvents.BeforeSave -= SaveEvents_BeforeSave;
-            SaveEvents.AfterLoad -= SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle -= SaveEvents_AfterReturnToTitle;
         }
 
