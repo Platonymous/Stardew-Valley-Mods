@@ -33,7 +33,7 @@ namespace Aquaponics
             build(position, location,4);
             if (position != Vector2.Zero)
             {
-                AquaponicsLocation apl = new AquaponicsLocation(AquaponicsMod.helper.Content.Load<Map>(@"assets\greenhouseMap.xnb", ContentSource.ModFolder), nameOfIndoors, (BuildableGameLocation)location);
+                AquaponicsLocation apl = new AquaponicsLocation(AquaponicsMod.helper.Content.Load<Map>(@"assets\greenhouseMap.tbin", ContentSource.ModFolder), nameOfIndoors, (BuildableGameLocation)location);
                 indoors = apl;
             }
             
@@ -48,7 +48,7 @@ namespace Aquaponics
             tilesHigh = 3;
             humanDoor = new Point(2, 2);
             animalDoor = new Point(-1, -1);
-            texture = AquaponicsMod.helper.Content.Load<Texture2D>(@"assets\greenhouse.xnb", ContentSource.ModFolder);
+            texture = AquaponicsMod.helper.Content.Load<Texture2D>(@"assets\greenhouse.png", ContentSource.ModFolder);
             buildingType = "Aquaponics";
             baseNameOfIndoors = buildingType;
             nameOfIndoorsWithoutUnique = baseNameOfIndoors;

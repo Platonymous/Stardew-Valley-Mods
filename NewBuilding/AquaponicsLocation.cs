@@ -20,7 +20,7 @@ namespace Aquaponics
         private Building building;
 
         public AquaponicsLocation()
-            :base(AquaponicsMod.helper.Content.Load<Map>(@"assets\greenhouseMap.xnb", ContentSource.ModFolder),"Aquaponics_Temp")
+            :base(AquaponicsMod.helper.Content.Load<Map>(@"assets\greenhouseMap.tbin", ContentSource.ModFolder),"Aquaponics_Temp")
         {
 
         }

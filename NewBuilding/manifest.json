@@ -4,10 +4,10 @@
   "Version": {
     "MajorVersion": 0,
     "MinorVersion": 1,
-    "PatchVersion": 0,
+    "PatchVersion": 1,
     "Build": ""
   },
-  "Description": "Aquaponics",
+  "Description": "Test Mod for CEH 1.3 & SMAPI 1.14",
   "UniqueID": "BashNinja.Aquaponics",
   "EntryDll": "GHAquaponics.dll"
 }

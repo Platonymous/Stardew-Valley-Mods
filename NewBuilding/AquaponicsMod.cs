@@ -94,7 +94,7 @@ namespace Aquaponics
                     AquaBP.itemsRequired.Add(Convert.ToInt32(strArray2[index]), Convert.ToInt32(strArray2[index + 1]));
                 index += 2;
             }
-            AquaBP.texture = this.Helper.Content.Load<Texture2D>(@"assets\greenhouse.xnb", ContentSource.ModFolder);
+            AquaBP.texture = this.Helper.Content.Load<Texture2D>(@"assets\greenhouse.png", ContentSource.ModFolder);
             AquaBP.humanDoor = new Point(2, 2);
             AquaBP.animalDoor = new Point(-1, -1);
             AquaBP.name = "Aquaponics";
