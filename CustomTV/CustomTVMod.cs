@@ -20,20 +20,22 @@ namespace CustomTV
             Modhelper = Helper;
             monitor = Monitor;
 
-            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged;
+            
+            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
+            SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
 
             loadDefaultChannels();
 
         }
 
-       
-
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
         {
-            if(e.KeyPressed.ToString().ToLower() == "h")
-            {
-                checkLocation((DecoratableLocation)Game1.currentLocation);
-            }
+            LocationEvents.CurrentLocationChanged -= LocationEvents_CurrentLocationChanged;
+        }
+
+        private void SaveEvents_AfterLoad(object sender, EventArgs e)
+        {
+            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged;
         }
 
         private void checkLocation(DecoratableLocation location)
