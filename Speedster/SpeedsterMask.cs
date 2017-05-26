@@ -1,14 +1,15 @@
-﻿
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+
 using StardewValley;
 using StardewValley.Objects;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 
 using CustomElementHandler;
 
+using System.Drawing;
+using System.IO;
+using System;
+using System.Collections.Generic;
 
 namespace Speedster
 {
@@ -22,14 +23,14 @@ namespace Speedster
         private static Microsoft.Xna.Framework.Color oldPants;
         private static Texture2D oldShirtTexture;
         private static Texture2D shirts;
-        public int index;
+        public static Texture2D masks;
         public static int baseIndex;
+        public int index;
         public static bool setup = false;
         public static bool hyperdrive = false;
 
 
         public SpeedsterMask()
-
         {
 
         }
@@ -44,10 +45,12 @@ namespace Speedster
         private void build(int index)
         {
             this.index = index;
-            shirts = loadTexture("shirts.png");
+            shirts = SpeedsterMod.ModHelper.Content.Load<Texture2D>("Assets/shirts.png");
+            masks = SpeedsterMod.ModHelper.Content.Load<Texture2D>("Assets/masks.png");
             oldPants = Game1.player.pantsColor;
             oldShirt = Game1.player.shirt;
             oldHair = Game1.player.hair;
+
             if (Game1.player.boots != null)
             {
                 oldShoes = Game1.player.boots.indexInColorSheet;
@@ -65,6 +68,7 @@ namespace Speedster
             }
 
             which = baseIndex + index;
+
             skipHairDraw = true;
             
             name = "Speedster Mask";
@@ -108,11 +112,11 @@ namespace Speedster
             {
                 if (hyperdrive)
                 {
-                    Game1.player.addedSpeed = Math.Max(24, Game1.player.addedSpeed);
+                    Game1.player.addedSpeed = Math.Max(SpeedsterMod.config.topSpeed, Game1.player.addedSpeed);
                 }  
                 else
                 {
-                    Game1.player.addedSpeed = Math.Max(6, Game1.player.addedSpeed);
+                    Game1.player.addedSpeed = Math.Max(SpeedsterMod.config.normalSpeed, Game1.player.addedSpeed);
                 }
                
             }
@@ -121,8 +125,8 @@ namespace Speedster
 
         public static void takeOffCostume()
         {
-        
-                if (wearing)
+
+            if (wearing)
             {
                 Game1.player.hair = oldHair;
                 FarmerRenderer.shirtsTexture = oldShirtTexture;
@@ -135,15 +139,58 @@ namespace Speedster
             }
         }
 
-
-        private Texture2D loadTexture(string file)
+        public override string getDescription()
         {
-            string path = Path.Combine(SpeedsterMod.ModHelper.DirectoryPath, "Assets", file);
-            Image textureImage = Image.FromFile(path);
-            Texture2D texture = Bitmap2Texture(new Bitmap(textureImage));
-            return texture;
+            return description;
         }
 
+        public override string Name
+        {
+            get
+            {
+                return name;
+            }
+ 
+        }
+
+        public override string DisplayName { get => name; set => name = value; }
+
+
+        public override Item getOne()
+        {
+            return new SpeedsterMask(index);
+        }
+
+        
+        public dynamic getReplacement()
+        {
+            if (Game1.player.hat == this)
+            {
+                return new Hat(index);
+            }
+            else
+            {
+                return new Chest(true);
+            }
+            
+        }
+
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
+        {
+            spriteBatch.Draw(masks, location + new Vector2(10f, 10f), new Microsoft.Xna.Framework.Rectangle?(new Microsoft.Xna.Framework.Rectangle(index * 20 % masks.Width, index * 20 / masks.Width * 20 * 4, 20, 20)), Microsoft.Xna.Framework.Color.White * transparency, 0.0f, new Vector2(3f, 3f), 3f * scaleSize, SpriteEffects.None, layerDepth);
+        }
+
+        public Dictionary<string, string> getAdditionalSaveData()
+        {
+            Dictionary<string,string> savedata = new Dictionary<string, string>();
+            savedata.Add("index", index.ToString());
+            return savedata;
+        }
+
+        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
+        {
+            build(int.Parse(additionalSaveData["index"]));
+        }
 
         public int setTextures(string path, int width, int height)
         {
@@ -153,7 +200,7 @@ namespace Speedster
             Image orgSprite = this.Texture2Image(orgSpriteSecondLoad);
             int osH = orgSprite.Height;
             int osW = orgSprite.Width;
-            
+
             Image newSprite = Image.FromFile(path);
             int nsH = newSprite.Height;
 
@@ -229,45 +276,6 @@ namespace Speedster
             return img3;
 
         }
-
-        public override string getDescription()
-        {
-            return description;
-        }
-
-        public override string Name
-        {
-            get
-            {
-                return name;
-            }
- 
-        }
-
-        public override string DisplayName { get => name; set => name = value; }
-
-
-        public override Item getOne()
-        {
-            return new SpeedsterMask(index);
-        }
-
-        
-        public dynamic getReplacement()
-        {
-            return new Hat(index);
-        }
-
-        public Dictionary<string, string> getAdditionalSaveData()
-        {
-            Dictionary<string,string> savedata = new Dictionary<string, string>();
-            savedata.Add("index", index.ToString());
-            return savedata;
-        }
-
-        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
-        {
-            build(int.Parse(additionalSaveData["index"]));
-        }
     }
+
 }

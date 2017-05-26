@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Drawing;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+
 using StardewValley;
 using StardewValley.Objects;
-using Microsoft.Xna.Framework.Graphics;
 
-
-using System.IO;
 using StardewValley.Menus;
+using Microsoft.Xna.Framework.Input;
 
 namespace Speedster
 {
@@ -18,21 +16,19 @@ namespace Speedster
     {
 
         internal static IModHelper ModHelper;
-   
+        internal static SConfig config;
+
         internal Game1 gamePtr;
         private TimeSpan oldTS;
         private bool isSpeeding;
-        private int phase = 0;
- 
 
         public override void Entry(IModHelper helper)
         {
             ModHelper = Helper;
+            config = Helper.ReadConfig<SConfig>();
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
 
-
-           
         }
 
         private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
@@ -41,8 +37,7 @@ namespace Speedster
             ControlEvents.KeyPressed -= ControlEvents_KeyPressed;
             GameEvents.FourthUpdateTick -= GameEvents_FourthUpdateTick;
             MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
-          
-
+            SaveEvents.BeforeSave -= SaveEvents_BeforeSave;
         }
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
@@ -69,10 +64,6 @@ namespace Speedster
 
         private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
         {
-            if (isSpeeding)
-            {
-                isSpeeding = false;
-            }
 
             if (Game1.player.hat is SpeedsterMask && SpeedsterMask.hyperdrive)
             {
@@ -110,18 +101,12 @@ namespace Speedster
         private void GameEvents_FourthUpdateTick(object sender, EventArgs e)
         {
             if (Game1.player.hat != null && Game1.player.hat is SpeedsterMask)
-            {
-              
+            {            
                 SpeedsterMask.putOnCostume((Game1.player.hat as SpeedsterMask).index);
-                
-                
-
             }
             else
-            {
-                
-                SpeedsterMask.takeOffCostume();
-                
+            {    
+                SpeedsterMask.takeOffCostume(); 
             }
         }
 
@@ -136,9 +121,8 @@ namespace Speedster
                 gamePtr.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 1);
                 isSpeeding = true;
                 speedUpTime();
- 
+                Utility.drawLightningBolt(Game1.player.position, Game1.currentLocation);
 
-               
             }
             else
             {
@@ -171,54 +155,29 @@ namespace Speedster
 
         private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
         {
-   
-            if(e.KeyPressed == Microsoft.Xna.Framework.Input.Keys.Space && Game1.player.hat is SpeedsterMask)
+
+            if (e.KeyPressed == config.timeKey && Game1.player.hat is SpeedsterMask)
             {
-
-                if (phase == 0)
-                {
-                    speedUp();
-                }
-
-                if (phase == 1)
+                if (isSpeeding)
                 {
                     timeSpeed();
                 }
 
-                if (phase == 2)
-                {
-                    timeSpeed();
-                    speedUp();
-                    phase = -1;
-                }
-
-                phase++;
-
-                
+                speedUp();
 
             }
 
+            if (e.KeyPressed == config.timeKey && (SpeedsterMask.hyperdrive || isSpeeding) && Game1.player.hat is SpeedsterMask)
+            {
 
+                if (SpeedsterMask.hyperdrive)
+                {
+                    speedUp();
+                }
 
-        }
+                timeSpeed();
 
-        private Texture2D loadTexture(string file)
-        {
-            string path = Path.Combine(Helper.DirectoryPath, "Assets", file);
-            Image textureImage = Image.FromFile(path);
-            Texture2D texture = Bitmap2Texture(new Bitmap(textureImage));
-            return texture;
-        }
-
-        private Texture2D Bitmap2Texture(Bitmap bmp)
-        {
-            MemoryStream s = new MemoryStream();
-
-            bmp.Save(s, System.Drawing.Imaging.ImageFormat.Png);
-            s.Seek(0, SeekOrigin.Begin);
-            Texture2D tx = Texture2D.FromStream(Game1.graphics.GraphicsDevice, s);
-
-            return tx;
+            }
 
         }
 
