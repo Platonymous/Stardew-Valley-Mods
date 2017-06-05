@@ -36,6 +36,8 @@ Makes it easier for SMAPI mods to add new TV Channels.
 # 12. Ring of Fire
 Adds the Ring of Fire to Marlon's shop that let's you channel your lifeforce into a firestorm.
 
+# 13. Swim Suit / Swim (Almost) Anywhere
+Allows you to swim in the river, lake and ocean.
 
 All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1) or via ModDrop : [Download](https://www.moddrop.com/)
 
