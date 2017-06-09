@@ -25,7 +25,7 @@ namespace HarpOfYobaRedux
         {
 
 
-            if (Game1.currentLocation.isOutdoors)
+            if (Game1.currentLocation.isOutdoors || Game1.currentLocation.name.Equals("Greenhouse"))
             {
 
                 List<Vector2> treetiles = new List<Vector2>();
