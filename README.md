@@ -7,7 +7,7 @@ Adds the Harp of Yoba to the game.
 Let Junimos help you on the farm.
 
 # 3. Custom Farmimg
-Add Custom Objects via json file. 
+Add Custom Machines via json file. 
 
 # 4. No Soil Decay Redux
 Prevents soil from decaying over night.
@@ -38,6 +38,9 @@ Adds the Ring of Fire to Marlon's shop that let's you channel your lifeforce int
 
 # 13. Swim Suit / Swim (Almost) Anywhere
 Allows you to swim in the river, lake and ocean.
+
+# 14. Custom Furniture
+Add Custom Furniture via json file
 
 All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1) or via ModDrop : [Download](https://www.moddrop.com/)
 
