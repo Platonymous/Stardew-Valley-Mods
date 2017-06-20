@@ -26,7 +26,7 @@ namespace Aquaponics
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
         }
- 
+
         private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
         {
             MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
