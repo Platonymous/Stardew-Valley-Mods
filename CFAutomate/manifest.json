@@ -9,5 +9,13 @@
   },
   "Description": "Allows Custom Farming to work with Automate",
   "UniqueID": "Platonymous.CFAutomate",
-  "EntryDll": "CFAutomate.dll"
+  "EntryDll": "CFAutomate.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Pathoschild.Automate"
+    },
+    {
+      "UniqueID": "Platonymous.CustomFarming"
+    }
+  ] 
 }

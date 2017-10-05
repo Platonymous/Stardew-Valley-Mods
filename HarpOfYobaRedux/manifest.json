@@ -9,5 +9,10 @@
   },
   "Description": "Adds The Harp of Yoba to the game.",
   "UniqueID": "Platonymous.HarpOfYobaRedux",
-  "EntryDll": "HarpOfYobaRedux.dll"
+  "EntryDll": "HarpOfYobaRedux.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ]
 }

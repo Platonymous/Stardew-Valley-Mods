@@ -9,5 +9,10 @@
   },
   "Description": "Helper Mod for Custom Furniture creation.",
   "UniqueID": "Platonymous.CustomFurniture",
-  "EntryDll": "CustomFurniture.dll"
+  "EntryDll": "CustomFurniture.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ]
 }

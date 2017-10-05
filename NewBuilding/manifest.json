@@ -9,5 +9,10 @@
   },
   "Description": "Test Mod for CEH 1.3 & SMAPI 1.14",
   "UniqueID": "BashNinja.Aquaponics",
-  "EntryDll": "GHAquaponics.dll"
+  "EntryDll": "GHAquaponics.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ]
 }

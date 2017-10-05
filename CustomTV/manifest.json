@@ -9,5 +9,10 @@
   },
   "Description": "Custom TV Channels.",
   "UniqueID": "Platonymous.CustomTV",
-  "EntryDll": "CustomTV.dll"
+  "EntryDll": "CustomTV.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ]
 }

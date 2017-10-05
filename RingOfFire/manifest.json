@@ -9,5 +9,10 @@
   },
   "Description": "Unleash the Flames",
   "UniqueID": "Platonymous.RingOfFire",
-  "EntryDll": "RingOfFire.dll"
+  "EntryDll": "RingOfFire.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ]
 }

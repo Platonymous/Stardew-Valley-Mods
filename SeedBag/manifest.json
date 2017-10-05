@@ -9,5 +9,10 @@
   },
   "Description": "Adds a Seed Bag to the Game",
   "UniqueID": "Platonymous.SeedBag",
-  "EntryDll": "SeedBag.dll"
+  "EntryDll": "SeedBag.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ]
 }

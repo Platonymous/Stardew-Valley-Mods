@@ -9,5 +9,10 @@
   },
   "Description": "To the outside world you are just an ordinary farmer, but secretly...",
   "UniqueID": "Platonymous.Speedster",
-  "EntryDll": "Speedster.dll"
+  "EntryDll": "Speedster.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ]
 }

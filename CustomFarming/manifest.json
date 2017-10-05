@@ -9,5 +9,10 @@
   },
   "Description": "Helper Mod for Custom Object creation.",
   "UniqueID": "Platonymous.CustomFarming",
-  "EntryDll": "CustomFarming.dll"
+  "EntryDll": "CustomFarming.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ]
 }
