@@ -4,8 +4,8 @@
   "Version": {
     "MajorVersion": 1,
     "MinorVersion": 0,
-    "PatchVersion": 6,
-    "Build": ""
+    "PatchVersion": 5,
+    "Build": null
   },
   "Description": "Custom TV Channels.",
   "UniqueID": "Platonymous.CustomTV",

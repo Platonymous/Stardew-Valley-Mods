@@ -1,13 +1,13 @@
 {
-   "Name": "Custom Farming",
-   "Author": "Platonymous",
-   "Version": {
-      "MajorVersion": 0,
-      "MinorVersion": 6,
-      "PatchVersion": 0,
-      "Build": ""
-   },
-   "Description": "Helper Mod for Custom Object creation.",
-   "UniqueID": "Platonymous.CustomFarming",
-   "EntryDll": "CustomFarming.dll"
+  "Name": "Custom Farming",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 0,
+    "MinorVersion": 6,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "Description": "Helper Mod for Custom Object creation.",
+  "UniqueID": "Platonymous.CustomFarming",
+  "EntryDll": "CustomFarming.dll"
 }

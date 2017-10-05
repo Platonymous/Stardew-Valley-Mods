@@ -5,7 +5,7 @@
     "MajorVersion": 1,
     "MinorVersion": 1,
     "PatchVersion": 0,
-    "Build": ""
+    "Build": null
   },
   "Description": "Allows the use of additional layers on maps between Back and Buildings",
   "UniqueID": "Platonymous.MoreMapLayers",

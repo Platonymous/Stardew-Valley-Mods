@@ -1,13 +1,13 @@
 {
-   "Name": "PelicanTTS",
-   "Author": "Platonymous",
-   "Version": {
-      "MajorVersion": 1,
-      "MinorVersion": 6,
-      "PatchVersion": 0,
-      "Build": ""
-   },
-   "Description": "Text-To-Speech Mod",
-   "UniqueID": "Platonymous.PelicanTTS",
-   "EntryDll": "PelicanTTS.dll"
+  "Name": "PelicanTTS",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 1,
+    "MinorVersion": 6,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "Description": "Text-To-Speech Mod",
+  "UniqueID": "Platonymous.PelicanTTS",
+  "EntryDll": "PelicanTTS.dll"
 }
