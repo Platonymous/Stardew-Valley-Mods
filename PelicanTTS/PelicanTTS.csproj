@@ -53,7 +53,9 @@
     <Compile Include="VoiceControl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="config.json" />
+    <None Include="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -61,26 +63,7 @@
     <Analyzer Include="..\packages\AWSSDK.Polly.3.3.1.1\analyzers\dotnet\cs\AWSSDK.Polly.CodeAnalysis.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="AfterBuild">
-    <PropertyGroup>
-      <ModPath>$(GamePath)\Mods\$(TargetName)</ModPath>
-    </PropertyGroup>
-    <Copy SourceFiles="$(TargetDir)\$(TargetName).dll" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(TargetDir)\$(TargetName).pdb" DestinationFolder="$(ModPath)" Condition="Exists('$(TargetDir)\$(TargetName).pdb')" />
-    <Copy SourceFiles="$(TargetDir)\$(TargetName).dll.mdb" DestinationFolder="$(ModPath)" Condition="Exists('$(TargetDir)\$(TargetName).dll.mdb')" />
-    <Copy SourceFiles="$(ProjectDir)manifest.json" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(ProjectDir)config.json" DestinationFolder="$(ModPath)" />
-    <ItemGroup>
-      <TTSFiles Include="TTS\**\*.*" />
-    </ItemGroup>
-    <Microsoft.Build.Tasks.Copy SourceFiles="@(TTSFiles)" DestinationFiles="@(TTSFiles->'$(ModPath)\TTS\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="$(TargetDir)\AWSSDK.Core.dll" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(TargetDir)\AWSSDK.Core.xml" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(TargetDir)\AWSSDK.Core.pdb" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(TargetDir)\AWSSDK.Polly.dll" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(TargetDir)\AWSSDK.Polly.xml" DestinationFolder="$(ModPath)" />
-    <Copy SourceFiles="$(TargetDir)\AWSSDK.Polly.pdb" DestinationFolder="$(ModPath)" />
-  </Target>
+  <Import Project="$(SolutionDir)\deploy-mod.targets" />
   <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.1.7.1\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.1.7.1\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
