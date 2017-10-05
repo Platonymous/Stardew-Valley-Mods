@@ -45,10 +45,14 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="Assets\fertilizerattachment.png" />
-    <Content Include="Assets\seedattachment.png" />
+    <Content Include="Assets\fertilizerattachment.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\seedattachment.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\seedbag.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
