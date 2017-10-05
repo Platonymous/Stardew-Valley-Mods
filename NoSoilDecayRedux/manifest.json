@@ -9,5 +9,6 @@
   },
   "Description": "Stops soil from decaying",
   "UniqueID": "Platonymous.NoSoilDecayRedux",
-  "EntryDll": "NoSoilDecayRedux.dll"
+  "EntryDll": "NoSoilDecayRedux.dll",
+  "UpdateKeys": [ "Nexus:1084" ]
 }

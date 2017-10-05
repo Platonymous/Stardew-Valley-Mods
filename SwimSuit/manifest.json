@@ -9,5 +9,6 @@
   },
   "Description": "Swim almost anywhere",
   "UniqueID": "Platonymous.SwimSuit",
-  "EntryDll": "SwimSuit.dll"
+  "EntryDll": "SwimSuit.dll",
+  "UpdateKeys": [ "Nexus:1215" ]
 }

@@ -9,5 +9,6 @@
   },
   "Description": "Let Junimos help you on the farm.",
   "UniqueID": "Platonymous.JunimoFarm",
-  "EntryDll": "JunimoFarm.dll"
+  "EntryDll": "JunimoFarm.dll",
+  "UpdateKeys": [ "Nexus:984" ]
 }

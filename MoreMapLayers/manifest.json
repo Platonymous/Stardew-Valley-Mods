@@ -9,5 +9,6 @@
   },
   "Description": "Allows the use of additional layers on maps between Back and Buildings",
   "UniqueID": "Platonymous.MoreMapLayers",
-  "EntryDll": "MoreMapLayers.dll"
+  "EntryDll": "MoreMapLayers.dll",
+  "UpdateKeys": [ "Nexus:1134" ]
 }

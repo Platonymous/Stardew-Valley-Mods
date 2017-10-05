@@ -9,5 +9,6 @@
   },
   "Description": "Text-To-Speech Mod",
   "UniqueID": "Platonymous.PelicanTTS",
-  "EntryDll": "PelicanTTS.dll"
+  "EntryDll": "PelicanTTS.dll",
+  "UpdateKeys": [ "Nexus:1079" ]
 }

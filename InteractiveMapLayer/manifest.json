@@ -9,5 +9,6 @@
   },
   "Description": "Adds more interactivity to maps",
   "UniqueID": "Platonymous.InteractiveMapLayer",
-  "EntryDll": "InteractiveMapLayer.dll"
+  "EntryDll": "InteractiveMapLayer.dll",
+  "UpdateKeys": [ ]
 }

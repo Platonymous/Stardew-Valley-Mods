@@ -9,5 +9,6 @@
   },
   "Description": "Adds new Machines to the game",
   "UniqueID": "Platonymous.MachinePack",
-  "EntryDll": "NewMachinesPack.dll"
+  "EntryDll": "NewMachinesPack.dll",
+  "UpdateKeys": [ ]
 }

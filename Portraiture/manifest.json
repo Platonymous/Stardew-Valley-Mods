@@ -9,5 +9,6 @@
   },
   "Description": "Helper Mod for Portraits.",
   "UniqueID": "Platonymous.Portraiture",
-  "EntryDll": "Portraiture.dll"
+  "EntryDll": "Portraiture.dll",
+  "UpdateKeys": [ "Nexus:999" ]
 }

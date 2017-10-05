@@ -9,5 +9,6 @@
   },
   "Description": "SaveHandler for Custom Objects",
   "UniqueID": "Platonymous.CustomElementHandler",
-  "EntryDll": "CustomElementHandler.dll"
+  "EntryDll": "CustomElementHandler.dll",
+  "UpdateKeys": [ "Nexus:1068" ]
 }
