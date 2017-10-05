@@ -59,7 +59,7 @@ namespace PelicanTTS
         }
 
 
-        private void TimeEvents_DayOfMonthChanged(object sender, EventArgsIntChanged e)
+        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
         {
 
             greeted = false;
@@ -205,7 +205,7 @@ namespace PelicanTTS
             pollySetup = false;
             checkPollySetup();
 
-            TimeEvents.DayOfMonthChanged += TimeEvents_DayOfMonthChanged;
+            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
             ModConfig config = Helper.ReadConfig<ModConfig>();
             if(config.polly == "on" && pollySetup)
             {
