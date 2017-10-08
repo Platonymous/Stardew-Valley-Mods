@@ -1,13 +1,14 @@
 {
-   "Name": "Junimo Farm",
-   "Author": "Platonymous",
-   "Version": {
-      "MajorVersion": 1,
-      "MinorVersion": 1,
-      "PatchVersion": 2,
-      "Build": ""
-   },
-   "Description": "Let Junimos help you on the farm.",
-   "UniqueID": "Platonymous.JunimoFarm",
-   "EntryDll": "JunimoFarm.dll"
+  "Name": "Junimo Farm",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 1,
+    "MinorVersion": 1,
+    "PatchVersion": 3,
+    "Build": null
+  },
+  "Description": "Let Junimos help you on the farm.",
+  "UniqueID": "Platonymous.JunimoFarm",
+  "EntryDll": "JunimoFarm.dll",
+  "UpdateKeys": [ "Nexus:984" ]
 }

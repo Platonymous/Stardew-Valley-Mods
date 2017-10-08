@@ -1,13 +1,19 @@
 {
-   "Name": "Harp of Yoba Redux",
-   "Author": "Platonymous",
-   "Version": {
-      "MajorVersion": 2,
-      "MinorVersion": 0,
-      "PatchVersion": 2,
-      "Build": ""
-   },
-   "Description": "Adds The Harp of Yoba to the game.",
-   "UniqueID": "Platonymous.HarpOfYobaRedux",
-   "EntryDll": "HarpOfYobaRedux.dll"
+  "Name": "Harp of Yoba Redux",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 2,
+    "MinorVersion": 0,
+    "PatchVersion": 3,
+    "Build": null
+  },
+  "Description": "Adds The Harp of Yoba to the game.",
+  "UniqueID": "Platonymous.HarpOfYobaRedux",
+  "EntryDll": "HarpOfYobaRedux.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ],
+  "UpdateKeys": [ "Nexus:914" ]
 }

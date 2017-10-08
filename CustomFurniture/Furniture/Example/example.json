@@ -1,0 +1,80 @@
+{
+  "furniture": [
+    {
+      "id": 0,
+	  "texture": "example.png",
+      "name": "Weathercock",
+      "description": "A Weathercock",
+      "type": "decor",
+      "price": 100,
+      "index": 0,
+      "width": 2,
+      "height": 4,
+      "boxWidth": 2,
+      "boxHeight": 2,
+      "rotations": 1,
+      "setWidth": 2,
+      "animationFrames": 4,
+      "fps": 6
+    },
+    {
+      "id": 1,
+	  "texture": "example.png",
+      "name": "Master Sword",
+      "description": "The Master Sword",
+      "type": "decor",
+      "price": 100,
+      "index": 8,
+      "width": 2,
+      "height": 3,
+      "boxWidth": 2,
+      "boxHeight": 2,
+      "rotations": 1,
+      "setWidth": -1,
+      "animationFrames": 0,
+      "fps": 6
+    },
+    {
+      "id": 2,
+	  "texture": "example.png",
+      "name": "Statue",
+      "description": "A small Statue",
+      "type": "decor",
+      "price": 100,
+      "index": 10,
+      "width": 1,
+      "height": 2,
+      "boxWidth": 1,
+      "boxHeight": 1,
+      "rotations": 1
+    },
+    {
+      "id": 3,
+	  "texture": "example.png",
+      "name": "Agahnim",
+      "description": "A big Statue",
+      "type": "decor",
+      "price": 100,
+      "index": 34,
+      "width": 2,
+      "height": 3,
+      "boxWidth": 2,
+      "boxHeight": 1,
+      "rotations": 1 
+    },
+    {
+      "id": 4,
+	  "texture": "example.png",
+      "name": "Rug",
+      "description": "A Rug",
+      "type": "rug",
+      "price": 100,
+      "index": 48,
+      "width": 3,
+      "height": 2,
+      "boxWidth": 3,
+      "boxHeight": 2,
+      "rotations": 2
+    }
+  ]
+}

@@ -4,10 +4,11 @@
   "Version": {
     "MajorVersion": 1,
     "MinorVersion": 1,
-    "PatchVersion": 0,
-    "Build": ""
+    "PatchVersion": 1,
+    "Build": null
   },
   "Description": "Allows the use of additional layers on maps between Back and Buildings",
   "UniqueID": "Platonymous.MoreMapLayers",
-  "EntryDll": "MoreMapLayers.dll"
+  "EntryDll": "MoreMapLayers.dll",
+  "UpdateKeys": [ "Nexus:1134" ]
 }

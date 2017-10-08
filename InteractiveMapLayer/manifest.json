@@ -5,9 +5,10 @@
     "MajorVersion": 0,
     "MinorVersion": 1,
     "PatchVersion": 1,
-    "Build": ""
+    "Build": null
   },
   "Description": "Adds more interactivity to maps",
   "UniqueID": "Platonymous.InteractiveMapLayer",
-  "EntryDll": "InteractiveMapLayer.dll"
+  "EntryDll": "InteractiveMapLayer.dll",
+  "UpdateKeys": [ ]
 }

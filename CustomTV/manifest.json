@@ -5,9 +5,15 @@
     "MajorVersion": 1,
     "MinorVersion": 0,
     "PatchVersion": 6,
-    "Build": ""
+    "Build": null
   },
   "Description": "Custom TV Channels.",
   "UniqueID": "Platonymous.CustomTV",
-  "EntryDll": "CustomTV.dll"
+  "EntryDll": "CustomTV.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomElementHandler"
+    }
+  ],
+  "UpdateKeys": [ "Nexus:1139" ]
 }
