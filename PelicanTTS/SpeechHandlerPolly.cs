@@ -152,7 +152,7 @@ namespace PelicanTTS
                 case "Sam": currentVoice = VoiceId.Russell; break;
                 case "Emily": currentVoice = VoiceId.Emma; break;
                 case "Haley": currentVoice = VoiceId.Emma; break;
-                case "Harvey": currentVoice = VoiceId.Brian; break;
+                case "Harvey": currentVoice = VoiceId.Matthew; break;
                 case "George": currentVoice = VoiceId.Brian; break;
                 case "Linus": currentVoice = VoiceId.Brian; break;
                 case "Lewis": currentVoice = VoiceId.Brian; break;
@@ -161,7 +161,7 @@ namespace PelicanTTS
                 case "Clint": currentVoice = VoiceId.Brian; break;
                 case "Willy": currentVoice = VoiceId.Brian; break;
                 case "Wizard": currentVoice = VoiceId.Geraint; break;
-                case "Pierre": currentVoice = VoiceId.Brian; break;
+                case "Pierre": currentVoice = VoiceId.Matthew; break;
                 case "Gunther": currentVoice = VoiceId.Brian; break;
                 case "Govenor": currentVoice = VoiceId.Brian; break;
                 case "Marlon": currentVoice = VoiceId.Brian; break;
