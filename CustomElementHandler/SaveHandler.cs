@@ -82,7 +82,8 @@ namespace CustomElementHandler
 
         private static object rebuildElement(string[] data, object replacement)
         {
-            
+            try
+            {
                 Type T = Type.GetType(data[2]);
 
                 if (T == null)
@@ -103,6 +104,8 @@ namespace CustomElementHandler
                 {
                     for (int i = 3; i < data.Length; i++)
                     {
+                        if (data[i] == "")
+                            continue;
                         string[] entry = data[i].Split('=');
                         additionalSaveData.Add(entry[0], entry[1]);
                     }
@@ -111,6 +114,13 @@ namespace CustomElementHandler
                 newElement.rebuild(additionalSaveData, replacement);
 
                 return newElement;
+            }
+            catch (Exception e)
+            {
+                Monitor.Log("Exception while rebuilding element: " + e.Message, LogLevel.Error);
+                Monitor.Log("" + e.StackTrace, LogLevel.Error);
+                return replacement;
+            }
             
         }
 
