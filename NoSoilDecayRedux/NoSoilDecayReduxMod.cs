@@ -13,47 +13,52 @@ namespace NoSoilDecayRedux
     {
         private GameLocation savelocation;
         private Vector2 savepoint;
-        private bool hoeDirtReplaced;
 
         public override void Entry(IModHelper helper)
         {
-            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged; ;
-            GameEvents.OneSecondTick += GameEvents_OneSecondTick;
-            SaveEvents.AfterSave += SaveEvents_AfterSave;
-            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            
+            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+            savepoint = new Vector2(2, 0);
+
+            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
         }
 
-        private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
+        private void startSprinklers()
         {
-            loadHoeDirt();
-        }
+            List<GameLocation> gls = new List<GameLocation>();
+            gls.Add(Game1.getLocationFromName("Greenhouse"));
+            gls.Add(Game1.getFarm());
 
-        private void SaveEvents_AfterSave(object sender, System.EventArgs e)
-        {
-            hoeDirtReplaced = false;
-        }
 
-        private void GameEvents_OneSecondTick(object sender, System.EventArgs e)
-        {
-            if(!hoeDirtReplaced && Game1.timeOfDay == 600 && Game1.activeClickableMenu == null)
+            for (int i = 0; i < gls.Count; i++)
             {
-                loadHoeDirt();
-                hoeDirtReplaced = true;
+                GameLocation location = gls[i];
+                foreach (Vector2 keyV in location.objects.Keys)
+                {
+                    if (location.objects[keyV] is Object obj && obj.name.ToLower().Contains("sprinkler"))
+                    {
+                        obj.DayUpdate(location);
+                    }
+                }
             }
-
         }
 
-        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
+        private void TimeEvents_AfterDayStarted(object sender, System.EventArgs e)
         {
+            savelocation = Game1.getLocationFromName("Town");
+            loadHoeDirt();
+            startSprinklers();
+        }
+
+        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        {
+            if ((Game1.currentLocation is GameLocation) && Game1.newDay)
+            {
                 saveHoeDirt();
+            }
         }
 
         private void saveHoeDirt()
         {
-            savelocation = Game1.getLocationFromName("Town");
-            savepoint = new Vector2(2, 0);
-
             List<string> saves = new List<string>();
 
             List<GameLocation> gls = new List<GameLocation>();
@@ -80,14 +85,11 @@ namespace NoSoilDecayRedux
 
             Chest saveobject = new Chest(true);
             saveobject.name = savestring;
-
-            
+      
             if (savelocation.objects.ContainsKey(savepoint))
             {
- 
-                savelocation.objects.Remove(savepoint);
+                 savelocation.objects.Remove(savepoint);
             }
-
 
             savelocation.objects.Add(savepoint, saveobject);
 
@@ -95,9 +97,6 @@ namespace NoSoilDecayRedux
 
         private void loadHoeDirt()
         {
-            savelocation = Game1.getLocationFromName("Town");
-            savepoint = new Vector2(2, 0);
-
             if (savelocation != null && savelocation.objects.ContainsKey(savepoint) && savelocation.objects[savepoint] is Chest)
             {
         
@@ -121,9 +120,14 @@ namespace NoSoilDecayRedux
                         location.terrainFeatures[position] = new HoeDirt(state);
                     }
 
+                    if (location.objects.ContainsKey(position) && location.objects[position] is Object o && (o.name.Equals("Weeds") || o.name.Equals("Stone") || o.name.Equals("Twig"))){
+                        location.objects.Remove(position);
+                    }
+
 
                 }
 
+                savelocation.objects.Remove(savepoint);
 
             }
        
