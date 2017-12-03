@@ -13,7 +13,14 @@ namespace CustomElementHandler
         {
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveHandler.Monitor = Monitor;
+            Helper.ConsoleCommands.Add("ceh", "[ceh cleanup] removes all custom element leftovers", cleanup);
             
+        }
+
+        private void cleanup(string command, string[] args)
+        {
+            if(args[0] == "cleanup")
+                SaveHandler.placeElements(true);
         }
         
         private void setUpEventHandlers()
