@@ -22,7 +22,6 @@ namespace NewMachinesPack
             {
                 string del = dirPath.Replace(contentSource, contentFolder);
 
-
                 foreach (string newPath in Directory.GetFiles(del, "*.*",
                 SearchOption.AllDirectories))
                 {

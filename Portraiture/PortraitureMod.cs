@@ -17,14 +17,17 @@ namespace Portraiture
         private DialogueBox activeDialogueBox;
         private float displayAlpha;
         public static IModHelper helper;
+        private static Mod instance;
         internal static PConfig config;
-
+        
         public override void Entry(IModHelper help)
         {
             helper = help;
+            instance = this;
             config = Helper.ReadConfig<PConfig>();
             string customContentFolder = Path.Combine(helper.DirectoryPath, "Portraits");
             displayAlpha = 0;
+            
 
             if (!Directory.Exists(customContentFolder))
             {
@@ -32,6 +35,11 @@ namespace Portraiture
             }
 
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
+        }
+
+        public static void log (string text)
+        {
+            instance.Monitor.Log(text);
         }
 
         private void SaveEvents_AfterLoad(object sender, System.EventArgs e)

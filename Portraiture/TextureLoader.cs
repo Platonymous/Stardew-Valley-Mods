@@ -23,7 +23,7 @@ namespace Portraiture
             folders = new List<string>();
             folders.Add("Vanilla");
             pTextures = new Dictionary<string, Texture2D>();
-            pTextures.Add("empty", PortraitureMod.helper.Content.Load<Texture2D>("empty.png", ContentSource.ModFolder));
+            pTextures.Add("empty", PortraitureMod.helper.Content.Load<Texture2D>("empty.png"));
             loadAllPortraits();
 
             string loadConfig = loadConfigFile().Split('?')[0];
@@ -115,10 +115,11 @@ namespace Portraiture
             foreach (string dir in Directory.EnumerateDirectories(contentFolder))
             {
                 string folderName = new DirectoryInfo(dir).Name;
-            
+
                 folders.Add(folderName);
-                foreach (string file in Directory.EnumerateFiles(dir,"*.*", SearchOption.TopDirectoryOnly).Where(s => s.EndsWith(".png") || s.EndsWith(".xnb"))){
-                    
+                foreach (string file in Directory.EnumerateFiles(dir, "*.*", SearchOption.TopDirectoryOnly).Where(s => s.EndsWith(".png") || s.EndsWith(".xnb")))
+                {
+
                     string fileName = Path.GetFileName(file);
                     string name = Path.GetFileNameWithoutExtension(file);
                     string extention = Path.GetExtension(file).ToLower();
@@ -126,7 +127,10 @@ namespace Portraiture
                     {
                         fileName = name;
                     }
-                    pTextures.Add(folderName + ">" + name, PortraitureMod.helper.Content.Load<Texture2D>(Path.Combine("Portraits",folderName,fileName)));
+                    if (!pTextures.ContainsKey(folderName + ">" + name))
+                        pTextures.Add(folderName + ">" + name, PortraitureMod.helper.Content.Load<Texture2D>($"Portraits/{folderName}/{fileName}"));
+                    else
+                        pTextures[folderName + ">" + name] = PortraitureMod.helper.Content.Load<Texture2D>($"Portraits/{folderName}/{fileName}");
 
                 }
             }
