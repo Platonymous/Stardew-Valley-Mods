@@ -1,0 +1,14 @@
+{
+  "Name": "Custom NPC",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 0,
+    "MinorVersion": 9,
+    "PatchVersion": 5,
+    "Build": ""
+  },
+  "Description": "Helps you add new NPCs to the Game",
+  "UniqueID": "Platonymous.CustomNPC",
+  "EntryDll": "CustomNPC.dll",
+  "UpdateKeys": [ "Nexus:1607" ]
+}
