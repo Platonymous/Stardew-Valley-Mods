@@ -291,6 +291,16 @@ namespace CustomTV
         {
             IPrivateMethod method = CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "getFortuneForecast");
             return method.Invoke<string>(new object[0]);
+        }	
+	
+        public override bool placementAction(GameLocation location, int x, int y, StardewValley.Farmer who = null)
+        {
+            bool _return = base.placementAction(location, x, y, who);
+            tv.tileLocation = base.tileLocation;
+            tv.boundingBox.X = base.boundingBox.X;
+            tv.boundingBox.Y = base.boundingBox.Y;
+            tv.updateDrawPosition();
+            return _return;
         }
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1f)
