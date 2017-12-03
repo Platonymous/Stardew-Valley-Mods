@@ -80,9 +80,12 @@ namespace CustomElementHandler
 
         }
 
-        private static object rebuildElement(string[] data, object replacement)
+        private static object rebuildElement(string[] data, object replacement, bool cleanup)
         {
-            
+            if (cleanup)
+                return null;
+            try
+            {
                 Type T = Type.GetType(data[2]);
 
                 if (T == null)
@@ -111,10 +114,17 @@ namespace CustomElementHandler
                 newElement.rebuild(additionalSaveData, replacement);
 
                 return newElement;
+                  }
+            catch (Exception e)
+            {
+                Monitor.Log("Exception while rebuilding element: " + e.Message, LogLevel.Error);
+                Monitor.Log("" + e.StackTrace, LogLevel.Error);
+                return replacement;
+            }
             
         }
 
-        internal static void placeElements()
+        internal static void placeElements(bool cleanup = false)
         {
 
             OnBeforeRebuilding(EventArgs.Empty);
@@ -141,7 +151,7 @@ namespace CustomElementHandler
                             string name = dataobject.name;
                             string[] data = name.Split('/');
                             lb[j].indoors.objects.Remove(Vector2.Zero);
-                            object replacement = rebuildElement(data, lb[j].indoors);
+                            object replacement = rebuildElement(data, lb[j].indoors, cleanup);
                             lb[j].indoors = (GameLocation)replacement;
                         }
                     }
@@ -154,7 +164,7 @@ namespace CustomElementHandler
                 string name = Game1.player.hat.name;
                 string[] data = name.Split('/');
 
-                object replacement = rebuildElement(data, Game1.player.hat);
+                object replacement = rebuildElement(data, Game1.player.hat, cleanup);
 
                 Game1.player.hat = (Hat)replacement;
 
@@ -164,7 +174,7 @@ namespace CustomElementHandler
                 string name = Game1.player.boots.name;
                 string[] data = name.Split('/');
 
-                object replacement = rebuildElement(data, Game1.player.boots);
+                object replacement = rebuildElement(data, Game1.player.boots, cleanup);
                 Game1.player.boots = (Boots)replacement;
 
             }
@@ -174,7 +184,7 @@ namespace CustomElementHandler
                 string name = Game1.player.leftRing.name;
                 string[] data = name.Split('/');
 
-                object replacement = rebuildElement(data, Game1.player.leftRing);
+                object replacement = rebuildElement(data, Game1.player.leftRing, cleanup);
                 Game1.player.leftRing = (Ring)replacement;
 
             }
@@ -184,7 +194,7 @@ namespace CustomElementHandler
                 string name = Game1.player.rightRing.name;
                 string[] data = name.Split('/');
 
-                object replacement = rebuildElement(data, Game1.player.rightRing);
+                object replacement = rebuildElement(data, Game1.player.rightRing, cleanup);
                 Game1.player.rightRing = (Ring)replacement;
 
             }
@@ -200,12 +210,16 @@ namespace CustomElementHandler
                         {
                             string name = bl[j].nameOfIndoors;
                             string[] data = name.Split('/');
-                            object replacement = rebuildElement(data, bl[j]);
+                            object replacement = rebuildElement(data, bl[j], cleanup);
+                            Building nullBuilding = new Building();
+                            nullBuilding.nameOfIndoors = "cehRemove";
+                            if (cleanup)
+                                replacement = nullBuilding;
                             bl[j] = (Building)replacement;
-                            
+
                         }
                     }
-                } 
+                }
                 else if (elements[i] is List<Item>)
                 {
                     List<Item> list = (List<Item>)elements[i];
@@ -225,10 +239,10 @@ namespace CustomElementHandler
                             }
 
                             string[] data = name.Split('/');
-                            
-                            object replacement = rebuildElement(data, list[j]);
-                            list[j] = (Item) replacement;
-                            
+
+                            object replacement = rebuildElement(data, list[j], cleanup);
+                            list[j] = (Item)replacement;
+
                         }
                     }
                 }
@@ -238,7 +252,7 @@ namespace CustomElementHandler
                     SerializableDictionary<Vector2, StardewValley.TerrainFeatures.TerrainFeature> terrainChanges = new SerializableDictionary<Vector2, StardewValley.TerrainFeatures.TerrainFeature>();
                     SerializableDictionary<Vector2, StardewValley.Object> dict = (SerializableDictionary<Vector2, StardewValley.Object>)elements[i];
                     SerializableDictionary<Vector2, StardewValley.TerrainFeatures.TerrainFeature> terrainDict = new SerializableDictionary<Vector2, StardewValley.TerrainFeatures.TerrainFeature>();
-                    if (elements[i+1] is SerializableDictionary<Vector2, StardewValley.TerrainFeatures.TerrainFeature>)
+                    if (elements[i + 1] is SerializableDictionary<Vector2, StardewValley.TerrainFeatures.TerrainFeature>)
                     {
                         terrainDict = (SerializableDictionary<Vector2, StardewValley.TerrainFeatures.TerrainFeature>)elements[i + 1];
                     }
@@ -250,13 +264,14 @@ namespace CustomElementHandler
                             string[] preData = dict[keyV].Name.Split('#');
                             string[] data = preData[0].Split('/');
 
-                            if (data[1] != "Terrain") {
-                            object replacement = rebuildElement(data, dict[keyV]);
-                            changes.Add(keyV,(StardewValley.Object) replacement);
+                            if (data[1] != "Terrain")
+                            {
+                                object replacement = rebuildElement(data, dict[keyV], cleanup);
+                                changes.Add(keyV, (StardewValley.Object)replacement);
                             }
                             else
                             {
-                                object replacement = rebuildElement(data, dict[keyV]);
+                                object replacement = rebuildElement(data, dict[keyV], cleanup);
                                 terrainChanges.Add(keyV, (StardewValley.TerrainFeatures.TerrainFeature)replacement);
 
                                 if (preData.Length == 1)
@@ -265,16 +280,17 @@ namespace CustomElementHandler
                                 }
                                 else
                                 {
-                                    
-                                    if (!preData.Contains("CEHe")){
+
+                                    if (!preData.Contains("CEHe"))
+                                    {
                                         changes[keyV] = dict[keyV];
                                         changes[keyV].name = preData[1];
                                     }
                                     else
                                     {
-                          
+
                                         string[] data2 = preData[1].Split('/');
-                                        object replacement2 = rebuildElement(data2, dict[keyV]);
+                                        object replacement2 = rebuildElement(data2, dict[keyV], cleanup);
                                         changes.Add(keyV, (StardewValley.Object)replacement2);
                                     }
 
@@ -287,9 +303,9 @@ namespace CustomElementHandler
 
                     foreach (Vector2 keyV in changes.Keys)
                     {
-                        if (changes[keyV].parentSheetIndex != -999)
+                        if (changes[keyV] is StardewValley.Object o && o.parentSheetIndex != -999)
                         {
-                            dict[keyV] = changes[keyV];
+                            dict[keyV] = o;
                         }
                         else
                         {
@@ -299,10 +315,11 @@ namespace CustomElementHandler
 
                     foreach (Vector2 keyV in terrainChanges.Keys)
                     {
-                        terrainDict[keyV] = terrainChanges[keyV];  
+                        terrainDict[keyV] = terrainChanges[keyV];
                     }
 
-                }else if (elements[i] is StardewValley.Object[])
+                }
+                else if (elements[i] is StardewValley.Object[])
                 {
                     StardewValley.Object[] list = (StardewValley.Object[])elements[i];
                     for (int j = 0; j < list.Length; j++)
@@ -311,7 +328,7 @@ namespace CustomElementHandler
                         {
                             string[] data = list[j].name.Split('/');
 
-                            object replacement = rebuildElement(data, list[j]);
+                            object replacement = rebuildElement(data, list[j], cleanup);
                             list[j] = (StardewValley.Object)replacement;
                         }
                     }
@@ -327,7 +344,7 @@ namespace CustomElementHandler
                         {
                             string[] data = dict[keyL].name.Split('/');
 
-                            object replacement = rebuildElement(data, dict[keyL]);
+                            object replacement = rebuildElement(data, dict[keyL], cleanup);
                             changes[keyL] = (FarmAnimal)replacement;
                         }
 
@@ -348,7 +365,7 @@ namespace CustomElementHandler
                         {
                             string[] data = list[j].name.Split('/');
 
-                            object replacement = rebuildElement(data, list[j]);
+                            object replacement = rebuildElement(data, list[j], cleanup);
                             list[j] = (NPC)replacement;
                         }
                     }
@@ -360,13 +377,26 @@ namespace CustomElementHandler
                         if (list[j] != null && list[j].name.Contains("CEHe"))
                         {
                             string[] data = list[j].name.Split('/');
-                            
-                            object replacement = rebuildElement(data, list[j]);
+
+                            object replacement = rebuildElement(data, list[j], cleanup);
+                            Furniture nullFurniture = new Furniture();
+                            nullFurniture.name = "cehRemove";
+                            if (cleanup)
+                                replacement = nullFurniture;
                             list[j] = (Furniture)replacement;
                         }
                     }
                 }
 
+                if (cleanup)
+                    foreach (GameLocation l in Game1.locations)
+                    {
+                        if (l is BuildableGameLocation bgl)
+                            bgl.buildings.RemoveAll(b => b.nameOfIndoors == "cehRemove");
+
+                        if (l is DecoratableLocation dl)
+                            dl.furniture.RemoveAll(f => f.name == "cehRemove");
+                    }
             }
 
             OnFinishedRebuilding(EventArgs.Empty);
