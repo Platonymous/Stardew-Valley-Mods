@@ -26,6 +26,7 @@ namespace CustomTV
         private static Dictionary<string, Action<TV, TemporaryAnimatedSprite,StardewValley.Farmer,string>> actions = new Dictionary<string, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string>>();
 
         public IPrivateField<TemporaryAnimatedSprite> tvScreen;
+        public IPrivateField<TemporaryAnimatedSprite> tvOverlay;
         public static TVIntercept activeIntercept;
 
         public TVIntercept()
@@ -42,7 +43,7 @@ namespace CustomTV
         {
             this.tv = tv;
             tvScreen = CustomTVMod.Modhelper.Reflection.GetPrivateField<TemporaryAnimatedSprite>(tv, "screen");
-          
+            tvOverlay = CustomTVMod.Modhelper.Reflection.GetPrivateField<TemporaryAnimatedSprite>(tv, "screenOverlay");
         }
 
         public static void addChannel(string id, string name, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string> action)
@@ -161,7 +162,7 @@ namespace CustomTV
             Game1.player.Halt();
         }
 
-        public static void showProgram(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null)
+        public static void showProgram(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null, TemporaryAnimatedSprite overlay = null)
         {
             if(afterDialogues == null)
             {
@@ -169,6 +170,12 @@ namespace CustomTV
             }
             
             activeIntercept.tvScreen.SetValue(sprite);
+
+            if (overlay != null)
+            {
+                activeIntercept.tvOverlay.SetValue(overlay);
+            }
+                
             Game1.drawObjectDialogue(Game1.parseText(text));
             Game1.afterDialogues = new Game1.afterFadeFunction(afterDialogues);
         }
