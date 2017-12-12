@@ -12,5 +12,6 @@ namespace CustomNPC
         public string map { get; set; } = "none";
         public bool isOutdoor { get; set; } = false;
         public string conditions = "none";
+        public Double[] mapLocation = null;
     }
 }
