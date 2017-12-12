@@ -31,15 +31,13 @@ namespace CustomNPC
         private Dictionary<string, Dictionary<string, string>> npcevents = new Dictionary<string, Dictionary<string, string>>();
         private bool waitingForDancePartner = false;
         private List<string> customLocations = new List<string>();
-        private Dictionary<NPCBlueprint, Dictionary<string, string>> dialogueCache = new Dictionary<NPCBlueprint, Dictionary<string, string>>();
-        private Dictionary<NPCBlueprint, Dictionary<string, string>> animationsCache = new Dictionary<NPCBlueprint, Dictionary<string, string>>();
-        private Dictionary<NPCBlueprint, Dictionary<string, string>> scheduleVariablesCache = new Dictionary<NPCBlueprint, Dictionary<string, string>>();
         private Dictionary<string, string> npcmail = new Dictionary<string, string>();
         private Dictionary<string, NPCBlueprint> shoplocations = new Dictionary<string, NPCBlueprint>();
         private Dictionary<CustomBuilding, Map> buildingMaps = new Dictionary<CustomBuilding, Map>();
         private Dictionary<string, Texture2D> buildingTilesheets = new Dictionary<string, Texture2D>();
         private bool waitingForShop = false;
         private bool menuChanging = false;
+        private bool npcMapLocationsSet = false;
 
         public override void Entry(IModHelper helper)
         {
@@ -87,7 +85,35 @@ namespace CustomNPC
 
             placeShops();
             receiveMail();
-            
+
+            if (Helper.ModRegistry.IsLoaded("NPCMapLocationsMod") && !npcMapLocationsSet)
+            {
+                Type apiClass = Type.GetType("NPCMapLocations.MapModMain, NPCMapLocations");
+
+                IPrivateField<Dictionary<string, string>> indoorLocationsF = Helper.Reflection.GetPrivateField<Dictionary<string, string>>(apiClass, "indoorLocations");
+                IPrivateField<Dictionary<string, string>> startingLocationsF = Helper.Reflection.GetPrivateField<Dictionary<string, string>>(apiClass, "startingLocations");
+                IPrivateField<Dictionary<string, Double[]>> locationVectorsF = Helper.Reflection.GetPrivateField<Dictionary<string, Double[]>>(apiClass, "locationVectors");
+
+                Dictionary<string, string> indoorLocations = indoorLocationsF.GetValue();
+                Dictionary<string, string> startingLocations = startingLocationsF.GetValue();
+                Dictionary<string, Double[]> locationVectors = locationVectorsF.GetValue();
+
+                foreach (NPCBlueprint blueprint in NPCS)
+                {
+                    if (!startingLocations.ContainsKey(blueprint.name))
+                        startingLocations.Add(blueprint.name, blueprint.map);
+
+                    foreach (CustomRoom room in blueprint.rooms)
+                        if (room.mapLocation != null && !locationVectors.ContainsKey(room.name))
+                            locationVectors.Add(room.name, room.mapLocation);
+                }
+
+                startingLocationsF.SetValue(startingLocations);
+                locationVectorsF.SetValue(locationVectors);
+
+                npcMapLocationsSet = true;
+            }
+
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
         }
@@ -243,7 +269,7 @@ namespace CustomNPC
                 FarmHouse farmHouse = (FarmHouse)Game1.getLocationFromName("FarmHouse");
                 Map farmHouseMap = farmHouse.map;
                 Map spouseRoomMap = Helper.Content.Load<Map>($"NPCs/{blueprint.fileDirectory}/" + blueprint.spouseRoom);
-                injectIntoMap(spouseRoomMap, farmHouseMap, new Vector2(29, 1), farmHouse, true);
+                injectIntoMap(spouseRoomMap, farmHouseMap, Game1.player.houseUpgradeLevel < 2 ? new Vector2(blueprint.spouseRoomPos[0], blueprint.spouseRoomPos[1]) : new Vector2(blueprint.spouseRoomPos[2], blueprint.spouseRoomPos[3]), farmHouse, true);
             }
         }
 
@@ -292,12 +318,7 @@ namespace CustomNPC
 
         private Dictionary<string,string> getScheduleVariables(NPCBlueprint blueprint)
         {
-            if (scheduleVariablesCache.ContainsKey(blueprint))
-                return scheduleVariablesCache[blueprint];
-
-            scheduleVariablesCache.Add(blueprint, loadCSV(blueprint, blueprint.schedule, blueprint.translateSchedule, 3));
-
-            return scheduleVariablesCache[blueprint];
+            return loadCSV(blueprint, blueprint.schedule, blueprint.translateSchedule, 3);
         }
 
         private string correctSeperator(string data)
@@ -763,12 +784,7 @@ namespace CustomNPC
 
         private Dictionary<string, string> getAnimations(NPCBlueprint blueprint, bool parse = true)
         {
-            if (animationsCache.ContainsKey(blueprint))
-                return animationsCache[blueprint];
-
-            animationsCache.Add(blueprint, loadCSV(blueprint, blueprint.animations, blueprint.translateAnimations, parse ? 0 : 3));
-
-            return animationsCache[blueprint];
+                return loadCSV(blueprint, blueprint.animations, blueprint.translateAnimations, parse ? 0 : 3);
         }
 
         private Item getItem(ForSaleItem item)
@@ -877,12 +893,7 @@ namespace CustomNPC
 
         private Dictionary<string, string> getDialogue(NPCBlueprint blueprint, bool parse = true)
         {
-            if (dialogueCache.ContainsKey(blueprint))
-                return dialogueCache[blueprint];
-
-            dialogueCache.Add(blueprint, loadCSV(blueprint, blueprint.dialogue,true, parse ? 0 : 3));
-
-            return dialogueCache[blueprint];
+            return loadCSV(blueprint, blueprint.dialogue,true, parse ? 0 : 3);
         }
 
         private Dictionary<string, string> getSpecialPositions(NPCBlueprint blueprint)
@@ -929,7 +940,7 @@ namespace CustomNPC
                 string[] parts = conditions.Split(':');
                 string key = cleanUpString(parts[0]);
                 string id = cleanUpString(parts[1]).Replace("ID", "99" + blueprint.name.GetHashCode().ToString().Substring(0, 5));
-                string commands = dictionary[conditions];
+                string commands = parseVariables(dictionary[conditions],blueprint);
 
                 if (!npcevents.ContainsKey(key))
                     npcevents.Add(key, new Dictionary<string, string>());
@@ -1257,7 +1268,7 @@ namespace CustomNPC
                         if (blueprint.animations == "none")
                             continue;
 
-                        Dictionary<string, string> dictionary = getAnimations(blueprint);
+                        Dictionary<string, string> dictionary = getAnimations(blueprint,true);
 
                         foreach (string key in dictionary.Keys)
                             if (!asset.AsDictionary<string, string>().Data.ContainsKey(key))
