@@ -171,7 +171,7 @@ namespace CustomTV
             
             activeIntercept.tvScreen.SetValue(sprite);
 
-            if (overlay != null)
+            if (overlay != null && activeIntercept != null && activeIntercept.tvOverlay != null)
             {
                 activeIntercept.tvOverlay.SetValue(overlay);
             }

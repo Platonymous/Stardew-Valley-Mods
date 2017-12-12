@@ -131,6 +131,15 @@ namespace CustomTV
             }
         }
 
+        public static void showProgram(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null)
+        {
+
+            if (TVIntercept.activeIntercept != null)
+            {
+                TVIntercept.showProgram(sprite, text, afterDialogues, null);
+            }
+        }
+
 
 
 
