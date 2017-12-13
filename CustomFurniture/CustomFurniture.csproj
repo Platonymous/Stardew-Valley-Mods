@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\Harmony\Harmony\bin\Debug\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -40,6 +43,7 @@
     <Compile Include="CustomFurnitureMod.cs" />
     <Compile Include="CustomFurniture.cs" />
     <Compile Include="CustomFurniturePack.cs" />
+    <Compile Include="Overrides\FurnitureFix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WallpaperData.cs" />
   </ItemGroup>

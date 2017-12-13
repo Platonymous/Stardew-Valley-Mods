@@ -12,6 +12,8 @@ using System.Linq;
 using StardewValley.Objects;
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using Harmony;
+using System.Reflection;
 
 namespace CustomFurniture
 {
@@ -26,10 +28,17 @@ namespace CustomFurniture
         {
             instance = this;
             CustomFurnitureMod.helper = helper;
+            harmonyFix();
             loadPacks();
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
             helper.ConsoleCommands.Add("replace_custom_furniture", "Triggers Custom Furniture Replacement", replaceCustomFurniture);
+        }
+
+        public void harmonyFix()
+        {
+            var instance = HarmonyInstance.Create("Platonymous.CustomFurniture");
+            instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 
         private void replaceCustomFurniture(string action, string[] param)

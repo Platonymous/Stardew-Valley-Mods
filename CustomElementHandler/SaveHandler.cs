@@ -390,6 +390,18 @@ namespace CustomElementHandler
                                 replacement = nullFurniture;
                             list[j] = (Furniture)replacement;
                         }
+
+                        if (list[j] != null && list[j].heldObject != null && list[j].heldObject.name.Contains("CEHe"))
+                        {
+                            string[] data = list[j].heldObject.name.Split('/');
+
+                            object replacement = rebuildElement(data, list[j].heldObject, cleanup);
+                            Furniture nullFurniture = new Furniture();
+                            nullFurniture.name = "cehRemove";
+                            if (cleanup)
+                                replacement = nullFurniture;
+                            list[j].heldObject = (Furniture)replacement;
+                        }
                     }
                 }
 
@@ -539,6 +551,18 @@ namespace CustomElementHandler
                 {
                     for (int j = 0; j < elist.Count; j++)
                     {
+                        if (elist[j].heldObject is ISaveElement)
+                        {
+                            ISaveElement element = (ISaveElement)elist[j].heldObject;
+                            string additionalSaveData = string.Join("/", element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+                            string type = getTypeName(element);
+                            string name = "CEHe/Item/" + type + "/" + additionalSaveData;
+                            StardewValley.Object replacement = (StardewValley.Object)element.getReplacement();
+                            replacement.name = name;
+
+                            elist[j].heldObject = (Furniture)replacement;
+                        }
+
                         if (elist[j] is ISaveElement)
                         {
                             ISaveElement element = (ISaveElement)elist[j];

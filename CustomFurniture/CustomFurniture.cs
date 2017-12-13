@@ -9,13 +9,12 @@ using Microsoft.Xna.Framework;
 
 using CustomElementHandler;
 using System.Collections.Generic;
-using StardewValley.Locations;
 
 namespace CustomFurniture
 {
     class CustomFurniture : Furniture, ISaveElement
     {
-        private Texture2D texture;
+        public Texture2D texture;
         private int animationFrames;
         private int frame;
         private Rectangle animatedSourceRect;
@@ -28,7 +27,6 @@ namespace CustomFurniture
         private int rotatedBoxHeight;
         public CustomFurnitureData data;
         public string id;
-
 
         public CustomFurniture()
         {
@@ -45,7 +43,7 @@ namespace CustomFurniture
             id = objectID;
             int shift = (data.type.Contains("table") && data.boxHeight < data.height && data.height != data.width) ? 1 : 0;
 
-            rotatedWidth = data.rotatedWidth == -1 ? data.height - shift : data.rotatedWidth ;
+            rotatedWidth = data.rotatedWidth == -1 ? data.height - shift : data.rotatedWidth;
             rotatedWidth *= 16;
             rotatedHeight = data.rotatedHeight == -1 ? data.width : data.rotatedHeight;
             rotatedHeight *= 16;
@@ -128,7 +126,7 @@ namespace CustomFurniture
 
         public override Item getOne()
         {
-            return new CustomFurniture(data,id,Vector2.Zero);
+            return new CustomFurniture(data, id, Vector2.Zero);
         }
 
         private float getScaleSize()
@@ -151,7 +149,7 @@ namespace CustomFurniture
                 sourceRect = new Rectangle(defaultSourceRect.X + defaultSourceRect.Width, defaultSourceRect.Y, rotatedWidth, rotatedHeight);
                 boundingBox = new Rectangle((int)tileLocation.X * Game1.tileSize, ((int)tileLocation.Y) * Game1.tileSize, rotatedBoxWidth, rotatedBoxHeight);
             }
-                spriteBatch.Draw(texture, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Rectangle?(defaultSourceRect), Color.White * transparency, 0.0f, new Vector2((float)(defaultSourceRect.Width / 2), (float)(defaultSourceRect.Height / 2)), 1f * getScaleSize() * scaleSize, SpriteEffects.None, layerDepth);
+            spriteBatch.Draw(texture, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Rectangle?(defaultSourceRect), Color.White * transparency, 0.0f, new Vector2((float)(defaultSourceRect.Width / 2), (float)(defaultSourceRect.Height / 2)), 1f * getScaleSize() * scaleSize, SpriteEffects.None, layerDepth);
         }
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1f)
@@ -180,7 +178,7 @@ namespace CustomFurniture
             {
                 customDrawAtNonTileSpot(ho, spriteBatch, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(boundingBox.Center.X - Game1.tileSize / 2), (float)(boundingBox.Center.Y - ho.sourceRect.Height * Game1.pixelZoom - (drawHeldObjectLow ? -Game1.tileSize / 4 : Game1.tileSize / 4)))), (float)(boundingBox.Bottom - 7) / 10000f, alpha);
             }
-            else if(heldObject is Furniture)
+            else if (heldObject is Furniture)
             {
                 (this.heldObject as Furniture).drawAtNonTileSpot(spriteBatch, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(this.boundingBox.Center.X - Game1.tileSize / 2), (float)(this.boundingBox.Center.Y - (this.heldObject as Furniture).sourceRect.Height * Game1.pixelZoom - (this.drawHeldObjectLow ? -Game1.tileSize / 4 : Game1.tileSize / 4)))), (float)(this.boundingBox.Bottom - 7) / 10000f, alpha);
             }
@@ -191,11 +189,6 @@ namespace CustomFurniture
             }
         }
 
-        public void newDrawAtNonTileSpot(SpriteBatch spriteBatch, Vector2 location, float layerDepth, float alpha = 1f)
-        {
-            spriteBatch.Draw(texture, location, new Rectangle?(sourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, this.flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, layerDepth);
-        }
-
         private void customDrawAtNonTileSpot(CustomFurniture ho, SpriteBatch spriteBatch, Vector2 location, float layerDepth, float alpha = 1f)
         {
             spriteBatch.Draw(ho.texture, location, new Rectangle?(ho.sourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, this.flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, layerDepth);
@@ -203,7 +196,10 @@ namespace CustomFurniture
 
         public object getReplacement()
         {
-            return new Furniture(0, tileLocation, currentRotation);
+            Furniture replacement = new Furniture(0, tileLocation, currentRotation);
+            if (heldObject != null)
+                replacement.heldObject = heldObject; 
+            return replacement;
         }
 
         public Dictionary<string, string> getAdditionalSaveData()
@@ -227,7 +223,13 @@ namespace CustomFurniture
                 {
                     rotate();
                 }
+
+                if(replacement is Furniture r && r.heldObject != null)
+                {
+                    this.heldObject = r.heldObject;
+                }
             }
         }
     }
+
 }
