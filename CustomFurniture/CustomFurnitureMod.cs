@@ -28,7 +28,14 @@ namespace CustomFurniture
         {
             instance = this;
             CustomFurnitureMod.helper = helper;
-            harmonyFix();
+            try
+            {
+                harmonyFix();
+            }
+            catch (Exception e)
+            {
+                Monitor.Log("Harmony Error: Custom deco won't work on tables." + e.StackTrace, LogLevel.Error);
+            }
             loadPacks();
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
