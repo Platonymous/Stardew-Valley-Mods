@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace CustomFurniture
 {
-    class CustomFurniture : Furniture, ISaveElement
+    public class CustomFurniture : Furniture, ISaveElement
     {
         public Texture2D texture;
         private int animationFrames;
@@ -198,7 +198,9 @@ namespace CustomFurniture
         {
             Furniture replacement = new Furniture(0, tileLocation, currentRotation);
             if (heldObject != null)
-                replacement.heldObject = heldObject; 
+                replacement.heldObject = heldObject;
+
+            replacement.sourceRect = this.sourceRect;
             return replacement;
         }
 
@@ -224,9 +226,13 @@ namespace CustomFurniture
                     rotate();
                 }
 
-                if(replacement is Furniture r && r.heldObject != null)
+                if(replacement is Furniture r)
                 {
-                    this.heldObject = r.heldObject;
+                    if(r.sourceRect != new Furniture(0, tileLocation, currentRotation).sourceRect)
+                        this.sourceRect = r.sourceRect;
+
+                    if (r.heldObject != null)
+                        this.heldObject = r.heldObject;
                 }
             }
         }

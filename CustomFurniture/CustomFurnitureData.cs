@@ -1,6 +1,6 @@
 ﻿namespace CustomFurniture
 {
-    class CustomFurnitureData
+    public class CustomFurnitureData
     {
         public int id { get; set; }
         public string texture { get; set; }

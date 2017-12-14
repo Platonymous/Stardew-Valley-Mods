@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B60CC08A-ABD5-4B7B-81BF-C0295C11A025}</ProjectGuid>
+    <ProjectGuid>{4B5FC017-74C2-4C03-9A55-41DCD90C489B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CustomFurniture</RootNamespace>
-    <AssemblyName>CustomFurniture</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>CustomFurnitureAnywhere</RootNamespace>
+    <AssemblyName>CustomFurnitureAnywhere</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -35,44 +35,44 @@
     <Reference Include="0Harmony">
       <HintPath>.\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="EntoaroxFramework">
+      <HintPath>.\EntoaroxFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="FurnitureAnywhere">
+      <HintPath>.\FurnitureAnywhere.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomFurnitureData.cs" />
-    <Compile Include="CustomFurnitureMod.cs" />
-    <Compile Include="CustomFurniture.cs" />
-    <Compile Include="CustomFurniturePack.cs" />
-    <Compile Include="Overrides\FurnitureFix.cs" />
+    <Compile Include="AnywhereCustomFurniture.cs" />
+    <Compile Include="CustomFurnitureAnywhereMod.cs" />
+    <Compile Include="FurnitureAnywhereModFix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WallpaperData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Furniture\Example\example.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CustomElementHandler\CustomElementHandler.csproj">
-      <Project>{7a31daf1-0ac8-48f7-bd2d-e861850adc72}</Project>
-      <Name>CustomElementHandler</Name>
+    <ProjectReference Include="..\CustomFurniture\CustomFurniture.csproj">
+      <Project>{b60cc08a-abd5-4b7b-81bf-c0295c11a025}</Project>
+      <Name>CustomFurniture</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Furniture\Example\example.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\deploy-mod.targets" />
-  <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.1\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.1\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
+  <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.1\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.1\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
+    <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
   </Target>
 </Project>
