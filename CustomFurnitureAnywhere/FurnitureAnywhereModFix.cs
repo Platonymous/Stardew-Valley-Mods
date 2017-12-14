@@ -72,7 +72,7 @@ namespace CustomFurnitureAnywhere
             SerializableDictionary<Vector2, StardewValley.Object> objects = __instance.objects;
             Vector2 key = new Vector2((float)(position.Left / Game1.tileSize), (float)(position.Top / Game1.tileSize));
 
-            if (__instance is DecoratableLocation || objects.ContainsKey(key))
+            if (__instance is DecoratableLocation || objects.ContainsKey(key) || (objects[key] is Furniture f && f.furniture_type == 12))
                 return;
 
             foreach (Vector2 k in objects.Keys)
