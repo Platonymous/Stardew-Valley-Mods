@@ -55,6 +55,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastForward", "GameSpeed\Fa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFurnitureAnywhere", "CustomFurnitureAnywhere\CustomFurnitureAnywhere.csproj", "{4B5FC017-74C2-4C03-9A55-41DCD90C489B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualize", "Visualize\Visualize.csproj", "{A9A81F01-58DD-4030-BB82-AE7E71D68D99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harmony", "..\Harmony\Harmony\Harmony.csproj", "{69AEE16A-B6E7-4642-8081-3928B32455DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -152,6 +156,14 @@ Global
 		{4B5FC017-74C2-4C03-9A55-41DCD90C489B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B5FC017-74C2-4C03-9A55-41DCD90C489B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B5FC017-74C2-4C03-9A55-41DCD90C489B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9A81F01-58DD-4030-BB82-AE7E71D68D99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9A81F01-58DD-4030-BB82-AE7E71D68D99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9A81F01-58DD-4030-BB82-AE7E71D68D99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9A81F01-58DD-4030-BB82-AE7E71D68D99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69AEE16A-B6E7-4642-8081-3928B32455DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69AEE16A-B6E7-4642-8081-3928B32455DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69AEE16A-B6E7-4642-8081-3928B32455DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69AEE16A-B6E7-4642-8081-3928B32455DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
