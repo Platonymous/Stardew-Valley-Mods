@@ -8,6 +8,7 @@ using System.Reflection;
 using System.IO;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
+using System;
 
 namespace Visualize
 {
@@ -16,13 +17,16 @@ namespace Visualize
         public static IMonitor _monitor;
         public static Profile _activeProfile;
         public static Config _config;
+        public static IModHelper _helper;
         public static List<Color> palette = new List<Color>();
+        public static Dictionary<Texture2D, List<Color>> paletteCache = new Dictionary<Texture2D, List<Color>>();
         public static List<Profile> profiles = new List<Profile>();
 
         public override void Entry(IModHelper helper)
         {
             _monitor = Monitor;
             _config = Helper.ReadConfig<Config>();
+            _helper = Helper;
             loadProfiles();
             setActiveProfile();
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
@@ -56,15 +60,22 @@ namespace Visualize
             if (_activeProfile == null && profiles.Count > 0)
                 _activeProfile = profiles[0];
 
+            palette = new List<Color>();
+
             if (_activeProfile.palette != "none")
             {
                 Texture2D paletteImage = Helper.Content.Load<Texture2D>($"Profiles/{_activeProfile.palette}", ContentSource.ModFolder);
-                palette = Effects.loadPalette(paletteImage);
+
+                if (paletteCache.ContainsKey(paletteImage))
+                    palette = paletteCache[paletteImage];
+                else
+                {
+                    palette = Effects.loadPalette(paletteImage);
+                    paletteCache.Add(paletteImage, palette);
+                }
+                    
             }
-            else
-            {
-                palette = new List<Color>();
-            }
+
         }
 
         public void harmonyFix()

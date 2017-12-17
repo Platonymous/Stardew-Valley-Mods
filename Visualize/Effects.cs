@@ -7,9 +7,9 @@ namespace Visualize
 {
     public class Effects
     {
-
         public static Dictionary<Texture2D, Texture2D> textureCache = new Dictionary<Texture2D, Texture2D>();
         public static Dictionary<Color, Color> colorCache = new Dictionary<Color, Color>();
+        public static Dictionary<Texture2D, List<Color>> paletteCache = new Dictionary<Texture2D, List<Color>>();
         public static BlendState lightingBlend = new BlendState() { ColorBlendFunction = BlendFunction.ReverseSubtract, ColorDestinationBlend = Blend.One, ColorSourceBlend = Blend.SourceColor };
 
         public static Texture2D processTexture(Texture2D texture)
@@ -19,7 +19,7 @@ namespace Visualize
 
         public static bool appyEffects(ref SpriteBatch spritebatch, ref Color color, ref Texture2D texture)
         {
-            if (VisualizeMod._activeProfile.noShadow && texture == Game1.shadowTexture)
+            if (VisualizeMod._activeProfile.noShadow && (texture == Game1.shadowTexture))
                 return false;
 
             if (VisualizeMod._activeProfile.noTransparancy && color != Color.White && color.R == color.G && color.G == color.B && color.B == color.A)
