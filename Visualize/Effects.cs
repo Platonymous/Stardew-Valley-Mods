@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewValley;
 using System.Collections.Generic;
 
 namespace Visualize
@@ -9,16 +10,25 @@ namespace Visualize
 
         public static Dictionary<Texture2D, Texture2D> textureCache = new Dictionary<Texture2D, Texture2D>();
         public static Dictionary<Color, Color> colorCache = new Dictionary<Color, Color>();
+        public static BlendState lightingBlend = new BlendState() { ColorBlendFunction = BlendFunction.ReverseSubtract, ColorDestinationBlend = Blend.One, ColorSourceBlend = Blend.SourceColor };
 
         public static Texture2D processTexture(Texture2D texture)
         {
             return changeColor(ref texture, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
         }
 
-        public static bool appyEffects(ref Color color, ref Texture2D texture)
+        public static bool appyEffects(ref SpriteBatch spritebatch, ref Color color, ref Texture2D texture)
         {
-            color = changeColor(ref color, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
+            if (VisualizeMod._activeProfile.noShadow && texture == Game1.shadowTexture)
+                return false;
+
+            if (VisualizeMod._activeProfile.noTransparancy && color != Color.White && color.R == color.G && color.G == color.B && color.B == color.A)
+                color = Color.White;
+            else
+                color = changeColor(ref color, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
+
             texture = changeColor(ref texture, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
+
             if (VisualizeMod._activeProfile.tint != Color.White)
                 color = multiply(color, VisualizeMod._activeProfile.tint);
 

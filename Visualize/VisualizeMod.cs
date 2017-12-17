@@ -26,7 +26,17 @@ namespace Visualize
             loadProfiles();
             setActiveProfile();
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            GameEvents.EighthUpdateTick += GameEvents_EighthUpdateTick;
             harmonyFix();
+        }
+
+        private void GameEvents_EighthUpdateTick(object sender, System.EventArgs e)
+        {
+            if (_activeProfile != null && _activeProfile.noAmbientLight)
+                Game1.ambientLight = Color.White;
+
+            if (_activeProfile.noLightsources && Game1.currentLocation is GameLocation location)
+                location.lightGlows = new List<Vector2>();
         }
 
         private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
@@ -50,6 +60,10 @@ namespace Visualize
             {
                 Texture2D paletteImage = Helper.Content.Load<Texture2D>($"Profiles/{_activeProfile.palette}", ContentSource.ModFolder);
                 palette = Effects.loadPalette(paletteImage);
+            }
+            else
+            {
+                palette = new List<Color>();
             }
         }
 
