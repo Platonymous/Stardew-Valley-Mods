@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Entoarox.FurnitureAnywhere;
+﻿using Entoarox.FurnitureAnywhere;
 using Harmony;
 using StardewValley;
-using StardewModdingAPI;
-using CustomFurniture;
 using Entoarox.Framework.Events;
 using Microsoft.Xna.Framework;
 using StardewValley.Objects;

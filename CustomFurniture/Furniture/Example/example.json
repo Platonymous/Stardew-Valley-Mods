@@ -1,8 +1,11 @@
 {
+  "author": "Platonymous",
+  "name": "Example Furniture",
+  "version": "1.0.0",
   "furniture": [
     {
       "id": 0,
-	  "texture": "example.png",
+      "texture": "example.png",
       "name": "Weathercock",
       "description": "A Weathercock",
       "type": "decor",
@@ -19,7 +22,7 @@
     },
     {
       "id": 1,
-	  "texture": "example.png",
+      "texture": "example.png",
       "name": "Master Sword",
       "description": "The Master Sword",
       "type": "decor",
@@ -36,7 +39,7 @@
     },
     {
       "id": 2,
-	  "texture": "example.png",
+      "texture": "example.png",
       "name": "Statue",
       "description": "A small Statue",
       "type": "decor",
@@ -50,7 +53,7 @@
     },
     {
       "id": 3,
-	  "texture": "example.png",
+      "texture": "example.png",
       "name": "Agahnim",
       "description": "A big Statue",
       "type": "decor",
@@ -60,11 +63,11 @@
       "height": 3,
       "boxWidth": 2,
       "boxHeight": 1,
-      "rotations": 1 
+      "rotations": 1
     },
     {
       "id": 4,
-	  "texture": "example.png",
+      "texture": "example.png",
       "name": "Rug",
       "description": "A Rug",
       "type": "rug",

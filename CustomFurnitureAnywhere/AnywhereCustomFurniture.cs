@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
-using CustomFurniture;
 
 namespace CustomFurnitureAnywhere
 {

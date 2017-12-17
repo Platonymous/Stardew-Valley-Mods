@@ -1,12 +1,9 @@
 ﻿using System;
 using System.IO;
-
 using StardewValley;
 using StardewValley.Objects;
-
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-
 using CustomElementHandler;
 using System.Collections.Generic;
 
@@ -66,7 +63,16 @@ namespace CustomFurniture
             parentSheetIndex = data.index;
 
             name = data.name;
-            furniture_type = getTypeFromName(data.type);
+            List<string> decorTypes = new List<string>();
+            decorTypes.Add("chair");
+            decorTypes.Add("bench");
+            decorTypes.Add("couch");
+            decorTypes.Add("armchair");
+            decorTypes.Add("dresser");
+            decorTypes.Add("bookcase");
+            decorTypes.Add("other");
+            string typename = data.type.Contains("table") ? "table" : decorTypes.Contains(data.type) ? "decor" : data.type;
+            furniture_type = getTypeFromName(typename);
             defaultSourceRect = new Rectangle(data.index * 16 % texture.Width, data.index * 16 / texture.Width * 16, 1, 1);
             drawHeldObjectLow = false;
 

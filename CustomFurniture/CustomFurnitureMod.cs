@@ -1,19 +1,16 @@
 ﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
-
 using Microsoft.Xna.Framework;
-
 using System.IO;
 using System.Collections.Generic;
-
 using StardewValley;
 using StardewValley.Menus;
 using System.Linq;
 using StardewValley.Objects;
 using System;
-using Microsoft.Xna.Framework.Graphics;
 using Harmony;
 using System.Reflection;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace CustomFurniture
 {
@@ -46,6 +43,11 @@ namespace CustomFurniture
         {
             var instance = HarmonyInstance.Create("Platonymous.CustomFurniture");
             instance.PatchAll(Assembly.GetExecutingAssembly());
+        }
+
+        public static void harmonyDraw(Texture2D texture, Vector2 location, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, float scale, SpriteEffects spriteeffects, float layerDepth)
+        {
+            Game1.spriteBatch.Draw(texture, location, sourceRectangle, color, rotation, origin, scale, spriteeffects, layerDepth);
         }
 
         private void replaceCustomFurniture(string action, string[] param)

@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>.\0Harmony.dll</HintPath>
-    </Reference>
     <Reference Include="EntoaroxFramework">
       <HintPath>.\EntoaroxFramework.dll</HintPath>
     </Reference>
@@ -61,6 +58,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
+      <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
+      <Name>Harmony</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CustomFurniture\CustomFurniture.csproj">
       <Project>{b60cc08a-abd5-4b7b-81bf-c0295c11a025}</Project>
       <Name>CustomFurniture</Name>
