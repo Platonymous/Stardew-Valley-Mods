@@ -68,17 +68,26 @@ namespace Visualize
             if (colorCache.ContainsKey(color))
                 return colorCache[color];
 
-            float adjust = 1f + (light / 100);
+            float adjust = light / 100;
 
             Color newColor = new Color(color.R, color.G, color.B, color.A);
+            
+            float newR = (adjust * color.R);
+            float newG = (adjust * color.G);
+            float newB = (adjust * color.B);
 
-            float newR = ((1f + (r / 100)) * adjust * color.R);
-            float newG = ((1f + (g / 100)) * adjust * color.G);
-            float newB = ((1f + (b / 100)) * adjust * color.B);
-
-            float s = 1f - (saturation / 100);
             float l = 0.2125f * newR + 0.7154f * newG + 0.0721f * newB;
 
+            float rs = 1f - (r / 100);
+            float gs = 1f - (g / 100);
+            float bs = 1f - (b / 100);
+
+            newR += rs * (l - newR);
+            newG += gs * (l - newG);
+            newB += bs * (l - newB);
+
+            float s = 1f - (saturation / 100);
+            
             if(s != 0)
             {
                 newR = newR + s * (l - newR);
@@ -89,8 +98,6 @@ namespace Visualize
             newColor.R = (byte)MathHelper.Min(newR, 255);
             newColor.G = (byte)MathHelper.Min(newG, 255);
             newColor.B = (byte)MathHelper.Min(newB, 255);
-
-           
 
             if (VisualizeMod._activeProfile.palette != "none" && VisualizeMod.palette.Count > 0)
                 newColor = FindNearestColor(VisualizeMod.palette.ToArray(), newColor);
