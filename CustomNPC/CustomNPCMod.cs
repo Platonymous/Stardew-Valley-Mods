@@ -166,8 +166,8 @@ namespace CustomNPC
 
             foreach (NPCBlueprint blueprint in NPCS)
                 foreach (CustomBuilding building in blueprint.buildings)
-                    if (building.clear)
-                        clearSpace(Game1.getLocationFromName(building.location), Helper.Content.Load<Map>($"NPCs/{blueprint.fileDirectory}/" + building.map), new Vector2((int)building.position[0], (int)building.position[1]));
+                    if (building.clear && Game1.getLocationFromName(building.location) is GameLocation location)
+                        clearSpace(location, Helper.Content.Load<Map>($"NPCs/{blueprint.fileDirectory}/" + building.map), new Vector2((int)building.position[0], (int)building.position[1]));
                  
             NPC.populateRoutesFromLocationToLocationList();
         }
