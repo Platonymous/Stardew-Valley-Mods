@@ -8,8 +8,8 @@ namespace Visualize
         public string author { get; set; } = "none";
         public string version { get; set; } = "1.0.0";
         public string id { get; set; } = "auto";
-        public bool mono { get; set; } = false;
         public Color tint { get; set; } = Color.White;
+        public float saturation { get; set; } = 100;
         public float red { get; set; } = 0;
         public float green { get; set; } = 0;
         public float blue { get; set; } = 0;

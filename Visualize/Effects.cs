@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
 using System.Collections.Generic;
 
 namespace Visualize
@@ -13,20 +12,20 @@ namespace Visualize
 
         public static Texture2D processTexture(Texture2D texture)
         {
-            return changeColor(ref texture, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.mono);
+            return changeColor(ref texture, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
         }
 
         public static bool appyEffects(ref Color color, ref Texture2D texture)
         {
-            color = changeColor(ref color, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.mono);
-            texture = changeColor(ref texture, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.mono);
+            color = changeColor(ref color, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
+            texture = changeColor(ref texture, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
             if (VisualizeMod._activeProfile.tint != Color.White)
                 color = multiply(color, VisualizeMod._activeProfile.tint);
 
             return true;
         }
 
-        public static Texture2D changeColor(ref Texture2D texture, float light, float r, float g, float b, bool mono)
+        public static Texture2D changeColor(ref Texture2D texture, float light, float r, float g, float b, float saturation)
         {
             if (textureCache.ContainsKey(texture))
                 return textureCache[texture];
@@ -49,7 +48,7 @@ namespace Visualize
             {
                 for (int y = 0; y < texture.Height; y++)
                 {
-                    colorData[x * texture.Height + y] = changeColor(ref colorData[x * texture.Height + y], light, r, g, b, mono);
+                    colorData[x * texture.Height + y] = changeColor(ref colorData[x * texture.Height + y], light, r, g, b, saturation);
                 }
             }
 
@@ -61,7 +60,7 @@ namespace Visualize
             return newTexture;
         }
 
-        public static Color changeColor(ref Color color, float light, float r, float g, float b, bool mono)
+        public static Color changeColor(ref Color color, float light, float r, float g, float b, float saturation)
         {
             if (color.A == 0 || color == Color.Black)
                 return color;
@@ -77,24 +76,28 @@ namespace Visualize
             float newG = ((1f + (g / 100)) * adjust * color.G);
             float newB = ((1f + (b / 100)) * adjust * color.B);
 
-            if (mono)
+            float s = 1f - (saturation / 100);
+            float l = 0.2125f * newR + 0.7154f * newG + 0.0721f * newB;
+
+            if(s != 0)
             {
-                float monoc = MathHelper.Min((0.2125f * newR) + (0.7154f * newG) + (0.0721f * newB), 255);
-                newR = (byte)monoc;
-                newG = (byte)monoc;
-                newB = (byte)monoc;
+                newR = newR + s * (l - newR);
+                newG = newG + s * (l - newG);
+                newB = newB + s * (l - newB);
             }
 
             newColor.R = (byte)MathHelper.Min(newR, 255);
             newColor.G = (byte)MathHelper.Min(newG, 255);
             newColor.B = (byte)MathHelper.Min(newB, 255);
 
+           
+
             if (VisualizeMod._activeProfile.palette != "none" && VisualizeMod.palette.Count > 0)
                 newColor = FindNearestColor(VisualizeMod.palette.ToArray(), newColor);
 
             newColor.A = color.A;
 
-                colorCache.Add(color, newColor);
+            colorCache.Add(color, newColor);
 
             return newColor;
         }
