@@ -72,9 +72,12 @@ namespace Visualize
 
         public static Color changeColor(ref Color color, float light, float r, float g, float b, float saturation)
         {
-            if (color.A == 0 || color == Color.Black)
+            if (color.A == 0)
                 return color;
 
+            if (VisualizeMod._activeProfile.noColorTransparancy && color.A < 255)
+                color.A = 255;
+                
             if (colorCache.ContainsKey(color))
                 return colorCache[color];
 
