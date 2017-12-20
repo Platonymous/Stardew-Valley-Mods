@@ -5,37 +5,49 @@ using System.Collections.Generic;
 
 namespace Visualize
 {
-    public class Effects
+    internal class Effects : IVisualizeHandler
     {
         public static Dictionary<Texture2D, Texture2D> textureCache = new Dictionary<Texture2D, Texture2D>();
         public static Dictionary<Color, Color> colorCache = new Dictionary<Color, Color>();
         public static Dictionary<Texture2D, List<Color>> paletteCache = new Dictionary<Texture2D, List<Color>>();
-        public static BlendState lightingBlend = new BlendState() { ColorBlendFunction = BlendFunction.ReverseSubtract, ColorDestinationBlend = Blend.One, ColorSourceBlend = Blend.SourceColor };
 
-        public static Texture2D processTexture(Texture2D texture)
+        public bool Draw(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
         {
-            return changeColor(ref texture, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
-        }
+            Profile useProfile = VisualizeMod._activeProfile;
 
-        public static bool appyEffects(ref SpriteBatch spritebatch, ref Color color, ref Texture2D texture)
-        {
-            if (VisualizeMod._activeProfile.noShadow && (texture == Game1.shadowTexture))
+            if (useProfile.noAmbientLight)
+                Game1.drawLighting = false;
+            
+            if (useProfile.noLightsources && Game1.currentLocation is GameLocation l && (color == Color.PaleGoldenrod * (l.IsOutdoors ? 0.35f : 0.43f) || ((color == Color.White * 0.75f) && (texture == Game1.mouseCursors) && (sourceRectangle.GetValueOrDefault() == new Rectangle(88, 1779, 32, 32)))))
                 return false;
 
-            if (VisualizeMod._activeProfile.noTransparancy && color != Color.White && color.R == color.G && color.G == color.B && color.B == color.A)
+            if (useProfile.noShadow && (texture == Game1.shadowTexture))
+                return false;
+
+            if (useProfile.noTransparancy && color != Color.White && color.R == color.G && color.G == color.B && color.B == color.A)
                 color = Color.White;
             else
-                color = changeColor(ref color, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
+                color = changeColor(ref color, useProfile.light, useProfile.red, useProfile.green, useProfile.blue, useProfile.saturation, useProfile.noColorTransparancy, useProfile.palette);
 
-            texture = changeColor(ref texture, VisualizeMod._activeProfile.light, VisualizeMod._activeProfile.red, VisualizeMod._activeProfile.green, VisualizeMod._activeProfile.blue, VisualizeMod._activeProfile.saturation);
+            texture = changeColor(ref texture, useProfile.light, useProfile.red, useProfile.green, useProfile.blue, useProfile.saturation, useProfile.noColorTransparancy, useProfile.palette);
 
-            if (VisualizeMod._activeProfile.tint != Color.White)
-                color = multiply(color, VisualizeMod._activeProfile.tint);
+            if (useProfile.tint != Color.White)
+                color = multiply(color, useProfile.tint);
 
             return true;
         }
 
-        public static Texture2D changeColor(ref Texture2D texture, float light, float r, float g, float b, float saturation)
+        public bool Begin (ref SpriteBatch __instance, ref SpriteSortMode sortMode, ref BlendState blendState, ref SamplerState samplerState, ref DepthStencilState depthStencilState, ref RasterizerState rasterizerState, ref Effect effect, ref Matrix transformMatrix)
+        {
+            if (VisualizeMod.shader is Effect e)
+                effect = e;
+
+            return true;
+        }
+
+
+
+        private Texture2D changeColor(ref Texture2D texture, float light, float r, float g, float b, float saturation, bool noColortransparency, string palletteFile)
         {
             if (textureCache.ContainsKey(texture))
                 return textureCache[texture];
@@ -58,7 +70,7 @@ namespace Visualize
             {
                 for (int y = 0; y < texture.Height; y++)
                 {
-                    colorData[x * texture.Height + y] = changeColor(ref colorData[x * texture.Height + y], light, r, g, b, saturation);
+                    colorData[x * texture.Height + y] = changeColor(ref colorData[x * texture.Height + y], light, r, g, b, saturation, noColortransparency, palletteFile);
                 }
             }
 
@@ -70,12 +82,14 @@ namespace Visualize
             return newTexture;
         }
 
-        public static Color changeColor(ref Color color, float light, float r, float g, float b, float saturation)
+        private Color changeColor(ref Color color, float light, float r, float g, float b, float saturation, bool noColortransparency, string palletteFile )
         {
+            saturation *= VisualizeMod._config.saturation / 100;
+
             if (color.A == 0)
                 return color;
 
-            if (VisualizeMod._activeProfile.noColorTransparancy && color.A < 255)
+            if (noColortransparency && color.A < 255)
                 color.A = 255;
                 
             if (colorCache.ContainsKey(color))
@@ -112,7 +126,7 @@ namespace Visualize
             newColor.G = (byte)MathHelper.Min(newG, 255);
             newColor.B = (byte)MathHelper.Min(newB, 255);
 
-            if (VisualizeMod._activeProfile.palette != "none" && VisualizeMod.palette.Count > 0)
+            if (palletteFile != "none" && VisualizeMod.palette.Count > 0)
                 newColor = FindNearestColor(VisualizeMod.palette.ToArray(), newColor);
 
             newColor.A = color.A;
@@ -122,7 +136,7 @@ namespace Visualize
             return newColor;
         }
 
-        public static Color multiply(Color color1, Color color2)
+        private Color multiply(Color color1, Color color2)
         {
             Color result = new Color();
 
@@ -134,7 +148,7 @@ namespace Visualize
             return result;
         }
 
-        public static List<Color> loadPalette(Texture2D texture)
+        internal List<Color> loadPalette(Texture2D texture)
         {
             Color[] colorData = new Color[texture.Width * texture.Height];
             List<Color> palette = new List<Color>();
@@ -154,7 +168,7 @@ namespace Visualize
 
         }
 
-        public static int GetDistance(Color current, Color match)
+        private int GetDistance(Color current, Color match)
         {
             int redDifference;
             int greenDifference;
@@ -167,7 +181,7 @@ namespace Visualize
             return redDifference * redDifference + greenDifference * greenDifference + blueDifference * blueDifference;
         }
 
-        public static Color FindNearestColor(Color[] map, Color current)
+        private Color FindNearestColor(Color[] map, Color current)
         {
             int shortestDistance;
             int index;

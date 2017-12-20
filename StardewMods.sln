@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualize", "Visualize\Visu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harmony", "..\Harmony\Harmony\Harmony.csproj", "{69AEE16A-B6E7-4642-8081-3928B32455DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capitalism", "Capitalism\Capitalism.csproj", "{D4E0525F-537E-49FA-B0A8-D19B774580E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,6 +166,10 @@ Global
 		{69AEE16A-B6E7-4642-8081-3928B32455DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69AEE16A-B6E7-4642-8081-3928B32455DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69AEE16A-B6E7-4642-8081-3928B32455DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4E0525F-537E-49FA-B0A8-D19B774580E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4E0525F-537E-49FA-B0A8-D19B774580E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4E0525F-537E-49FA-B0A8-D19B774580E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4E0525F-537E-49FA-B0A8-D19B774580E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

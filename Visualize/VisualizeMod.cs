@@ -6,7 +6,6 @@ using StardewModdingAPI.Events;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
-using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using System;
 
@@ -14,13 +13,17 @@ namespace Visualize
 {
     public class VisualizeMod : Mod
     {
-        public static IMonitor _monitor;
-        public static Profile _activeProfile;
-        public static Config _config;
-        public static IModHelper _helper;
-        public static List<Color> palette = new List<Color>();
-        public static Dictionary<Texture2D, List<Color>> paletteCache = new Dictionary<Texture2D, List<Color>>();
-        public static List<Profile> profiles = new List<Profile>();
+        internal static IMonitor _monitor;
+        internal static Profile _activeProfile;
+        internal static Config _config;
+        internal static IModHelper _helper;
+        internal static List<Color> palette = new List<Color>();
+        internal static Effect shader = null;
+        internal static Dictionary<Texture2D, List<Color>> paletteCache = new Dictionary<Texture2D, List<Color>>();
+        internal static Dictionary<string, Effect> shaderChache = new Dictionary<string, Effect>();
+        internal static List<Profile> profiles = new List<Profile>();
+        internal static List<IVisualizeHandler> _handlers = new List<IVisualizeHandler>();
+        internal static Effects _handler = new Effects();
 
         public override void Entry(IModHelper helper)
         {
@@ -30,17 +33,25 @@ namespace Visualize
             loadProfiles();
             setActiveProfile();
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-            GameEvents.EighthUpdateTick += GameEvents_EighthUpdateTick;
             harmonyFix();
         }
 
-        private void GameEvents_EighthUpdateTick(object sender, System.EventArgs e)
+        internal static bool callDrawHandlers(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
         {
-            if (_activeProfile != null && _activeProfile.noAmbientLight)
-                Game1.ambientLight = Color.White;
+            foreach (IVisualizeHandler handler in _handlers)
+                if (!handler.Draw(ref __instance, ref texture, ref destination, ref scaleDestination, ref sourceRectangle, ref color, ref rotation, ref origin, ref effects, ref depth))
+                    return false;
 
-            if (_activeProfile.noLightsources && Game1.currentLocation is GameLocation location)
-                location.lightGlows = new List<Vector2>();
+            return true;
+        }
+
+        internal static bool callBeginHandlers(ref SpriteBatch __instance, ref SpriteSortMode sortMode, ref BlendState blendState, ref SamplerState samplerState, ref DepthStencilState depthStencilState, ref RasterizerState rasterizerState, ref Effect effect, ref Matrix transformMatrix)
+        {
+            foreach (IVisualizeHandler handler in _handlers)
+                if (!handler.Begin(ref __instance, ref sortMode, ref blendState, ref samplerState, ref depthStencilState, ref rasterizerState, ref effect, ref transformMatrix))
+                    return false;
+
+            return true;
         }
 
         private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
@@ -50,35 +61,113 @@ namespace Visualize
 
             if (e.KeyPressed == _config.previous)
                 switchProfile(-1);
+
+            if (e.KeyPressed == _config.satHigher || e.KeyPressed == _config.satLower)
+            {
+                if (e.KeyPressed == _config.satHigher)
+                    _config.saturation = MathHelper.Min(200, _config.saturation + 10);
+
+                if (e.KeyPressed == _config.satLower)
+                    _config.saturation = MathHelper.Max(0, _config.saturation - 10);
+
+                emptyCache();
+                Helper.WriteConfig<Config>(_config);
+            }
         }
 
-        public void setActiveProfile()
+        internal static void emptyCache()
         {
-            if (_activeProfile == null)
-                _activeProfile = profiles.Find(p => p.id == _config.activeProfile);
+            Effects.colorCache = new Dictionary<Color, Color>();
+            Effects.textureCache = new Dictionary<Texture2D, Texture2D>();
+        }
 
-            if (_activeProfile == null && profiles.Count > 0)
-                _activeProfile = profiles[0];
-
+        internal static void resetEffects()
+        {
+            emptyCache();
             palette = new List<Color>();
+            shader = null;
+        }
 
-            if (_activeProfile.palette != "none")
+        public static void addHandler(IVisualizeHandler handler)
+        {
+            if (!_handlers.Contains(handler))
+                _handlers.Add(handler);
+        }
+
+        public static void addProfile(Profile profile)
+        {
+            if (!profiles.Contains(profile))
+                profiles.Add(profile);
+        }
+
+        public static void removeHandler(IVisualizeHandler handler)
+        {
+            if (_handlers.Contains(handler))
+                _handlers.Remove(handler);
+        }
+
+        public static void removeProfile(Profile profile)
+        {
+            if (profiles.Contains(profile))
+                profiles.Remove(profile);
+        }
+
+        public static Profile getActiveProfile()
+        {
+            return _activeProfile;
+        }
+
+        internal static void setActiveProfile(Profile profile = null, bool activate = true)
+        {
+            resetEffects();
+
+            if (profile == null)
+                profile = profiles.Find(p => p.id == _config.activeProfile);
+
+            if (profile == null && profiles.Count > 0)
+                profile = profiles[0];
+
+            if (profile.palette != "none")
             {
-                Texture2D paletteImage = Helper.Content.Load<Texture2D>($"Profiles/{_activeProfile.palette}", ContentSource.ModFolder);
+                Texture2D paletteImage = _helper.Content.Load<Texture2D>($"Profiles/{profile.palette}", ContentSource.ModFolder);
 
                 if (paletteCache.ContainsKey(paletteImage))
                     palette = paletteCache[paletteImage];
                 else
                 {
-                    palette = Effects.loadPalette(paletteImage);
+                    palette = VisualizeMod._handler.loadPalette(paletteImage);
                     paletteCache.Add(paletteImage, palette);
                 }
-                    
             }
+
+            if (profile.shader != "none")
+                shader = _helper.Content.Load<Effect>("Profiles/" + profile.shader);
+
+            else if (profile.shaderType != "none")
+            {
+                if (shaderChache.ContainsKey(profile.shaderType))
+                    shader = shaderChache[profile.shaderType];
+                else
+                    try
+                    {
+                        Type T = Type.GetType(profile.shaderType);
+                        Effect effectType = (Effect)Activator.CreateInstance(T);
+                        shader = effectType;
+                        shaderChache.Add(profile.shaderType, effectType);
+                    }
+                    catch (Exception e)
+                    {
+                        _monitor.Log("Exception loading Shader Type: " + e.Message, LogLevel.Error);
+                        _monitor.Log("" + e.StackTrace, LogLevel.Error);
+                    }
+            }
+
+            if(activate)
+                _activeProfile = profile;
 
         }
 
-        public void harmonyFix()
+        private void harmonyFix()
         {
             var instance = HarmonyInstance.Create("Platonymous.Visualize");
             instance.PatchAll(Assembly.GetExecutingAssembly());
@@ -86,8 +175,6 @@ namespace Visualize
 
         private void loadProfiles()
         {
-            profiles = new List<Profile>();
-
             string[] files = parseDir(Path.Combine(Helper.DirectoryPath, "Profiles"), "*.json");
 
             foreach (string file in files)
@@ -110,7 +197,7 @@ namespace Visualize
             return Directory.GetFiles(path, extension, SearchOption.TopDirectoryOnly);
         }
 
-        private void switchProfile(int i)
+        internal static void switchProfile(int i)
         {
             int cIndex = profiles.FindIndex(p => p == _activeProfile);
             int nIndex = cIndex + i;
@@ -121,19 +208,14 @@ namespace Visualize
             if (nIndex >= profiles.Count)
                 nIndex = 0;
 
-            _activeProfile = profiles[nIndex];
-
-            Effects.colorCache = new Dictionary<Color, Color>();
-            Effects.textureCache = new Dictionary<Texture2D, Texture2D>();
-
-            setActiveProfile();
+            setActiveProfile(profiles[nIndex], true);
 
             Game1.playSound("coin");
             string author = _activeProfile.author == "none" ? "" : " by " + _activeProfile.author;
             Game1.hudMessages.Clear();
             Game1.addHUDMessage(new HUDMessage("Profile: " + _activeProfile.name + author, 1));
             _config.activeProfile = _activeProfile.id;
-            Helper.WriteConfig<Config>(_config);
+            _helper.WriteConfig<Config>(_config);
         }
 
     }

@@ -2,10 +2,13 @@
 
 namespace Visualize
 {
-    public class Config
+    internal class Config
     {
         public string activeProfile { get; set; } = "Platonymous.Original";
+        public float saturation { get; set; } = 100;
         public Keys next { get; set; } = Keys.PageDown;
         public Keys previous { get; set; } = Keys.PageUp;
+        public Keys satHigher { get; set; } = Keys.NumPad9;
+        public Keys satLower { get; set; } = Keys.NumPad6;
     }
 }

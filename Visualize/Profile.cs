@@ -15,6 +15,9 @@ namespace Visualize
         public float blue { get; set; } = 100;
         public float light { get; set; } = 100;
         public string palette { get; set; } = "none";
+        public string shader { get; set; } = "none";
+        public string shaderType { get; set; } = "none";
+        public string handlerType { get; set; } = "none";
         public bool noAmbientLight { get; set; } = false;
         public bool noTransparancy { get; set; } = false;
         public bool noLightsources { get; set; } = false;
