@@ -12,6 +12,9 @@ namespace Visualize
     {
         internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
         {
+            if (!VisualizeMod.active)
+                return true;
+
             if (!VisualizeMod.callDrawHandlers(ref __instance, ref texture, ref destination, ref scaleDestination, ref sourceRectangle, ref color, ref rotation, ref origin, ref effects, ref depth))
                 return false;
 
@@ -24,6 +27,9 @@ namespace Visualize
     {
         internal static bool Prefix(ref GameLocation __instance)
         {
+            if (!VisualizeMod.active)
+                return true;
+
             if (VisualizeMod._activeProfile.noLightsources)
                 return false;
 
@@ -36,6 +42,9 @@ namespace Visualize
     {
         internal static bool Prefix(ref SpriteBatch __instance, ref SpriteSortMode sortMode, ref BlendState blendState, ref SamplerState samplerState, ref DepthStencilState depthStencilState, ref RasterizerState rasterizerState, ref Effect effect, ref Matrix transformMatrix)
         {
+            if (!VisualizeMod.active)
+                return true;
+
             if (!VisualizeMod.callBeginHandlers(ref __instance, ref sortMode, ref blendState, ref samplerState, ref depthStencilState, ref rasterizerState, ref effect, ref transformMatrix))
                 return true;
 

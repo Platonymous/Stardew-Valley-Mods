@@ -24,6 +24,7 @@ namespace Visualize
         internal static List<Profile> profiles = new List<Profile>();
         internal static List<IVisualizeHandler> _handlers = new List<IVisualizeHandler>();
         internal static Effects _handler = new Effects();
+        internal static bool active = false;
 
         public override void Entry(IModHelper helper)
         {
@@ -81,13 +82,6 @@ namespace Visualize
             Effects.textureCache = new Dictionary<Texture2D, Texture2D>();
         }
 
-        internal static void resetEffects()
-        {
-            emptyCache();
-            palette = new List<Color>();
-            shader = null;
-        }
-
         public static void addHandler(IVisualizeHandler handler)
         {
             if (!_handlers.Contains(handler))
@@ -117,16 +111,8 @@ namespace Visualize
             return _activeProfile;
         }
 
-        internal static void setActiveProfile(Profile profile = null, bool activate = true)
+        internal static void loadPalette(Profile profile)
         {
-            resetEffects();
-
-            if (profile == null)
-                profile = profiles.Find(p => p.id == _config.activeProfile);
-
-            if (profile == null && profiles.Count > 0)
-                profile = profiles[0];
-
             if (profile.palette != "none")
             {
                 Texture2D paletteImage = _helper.Content.Load<Texture2D>($"Profiles/{profile.palette}", ContentSource.ModFolder);
@@ -139,10 +125,14 @@ namespace Visualize
                     paletteCache.Add(paletteImage, palette);
                 }
             }
+            else
+                palette = new List<Color>();
+        }
 
+        internal static void loadShader(Profile profile)
+        {
             if (profile.shader != "none")
                 shader = _helper.Content.Load<Effect>("Profiles/" + profile.shader);
-
             else if (profile.shaderType != "none")
             {
                 if (shaderChache.ContainsKey(profile.shaderType))
@@ -161,10 +151,26 @@ namespace Visualize
                         _monitor.Log("" + e.StackTrace, LogLevel.Error);
                     }
             }
+            else
+                shader = null;
+        }
 
-            if(activate)
-                _activeProfile = profile;
+        internal static void setActiveProfile(Profile profile = null)
+        {
+            active = false;
 
+            emptyCache();
+
+            if (profile == null)
+                profile = profiles.Find(p => p.id == _config.activeProfile);
+
+            if (profile == null && profiles.Count > 0)
+                profile = profiles[0];
+
+            loadShader(profile);
+            loadPalette(profile);
+            _activeProfile = profile;
+            active = true;
         }
 
         private void harmonyFix()
@@ -208,7 +214,7 @@ namespace Visualize
             if (nIndex >= profiles.Count)
                 nIndex = 0;
 
-            setActiveProfile(profiles[nIndex], true);
+            setActiveProfile(profiles[nIndex]);
 
             Game1.playSound("coin");
             string author = _activeProfile.author == "none" ? "" : " by " + _activeProfile.author;
