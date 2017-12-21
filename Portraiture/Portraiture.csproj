@@ -57,7 +57,6 @@
     <ProjectReference Include="..\Visualize\Visualize.csproj">
       <Project>{a9a81f01-58dd-4030-bb82-ae7e71d68d99}</Project>
       <Name>Visualize</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
