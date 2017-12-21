@@ -10,6 +10,7 @@ namespace Visualize
         public static Dictionary<Texture2D, Texture2D> textureCache = new Dictionary<Texture2D, Texture2D>();
         public static Dictionary<Color, Color> colorCache = new Dictionary<Color, Color>();
         public static Dictionary<Texture2D, List<Color>> paletteCache = new Dictionary<Texture2D, List<Color>>();
+        internal static int[] whitecolor = new int[] { 255, 255, 255, 255 };
 
         public bool Draw(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
         {
@@ -31,13 +32,21 @@ namespace Visualize
 
             texture = changeColor(ref texture, useProfile.light, useProfile.red, useProfile.green, useProfile.blue, useProfile.saturation, useProfile.noColorTransparancy, useProfile.palette);
 
-            if (useProfile.tint != Color.White)
-                color = multiply(color, useProfile.tint);
+            if (useProfile.tint != whitecolor)
+                color = multiply(color, new Color(useProfile.tint[0], useProfile.tint[1], useProfile.tint[2],useProfile.tint[3]));
 
             return true;
         }
 
         public bool Begin (ref SpriteBatch __instance, ref SpriteSortMode sortMode, ref BlendState blendState, ref SamplerState samplerState, ref DepthStencilState depthStencilState, ref RasterizerState rasterizerState, ref Effect effect, ref Matrix transformMatrix)
+        {
+            if (VisualizeMod.shader is Effect e)
+                effect = e;
+
+            return true;
+        }
+
+        public bool Begin(ref SpriteBatch __instance, ref SpriteSortMode sortMode, ref BlendState blendState, ref SamplerState samplerState, ref DepthStencilState depthStencilState, ref RasterizerState rasterizerState, ref Effect effect, ref Matrix? transformMatrix)
         {
             if (VisualizeMod.shader is Effect e)
                 effect = e;

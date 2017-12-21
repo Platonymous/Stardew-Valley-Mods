@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="FakeSpriteBatch.cs" />
     <Compile Include="IVisualizeHandler.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="Effects.cs" />
