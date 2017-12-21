@@ -33,11 +33,8 @@ namespace Visualize
             _helper = Helper;
             loadProfiles();
             setActiveProfile();
-            _monitor.Log(new GameLocation().GetType().AssemblyQualifiedName);
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-   
             harmonyFix();
-      
         }
 
         internal static bool callDrawHandlers(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
@@ -143,9 +140,7 @@ namespace Visualize
 
         internal static void loadShader(Profile profile)
         {
-            if (profile.shader != "none")
-                shader = _helper.Content.Load<Effect>("Profiles/" + profile.shader);
-            else if (profile.shaderType != "none")
+            if (profile.shaderType != "none")
             {
                 if (shaderChache.ContainsKey(profile.shaderType))
                     shader = shaderChache[profile.shaderType];
