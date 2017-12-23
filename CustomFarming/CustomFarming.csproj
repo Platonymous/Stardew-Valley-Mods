@@ -46,7 +46,6 @@
     <Compile Include="customFarmingMod.cs" />
     <Compile Include="ICustomFarmingObject.cs" />
     <Compile Include="ISaveObject.cs" />
-    <Compile Include="SaveHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="simpleMachine.cs" />
   </ItemGroup>

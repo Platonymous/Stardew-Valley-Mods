@@ -121,7 +121,6 @@ namespace CustomFarming
 
         public void build(int produceBaseIndex, string produceTilesheetPath, int produceTilesheetindex, int initialStack, string name, string description, Microsoft.Xna.Framework.Color color)
         {
-            SaveHandler.register(this);
             this.tileLocation = Vector2.Zero;
             this.parentSheetIndex = produceBaseIndex;
             this.loadBaseObjectInformation();
@@ -291,7 +290,6 @@ namespace CustomFarming
                 float num = this.quality < 4 ? 0.0f : (float)((Math.Cos((double)Game1.currentGameTime.TotalGameTime.Milliseconds * Math.PI / 512.0) + 1.0) * 0.0500000007450581);
                 spriteBatch.Draw(Game1.mouseCursors, location + new Vector2(12f, (float)(Game1.tileSize - 12) + num), new Microsoft.Xna.Framework.Rectangle?(this.quality < 4 ? new Microsoft.Xna.Framework.Rectangle(338 + (this.quality - 1) * 8, 400, 8, 8) : new Microsoft.Xna.Framework.Rectangle(346, 392, 8, 8)), Microsoft.Xna.Framework.Color.White * transparency, 0.0f, new Vector2(4f, 4f), (float)(3.0 * (double)scaleSize * (1.0 + (double)num)), SpriteEffects.None, layerDepth);
             }
-            SaveHandler.drawInMenu(this);
         }
 
 

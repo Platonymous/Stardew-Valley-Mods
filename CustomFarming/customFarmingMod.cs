@@ -226,13 +226,7 @@ namespace CustomFarming
         private void load()
         {            
             customFiles = new List<string>();
-            ParseDir(customContentFolder);
-            SaveHandler.loadFromFile("CustomFarmingMod");
-            if(SaveHandler.saveString != "")
-            {
-                SaveHandler.LoadAndReplace();
-            }
-            
+            ParseDir(customContentFolder);            
             buildMaschines();
             buildCraftingPage();
         }

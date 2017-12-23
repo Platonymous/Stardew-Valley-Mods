@@ -200,7 +200,6 @@ namespace CustomFarming
 
         public void build(string modFolder, string filename)
         {
-            SaveHandler.register(this);
             if (allMachines == null)
             {
                 allMachines = new List<simpleMachine>();
@@ -745,7 +744,6 @@ namespace CustomFarming
                 spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(this.tileLocation.X * Game1.tileSize + Game1.tileSize / 2 + Game1.pixelZoom), (float)(this.tileLocation.Y * Game1.tileSize - Game1.tileSize - 24 - Game1.tileSize / 8) + num)), new Microsoft.Xna.Framework.Rectangle?(new Microsoft.Xna.Framework.Rectangle(189, 423, 15, 13)), Microsoft.Xna.Framework.Color.White, 0.0f, new Vector2(7f, 6f), 4f, SpriteEffects.None, (float)((double)(17 * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + 0.00680000009015203));
             }
 
-            SaveHandler.draw(this, new Vector2(x, y));
         }
 
 
@@ -761,7 +759,6 @@ namespace CustomFarming
             this.tileindex = this.menuTileIndex;
             updateSourceRectangle();
             spriteBatch.Draw(this.tilesheet, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Microsoft.Xna.Framework.Rectangle?(this.sourceRectangle), Microsoft.Xna.Framework.Color.White * transparency, 0.0f, new Vector2(this.tileWidth/2, this.tileWidth), (float)Game1.pixelZoom * ((double)scaleSize < 0.2 ? scaleSize : scaleSize / 2.00f), SpriteEffects.None, layerDepth);
-            SaveHandler.drawInMenu(this);
         }
 
 
