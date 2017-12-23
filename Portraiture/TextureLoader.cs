@@ -18,6 +18,8 @@ namespace Portraiture
 
         public static void loadTextures()
         {
+            Visualize.VisualizeMod.setProfileToVanilla();
+
             activeFolder = 0;
             contentFolder = Path.Combine(PortraitureMod.helper.DirectoryPath, "Portraits");
             folders = new List<string>();
@@ -36,6 +38,8 @@ namespace Portraiture
                 activeFolder = folders.FindIndex(f => f == loadConfig);
 
             saveConfig();
+
+            Visualize.VisualizeMod.setProfile();
         }
 
         internal static Rectangle getSoureRectangle(Texture2D texture)

@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using CustomElementHandler;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CustomFurniture
 {
@@ -22,6 +23,7 @@ namespace CustomFurniture
         private int rotatedWidth;
         private int rotatedBoxWidth;
         private int rotatedBoxHeight;
+        public FurnitureRotation fRotation;
         public CustomFurnitureData data;
         public string id;
 
@@ -38,15 +40,13 @@ namespace CustomFurniture
         public void build(CustomFurnitureData data, string objectID, Vector2 tile)
         {
             id = objectID;
-            int shift = (data.type.Contains("table") && data.boxHeight < data.height && data.height != data.width) ? 1 : 0;
-
-            rotatedWidth = data.rotatedWidth == -1 ? data.height - shift : data.rotatedWidth;
+            rotatedWidth = data.rotatedWidth == -1 ? data.height : data.rotatedWidth;
             rotatedWidth *= 16;
             rotatedHeight = data.rotatedHeight == -1 ? data.width : data.rotatedHeight;
             rotatedHeight *= 16;
             rotatedBoxWidth = data.rotatedBoxWidth == -1 ? data.boxHeight : data.rotatedBoxWidth;
             rotatedBoxWidth *= Game1.tileSize;
-            rotatedBoxHeight = data.rotatedBoxHeight == -1 ? data.boxWidth - shift : data.rotatedBoxHeight;
+            rotatedBoxHeight = data.rotatedBoxHeight == -1 ? data.boxWidth : data.rotatedBoxHeight;
             rotatedBoxHeight *= Game1.tileSize;
             string folder = new DirectoryInfo(data.folderName).Name;
             texture = CustomFurnitureMod.helper.Content.Load<Texture2D>($"Furniture/{folder}/{data.texture}");
@@ -72,28 +72,27 @@ namespace CustomFurniture
             decorTypes.Add("bookcase");
             decorTypes.Add("other");
             string typename = data.type.Contains("table") ? "table" : decorTypes.Contains(data.type) ? "decor" : data.type;
+            furniture_type = data.type.Contains("table") ? 11 : decorTypes.Contains(data.type) ? 8 : CustomFurnitureMod.helper.Reflection.GetPrivateMethod(new Furniture(), "getTypeNumberFromName").Invoke<int>(new[] { data.type });
             furniture_type = getTypeFromName(typename);
             defaultSourceRect = new Rectangle(data.index * 16 % texture.Width, data.index * 16 / texture.Width * 16, 1, 1);
             drawHeldObjectLow = false;
 
-            defaultSourceRect.Width = data.width;
-            defaultSourceRect.Height = data.height;
-            sourceRect = new Rectangle(data.index * 16 % texture.Width, data.index * 16 / texture.Width * 16, defaultSourceRect.Width * 16, defaultSourceRect.Height * 16);
+            defaultSourceRect.Width = data.width * 16;
+            defaultSourceRect.Height = data.height * 16;
+            sourceRect = new Rectangle(defaultSourceRect.X, defaultSourceRect.Y, defaultSourceRect.Width, defaultSourceRect.Height);
             animatedSourceRect = sourceRect;
             defaultSourceRect = sourceRect;
 
-            defaultBoundingBox = new Rectangle((int)tileLocation.X, (int)tileLocation.Y, 1, 1);
+            defaultBoundingBox = new Rectangle((int)tileLocation.X, (int)tileLocation.Y, data.boxWidth * Game1.tileSize, data.boxHeight * Game1.tileSize);
 
-
-            defaultBoundingBox.Width = data.boxWidth;
-            defaultBoundingBox.Height = data.boxHeight;
-            boundingBox = new Rectangle((int)tileLocation.X * Game1.tileSize, (int)tileLocation.Y * Game1.tileSize, defaultBoundingBox.Width * Game1.tileSize, defaultBoundingBox.Height * Game1.tileSize);
+            boundingBox = new Rectangle((int)tileLocation.X * Game1.tileSize, (int)tileLocation.Y * Game1.tileSize, defaultBoundingBox.Width, defaultBoundingBox.Height);
             defaultBoundingBox = boundingBox;
 
             updateDrawPosition();
             rotations = data.rotations;
             price = data.price;
 
+            fRotation = FurnitureRotation.horizontal;
         }
 
         protected override string loadDisplayName()
@@ -148,13 +147,55 @@ namespace CustomFurniture
             return num1 <= 4 ? 1f : 0.1f;
         }
 
+        public enum FurnitureRotation : int
+        {
+            horizontal = 0,
+            vertical = 1,
+            flipped = 3,
+            back = 2
+        }
+
+        public void customRotate()
+        {
+            fRotation = (FurnitureRotation) currentRotation;
+            flipped = false;
+
+            if (rotations < 2)
+                return;
+
+            switch (fRotation)
+            {
+                case FurnitureRotation.horizontal: fRotation = FurnitureRotation.vertical; break;
+                case FurnitureRotation.vertical: fRotation = (rotations > 2) ? FurnitureRotation.back : FurnitureRotation.horizontal; break;
+                case FurnitureRotation.back: fRotation = FurnitureRotation.flipped; flipped = true; break;
+                case FurnitureRotation.flipped: fRotation = FurnitureRotation.horizontal; break;
+            }
+
+            currentRotation = (int)fRotation;
+            sourceRect = getCurrentSourceRectangle();
+            boundingBox = getCurrentBoundingBox();
+        }
+
+        public Rectangle getCurrentSourceRectangle()
+        {
+            if(fRotation == FurnitureRotation.vertical || fRotation == FurnitureRotation.flipped)
+                return new Rectangle(defaultSourceRect.X + defaultSourceRect.Width, defaultSourceRect.Y, rotatedWidth, rotatedHeight);
+            if (fRotation == FurnitureRotation.back)
+                return new Rectangle(defaultSourceRect.X + defaultSourceRect.Width + rotatedWidth, defaultSourceRect.Y, defaultSourceRect.Width, defaultSourceRect.Height);
+
+            return defaultSourceRect;
+        }
+
+        public Rectangle getCurrentBoundingBox()
+        {
+            if (fRotation == FurnitureRotation.vertical || fRotation == FurnitureRotation.flipped)
+                return new Rectangle((int)tileLocation.X * Game1.tileSize, ((int)tileLocation.Y) * Game1.tileSize, rotatedBoxWidth, rotatedBoxHeight);
+
+            return defaultBoundingBox;
+        }
+
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
         {
-            if (rotations > 1 && currentRotation == 2)
-            {
-                sourceRect = new Rectangle(defaultSourceRect.X + defaultSourceRect.Width, defaultSourceRect.Y, rotatedWidth, rotatedHeight);
-                boundingBox = new Rectangle((int)tileLocation.X * Game1.tileSize, ((int)tileLocation.Y) * Game1.tileSize, rotatedBoxWidth, rotatedBoxHeight);
-            }
             spriteBatch.Draw(texture, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Rectangle?(defaultSourceRect), Color.White * transparency, 0.0f, new Vector2((float)(defaultSourceRect.Width / 2), (float)(defaultSourceRect.Height / 2)), 1f * getScaleSize() * scaleSize, SpriteEffects.None, layerDepth);
         }
 
@@ -167,13 +208,7 @@ namespace CustomFurniture
             int offset = frameWidth * 16 * frame;
 
             animatedSourceRect = frame == 0 ? sourceRect : new Rectangle(offset + sourceRect.X, sourceRect.Y, sourceRect.Width, sourceRect.Height);
-
-            if (rotations > 1 && currentRotation == 2)
-            {
-                animatedSourceRect = new Rectangle(defaultSourceRect.X + defaultSourceRect.Width, defaultSourceRect.Y, rotatedWidth, rotatedHeight);
-                boundingBox = new Rectangle((int)tileLocation.X * Game1.tileSize, ((int)tileLocation.Y) * Game1.tileSize, rotatedBoxWidth, rotatedBoxHeight);
-            }
-
+          
             if (x == -1)
                 spriteBatch.Draw(texture, Game1.GlobalToLocal(Game1.viewport, drawPosition), new Rectangle?(animatedSourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, furniture_type == 12 ? 0.0f : (float)(boundingBox.Bottom - 8) / 10000f);
             else
@@ -207,6 +242,8 @@ namespace CustomFurniture
                 replacement.heldObject = heldObject;
 
             replacement.sourceRect = this.sourceRect;
+            replacement.rotations = rotations;
+            replacement.currentRotation = currentRotation;
             return replacement;
         }
 
@@ -215,31 +252,37 @@ namespace CustomFurniture
             Dictionary<string, string> savedata = new Dictionary<string, string>();
             savedata.Add("name", name);
             savedata.Add("id", id);
-            savedata.Add("rotation", currentRotation.ToString());
+            savedata.Add("rotation", ((int) fRotation).ToString());
+            savedata.Add("rotations", rotations.ToString());
             return savedata;
         }
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
+            
             if (replacement is Furniture f)
             {
                 string id = additionalSaveData["id"];
+                CustomFurnitureMod.log("Rebuild:" + id);
+                if (!CustomFurnitureMod.furniture.ContainsKey(id))
+                    id = new List<string>(CustomFurnitureMod.furniture.Keys).Find(k => id.Contains(Path.Combine("Furniture",k)));
+                if (id == null || !CustomFurnitureMod.furniture.ContainsKey(id))
+                    id = CustomFurnitureMod.furniture.Keys.First<string>();
+
                 build(CustomFurnitureMod.furniture[id].data, id, f.tileLocation);
-                int targetRotation = additionalSaveData.ContainsKey("rotation") ? int.Parse(additionalSaveData["rotation"]) : f.currentRotation;
-                tileLocation = (replacement as Furniture).tileLocation;
-                while (currentRotation != targetRotation)
-                {
-                    rotate();
-                }
 
-                if(replacement is Furniture r)
-                {
-                    if(r.sourceRect != new Furniture(0, tileLocation, currentRotation).sourceRect)
-                        this.sourceRect = r.sourceRect;
+                rotations = additionalSaveData.ContainsKey("rotations") ? int.Parse(additionalSaveData["rotations"]) : (replacement as Furniture).rotations;
+                currentRotation = additionalSaveData.ContainsKey("rotation") ? int.Parse(additionalSaveData["rotation"]) : (replacement as Furniture).currentRotation;
+                fRotation = (FurnitureRotation)currentRotation;
+                tileLocation = (replacement as Furniture).tileLocation; ;
 
-                    if (r.heldObject != null)
-                        this.heldObject = r.heldObject;
-                }
+                rotate();
+                rotate();
+                rotate();
+                rotate();
+
+                if (f.heldObject != null)
+                    this.heldObject = f.heldObject;
             }
         }
     }

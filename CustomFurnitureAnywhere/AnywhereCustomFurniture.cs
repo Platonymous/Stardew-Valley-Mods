@@ -2,27 +2,31 @@
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
+using CustomElementHandler;
+using Entoarox.FurnitureAnywhere;
 
 namespace CustomFurnitureAnywhere
 {
-    class AnywhereCustomFurniture : CustomFurniture.CustomFurniture
+    class AnywhereCustomFurniture : CustomFurniture.CustomFurniture, ISaveElement
     {
         public AnywhereCustomFurniture()
         {
 
         }
+
         public AnywhereCustomFurniture(CustomFurniture.CustomFurniture item) : base(item.data, item.id, item.tileLocation)
         {
             this.defaultBoundingBox = item.defaultBoundingBox;
             this.boundingBox = item.boundingBox;
             this.currentRotation = item.currentRotation;
             this.rotations = item.rotations;
+            this.furniture_type = item.furniture_type;
             this.rotate();
             this.rotate();
             this.rotate();
             this.rotate();
-            CustomFurnitureAnywhereMod.modmonitor.Log(boundingBox.Width.ToString());
         }
+
         public Furniture Revert()
         {
             CustomFurniture.CustomFurniture self = new CustomFurniture.CustomFurniture(this.data, this.id, this.tileLocation);
@@ -136,6 +140,7 @@ namespace CustomFurnitureAnywhere
                 else
                     location.objects.Add(this.tileLocation, @object);
                 (@object as AnywhereCustomFurniture).sourceRect = this.sourceRect;
+                (@object as AnywhereCustomFurniture).boundingBox = this.boundingBox;
                 @object.initializeLightSource(this.tileLocation);
             }
 
@@ -158,6 +163,7 @@ namespace CustomFurnitureAnywhere
             furniture.boundingBox = this.boundingBox;
             furniture.currentRotation = this.currentRotation;
             furniture.rotations = this.rotations;
+            furniture.furniture_type = this.furniture_type;
             furniture.sourceRect = this.sourceRect;
             furniture.rotate();
             furniture.rotate();
@@ -166,7 +172,7 @@ namespace CustomFurnitureAnywhere
             return furniture;
         }
         public override bool clicked(StardewValley.Farmer who)
-        {
+        { 
             Game1.haltAfterCheck = false;
             if (this.furniture_type == 11 && who.ActiveObject != null && (who.ActiveObject != null && this.heldObject == null))
                 return false;

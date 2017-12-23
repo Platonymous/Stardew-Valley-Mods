@@ -22,6 +22,6 @@ namespace Visualize
         public bool noTransparancy { get; set; } = false;
         public bool noLightsources { get; set; } = false;
         public bool noShadow { get; set; } = false;
-        public bool noColorTransparancy { get; set; } = false;
+        public bool excludeFarmer { get; set; } = false;
     }
 }

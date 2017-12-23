@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Locations;
+using System;
 using System.Collections.Generic;
 
 namespace Visualize
@@ -15,9 +17,11 @@ namespace Visualize
         public bool Draw(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
         {
             Profile useProfile = VisualizeMod._activeProfile;
-
+            
             if (useProfile.noAmbientLight)
                 Game1.drawLighting = false;
+            else if(Game1.currentLocation is GameLocation gl)
+                Game1.drawLighting = gl.IsOutdoors && !Game1.outdoorLight.Equals(Color.White) || (!Game1.ambientLight.Equals(Color.White) || gl is MineShaft ms&& !ms.getLightingColor(Game1.currentGameTime).Equals(Color.White));
             
             if (useProfile.noLightsources && Game1.currentLocation is GameLocation l && (color == Color.PaleGoldenrod * (l.IsOutdoors ? 0.35f : 0.43f) || ((color == Color.White * 0.75f) && (texture == Game1.mouseCursors) && (sourceRectangle.GetValueOrDefault() == new Rectangle(88, 1779, 32, 32)))))
                 return false;
@@ -28,9 +32,9 @@ namespace Visualize
             if (useProfile.noTransparancy && color != Color.White && color.R == color.G && color.G == color.B && color.B == color.A)
                 color = Color.White;
             else
-                color = changeColor(ref color, useProfile.light, useProfile.red, useProfile.green, useProfile.blue, useProfile.saturation, useProfile.noColorTransparancy, useProfile.palette);
+                color = changeColor(color, useProfile.light, useProfile.red, useProfile.green, useProfile.blue, useProfile.saturation, useProfile.palette);
 
-            texture = changeColor(ref texture, useProfile.light, useProfile.red, useProfile.green, useProfile.blue, useProfile.saturation, useProfile.noColorTransparancy, useProfile.palette);
+            texture = changeColor(ref texture, useProfile.light, useProfile.red, useProfile.green, useProfile.blue, useProfile.saturation, useProfile.palette);
 
             if (useProfile.tint != whitecolor)
                 color = multiply(color, new Color(useProfile.tint[0], useProfile.tint[1], useProfile.tint[2],useProfile.tint[3]));
@@ -56,51 +60,43 @@ namespace Visualize
 
 
 
-        private Texture2D changeColor(ref Texture2D texture, float light, float r, float g, float b, float saturation, bool noColortransparency, string palletteFile)
+        private Texture2D changeColor(ref Texture2D texture, float light, float r, float g, float b, float saturation, string palletteFile)
         {
             if (textureCache.ContainsKey(texture))
                 return textureCache[texture];
 
-            Color[] colorData = new Color[texture.Width * texture.Height];
-
-            try
-            {
-                texture.GetData(colorData);
-            }
-            catch
-            {
-                textureCache.Add(texture, texture);
+            if (texture.Width == Game1.viewport.Width && texture.Height == Game1.viewport.Height)
                 return texture;
-            }
+
+            VisualizeMod.pass++;
+
+            if (VisualizeMod.pass >= VisualizeMod._config.passes)
+               return texture;
+                
+            Texture2D newTexture = new Texture2D(texture.GraphicsDevice, texture.Width, texture.Height);
 
             float adjust = 1f + (light / 100);
 
+            Color[] colorData = new Color[texture.Width * texture.Height];
+            texture.GetData<Color>(colorData);
+
             for (int x = 0; x < texture.Width; x++)
-            {
                 for (int y = 0; y < texture.Height; y++)
-                {
-                    colorData[x * texture.Height + y] = changeColor(ref colorData[x * texture.Height + y], light, r, g, b, saturation, noColortransparency, palletteFile);
-                }
-            }
-
-            Texture2D newTexture = new Texture2D(texture.GraphicsDevice, texture.Width, texture.Height);
-            newTexture.SetData(colorData);
-
+                    colorData[x * texture.Height + y] = changeColor(colorData[x * texture.Height + y], light, r, g, b, saturation, palletteFile);
+            
+            newTexture.SetData<Color>(colorData);
             textureCache.Add(texture, newTexture);
 
             return newTexture;
         }
 
-        private Color changeColor(ref Color color, float light, float r, float g, float b, float saturation, bool noColortransparency, string palletteFile )
+        private Color changeColor(Color color, float light, float r, float g, float b, float saturation, string palletteFile)
         {
-            saturation *= VisualizeMod._config.saturation / 100;
-
             if (color.A == 0)
                 return color;
 
-            if (noColortransparency && color.A < 255)
-                color.A = 255;
-                
+            saturation *= VisualizeMod._config.saturation / 100;
+
             if (colorCache.ContainsKey(color))
                 return colorCache[color];
 

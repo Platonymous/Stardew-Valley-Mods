@@ -132,8 +132,9 @@ namespace CustomFurniture
                 {
                     countObjects++;
                     data.folderName = Path.GetDirectoryName(file);
-                    string objectID = data.folderName + "." + Path.GetFileName(file) + "." + data.id;
                     string pileID = new DirectoryInfo(data.folderName).Name + "." + new FileInfo(file).Name+ "." + data.id;
+                    string objectID = pileID;
+                    CustomFurnitureMod.log("Load:" + objectID);
                     CustomFurniture f = new CustomFurniture(data, objectID, Vector2.Zero);
                     furniturePile.Add(pileID, f);
                     furniture.Add(objectID, f);

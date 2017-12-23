@@ -26,6 +26,7 @@ namespace CustomNPC
         private List<NPCBlueprint> NPCS = new List<NPCBlueprint>();
         private List<string> markedAssets = new List<string>();
         private string npcpath;
+        private string npcfolder;
 
         private Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         private Dictionary<string, Dictionary<string, string>> npcevents = new Dictionary<string, Dictionary<string, string>>();
@@ -41,12 +42,14 @@ namespace CustomNPC
 
         public override void Entry(IModHelper helper)
         {
-            npcpath = Path.Combine("Mods", "CustomNPC", "Npcs");
+            npcfolder = "Npcs";
+            npcpath = Path.Combine("Mods", "CustomNPC", npcfolder);
+            
             loadNPCs();
             foreach (NPCBlueprint blueprint in NPCS)
                 foreach (CustomBuilding building in blueprint.buildings)
                 {
-                    Map map = Helper.Content.Load<Map>($"NPCs/{blueprint.fileDirectory}/" + building.map);
+                    Map map = Helper.Content.Load<Map>($"{npcfolder}/{blueprint.fileDirectory}/" + building.map);
                     if (!buildingMaps.ContainsKey(building))
                         buildingMaps.Add(building, map);
 
@@ -56,9 +59,9 @@ namespace CustomNPC
                             string file = new FileInfo(ts.ImageSource).Name;
                             buildingTilesheets.Add(building.map + "_" + ts.Id, Helper.Content.Load<Texture2D>($"NPCs/{blueprint.fileDirectory}/" + file));
                             if (file.StartsWith("spring_")){
-                                buildingTilesheets.Add(building.map + "_" + ts.Id + "_summer", Helper.Content.Load<Texture2D>($"NPCs/{blueprint.fileDirectory}/" + file.Replace("spring_","summer_")));
-                                buildingTilesheets.Add(building.map + "_" + ts.Id + "_fall", Helper.Content.Load<Texture2D>($"NPCs/{blueprint.fileDirectory}/" + file.Replace("spring_", "fall_")));
-                                buildingTilesheets.Add(building.map + "_" + ts.Id + "_winter", Helper.Content.Load<Texture2D>($"NPCs/{blueprint.fileDirectory}/" + file.Replace("spring_", "winter_")));
+                                buildingTilesheets.Add(building.map + "_" + ts.Id + "_summer", Helper.Content.Load<Texture2D>($"{npcfolder}/{blueprint.fileDirectory}/" + file.Replace("spring_","summer_")));
+                                buildingTilesheets.Add(building.map + "_" + ts.Id + "_fall", Helper.Content.Load<Texture2D>($"{npcfolder}/{blueprint.fileDirectory}/" + file.Replace("spring_", "fall_")));
+                                buildingTilesheets.Add(building.map + "_" + ts.Id + "_winter", Helper.Content.Load<Texture2D>($"{npcfolder}/{blueprint.fileDirectory}/" + file.Replace("spring_", "winter_")));
                             }
                         }
                 }
@@ -162,12 +165,12 @@ namespace CustomNPC
             foreach (NPCBlueprint blueprint in NPCS)
                 foreach (CustomRoom room in blueprint.rooms)
                     if (!doseNotmeetsPlacementCondition(blueprint) && meetsConditions(room.conditions.Replace("ID", "99" + blueprint.name.GetHashCode().ToString().Substring(0, 5))))
-                        placeRoom(Helper.Content.Load<Map>($"NPCs/{blueprint.fileDirectory}/" + room.map), room.name, room.isOutdoor);
+                        placeRoom(Helper.Content.Load<Map>($"{npcfolder}/{blueprint.fileDirectory}/" + room.map), room.name, room.isOutdoor);
 
             foreach (NPCBlueprint blueprint in NPCS)
                 foreach (CustomBuilding building in blueprint.buildings)
                     if (building.clear && Game1.getLocationFromName(building.location) is GameLocation location)
-                        clearSpace(location, Helper.Content.Load<Map>($"NPCs/{blueprint.fileDirectory}/" + building.map), new Vector2((int)building.position[0], (int)building.position[1]));
+                        clearSpace(location, Helper.Content.Load<Map>($"{npcfolder}/{blueprint.fileDirectory}/" + building.map), new Vector2((int)building.position[0], (int)building.position[1]));
                  
             NPC.populateRoutesFromLocationToLocationList();
         }
@@ -228,7 +231,7 @@ namespace CustomNPC
         {
             int countNPCs = 0;
 
-            string[] files = parseDir(Path.Combine(Helper.DirectoryPath, "Npcs"), "*.json");
+            string[] files = parseDir(Path.Combine(Helper.DirectoryPath, npcfolder), "*.json");
 
             countNPCs = files.Length;
 
@@ -268,7 +271,7 @@ namespace CustomNPC
             {
                 FarmHouse farmHouse = (FarmHouse)Game1.getLocationFromName("FarmHouse");
                 Map farmHouseMap = farmHouse.map;
-                Map spouseRoomMap = Helper.Content.Load<Map>($"NPCs/{blueprint.fileDirectory}/" + blueprint.spouseRoom);
+                Map spouseRoomMap = Helper.Content.Load<Map>($"{npcfolder}/{blueprint.fileDirectory}/" + blueprint.spouseRoom);
                 injectIntoMap(spouseRoomMap, farmHouseMap, Game1.player.houseUpgradeLevel < 2 ? new Vector2(blueprint.spouseRoomPos[0], blueprint.spouseRoomPos[1]) : new Vector2(blueprint.spouseRoomPos[2], blueprint.spouseRoomPos[3]), farmHouse, true);
             }
         }

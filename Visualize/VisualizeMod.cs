@@ -25,6 +25,7 @@ namespace Visualize
         internal static List<IVisualizeHandler> _handlers = new List<IVisualizeHandler>();
         internal static Effects _handler = new Effects();
         internal static bool active = false;
+        internal static int pass = 0;
 
         public override void Entry(IModHelper helper)
         {
@@ -32,33 +33,34 @@ namespace Visualize
             _config = Helper.ReadConfig<Config>();
             _helper = Helper;
             loadProfiles();
-            setActiveProfile();
+            setActiveProfile(new Profile());
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            GameEvents.HalfSecondTick += GameEvents_HalfSecondTick;
+            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
             harmonyFix();
+        }
+
+        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        {
+            emptyCache();
+        }
+
+        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        {            
+            setActiveProfile();
+            MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
+        }
+
+        private void GameEvents_HalfSecondTick(object sender, EventArgs e)
+        {
+            pass = 0;
         }
 
         internal static bool callDrawHandlers(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
         {
             foreach (IVisualizeHandler handler in _handlers)
                 if (!handler.Draw(ref __instance, ref texture, ref destination, ref scaleDestination, ref sourceRectangle, ref color, ref rotation, ref origin, ref effects, ref depth))
-                    return false;
-
-            return true;
-        }
-
-        internal static bool callBeginHandlers(ref SpriteBatch __instance, ref SpriteSortMode sortMode, ref BlendState blendState, ref SamplerState samplerState, ref DepthStencilState depthStencilState, ref RasterizerState rasterizerState, ref Effect effect, ref Matrix transformMatrix)
-        {
-            foreach (IVisualizeHandler handler in _handlers)
-                if (!handler.Begin(ref __instance, ref sortMode, ref blendState, ref samplerState, ref depthStencilState, ref rasterizerState, ref effect, ref transformMatrix))
-                    return false;
-
-            return true;
-        }
-
-        internal static bool callBeginHandlers(ref SpriteBatch __instance, ref SpriteSortMode sortMode, ref BlendState blendState, ref SamplerState samplerState, ref DepthStencilState depthStencilState, ref RasterizerState rasterizerState, ref Effect effect, ref Matrix? transformMatrix)
-        {
-            foreach (IVisualizeHandler handler in _handlers)
-                if (!handler.Begin(ref __instance, ref sortMode, ref blendState, ref samplerState, ref depthStencilState, ref rasterizerState, ref effect, ref transformMatrix))
                     return false;
 
             return true;
@@ -71,6 +73,9 @@ namespace Visualize
 
             if (e.KeyPressed == _config.previous)
                 switchProfile(-1);
+
+            if (e.KeyPressed == _config.reset)
+                reset();
 
             if (e.KeyPressed == _config.satHigher || e.KeyPressed == _config.satLower)
             {
@@ -87,8 +92,8 @@ namespace Visualize
 
         internal static void emptyCache()
         {
-            Effects.colorCache = new Dictionary<Color, Color>();
             Effects.textureCache = new Dictionary<Texture2D, Texture2D>();
+            Effects.colorCache = new Dictionary<Color, Color>();
         }
 
         public static void addHandler(IVisualizeHandler handler)
@@ -97,10 +102,12 @@ namespace Visualize
                 _handlers.Add(handler);
         }
 
-        public static void addProfile(Profile profile)
+        public static int addProfile(Profile profile)
         {
             if (!profiles.Contains(profile))
                 profiles.Add(profile);
+
+            return profiles.FindIndex(p => p == profile);
         }
 
         public static void removeHandler(IVisualizeHandler handler)
@@ -220,9 +227,13 @@ namespace Visualize
 
             if (nIndex >= profiles.Count)
                 nIndex = 0;
-
+            
             setActiveProfile(profiles[nIndex]);
+            saveProfileChoice();
+        }
 
+        internal static void saveProfileChoice()
+        {
             Game1.playSound("coin");
             string author = _activeProfile.author == "none" ? "" : " by " + _activeProfile.author;
             Game1.hudMessages.Clear();
@@ -231,5 +242,27 @@ namespace Visualize
             _helper.WriteConfig<Config>(_config);
         }
 
+        internal static void reset()
+        {
+            setProfile(new Profile());
+            _config.saturation = 100;
+            saveProfileChoice();
+        }
+
+        public static void setProfile(Profile profile)
+        {
+            int i = addProfile(profile);
+            setActiveProfile(profiles[i]);
+        }
+
+        public static void setProfileToVanilla()
+        {
+            setActiveProfile(new Profile());
+        }
+
+        public static void setProfile()
+        {
+            setActiveProfile();
+        }
     }
 }

@@ -5,6 +5,8 @@ using Entoarox.Framework.Events;
 using Microsoft.Xna.Framework;
 using StardewValley.Objects;
 using StardewValley.Locations;
+using System.Reflection;
+using System;
 
 namespace CustomFurnitureAnywhere
 {
@@ -57,10 +59,18 @@ namespace CustomFurnitureAnywhere
         }
     }
 
-    [HarmonyPatch(typeof(GameLocation), "isCollidingPosition", new[] { typeof(Rectangle), typeof(xTile.Dimensions.Rectangle), typeof(bool), typeof(int), typeof(bool), typeof(Character)})]
+    [HarmonyPatch]
     public class FurnitureAnywhereModFix4
     {
-        internal static void Prefix(GameLocation __instance, Rectangle position)
+        internal static MethodInfo TargetMethod()
+        {
+            if (Type.GetType("StardewValley.GameLocation, Stardew Valley") != null)
+                return AccessTools.Method(Type.GetType("StardewValley.GameLocation, Stardew Valley"), "isCollidingPosition", new[] { typeof(Rectangle), typeof(xTile.Dimensions.Rectangle), typeof(bool), typeof(int), typeof(bool), typeof(Character) });
+            else
+                return AccessTools.Method(Type.GetType("StardewValley.GameLocation, StardewValley"), "isCollidingPosition", new[] { typeof(Rectangle), typeof(xTile.Dimensions.Rectangle), typeof(bool), typeof(int), typeof(bool), typeof(Character) });
+        }
+
+        internal static void Postfix(ref bool __result, GameLocation __instance, Rectangle position)
         {
             SerializableDictionary<Vector2, StardewValley.Object> objects = __instance.objects;
             Vector2 key = new Vector2((float)(position.Left / Game1.tileSize), (float)(position.Top / Game1.tileSize));
@@ -71,26 +81,27 @@ namespace CustomFurnitureAnywhere
             foreach (Vector2 k in objects.Keys)
                 if (objects[k] is Furniture f)
                     if (objects[k].boundingBox.Intersects(position))
-                    {
-                        if (f.furniture_type == 12)
-                            continue;
-
-                        Chest chest = new Chest(true);
-                        chest.name = "collider";
-                        objects.Add(key,chest);
-                        return;
-                    }
-        }
-
-        internal static void Postfix(GameLocation __instance, Rectangle position)
-        {
-            SerializableDictionary<Vector2, StardewValley.Object> objects = __instance.objects;
-            Vector2 key = new Vector2((float)(position.Left / Game1.tileSize), (float)(position.Top / Game1.tileSize));
-
-            if (objects.ContainsKey(key) && objects[key] is Chest chest && chest.name == "collider")
-                objects.Remove(key);
-        }
+                        __result = true;
+        }           
     }
 
+    
+    [HarmonyPatch]
+    public class FurnitureAnywhereModFix5
+    {
+        internal static MethodInfo TargetMethod()
+        {
+            if (Type.GetType("StardewValley.Object, Stardew Valley") != null)
+                return AccessTools.Method(Type.GetType("StardewValley.Object, Stardew Valley"), "clicked");
+            else
+                return AccessTools.Method(Type.GetType("StardewValley.Object, StardewValley"), "clicked");
+        }
+
+        internal static void Postfix(StardewValley.Object __instance, StardewValley.Farmer who, ref bool __result)
+        {
+            if (!(Game1.currentLocation is DecoratableLocation) && __instance is Furniture)
+                __result = __instance.clicked(who);
+        }
+    }
 }
     
