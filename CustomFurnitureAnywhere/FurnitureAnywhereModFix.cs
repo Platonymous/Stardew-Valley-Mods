@@ -73,16 +73,18 @@ namespace CustomFurnitureAnywhere
         internal static void Postfix(ref bool __result, GameLocation __instance, Rectangle position)
         {
             SerializableDictionary<Vector2, StardewValley.Object> objects = __instance.objects;
-            Vector2 key = new Vector2((float)(position.Left / Game1.tileSize), (float)(position.Top / Game1.tileSize));
 
-            if (__instance is DecoratableLocation || objects.ContainsKey(key))
+            if (__instance is DecoratableLocation)
                 return;
 
             foreach (Vector2 k in objects.Keys)
                 if (objects[k] is Furniture f)
-                    if (objects[k].boundingBox.Intersects(position))
+                    if (f.furniture_type != Furniture.rug && f.boundingBox.Intersects(position))
+                    {
                         __result = true;
-        }           
+                        return;
+                    }
+        }
     }
 
     
