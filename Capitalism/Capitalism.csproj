@@ -43,9 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CapitalismMod.cs" />
-    <Compile Include="Overrides\MoneyDialFix.cs" />
+    <Compile Include="Components\CapitalismCurrency.cs" />
+    <Compile Include="Components\CapitalismMoneyDial.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VisualizeHandler.cs" />
+    <Compile Include="MainVisualizeHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json" />

@@ -1,26 +1,41 @@
 ﻿using Harmony;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using System.Collections.Generic;
 using System.Reflection;
+using Visualize;
 
 namespace Capitalism
 {
     public class CapitalismMod : Mod
     {
-        internal static int counter = -1;
-        internal static bool showZero = false;
-        internal static Texture2D pointTex;
-        private VisualizeHandler vHandler;
+        private MainVisualizeHandler vHandlerMain;
+        internal static List<IVisualizeHandler> vHandlers;
+        internal static IModHelper _helper;
+        internal static IMonitor _monitor;
 
         public override void Entry(IModHelper helper)
         {
+            _monitor = Monitor;
+            _helper = helper;
+            onEntry();
+
             var instance = HarmonyInstance.Create("Platonymous.Capitalism");
             instance.PatchAll(Assembly.GetExecutingAssembly());
 
-            pointTex = Helper.Content.Load<Texture2D>("point.png");
-            vHandler = new VisualizeHandler();
+            setVisualizeHandlers();
+        }
 
-            Visualize.VisualizeMod.addHandler(vHandler);
+        private void setVisualizeHandlers()
+        {
+            vHandlers = new List<IVisualizeHandler>();
+            vHandlers.Add(new Components.CapitalismMoneyDialPatch.MoneyDialVisualizeHandler());
+            vHandlerMain = new MainVisualizeHandler();
+            VisualizeMod.addHandler(vHandlerMain);
+        }
+
+        private void onEntry()
+        {
+            Components.CapitalismMoneyDialPatch.CapitalismMoneyDial.onEntry();
         }
     }
 }
