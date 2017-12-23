@@ -78,12 +78,11 @@ namespace CustomFurnitureAnywhere
                 return;
 
             foreach (Vector2 k in objects.Keys)
-                if (objects[k] is Furniture f)
-                    if (f.furniture_type != Furniture.rug && f.boundingBox.Intersects(position))
-                    {
-                        __result = true;
-                        return;
-                    }
+                if (objects[k] is Furniture f && f.furniture_type != Furniture.rug && f.boundingBox.Intersects(position))
+                {
+                    __result = true;
+                    return;
+                }
         }
     }
 
