@@ -1,0 +1,13 @@
+{
+  "Name": "PyTK",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 0,
+    "MinorVersion": 1,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "Description": "Platonymous Toolkit",
+  "UniqueID": "Platonymous.Toolkit",
+  "EntryDll": "PyTK.dll"
+}
