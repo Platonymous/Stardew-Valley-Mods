@@ -56,7 +56,7 @@ namespace PyTK.Extensions
            return t.injectInto(assetName, null, new Rectangle(position.X, position.Y, t.Width, t.Height), mode);
         }
 
-        public static AssetInjector<IAssetDataForImage, IAssetDataForImage> injectTileInto(this Texture2D t, string assetName, int targetTileIndex, int sourceTileIndex = 0, int tileWidth = -1, int tileHeight = -1, PatchMode mode = PatchMode.Replace)
+        public static AssetInjector<IAssetDataForImage, IAssetDataForImage> injectTileInto(this Texture2D t, string assetName, int targetTileIndex, int sourceTileIndex = 0, int tileWidth = 16, int tileHeight = 16, PatchMode mode = PatchMode.Replace)
         {
             Func<IAssetDataForImage, IAssetDataForImage> merger = new Func<IAssetDataForImage, IAssetDataForImage>(delegate (IAssetDataForImage asset)
             {
