@@ -7,9 +7,8 @@ using Microsoft.Xna.Framework.Input;
 using StardewValley.TerrainFeatures;
 using StardewValley.Objects;
 using SObject = StardewValley.Object;
-using StardewValley.Menus;
-using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace PyTK
 {
@@ -27,7 +26,7 @@ namespace PyTK
             ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log("Number of Weeds:" + o.numberOfWeeds));
             new InventoryItem(new Chest(true), 100).addToNPCShop("Pierre").once();
             new ItemSelector<SObject>(p => p.name == "Chest").whenAddedToInventory(new Action<List<SObject>>(l => l.useAll(i => i.name = "Test")));
-
+            Helper.Content.Load<Texture2D>($"Maps/MenuTiles",ContentSource.GameContent).setSaturation(0).injectAs($"Maps/MenuTiles");
         }
 
     }

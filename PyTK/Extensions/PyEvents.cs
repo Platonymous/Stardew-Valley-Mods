@@ -5,7 +5,6 @@ using StardewValley.Menus;
 using StardewValley.Objects;
 using System;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework;
 using StardewValley.TerrainFeatures;
 using StardewValley;
 using PyTK.Types;
@@ -138,7 +137,7 @@ namespace PyTK.Extensions
             EventHandler<EventArgsClickableMenuChanged> d = delegate (object sender, EventArgsClickableMenuChanged e)
             {
                 if (e.NewMenu is T)
-                    action.Invoke(e.NewMenu as T);
+                    action.Invoke((T) e.NewMenu);
             };
 
             MenuEvents.MenuChanged += d;
@@ -168,7 +167,7 @@ namespace PyTK.Extensions
             EventHandler<EventArgsClickableMenuClosed> d = delegate (object sender, EventArgsClickableMenuClosed e)
             {
                 if (e.PriorMenu is T)
-                    action.Invoke(e.PriorMenu as T);
+                    action.Invoke((T) e.PriorMenu);
             };
 
             return d;
@@ -187,7 +186,7 @@ namespace PyTK.Extensions
                 priceAndStock = priceAndStock.Union(inventory.priceAndStock()).ToDictionary(dict => dict.Key, dict => dict.Value);
             };
 
-            d = d.addPredicate(e => predicate.Invoke((e.NewMenu as ShopMenu)));
+            d = d.addPredicate(e => predicate.Invoke(((ShopMenu) e.NewMenu)));
 
             return Game1.activeClickableMenu.onActivation<ShopMenu>(d);
         }
@@ -228,7 +227,7 @@ namespace PyTK.Extensions
                 priceAndStock.AddOrReplace(inventory.item, new int[] { inventory.price, inventory.stock });
             };
 
-            d = d.addPredicate(e => predicate.Invoke((e.NewMenu as ShopMenu)));
+            d = d.addPredicate(e => predicate.Invoke(((ShopMenu) e.NewMenu)));
 
             return Game1.activeClickableMenu.onActivation<ShopMenu>(d);
         }
@@ -489,8 +488,8 @@ namespace PyTK.Extensions
         {
             EventHandler<EventArgsInventoryChanged> d = delegate (object sender, EventArgsInventoryChanged e)
             {
-                if (e.Added.Exists(p => p.Item is T && t.predicate(p.Item as T)))
-                    handler.Invoke(sender, e.Added.FindAll(p => p.Item is T && t.predicate(p.Item as T)).ConvertAll(p => p.Item as T));
+                if (e.Added.Exists(p => p.Item is T && t.predicate((T) p.Item)))
+                    handler.Invoke(sender, e.Added.FindAll(p => p.Item is T && t.predicate((T) p.Item)).ConvertAll(p => (T) p.Item));
             };
 
             PlayerEvents.InventoryChanged += d;
@@ -504,8 +503,8 @@ namespace PyTK.Extensions
         {
             EventHandler<EventArgsInventoryChanged> d = delegate (object sender, EventArgsInventoryChanged e)
             {
-                if (e.Added.Exists(p => p.Item is T && t.predicate(p.Item as T)))
-                    action.Invoke(e.Added.FindAll(p => p.Item is T && t.predicate(p.Item as T)).ConvertAll(p => p.Item as T));
+                if (e.Added.Exists(p => p.Item is T && t.predicate((T) p.Item)))
+                    action.Invoke(e.Added.FindAll(p => p.Item is T && t.predicate((T) p.Item)).ConvertAll(p => (T) p.Item));
             };
 
             PlayerEvents.InventoryChanged += d;

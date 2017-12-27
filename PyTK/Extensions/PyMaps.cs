@@ -2,11 +2,14 @@
 using StardewValley;
 using SObject = StardewValley.Object;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley.TerrainFeatures;
 using StardewValley.Objects;
 using StardewValley.Locations;
+using xTile;
+using xTile.Tiles;
+using xTile.Layers;
+using System.IO;
 
 namespace PyTK.Extensions
 {
@@ -23,7 +26,7 @@ namespace PyTK.Extensions
             {
                 Dictionary<Vector2, SObject> objects = location.objects;
                 if (objects.ContainsKey(t) && (objects[t] is T))
-                    return (objects[t] as T);
+                    return ((T) objects[t]);
             }
             return null;
         }
@@ -36,7 +39,7 @@ namespace PyTK.Extensions
             {
                 Dictionary<Vector2, TerrainFeature> terrain = location.terrainFeatures;
                 if (terrain.ContainsKey(t) && (terrain[t] is T))
-                    return (terrain[t] as T);
+                    return ((T) terrain[t]);
             }
             return null;
         }
@@ -48,7 +51,7 @@ namespace PyTK.Extensions
             if (Game1.currentLocation is DecoratableLocation location)
             {
                 List<Furniture> furniture = location.furniture;
-                return (furniture.Find(f => f.getBoundingBox(t).Intersects(new Rectangle((int) t.X * Game1.tileSize, (int) t.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize))) as T);
+                return ((T) furniture.Find(f => f.getBoundingBox(t).Intersects(new Rectangle((int) t.X * Game1.tileSize, (int) t.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize))));
             }
             return null;
         }
@@ -66,37 +69,77 @@ namespace PyTK.Extensions
             return null;
         }
 
-        public static Vector2 toVector2(this Point p)
+        public static bool hasTileSheet(this Map map, TileSheet tilesheet)
         {
-            return new Vector2(p.X, p.Y);
+            foreach (TileSheet ts in map.TileSheets)
+                if (tilesheet.ImageSource.EndsWith(new FileInfo(ts.ImageSource).Name) || tilesheet.Id == ts.Id)
+                    return true;
+
+            return false;
         }
 
-        public static Vector2 toVector2(this Rectangle r)
+        public static Map mergeInto(this Map t, Map map, Vector2 position, bool includeEmpty = false, bool properties = true)
         {
-            return new Vector2(r.X, r.Y);
+            Rectangle sourceRectangle = new Rectangle(0, 0, t.DisplayWidth / Game1.tileSize, t.DisplayHeight / Game1.tileSize);
+
+            foreach (TileSheet tilesheet in t.TileSheets)
+                if (tilesheet.Id.StartsWith("z") && !map.hasTileSheet(tilesheet))
+                    map.AddTileSheet(new TileSheet(tilesheet.Id, map, tilesheet.ImageSource, tilesheet.SheetSize, tilesheet.TileSize));
+
+            for (Vector2 _x = new Vector2(sourceRectangle.X, position.X); _x.X < sourceRectangle.Width; _x += new Vector2(1, 1))
+            {
+                for (Vector2 _y = new Vector2(sourceRectangle.Y, position.Y); _y.X < sourceRectangle.Height; _y += new Vector2(1, 1))
+                {
+                    foreach (Layer layer in t.Layers)
+                    {
+                        Tile sourceTile = layer.Tiles[(int)_x.X, (int)_y.X];
+                        Layer mapLayer = map.GetLayer(layer.Id);
+
+                        if (mapLayer == null)
+                        {
+                            map.InsertLayer(new Layer(layer.Id, map, map.Layers[0].LayerSize, map.Layers[0].TileSize), map.Layers.Count);
+                            mapLayer = map.GetLayer(layer.Id);
+                        }
+                        
+                        if (sourceTile == null)
+                        {
+                            if (includeEmpty)
+                            {
+                                try
+                                {
+                                    mapLayer.Tiles[(int)_x.Y, (int)_y.Y] = null;
+                                }
+                                catch { }
+                            }
+                            continue;
+                        }
+
+                        TileSheet tilesheet = map.GetTileSheet(sourceTile.TileSheet.Id);
+                        Tile newTile = new StaticTile(mapLayer, tilesheet, BlendMode.Additive, sourceTile.TileIndex);
+
+                        if (sourceTile is AnimatedTile aniTile)
+                        {
+                            List<StaticTile> staticTiles = new List<StaticTile>();
+
+                            foreach (StaticTile frame in aniTile.TileFrames)
+                                staticTiles.Add(new StaticTile(mapLayer, tilesheet, BlendMode.Additive, frame.TileIndex));
+
+                            newTile = new AnimatedTile(mapLayer, staticTiles.ToArray(), aniTile.FrameInterval);
+                        }
+
+                        if(properties)
+                            foreach (var prop in sourceTile.Properties)
+                                newTile.Properties.Add(prop);
+
+                        mapLayer.Tiles[(int)_x.Y, (int)_y.Y] = newTile;
+                    }
+
+                }
+            }
+            return map;
         }
 
-        public static Vector2 toVector2(this xTile.Dimensions.Rectangle r)
-        {
-            return new Vector2(r.X, r.Y);
-        }
-
-        public static Point toPoint(this Vector2 t)
-        {
-            return new Point((int) t.X, (int) t.Y);
-        }
-
-        public static Point toPoint(this MouseState t)
-        {
-            return new Point((int)t.X, (int)t.Y);
-        }
-
-        public static Vector2 floorValues(this Vector2 t)
-        {
-            t.X = (int)t.X;
-            t.Y = (int)t.Y;
-            return t;
-        }
+        
 
 
 

@@ -29,5 +29,38 @@ namespace PyTK.Extensions
             return new Vector2((int)(Game1.getOldMouseX() + Game1.viewport.X) / Game1.tileSize, (int)(Game1.getOldMouseY() + Game1.viewport.Y) / Game1.tileSize);
         }
 
+        /* Converter */
+
+        public static Vector2 toVector2(this Point p)
+        {
+            return new Vector2(p.X, p.Y);
+        }
+
+        public static Vector2 toVector2(this Rectangle r)
+        {
+            return new Vector2(r.X, r.Y);
+        }
+
+        public static Vector2 toVector2(this xTile.Dimensions.Rectangle r)
+        {
+            return new Vector2(r.X, r.Y);
+        }
+
+        public static Point toPoint(this Vector2 t)
+        {
+            return new Point((int)t.X, (int)t.Y);
+        }
+
+        public static Point toPoint(this MouseState t)
+        {
+            return new Point((int)t.X, (int)t.Y);
+        }
+
+        public static Vector2 floorValues(this Vector2 t)
+        {
+            t.X = (int)t.X;
+            t.Y = (int)t.Y;
+            return t;
+        }
     }
 }
