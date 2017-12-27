@@ -46,7 +46,10 @@ Add Custom Furniture via json file
 Add Custom NPCs via json and tsc/cvs files
 
 # 16. Visualize
-Add Color Profiles
+Add color profiles
+
+# 16. Sprinkles
+Activate sprinklers on click
 
 
 All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1) or via ModDrop : [Download](https://www.moddrop.com/)

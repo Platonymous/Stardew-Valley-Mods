@@ -63,6 +63,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capitalism", "Capitalism\Ca
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomElementHandlerHarmony", "CustomElementHandlerHarmony\CustomElementHandlerHarmony.csproj", "{C4BE7AAF-5DD1-4597-B1C3-3BD8B2816052}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PyTK", "PyTK\PyTK.csproj", "{A8E6272F-A6A1-4BFE-BA8F-021F63596987}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sprinkles", "Sprinkles\Sprinkles.csproj", "{9BD185C7-1431-4639-AB4C-81FBA19D734D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -176,6 +180,14 @@ Global
 		{C4BE7AAF-5DD1-4597-B1C3-3BD8B2816052}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4BE7AAF-5DD1-4597-B1C3-3BD8B2816052}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4BE7AAF-5DD1-4597-B1C3-3BD8B2816052}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8E6272F-A6A1-4BFE-BA8F-021F63596987}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8E6272F-A6A1-4BFE-BA8F-021F63596987}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8E6272F-A6A1-4BFE-BA8F-021F63596987}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8E6272F-A6A1-4BFE-BA8F-021F63596987}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BD185C7-1431-4639-AB4C-81FBA19D734D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BD185C7-1431-4639-AB4C-81FBA19D734D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BD185C7-1431-4639-AB4C-81FBA19D734D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BD185C7-1431-4639-AB4C-81FBA19D734D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
