@@ -48,7 +48,7 @@ Add Custom NPCs via json and tsc/cvs files
 # 16. Visualize
 Add color profiles
 
-# 16. Sprinkles
+# 17. Sprinkles
 Activate sprinklers on click
 
 
