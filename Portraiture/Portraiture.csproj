@@ -49,11 +49,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="empty.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Visualize\Visualize.csproj">
       <Project>{a9a81f01-58dd-4030-bb82-ae7e71d68d99}</Project>
       <Name>Visualize</Name>

@@ -23,12 +23,14 @@ namespace PyTK
             _helper = helper;
             _monitor = Monitor;
 
+            /*
             Keys.K.onPressed(new Func<string>(() => Game1.currentGameTime.TotalGameTime.Seconds.ToString()).toLogAction(LogLevel.Info, Monitor));
-            ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log($"Number of Weeds: {o.numberOfWeeds}"));
-            new InventoryItem(new Chest(true), 100).addToNPCShop("Pierre").once();
+            ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log($"Number of Weeds: {o.numberOfWeeds}",LogLevel.Info));
+            new InventoryItem(new Chest(true), 100).addToNPCShop("Pierre");
             new ItemSelector<SObject>(p => p.name == "Chest").whenAddedToInventory(l => l.useAll(i => i.name = "Test"));
             Helper.Content.Load<Texture2D>($"Maps/MenuTiles",ContentSource.GameContent).setSaturation(0).injectAs($"Maps/MenuTiles");
             Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", 74, 74);
+            */
         }
 
     }

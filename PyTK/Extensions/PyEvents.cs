@@ -35,11 +35,37 @@ namespace PyTK.Extensions
 
         /// <summary>Wraps the the method in the predicate, so it only executes if the predicate returns true.</summary>
         /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<TArgs> addPredicate<TArgs>(this EventHandler<TArgs> t, string conditions)
+        {
+            EventHandler<TArgs> d = delegate (object sender, TArgs e)
+            {
+                if (PyUtils.CheckEventConditions(conditions))
+                    t.Invoke(sender, e);
+            };
+
+            return d;
+        }
+
+        /// <summary>Wraps the the method in the predicate, so it only executes if the predicate returns true.</summary>
+        /// <returns>Returns the wrapped method.</returns>
         public static Action<TArgs> addPredicate<TArgs>(this Action<TArgs> t, Func<TArgs, bool> p)
         {
             Action<TArgs> d = delegate (TArgs e)
             {
                 if (p.Invoke(e))
+                    t.Invoke(e);
+            };
+
+            return d;
+        }
+
+        /// <summary>Wraps the the method in the predicate, so it only executes if the predicate returns true.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static Action<TArgs> addPredicate<TArgs>(this Action<TArgs> t, string conditions)
+        {
+            Action<TArgs> d = delegate (TArgs e)
+            {
+                if (PyUtils.CheckEventConditions(conditions))
                     t.Invoke(e);
             };
 
@@ -96,6 +122,25 @@ namespace PyTK.Extensions
 
         /// <summary>Wraps the the method so it only executes until the predicate returns true.</summary>
         /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<TArgs> until<TArgs>(this EventHandler<TArgs> t, string conditions, bool checkAfter = false)
+        {
+            EventHandler<TArgs> d = delegate (object sender, TArgs e)
+            {
+                if (!checkAfter && PyUtils.CheckEventConditions(conditions))
+                    t = null;
+
+                if (t != null)
+                    t.Invoke(sender, e);
+
+                if (checkAfter && PyUtils.CheckEventConditions(conditions))
+                    t = null;
+            };
+
+            return d;
+        }
+
+        /// <summary>Wraps the the method so it only executes until the predicate returns true.</summary>
+        /// <returns>Returns the wrapped method.</returns>
         public static Action<T> until<T>(this Action<T> t, Func<bool> p, bool checkAfter = false)
         {
             Action<T> d = delegate (T e)
@@ -107,6 +152,25 @@ namespace PyTK.Extensions
                     t.Invoke(e);
 
                 if (checkAfter && p.Invoke())
+                    t = null;
+            };
+
+            return d;
+        }
+
+        /// <summary>Wraps the the method so it only executes until the predicate returns true.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static Action<T> until<T>(this Action<T> t, string conditions, bool checkAfter = false)
+        {
+            Action<T> d = delegate (T e)
+            {
+                if (!checkAfter && PyUtils.CheckEventConditions(conditions))
+                    t = null;
+
+                if (t != null)
+                    t.Invoke(e);
+
+                if (checkAfter && PyUtils.CheckEventConditions(conditions))
                     t = null;
             };
 
@@ -169,6 +233,8 @@ namespace PyTK.Extensions
                 if (e.PriorMenu is T)
                     action.Invoke((T) e.PriorMenu);
             };
+
+            MenuEvents.MenuClosed += d;
 
             return d;
         }
@@ -511,5 +577,7 @@ namespace PyTK.Extensions
 
             return d;
         }    
+        
+
     }
 }

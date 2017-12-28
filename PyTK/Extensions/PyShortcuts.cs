@@ -2,6 +2,9 @@
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using StardewValley;
+using PyTK.Types;
+using System.Collections.Generic;
+using System;
 
 namespace PyTK.Extensions
 {
@@ -61,6 +64,16 @@ namespace PyTK.Extensions
             t.X = (int)t.X;
             t.Y = (int)t.Y;
             return t;
+        }
+
+        public static int toInt(this string t)
+        {
+            return int.Parse(t);
+        }
+
+        public static bool toBool(this string t)
+        {
+            return t.ToLower().Equals("true");
         }
     }
 }
