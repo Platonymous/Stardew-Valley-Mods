@@ -97,11 +97,11 @@ namespace PyTK.Extensions
             return new AssetInjector<Map, Map>(assetName, t).injectEdit();
         }
 
-        public static AssetInjector<Map, Map> injectInto(this Map t, string assetName, Vector2 position)
+        public static AssetInjector<Map, Map> injectInto(this Map t, string assetName, Vector2 position, Rectangle? sourceRectangle)
         {
             Func<Map, Map> merger = new Func<Map, Map>(delegate (Map asset)
             {
-                return t.mergeInto(asset, position);
+                return t.mergeInto(asset, position, sourceRectangle);
             });
 
             return new AssetInjector<Map, Map>(assetName, merger).injectEdit();

@@ -1,15 +1,15 @@
-﻿using StardewModdingAPI;
-using StardewValley;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using PyTK.Extensions;
 using PyTK.Types;
-using Microsoft.Xna.Framework.Input;
-using StardewValley.TerrainFeatures;
+using StardewModdingAPI;
+using StardewValley;
 using StardewValley.Objects;
 using SObject = StardewValley.Object;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
+using StardewValley.TerrainFeatures;
+using System;
 using Microsoft.Xna.Framework;
+using StardewModdingAPI.Events;
 
 namespace PyTK
 {
@@ -23,22 +23,32 @@ namespace PyTK
             _helper = helper;
             _monitor = Monitor;
 
-            /*
-            Keys.K.onPressed(new Func<string>(() => Game1.currentGameTime.TotalGameTime.Seconds.ToString()).toLogAction(LogLevel.Info, Monitor));
-            ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log($"Number of Weeds: {o.numberOfWeeds}",LogLevel.Info));
-            new InventoryItem(new Chest(true), 100).addToNPCShop("Pierre");
-            new ItemSelector<SObject>(p => p.name == "Chest").whenAddedToInventory(l => l.useAll(i => i.name = "Test"));
-            Helper.Content.Load<Texture2D>($"Maps/MenuTiles",ContentSource.GameContent).setSaturation(0).injectAs($"Maps/MenuTiles");
-            Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", 74, 74);
-            Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129,166));
-            */
-            
+            //testing();
+
             registerConsoleCommands();
         }
 
         private void registerConsoleCommands()
         {
             ConsoleCommands.CcLocations.clearSpace().register();
+        }
+
+        private void testing()
+        {
+            Keys.K.onPressed(new Func<string>(() => Game1.currentGameTime.TotalGameTime.Seconds.ToString()).toLogAction(LogLevel.Info, Monitor));
+            ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log($"Number of Weeds: {o.numberOfWeeds}", LogLevel.Info));
+            new InventoryItem(new Chest(true), 100).addToNPCShop("Pierre");
+            new ItemSelector<SObject>(p => p.name == "Chest").whenAddedToInventory(l => l.useAll(i => i.name = "Test"));
+            Helper.Content.Load<Texture2D>($"Maps/MenuTiles", ContentSource.GameContent).setSaturation(0).injectAs($"Maps/MenuTiles");
+            Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", 74, 74);
+            Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129, 166));
+            Action mapMergeTest = delegate ()
+            {
+                "Beach".toLocation().Map.mergeInto("Town".toLocation().Map, new Vector2(60, 30), new Rectangle(15, 15, 20, 20)).injectAs(@"Maps/Town");
+                "Town".toLocation().clearArea(new Rectangle(60, 30, 20, 20));
+            };
+
+            SaveEvents.AfterLoad += (s,e) => mapMergeTest();
         }
 
     }

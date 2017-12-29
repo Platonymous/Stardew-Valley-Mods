@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.Input;
 using StardewValley.TerrainFeatures;
 using StardewValley;
 using PyTK.Types;
-using PyTK.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Specialized;

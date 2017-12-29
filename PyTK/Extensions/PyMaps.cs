@@ -78,12 +78,26 @@ namespace PyTK.Extensions
             return false;
         }
 
-        public static Map mergeInto(this Map t, Map map, Vector2 position, bool includeEmpty = false, bool properties = true)
+        public static GameLocation clearArea(this GameLocation l, Rectangle area)
         {
-            Rectangle sourceRectangle = new Rectangle(0, 0, t.DisplayWidth / Game1.tileSize, t.DisplayHeight / Game1.tileSize);
+
+            for (int x = area.X; x < area.Width; x++)
+                for (int y = area.Y; y < area.Height; y++)
+                {
+                    l.objects.Remove(new Vector2(x, y));
+                    l.largeTerrainFeatures.Remove(l.largeTerrainFeatures.Find(p => p.tilePosition == new Vector2(x,y)));
+                    l.terrainFeatures.Remove(new Vector2(x, y));
+                }
+
+            return l;
+        }
+
+        public static Map mergeInto(this Map t, Map map, Vector2 position, Rectangle? sourceArea, bool includeEmpty = false, bool properties = true)
+        {
+            Rectangle sourceRectangle = sourceArea.HasValue ? sourceArea.Value : new Rectangle(0, 0, t.DisplayWidth / Game1.tileSize, t.DisplayHeight / Game1.tileSize);
 
             foreach (TileSheet tilesheet in t.TileSheets)
-                if (tilesheet.Id.StartsWith("z") && !map.hasTileSheet(tilesheet))
+                if (!map.hasTileSheet(tilesheet))
                     map.AddTileSheet(new TileSheet(tilesheet.Id, map, tilesheet.ImageSource, tilesheet.SheetSize, tilesheet.TileSize));
 
             for (Vector2 _x = new Vector2(sourceRectangle.X, position.X); _x.X < sourceRectangle.Width; _x += new Vector2(1, 1))
