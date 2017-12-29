@@ -18,6 +18,7 @@ namespace PyTK.ConsoleCommands
                      location.objects.Clear();
                      location.largeTerrainFeatures.Clear();
                      location.terrainFeatures.Clear();
+
                      if (location is Farm farm)
                      {
                          o += farm.resourceClumps.Count;
