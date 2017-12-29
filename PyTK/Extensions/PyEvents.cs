@@ -8,8 +8,11 @@ using Microsoft.Xna.Framework.Input;
 using StardewValley.TerrainFeatures;
 using StardewValley;
 using PyTK.Types;
+using PyTK.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Specialized;
+using Microsoft.Xna.Framework;
 
 namespace PyTK.Extensions
 {
@@ -277,8 +280,6 @@ namespace PyTK.Extensions
         {
             return items.addToShop(p => p.isHatShop());
         }
-
-        //---
 
         /// <summary>Generates a method that adds this inventory to a shop that matches the defined conditions and adds it to MenuEvents.MenuChanged.</summary>
         /// <returns>Returns the method.</returns>
@@ -577,6 +578,90 @@ namespace PyTK.Extensions
 
             return d;
         }    
+
+        public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenAddedToLocation<T>(this ItemSelector<T> t, Action<GameLocation,List<Vector2>> action, GameLocation l = null) where T : SObject
+        {
+            List<GameLocation> gls = new List<GameLocation>();
+            if (l == null)
+                gls = PyUtils.getAllLocationsAndBuidlings();
+            else
+                gls.Add(l);
+
+            Action<GameLocation, NotifyCollectionChangedEventArgs> a = delegate (GameLocation location, NotifyCollectionChangedEventArgs e)
+             {
+                 List<Vector2> keys = new List<Vector2>();
+
+                 if (e.Action == NotifyCollectionChangedAction.Add)
+                     foreach (Vector2 key in e.NewItems)
+                         if (t.predicate(location.objects[key]))
+                             keys.Add(key);
+
+                 action.Invoke(location, keys);
+             };
+
+            Dictionary<GameLocation, NotifyCollectionChangedEventHandler> d = new Dictionary<GameLocation, NotifyCollectionChangedEventHandler>();
+
+            foreach (GameLocation gl in gls)
+                d.AddOrReplace(gl, (o, e) => a(gl, e));
+
+            return d.useAll(p => p.Key.objects.CollectionChanged += p.Value);
+        }
+
+        public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenAddedToLocation<T>(this TerrainSelector<T> t, Action<GameLocation, List<Vector2>> action, GameLocation l = null) where T : TerrainFeature
+        {
+            List<GameLocation> gls = new List<GameLocation>();
+            if (l == null)
+                gls = PyUtils.getAllLocationsAndBuidlings();
+            else
+                gls.Add(l);
+
+            Action<GameLocation, NotifyCollectionChangedEventArgs> a = delegate (GameLocation location, NotifyCollectionChangedEventArgs e)
+            {
+                List<Vector2> keys = new List<Vector2>();
+
+                if (e.Action == NotifyCollectionChangedAction.Add)
+                    foreach (Vector2 key in e.NewItems)
+                        if (t.predicate(location.terrainFeatures[key]))
+                            keys.Add(key);
+
+                action.Invoke(location, keys);
+            };
+
+            Dictionary<GameLocation, NotifyCollectionChangedEventHandler> d = new Dictionary<GameLocation, NotifyCollectionChangedEventHandler>();
+
+            foreach (GameLocation gl in gls)
+                d.AddOrReplace(gl, (o, e) => a(gl, e));
+
+            return d.useAll(p => p.Key.terrainFeatures.CollectionChanged += p.Value);
+        }
+
+        public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenRemovedFromLocation(this TileLocationSelector t, Action<GameLocation, List<Vector2>> action)
+        {
+            List<GameLocation> gls = new List<GameLocation>();
+            if (t.location == null)
+                gls = PyUtils.getAllLocationsAndBuidlings();
+            else
+                gls.Add(t.location);
+
+            Action<GameLocation, NotifyCollectionChangedEventArgs> a = delegate (GameLocation location, NotifyCollectionChangedEventArgs e)
+            {
+                List<Vector2> keys = new List<Vector2>();
+
+                if (e.Action == NotifyCollectionChangedAction.Remove)
+                    foreach (Vector2 key in e.OldItems)
+                        if (t.predicate(location, key))
+                            keys.Add(key);
+
+                action.Invoke(location, keys);
+            };
+
+            Dictionary<GameLocation, NotifyCollectionChangedEventHandler> d = new Dictionary<GameLocation, NotifyCollectionChangedEventHandler>();
+
+            foreach (GameLocation gl in gls)
+                d.AddOrReplace(gl, (o, e) => a(gl, e));
+
+            return d.useAll(p => p.Key.terrainFeatures.CollectionChanged += p.Value);
+        }
         
 
     }

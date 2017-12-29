@@ -31,6 +31,13 @@ namespace PyTK
             Helper.Content.Load<Texture2D>($"Maps/MenuTiles",ContentSource.GameContent).setSaturation(0).injectAs($"Maps/MenuTiles");
             Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", 74, 74);
             */
+
+            registerConsoleCommands();
+        }
+
+        private void registerConsoleCommands()
+        {
+            ConsoleCommands.CcLocations.clearSpace().register();
         }
 
     }

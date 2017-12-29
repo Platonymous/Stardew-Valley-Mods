@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Extensions\PyAssets.cs" />
     <Compile Include="Extensions\PyTextures.cs" />
+    <Compile Include="ConsoleCommands\CcLocations.cs" />
     <Compile Include="Types\AssetInjector.cs" />
     <Compile Include="Types\ButtonClick.cs" />
     <Compile Include="Extensions\PyCollections.cs" />
@@ -56,8 +57,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PyUtils.cs" />
     <Compile Include="Types\ColorManipulation.cs" />
+    <Compile Include="Types\ConsoleCommand.cs" />
+    <Compile Include="Types\DictionaryEntry.cs" />
     <Compile Include="Types\InventoryItem.cs" />
+    <Compile Include="Types\TerrainSelector.cs" />
     <Compile Include="Types\ItemSelector.cs" />
+    <Compile Include="Types\TileLocationSelector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json" />

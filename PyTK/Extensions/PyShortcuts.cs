@@ -25,6 +25,14 @@ namespace PyTK.Extensions
             return Keyboard.GetState().IsKeyUp(k);
         }
 
+        /* Checks */
+
+
+        public static bool isLocation(this string t)
+        {
+            return Game1.getLocationFromName(t) is GameLocation;
+        }
+
         /* Maps */
 
         public static Vector2 getTileAtMousePosition(this GameLocation t)
@@ -75,5 +83,32 @@ namespace PyTK.Extensions
         {
             return t.ToLower().Equals("true");
         }
+
+        public static GameLocation toLocation(this string t)
+        {
+            return Game1.getLocationFromName(t);
+        }
+
+        public static ConsoleCommand toConsoleCommand(this Action<string,string[]> t, string name, string documentation)
+        {
+            return new ConsoleCommand(name, documentation, t);
+        }
+
+        public static ConsoleCommand toConsoleCommand(this Action t, string name, string documentation)
+        {
+            return new ConsoleCommand(name, documentation, (s,p) => t.Invoke());
+        }
+
+        public static ConsoleCommand toConsoleCommand(this Action<string> t, string name, string documentation)
+        {
+            return new ConsoleCommand(name, documentation, (s, p) => t.Invoke(s));
+        }
+
+        public static ConsoleCommand toConsoleCommand(this Action<string[]> t, string name, string documentation)
+        {
+            return new ConsoleCommand(name, documentation, (s, p) => t.Invoke(p));
+        }
+
+
     }
 }

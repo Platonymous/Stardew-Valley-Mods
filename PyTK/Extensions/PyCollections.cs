@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PyTK.Types;
+using StardewValley;
+using System;
 using System.Collections.Generic;
 
 namespace PyTK.Extensions
@@ -20,6 +22,14 @@ namespace PyTK.Extensions
         {
             foreach(KeyValuePair<TKey,TValue> k in dict)
                 t.AddOrReplace(k.Key, k.Value);
+
+            return t;
+        }
+
+        public static List<T> AddOrReplace<T>(this List<T> t, T item)
+        {
+            if (!t.Contains(item))
+                t.Add(item);
 
             return t;
         }
@@ -50,12 +60,30 @@ namespace PyTK.Extensions
             return list;
         }
 
+        public static Dictionary<TKey,TValue> toDictionary<TKey, TValue, T>(this List<T> t, Func<T, DictionaryEntry<TKey,TValue>> conversion)
+        {
+            Dictionary<TKey,TValue> dict = new Dictionary<TKey, TValue>();
+            foreach (T i in t)
+                if (conversion.Invoke(i) is DictionaryEntry<TKey,TValue> n)
+                    dict.AddOrReplace(n.key, n.value);
+
+            return dict;
+        }
+
         public static List<T> useAll<T>(this List<T> list, Action<T> action)
         {
             foreach (T item in list)
                 action.Invoke(item);
 
             return list;
+        }
+
+        public static Dictionary<TKey,TValue> useAll<TKey,TValue>(this Dictionary<TKey, TValue> dict, Action<KeyValuePair<TKey,TValue>> action)
+        {
+            foreach (KeyValuePair<TKey,TValue> entry in dict)
+                action.Invoke(entry);
+
+            return dict;
         }
 
     }

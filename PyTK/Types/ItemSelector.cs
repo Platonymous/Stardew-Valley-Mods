@@ -5,11 +5,12 @@ namespace PyTK.Types
 {
     public class ItemSelector<T> where T : Item
     {
-        public Func<T, bool> predicate;
+        public Func<Item, bool> predicate = o => o is T;
 
-        public ItemSelector(Func<T, bool> predicate)
+        public ItemSelector(Func<T, bool> predicate = null)
         {
-            this.predicate = predicate;
+            if (predicate != null)
+                this.predicate = o => (o is T) ? predicate.Invoke((T) o) : false;
         }
     }
 }
