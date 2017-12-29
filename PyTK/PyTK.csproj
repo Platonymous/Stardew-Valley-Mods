@@ -60,6 +60,7 @@
     <Compile Include="Types\ConsoleCommand.cs" />
     <Compile Include="Types\DictionaryEntry.cs" />
     <Compile Include="Types\InventoryItem.cs" />
+    <Compile Include="Types\Range.cs" />
     <Compile Include="Types\TerrainSelector.cs" />
     <Compile Include="Types\ItemSelector.cs" />
     <Compile Include="Types\TileLocationSelector.cs" />

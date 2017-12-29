@@ -69,6 +69,22 @@ namespace PyTK.Extensions
             return new AssetInjector<IAssetDataForImage, IAssetDataForImage>(assetName, merger).injectEdit();
         }
 
+        public static AssetInjector<IAssetDataForImage, IAssetDataForImage> injectTileInto(this Texture2D t, string assetName, Range targetTileIndex, Range sourceTileIndex, int tileWidth = 16, int tileHeight = 16, PatchMode mode = PatchMode.Replace)
+        {
+            Func<IAssetDataForImage, IAssetDataForImage> merger = new Func<IAssetDataForImage, IAssetDataForImage>(delegate (IAssetDataForImage asset)
+            {
+                for(int i = 0; i < sourceTileIndex.length; i++)
+                {
+                    Rectangle source = Game1.getSourceRectForStandardTileSheet(t, sourceTileIndex[i], tileWidth, tileHeight);
+                    Rectangle target = Game1.getSourceRectForStandardTileSheet(asset.Data, targetTileIndex[i], tileWidth, tileHeight);
+                    asset.PatchImage(t, source, target, mode);
+                }
+                return asset;
+            });
+
+            return new AssetInjector<IAssetDataForImage, IAssetDataForImage>(assetName, merger).injectEdit();
+        }
+
         /* Maps */
 
         public static AssetInjector<Map, IAssetInfo> inject(this Map t, string assetName)

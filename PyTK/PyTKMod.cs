@@ -30,8 +30,9 @@ namespace PyTK
             new ItemSelector<SObject>(p => p.name == "Chest").whenAddedToInventory(l => l.useAll(i => i.name = "Test"));
             Helper.Content.Load<Texture2D>($"Maps/MenuTiles",ContentSource.GameContent).setSaturation(0).injectAs($"Maps/MenuTiles");
             Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", 74, 74);
+            Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129,166));
             */
-
+            
             registerConsoleCommands();
         }
 
