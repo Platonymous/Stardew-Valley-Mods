@@ -12,7 +12,7 @@
   "EntryDll": "HarpOfYobaRedux.dll",
   "Dependencies": [
     {
-      "UniqueID": "Platonymous.CustomElementHandler"
+      "UniqueID": "Platonymous.Toolkit"
     }
   ],
   "UpdateKeys": [ "Nexus:914" ]
