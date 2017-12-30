@@ -3,11 +3,12 @@
   "Author": "Platonymous",
   "Version": {
     "MajorVersion": 0,
-    "MinorVersion": 3,
+    "MinorVersion": 4,
     "PatchVersion": 0,
     "Build": null
   },
   "Description": "Platonymous Toolkit",
   "UniqueID": "Platonymous.Toolkit",
-  "EntryDll": "PyTK.dll"
+  "EntryDll": "PyTK.dll",
+  "UpdateKeys": [ "Nexus:1726" ]
 }

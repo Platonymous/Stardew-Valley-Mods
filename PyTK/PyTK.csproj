@@ -43,9 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleCommands\CcSaveHandler.cs" />
     <Compile Include="Extensions\PyAssets.cs" />
     <Compile Include="Extensions\PyTextures.cs" />
     <Compile Include="ConsoleCommands\CcLocations.cs" />
+    <Compile Include="CustomElementHandler\ISaveElement.cs" />
+    <Compile Include="CustomElementHandler\SaveHandler.cs" />
     <Compile Include="Types\AssetInjector.cs" />
     <Compile Include="Types\ButtonClick.cs" />
     <Compile Include="Extensions\PyCollections.cs" />

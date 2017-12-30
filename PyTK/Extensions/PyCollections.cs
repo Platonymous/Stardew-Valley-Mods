@@ -1,4 +1,5 @@
-﻿using PyTK.Types;
+﻿using Microsoft.Xna.Framework;
+using PyTK.Types;
 using System;
 using System.Collections.Generic;
 
@@ -83,6 +84,21 @@ namespace PyTK.Extensions
                 action.Invoke(entry);
 
             return dict;
+        }
+
+        public static string Join<TKey,TValue>(this Dictionary<TKey,TValue> t, char keySeperator = '|', char valueSeperator = '=')
+        {
+            return String.Join(keySeperator.ToString(), t.toList(p => p.Key + valueSeperator.ToString() + p.Value));
+        }
+
+        public static Dictionary<TKey, TValue> ToDictionary<TKey,TValue>(this string dict, string joinedString, Func<string, TKey> keyConverter, Func<string, TValue> valueConverter, char keySeperator = '|', char valueSeperator = '=')
+        {
+            return new List<string>(joinedString.Split(keySeperator)).toDictionary(p => new DictionaryEntry<TKey, TValue>(keyConverter(p.Split(valueSeperator)[0]), valueConverter(p.Split(valueSeperator)[1])));
+        }
+
+        public static Dictionary<string, string> ToDictionary(this string dict, string joinedString, char keySeperator = '|', char valueSeperator = '=')
+        {
+            return new List<string>(joinedString.Split(keySeperator)).toDictionary(p => new DictionaryEntry<string, string>(p.Split(valueSeperator)[0],p.Split(valueSeperator)[1]));
         }
 
     }

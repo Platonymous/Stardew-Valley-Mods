@@ -10,6 +10,8 @@ using StardewValley.TerrainFeatures;
 using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
+using PyTK.CustomElementHandler;
+using PyTK.ConsoleCommands;
 
 namespace PyTK
 {
@@ -26,16 +28,18 @@ namespace PyTK
             //testing();
 
             registerConsoleCommands();
+            SaveHandler.setUpEventHandlers();
         }
 
         private void registerConsoleCommands()
         {
-            ConsoleCommands.CcLocations.clearSpace().register();
+            CcLocations.clearSpace().register();
+            CcSaveHandler.cleanup().register();
         }
 
         private void testing()
         {
-            Keys.K.onPressed(new Func<string>(() => Game1.currentGameTime.TotalGameTime.Seconds.ToString()).toLogAction(LogLevel.Info, Monitor));
+            Keys.K.onPressed(() => Monitor.Log($"Played: {Game1.currentGameTime.TotalGameTime.Minutes} min"));
             ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log($"Number of Weeds: {o.numberOfWeeds}", LogLevel.Info));
             new InventoryItem(new Chest(true), 100).addToNPCShop("Pierre");
             new ItemSelector<SObject>(p => p.name == "Chest").whenAddedToInventory(l => l.useAll(i => i.name = "Test"));
@@ -48,8 +52,7 @@ namespace PyTK
                 "Town".toLocation().clearArea(new Rectangle(60, 30, 20, 20));
             };
 
-            SaveEvents.AfterLoad += (s,e) => mapMergeTest();
+            SaveEvents.AfterLoad += (s, e) => mapMergeTest();
         }
-
     }
 }
