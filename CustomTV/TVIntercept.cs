@@ -4,12 +4,11 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 using System.Collections.Generic;
-using CustomElementHandler;
 using System;
 
 namespace CustomTV
 {
-    public class TVIntercept : Furniture, ISaveElement
+    public class TVIntercept : Furniture
     {
 
         public static string weatherString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13105");
