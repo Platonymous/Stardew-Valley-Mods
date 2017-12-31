@@ -128,6 +128,5 @@ namespace PyTK.Extensions
 
             return new AssetInjector<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>>(assetName, merger).injectEdit();
         }
-
     }
 }

@@ -146,6 +146,9 @@ namespace PyTK.CustomElementHandler
                 chest.currentLidFrame = 131;
                 chest.bigCraftable = true;
                 chest.canBeSetDown = true;
+                chest.giftbox = false;
+                chest.frameCounter = -1;
+                chest.type = "Crafting";
                 return chest;
             }
             return replacement;
@@ -195,6 +198,9 @@ namespace PyTK.CustomElementHandler
             try
             {
                 Type T = Type.GetType(data[2]);
+                if (T == null)
+                    return replacement;
+
                 object o = Activator.CreateInstance(T);
 
                 if (!(o is ISaveElement newElement))
