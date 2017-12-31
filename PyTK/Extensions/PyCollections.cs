@@ -60,6 +60,16 @@ namespace PyTK.Extensions
             return list;
         }
 
+        public static List<T> toList<T>(this List<T> t, Func<T, bool> predicate)
+        {
+            List<T> list = new List<T>();
+            foreach (T i in t)
+                if (predicate.Invoke(i))
+                    list.Add(i);
+
+            return list;
+        }
+
         public static Dictionary<TKey,TValue> toDictionary<TKey, TValue, T>(this List<T> t, Func<T, DictionaryEntry<TKey,TValue>> conversion)
         {
             Dictionary<TKey,TValue> dict = new Dictionary<TKey, TValue>();

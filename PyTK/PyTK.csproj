@@ -44,11 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleCommands\CcSaveHandler.cs" />
+    <Compile Include="CustomTV\CustomTVMod.cs" />
     <Compile Include="Extensions\PyAssets.cs" />
     <Compile Include="Extensions\PyTextures.cs" />
     <Compile Include="ConsoleCommands\CcLocations.cs" />
     <Compile Include="CustomElementHandler\ISaveElement.cs" />
     <Compile Include="CustomElementHandler\SaveHandler.cs" />
+    <Compile Include="Overrides\OvTV.cs" />
     <Compile Include="Types\AssetInjector.cs" />
     <Compile Include="Types\ButtonClick.cs" />
     <Compile Include="Extensions\PyCollections.cs" />
@@ -68,10 +70,17 @@
     <Compile Include="Types\TerrainSelector.cs" />
     <Compile Include="Types\ItemSelector.cs" />
     <Compile Include="Types\TileLocationSelector.cs" />
+    <Compile Include="Types\TVChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
+      <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
+      <Name>Harmony</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets')" />

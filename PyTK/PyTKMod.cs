@@ -12,6 +12,9 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
 using PyTK.CustomElementHandler;
 using PyTK.ConsoleCommands;
+using PyTK.CustomTV;
+using Harmony;
+using System.Reflection;
 
 namespace PyTK
 {
@@ -27,8 +30,17 @@ namespace PyTK
 
             //testing();
 
+            harmonyFix();
+
             registerConsoleCommands();
+            CustomTVMod.load();
             SaveHandler.setUpEventHandlers();
+        }
+
+        private void harmonyFix()
+        {
+            var instance = HarmonyInstance.Create("Platonymous.PyTK");
+            instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 
         private void registerConsoleCommands()
