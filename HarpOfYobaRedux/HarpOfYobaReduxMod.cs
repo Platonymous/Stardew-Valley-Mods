@@ -3,19 +3,49 @@
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using PyTK.CustomElementHandler;
+using PyTK.Types;
+using PyTK.Extensions;
 using StardewValley.Menus;
+using System.Collections.Generic;
+using StardewValley;
 
 namespace HarpOfYobaRedux
 {
     public class HarpOfYobaReduxMod : Mod
     {
         private DataLoader data;
+        public static Config config;
 
         public override void Entry(IModHelper helper)
         {
+            config = Helper.ReadConfig<Config>();
+            new ConsoleCommand("hoy_cheat", "Get all sheets without doing anything.", (c, p) => cheat(p)).register();
             SaveHandler.BeforeRebuilding += SaveHandler_BeforeRebuilding;
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+        }
+
+        private void cheat(string[] p)
+        {
+            if (p == null || p.Length < 1)
+            {
+                List<string> list = SheetMusic.allSheets.toList(d => d.Key);
+                list.Add("harp");
+                Monitor.Log(String.Join(" - ", list),LogLevel.Info);
+            }
+
+            List<Item> items = new List<Item>();
+
+            foreach (string s in p)
+            {
+                Monitor.Log(s);
+                if (s == "harp")
+                    items.AddOrReplace(new Instrument("harp"));
+                else if (SheetMusic.allSheets.ContainsKey(s))
+                    items.AddOrReplace(new SheetMusic(s));
+            }
+            if(items.Count > 0)
+                Game1.activeClickableMenu = new ItemGrabMenu(items);
         }
 
         private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)

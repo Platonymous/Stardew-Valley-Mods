@@ -10,7 +10,7 @@ namespace HarpOfYobaRedux
 {
     internal class SheetMusic : StardewValley.Object, ISaveElement
     {
-        private static Dictionary<string, SheetMusic> allSheets;
+        internal static Dictionary<string, SheetMusic> allSheets;
         public string sheetMusicID;
         private string sheetDescription;
         private bool owned;
@@ -128,7 +128,9 @@ namespace HarpOfYobaRedux
 
         public void doMagic()
         {
-            magic.doMagic(playedToday);
+            if(HarpOfYobaReduxMod.config.magic)
+                magic.doMagic(playedToday);
+
             playedToday = true;
         }
 

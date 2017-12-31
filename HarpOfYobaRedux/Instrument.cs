@@ -159,7 +159,7 @@ namespace HarpOfYobaRedux
             return additionalSaveData;
         }
 
-        public dynamic getReplacement()
+        public object getReplacement()
         {
             FishingRod replacement = new FishingRod(1);
             replacement.upgradeLevel = -1;
