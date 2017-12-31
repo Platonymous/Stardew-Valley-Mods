@@ -4,6 +4,7 @@ using StardewValley;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using PyTK.CustomElementHandler;
+using PyTK.Extensions;
 
 namespace HarpOfYobaRedux
 {
@@ -29,9 +30,7 @@ namespace HarpOfYobaRedux
         public SheetMusic(string id, Texture2D texture, string name, string description, Color color, string music, int lenght, IMagic magic)
         {
             if (allSheets == null)
-            {
                 allSheets = new Dictionary<string, SheetMusic>();
-            }
 
             this.magic = magic;
             this.lenght = lenght;
@@ -43,23 +42,11 @@ namespace HarpOfYobaRedux
             sheetDescription = description;
             sheetMusicID = id;
 
-            if (allSheets.ContainsKey(id))
-            {
-                allSheets.Remove(id);
-            }
-
+            allSheets.AddOrReplace(id, this);
             owned = false;
-            allSheets.Add(id, this);
-
         }
 
-        public override string Name
-        {
-            get
-            {
-                return name;
-            }
-        }
+        public override string Name { get => name; }
 
         public override string DisplayName { get => name; set => name = value; }
 
@@ -86,7 +73,6 @@ namespace HarpOfYobaRedux
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
             build(additionalSaveData["id"]);
-
         }
 
         public override bool canBeDropped()
@@ -109,7 +95,6 @@ namespace HarpOfYobaRedux
            return allSheets[id].owned;
         }
 
-
         public override string getDescription()
         {
             string text = this.sheetDescription;
@@ -121,22 +106,19 @@ namespace HarpOfYobaRedux
         public Dictionary<string, string> getAdditionalSaveData()
         {
             Dictionary<string, string> additionalSaveData = new Dictionary<string, string>();
-            additionalSaveData.Add("id", this.sheetMusicID.ToString());
+            additionalSaveData.Add("id", sheetMusicID.ToString());
             return additionalSaveData;
         }
 
-        public dynamic getReplacement()
+        public object getReplacement()
         {
-    
             return new StardewValley.Object(685,1); 
         }
 
         public static void beforeRebuilding()
         {
             foreach (SheetMusic sheet in allSheets.Values)
-            {
                 sheet.owned = false;
-            }
         }
 
         public override Item getOne()
@@ -146,9 +128,7 @@ namespace HarpOfYobaRedux
 
         public void doMagic()
         {
-
             magic.doMagic(playedToday);
-
             playedToday = true;
         }
 
@@ -160,22 +140,18 @@ namespace HarpOfYobaRedux
 
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
         {
- 
-            Rectangle sourceRectangle = new Microsoft.Xna.Framework.Rectangle(0, 0, 16, 16);
-            spriteBatch.Draw(texture, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Microsoft.Xna.Framework.Rectangle?(sourceRectangle), Color.White * transparency, 0.0f, new Vector2(8, 8), (float)Game1.pixelZoom * scaleSize * 0.8f, SpriteEffects.None, layerDepth);
-
-            Rectangle sourceRectangleNote = new Microsoft.Xna.Framework.Rectangle(16, 0, 16, 16);
-            spriteBatch.Draw(texture, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Microsoft.Xna.Framework.Rectangle?(sourceRectangleNote), color * transparency, 0.0f, new Vector2(8, 8), (float)Game1.pixelZoom * scaleSize * 0.8f, SpriteEffects.None, layerDepth);
-
+            Rectangle sourceRectangle = new Rectangle(0, 0, 16, 16);
+            spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), new Rectangle?(sourceRectangle), Color.White * transparency, 0.0f, new Vector2(8, 8), Game1.pixelZoom * scaleSize * 0.8f, SpriteEffects.None, layerDepth);
+            Rectangle sourceRectangleNote = new Rectangle(16, 0, 16, 16);
+            spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), new Rectangle?(sourceRectangleNote), color * transparency, 0.0f, new Vector2(8, 8), Game1.pixelZoom * scaleSize * 0.8f, SpriteEffects.None, layerDepth);
         }
 
-        public override void drawWhenHeld(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, Vector2 objectPosition, StardewValley.Farmer f)
+        public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, StardewValley.Farmer f)
         {
-            Rectangle sourceRectangle = new Microsoft.Xna.Framework.Rectangle(0, 0, 16, 16);
-            spriteBatch.Draw(texture, objectPosition, new Microsoft.Xna.Framework.Rectangle?(sourceRectangle), Color.White, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 2) / 10000f));
-
-            Rectangle sourceRectangleNote = new Microsoft.Xna.Framework.Rectangle(16, 0, 16, 16);
-            spriteBatch.Draw(texture, objectPosition, new Microsoft.Xna.Framework.Rectangle?(sourceRectangleNote), color, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 3) / 10000f));
+            Rectangle sourceRectangle = new Rectangle(0, 0, 16, 16);
+            spriteBatch.Draw(texture, objectPosition, new Rectangle?(sourceRectangle), Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 2) / 10000f));
+            Rectangle sourceRectangleNote = new Rectangle(16, 0, 16, 16);
+            spriteBatch.Draw(texture, objectPosition, new Rectangle?(sourceRectangleNote), color, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 3) / 10000f));
         }
 
     }

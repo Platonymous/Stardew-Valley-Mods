@@ -5,7 +5,6 @@ using StardewModdingAPI.Events;
 using PyTK.CustomElementHandler;
 using StardewValley.Menus;
 
-
 namespace HarpOfYobaRedux
 {
     public class HarpOfYobaReduxMod : Mod
@@ -14,57 +13,33 @@ namespace HarpOfYobaRedux
 
         public override void Entry(IModHelper helper)
         {
-
             SaveHandler.BeforeRebuilding += SaveHandler_BeforeRebuilding;
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
-            
         }
-
-     
-        
 
         private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
         {
-            ControlEvents.KeyPressed -= ControlEvents_KeyPressed;
             MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
             SaveHandler.BeforeRebuilding -= SaveHandler_BeforeRebuilding2;
-            TimeEvents.TimeOfDayChanged -= TimeEvents_TimeOfDayChanged;
         }
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
             SaveHandler.BeforeRebuilding += SaveHandler_BeforeRebuilding2;
             SaveHandler_BeforeRebuilding(sender, e);
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-            TimeEvents.TimeOfDayChanged += TimeEvents_TimeOfDayChanged;
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-        }
 
-        private void TimeEvents_TimeOfDayChanged(object sender, EventArgsIntChanged e)
-        {
-            if(e.NewInt == 700 || e.NewInt == 1200 || e.NewInt == 18)
-            {
-                Delivery.checkMail();
-            }
-            
+            TimeEvents.AfterDayStarted += (s,ev) => Delivery.checkMail();
+            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
         }
 
         private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
         {
-            if(e.NewMenu is LetterViewerMenu && !Delivery.showsLetter)
+            if (e.NewMenu is LetterViewerMenu lvm)
             {
-                Delivery.showLetter();
-            }
-        }
-
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
-        {
-            string key = e.KeyPressed.ToString().ToLower();
-
-            if (key == "h")
-            {
-             
+                string mailTitle = Helper.Reflection.GetField<string>(lvm, "mailTitle").GetValue();
+                if (mailTitle.StartsWith("hoy_"))
+                    lvm.itemsToGrab[0].item = DataLoader.getLetter(mailTitle).item;
             }
         }
 
@@ -77,8 +52,6 @@ namespace HarpOfYobaRedux
             }
 
             SaveHandler.BeforeRebuilding -= SaveHandler_BeforeRebuilding;
-
-
         }
 
         private void SaveHandler_BeforeRebuilding2(object sender, EventArgs e)
