@@ -94,7 +94,7 @@ namespace Portraiture
             
             if (e.KeyPressed == config.changeKey && Game1.activeClickableMenu is DialogueBox d && d.isPortraitBox() && Game1.currentSpeaker is NPC cs)
             {
-                if (d.width < 107 * Game1.pixelZoom * 3 / 2 || Helper.Reflection.GetPrivateValue<bool>(d, "transitioning") || Helper.Reflection.GetPrivateValue<bool>(d, "isQuestion"))
+                if (d.width < 107 * Game1.pixelZoom * 3 / 2 || Helper.Reflection.GetField<bool>(d, "transitioning").GetValue() || Helper.Reflection.GetField<bool>(d, "isQuestion").GetValue())
                     return;
 
                 TextureLoader.nextFolder();
@@ -123,8 +123,8 @@ namespace Portraiture
         {
             if (Game1.activeClickableMenu is DialogueBox d && d.isPortraitBox() && Game1.currentSpeaker is NPC cs)
             {
-                int x = Helper.Reflection.GetPrivateValue<int>(d, "x");
-                int y = Helper.Reflection.GetPrivateValue<int>(d, "y");
+                int x = Helper.Reflection.GetField<int>(d, "x").GetValue();
+                int y = Helper.Reflection.GetField<int>(d, "y").GetValue();
                 drawFolderName(Game1.spriteBatch, x, y);                
             }
         }
