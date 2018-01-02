@@ -86,7 +86,7 @@ namespace Visualize
                     _config.saturation = MathHelper.Max(0, _config.saturation - 10);
 
                 emptyCache();
-                Helper.WriteConfig<Config>(_config);
+                Helper.WriteConfig(_config);
             }
         }
 
@@ -179,7 +179,7 @@ namespace Visualize
                 profile = profiles.Find(p => p.id == _config.activeProfile);
 
             if (profile == null && profiles.Count > 0)
-                profile = profiles[0];
+                profile = profiles.Exists(p => p.id == "Platonymous.Original") ? profiles.Find(p => p.id == "Platonymous.Original") : profiles[0];
 
             loadShader(profile);
             loadPalette(profile);
@@ -257,7 +257,7 @@ namespace Visualize
 
         public static void setProfileToVanilla()
         {
-            setActiveProfile(new Profile());
+            setActiveProfile(profiles.Find(p => p.id == "Platonymous.Original"));
         }
 
         public static void setProfile()
