@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using PyTK.Types;
+using System.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -78,6 +79,11 @@ namespace PyTK.Extensions
                     dict.AddOrReplace(n.key, n.value);
 
             return dict;
+        }
+
+        public static Dictionary<TKey,TValue> clone<TKey, TValue>(this Dictionary<TKey,TValue> t)
+        {
+            return t.ToDictionary(k => k.Key, v => v.Value);
         }
 
         public static List<T> useAll<T>(this List<T> list, Action<T> action)

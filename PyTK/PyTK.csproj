@@ -46,10 +46,12 @@
     <Compile Include="ConsoleCommands\CcSaveHandler.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
     <Compile Include="Extensions\PyAssets.cs" />
+    <Compile Include="Extensions\PyCrafting.cs" />
     <Compile Include="Extensions\PyTextures.cs" />
     <Compile Include="ConsoleCommands\CcLocations.cs" />
     <Compile Include="CustomElementHandler\ISaveElement.cs" />
     <Compile Include="CustomElementHandler\SaveHandler.cs" />
+    <Compile Include="Overrides\OvLocations.cs" />
     <Compile Include="Overrides\OvTV.cs" />
     <Compile Include="Types\AssetInjector.cs" />
     <Compile Include="Types\ButtonClick.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="Types\Range.cs" />
     <Compile Include="Types\TerrainSelector.cs" />
     <Compile Include="Types\ItemSelector.cs" />
+    <Compile Include="Types\TileAction.cs" />
     <Compile Include="Types\TileLocationSelector.cs" />
     <Compile Include="Types\TVChannel.cs" />
   </ItemGroup>
