@@ -81,6 +81,17 @@ myTileReplacement.injectTileInto($"Maps/springobjects", 74, 74);
 orgTexture.setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129, 166));
 ```
 
+## Data
+
+##### Injection / Manipulation
+```sh
+using PyTK.Extensions;
+using PyTK.Types;
+
+myData.injectInto(@"Data/ObjectInformation");
+new Mail(id, text, attachements, AttachmentType.OBJECT).injectIntoMail();
+```
+
 ## Frameworks
 ##### Custom TV
 ```sh
