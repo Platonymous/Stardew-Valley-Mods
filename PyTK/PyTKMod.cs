@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using PyTK.Extensions;
-using PyTK.Types;
+
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
@@ -10,6 +9,8 @@ using StardewValley.TerrainFeatures;
 using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
+using PyTK.Extensions;
+using PyTK.Types;
 using PyTK.CustomElementHandler;
 using PyTK.ConsoleCommands;
 using PyTK.CustomTV;
