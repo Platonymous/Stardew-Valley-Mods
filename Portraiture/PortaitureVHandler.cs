@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Visualize;
 using StardewValley;
 using StardewValley.Menus;
-using System.Collections.Generic;
 
 namespace Portraiture
 {

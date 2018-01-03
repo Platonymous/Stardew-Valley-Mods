@@ -48,7 +48,7 @@ namespace Portraiture
             int index = 0;
 
             if (Game1.activeClickableMenu is DialogueBox box)
-                index = PortraitureMod.helper.Reflection.GetPrivateValue<Dialogue>(box, "characterDialogue").getPortraitIndex();
+                index = PortraitureMod.helper.Reflection.GetField<Dialogue>(box, "characterDialogue").GetValue().getPortraitIndex();
 
             return Game1.getSourceRectForStandardTileSheet(texture, index, textureSize, textureSize);
         }
@@ -108,7 +108,7 @@ namespace Portraiture
             string directoryName = folders[activeFolder];
             string savstring = directoryName;
             PortraitureMod.config.active = savstring;
-            PortraitureMod.helper.WriteConfig<PConfig>(PortraitureMod.config);
+            PortraitureMod.helper.WriteConfig(PortraitureMod.config);
         }
 
 
