@@ -425,6 +425,38 @@ namespace PyTK.Extensions
             return d;
         }
 
+
+        /// <summary>Wraps the the method so it only executes if the player clickes on the specified tileposition and adds it to InputEvents.ButtonPressed.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<EventArgsInput> onClick(this ButtonClick t, TileLocationSelector tile, Action<Vector2> handler)
+        {
+            EventHandler<EventArgsInput> d = delegate (object sender, EventArgsInput e)
+            {
+                bool isButton = t.Equals(ButtonClick.UseToolButton) ? e.IsUseToolButton : e.IsActionButton;
+                if (isButton && Game1.currentLocation is GameLocation location && tile.predicate(location,location.getTileAtMousePosition()))
+                    handler.Invoke(location.getTileAtMousePosition());
+            };
+
+            InputEvents.ButtonPressed += d;
+            return d;
+        }
+
+        /// <summary>Wraps the the method so it only executes if the player clickes on the specified tile and adds it to InputEvents.ButtonPressed.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<EventArgsInput> onClick(this ButtonClick t, Vector2 tile, GameLocation location, Action<Vector2> handler)
+        {
+            EventHandler<EventArgsInput> d = delegate (object sender, EventArgsInput e)
+            {
+                bool isButton = t.Equals(ButtonClick.UseToolButton) ? e.IsUseToolButton : e.IsActionButton;
+                if (isButton && Game1.currentLocation == location && location.getTileAtMousePosition() == tile)
+                    handler.Invoke(location.getTileAtMousePosition());
+            };
+
+            InputEvents.ButtonPressed += d;
+            return d;
+        }
+
+
         /// <summary>Wraps the the method so it only executes if an object of the requested type is clicked on and adds it to InputEvents.ButtonPressed.</summary>
         /// <returns>Returns the wrapped method.</returns>
         public static EventHandler<EventArgsInput> onObjectClick<T>(this ButtonClick t, EventHandler<T> handler) where T : SObject

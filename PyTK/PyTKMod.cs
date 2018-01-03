@@ -15,6 +15,8 @@ using PyTK.ConsoleCommands;
 using PyTK.CustomTV;
 using Harmony;
 using System.Reflection;
+using StardewValley.Menus;
+using System.Collections.Generic;
 
 namespace PyTK
 {
@@ -58,10 +60,18 @@ namespace PyTK
             Helper.Content.Load<Texture2D>($"Maps/MenuTiles", ContentSource.GameContent).setSaturation(0).injectAs($"Maps/MenuTiles");
             Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", 74, 74);
             Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129, 166));
+
+            Action<List<string>> tileActionTest = delegate (List<string> s)
+            {
+                s.Remove(s[0]);
+                Game1.activeClickableMenu = new DialogueBox(String.Join(" ", s));
+            };
+
             Action mapMergeTest = delegate ()
             {
                 "Beach".toLocation().Map.mergeInto("Town".toLocation().Map, new Vector2(60, 30), new Rectangle(15, 15, 20, 20)).injectAs(@"Maps/Town");
                 "Town".toLocation().clearArea(new Rectangle(60, 30, 20, 20));
+                "Town".toLocation().Map.addAction(new Vector2(18, 60), new TileAction("testaction", tileActionTest).register(),"Smells interesting");
             };
 
             SaveEvents.AfterLoad += (s, e) => mapMergeTest();

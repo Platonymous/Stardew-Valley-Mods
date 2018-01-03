@@ -14,12 +14,12 @@ namespace PyTK.Extensions
 
         /* Input */
 
-        public static bool isDown<T>(this Keys k)
+        public static bool isDown(this Keys k)
         {
             return Keyboard.GetState().IsKeyDown(k);
         }
 
-        public static bool isUp<T>(this Keys k)
+        public static bool isUp(this Keys k)
         {
             return Keyboard.GetState().IsKeyUp(k);
         }

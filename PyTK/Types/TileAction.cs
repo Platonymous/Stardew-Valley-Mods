@@ -9,18 +9,31 @@ namespace PyTK.Types
 {
     public class TileAction
     {
-        Func<List<string>, SFarmer, Location, bool> action;
-        string trigger;
+        public Func<List<string>, bool> action;
+        public string trigger;
 
-        public TileAction(string trigger, Func<List<string>, SFarmer, Location, bool> action)
+        public TileAction(string trigger, Func<List<string>, bool> action)
         {
             this.trigger = trigger;
             this.action = action;
         }
 
-        public void register()
+        public TileAction(string trigger, Action<List<string>> action)
+        {
+            this.trigger = trigger;
+            this.action = delegate(List<string> s) { action.Invoke(s);  return true; };
+        }
+
+        public TileAction(string trigger, Action action)
+        {
+            this.trigger = trigger;
+            this.action = delegate (List<string> s) { action.Invoke(); return true; };
+        }
+
+        public TileAction register()
         {
             OvLocations.actions.AddOrReplace(trigger, action);
+            return this;
         }
 
 

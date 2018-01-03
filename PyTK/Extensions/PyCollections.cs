@@ -3,6 +3,7 @@ using PyTK.Types;
 using System.Linq;
 using System;
 using System.Collections.Generic;
+using xTile.ObjectModel;
 
 namespace PyTK.Extensions
 {
@@ -10,6 +11,16 @@ namespace PyTK.Extensions
     {
         
         public static Dictionary<TKey, TValue> AddOrReplace<TKey, TValue>(this Dictionary<TKey, TValue> t, TKey key, TValue value)
+        {
+            if (!t.ContainsKey(key))
+                t.Add(key, value);
+            else
+                t[key] = value;
+
+            return t;
+        }
+
+        public static IPropertyCollection AddOrReplace(this IPropertyCollection t, string key, string value)
         {
             if (!t.ContainsKey(key))
                 t.Add(key, value);

@@ -10,6 +10,9 @@ using xTile;
 using xTile.Tiles;
 using xTile.Layers;
 using System.IO;
+using PyTK.Types;
+using PyTK.Extensions;
+using xTile.Dimensions;
 
 namespace PyTK.Extensions
 {
@@ -51,7 +54,7 @@ namespace PyTK.Extensions
             if (Game1.currentLocation is DecoratableLocation location)
             {
                 List<Furniture> furniture = location.furniture;
-                return ((T) furniture.Find(f => f.getBoundingBox(t).Intersects(new Rectangle((int) t.X * Game1.tileSize, (int) t.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize))));
+                return ((T) furniture.Find(f => f.getBoundingBox(t).Intersects(new Microsoft.Xna.Framework.Rectangle((int) t.X * Game1.tileSize, (int) t.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize))));
             }
             return null;
         }
@@ -78,7 +81,7 @@ namespace PyTK.Extensions
             return false;
         }
 
-        public static GameLocation clearArea(this GameLocation l, Rectangle area)
+        public static GameLocation clearArea(this GameLocation l, Microsoft.Xna.Framework.Rectangle area)
         {
 
             for (int x = area.X; x < area.Width; x++)
@@ -92,9 +95,9 @@ namespace PyTK.Extensions
             return l;
         }
 
-        public static Map mergeInto(this Map t, Map map, Vector2 position, Rectangle? sourceArea, bool includeEmpty = false, bool properties = true)
+        public static Map mergeInto(this Map t, Map map, Vector2 position, Microsoft.Xna.Framework.Rectangle? sourceArea, bool includeEmpty = false, bool properties = true)
         {
-            Rectangle sourceRectangle = sourceArea.HasValue ? sourceArea.Value : new Rectangle(0, 0, t.DisplayWidth / Game1.tileSize, t.DisplayHeight / Game1.tileSize);
+            Microsoft.Xna.Framework.Rectangle sourceRectangle = sourceArea.HasValue ? sourceArea.Value : new Microsoft.Xna.Framework.Rectangle(0, 0, t.DisplayWidth / Game1.tileSize, t.DisplayHeight / Game1.tileSize);
 
             foreach (TileSheet tilesheet in t.TileSheets)
                 if (!map.hasTileSheet(tilesheet))
@@ -153,9 +156,14 @@ namespace PyTK.Extensions
             return map;
         }
 
-        
+        public static void addAction(this Map m, Vector2 position, TileAction action, string args)
+        {
+            m.GetLayer("Buildings").PickTile(new Location((int)position.X * Game1.tileSize, (int)position.Y * Game1.tileSize), Game1.viewport.Size).Properties.AddOrReplace("Action", action.trigger + " " + args);
+        }
 
-
-
+        public static void addAction(this Map m, Vector2 position, string trigger, string args)
+        {
+            m.GetLayer("Buildings").PickTile(new Location((int)position.X * Game1.tileSize, (int)position.Y * Game1.tileSize), Game1.viewport.Size).Properties.AddOrReplace("Action", trigger + " " + args);
+        }
     }
 }
