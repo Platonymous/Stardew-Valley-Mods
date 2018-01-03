@@ -44,7 +44,7 @@ new InventoryItem(yourItem, yourPrice).addToNPCShop(shopName);
 using PyTK.Extensions;
 using PyTK.Types;
 
-new ItemSelector<SObject>(obj => obj.name == "Chest").whenAddedToInventory(list => list.useAll(i => i.name = "Test"));
+new ItemSelector<SObject>(o => o.name == "Chest").whenAddedToInventory(list => list.useAll(i => i.name = "Test"));
 new TerrainSelector<TerrainFeature>(yourPredicate).whenAddedToLocation(yourMethod);
 ```
 
