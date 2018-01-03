@@ -77,7 +77,7 @@ using PyTK.Types;
 
 myNewTexture.inject($"Characters/MyTexture");
 myTextureReplacement.injectAs($"Maps/MenuTiles");
-myTileReplacement.injectTileInto($"Maps/springobjects", 74, 74);
+myTileReplacement.injectTileInto($"Maps/springobjects", 74);
 orgTexture.setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129, 166));
 ```
 
