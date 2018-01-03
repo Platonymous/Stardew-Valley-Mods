@@ -44,7 +44,7 @@ new InventoryItem(yourItem, yourPrice).addToNPCShop(shopName);
 using PyTK.Extensions;
 using PyTK.Types;
 
-new ItemSelector<SObject>(obj => obj.name == "Chest").whenAddedToInventory(list => list.useAll(item => item.name = "Test"));
+new ItemSelector<SObject>(obj => obj.name == "Chest").whenAddedToInventory(list => list.useAll(i => i.name = "Test"));
 new TerrainSelector<TerrainFeature>(yourPredicate).whenAddedToLocation(yourMethod);
 ```
 
@@ -64,7 +64,7 @@ using PyTK.Extensions;
 
 myNewMap.inject(@"Maps/MyMap");
 myMapReplacement.injectAs(@"Maps/Beach");
-myMap.mergeInto("Town".toLocation().Map, new Vector2(60, 30), new Rectangle(15, 15, 20, 20)).injectAs(@"Maps/Town");
+myMap.mergeInto("Town".toLocation().Map, position, sourceRectangle).injectAs(@"Maps/Town");
 "Town".toLocation().clearArea(new Rectangle(60, 30, 20, 20));
 ```
 
@@ -78,7 +78,7 @@ using PyTK.Types;
 myNewTexture.inject($"Characters/MyTexture");
 myTextureReplacement.injectAs($"Maps/MenuTiles");
 myTileReplacement.injectTileInto($"Maps/springobjects", 74, 74);
-Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129, 166));
+orgTexture.setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129, 166));
 ```
 
 ## Frameworks
