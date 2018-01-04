@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using StardewModdingAPI;
 using StardewValley;
 
-
 namespace HarpOfYobaRedux
 {
     internal class DataLoader

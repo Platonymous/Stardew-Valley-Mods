@@ -3,8 +3,6 @@ using StardewValley;
 using StardewValley.TerrainFeatures;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using PyTK.Extensions;
 using PyTK.Types;
 using PyTK;
 
