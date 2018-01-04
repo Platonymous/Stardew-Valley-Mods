@@ -76,6 +76,7 @@
     <Compile Include="Types\TVChannel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Examples.md" />
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>

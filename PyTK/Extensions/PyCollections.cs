@@ -128,5 +128,9 @@ namespace PyTK.Extensions
             return new List<string>(joinedString.Split(keySeperator)).toDictionary(p => new DictionaryEntry<string, string>(p.Split(valueSeperator)[0],p.Split(valueSeperator)[1]));
         }
 
+        public static int getIndexByName(this Dictionary<int, string> dictionary, string name)
+        {
+            return (dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Key;
+        }
     }
 }

@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using PyTK;
 using PyTK.Extensions;
 using PyTK.Types;
-using System;
 
 namespace NoSoilDecayRedux
 {

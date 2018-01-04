@@ -1,8 +1,13 @@
 ﻿using Harmony;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
+using StardewValley;
 using System.Collections.Generic;
 using System.Reflection;
 using Visualize;
+using PyTK.Extensions;
 
 namespace Capitalism
 {
