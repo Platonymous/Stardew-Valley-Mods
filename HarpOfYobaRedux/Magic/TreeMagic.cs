@@ -52,6 +52,7 @@ namespace HarpOfYobaRedux
                     }
 
                     if (gls.terrainFeatures[treetiles[i]] is Grass)
+                    {
                         if (!playedToday)
                         {
                             Grass grass = (gls.terrainFeatures[treetiles[i]] as Grass);
@@ -59,6 +60,7 @@ namespace HarpOfYobaRedux
                             gls.terrainFeatures[treetiles[i]] = grass;
                         }
                         (gls.terrainFeatures[treetiles[i]] as Grass).doCollisionAction(gls.terrainFeatures[treetiles[i]].getBoundingBox(treetiles[i]), 3, treetiles[i], Game1.player, Game1.currentLocation);
+                   }
 
                     if (gls.terrainFeatures[treetiles[i]] is Bush)
                         (gls.terrainFeatures[treetiles[i]] as Bush).performUseAction(treetiles[i]);
