@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
 using StardewModdingAPI.Utilities;
+using SFarmer = StardewValley.Farmer;
+using PyTK.Extensions;
 
 namespace CustomFarmingRedux
 {
@@ -36,6 +38,9 @@ namespace CustomFarmingRedux
         private int skipFrame = 10;
         private int animationFrames = 1;
         private int counter = 0;
+        private RecipeBlueprint activeRecipe;
+        private RecipeBlueprint starterRecipe;
+        private GameLocation location;
         private int frame {
             get
             {
@@ -71,6 +76,72 @@ namespace CustomFarmingRedux
             skipFrame = 60 / blueprint.fps;
             animationFrames = blueprint.frames;
             tileindex = blueprint.tileindex;
+            if (blueprint.starter != null)
+            {
+                starterRecipe = new RecipeBlueprint();
+                starterRecipe.materials = new List<IngredientBlueprint>();
+                starterRecipe.materials.Add(blueprint.starter);
+            }
+                
+        }
+
+        private RecipeBlueprint findRecipe(List<List<Item>> items)
+        {
+            activeRecipe = null;
+
+            foreach (RecipeBlueprint r in blueprint.production)
+                if (r.hasIngredients(items))
+                    activeRecipe = r;
+
+            return activeRecipe;
+        }
+
+        private bool hasStarterMaterials(List<List<Item>> items)
+        {
+            if (starterRecipe == null)
+                return true;
+
+            if (starterRecipe.hasIngredients(items))
+                return true;
+
+            return false;
+        }
+
+        private List<List<Item>> getItemLists(SFarmer player = null)
+        {
+            List<List<Item>> items = new List<List<Item>>();
+
+            if (player != null)
+                items.Add(player.items);
+
+            if (CustomFarmingReduxMod._config.automation)
+            {
+                List<Vector2> tiles = Utility.getAdjacentTileLocations(tileLocation);
+                if (location is GameLocation)
+                    foreach (SObject obj in location.objects.Values)
+                        if (obj is Chest c && !items.Contains(c.items))
+                            items.Add(c.items);
+            }
+            
+            return items;
+        }
+
+        private Color getColor(SObject obj)
+        {
+            return Color.White;
+        }
+
+        private Item createItem()
+        {
+            if (activeRecipe.colored)
+            {
+                if (activeRecipe.color != null)
+                    return activeRecipe.createObject(new Color(activeRecipe.color.toVector<Vector4>()));
+                else
+                    return activeRecipe.createObject(getColor(null));
+            }
+            else
+                return activeRecipe.createObject();
         }
 
         public override string DisplayName { get => name; set => base.DisplayName = value; }

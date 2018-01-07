@@ -13,6 +13,7 @@ namespace CustomFarmingRedux
         public static IModHelper _helper;
         public static IMonitor _monitor;
         public static List<CustomMachineBlueprint> machines;
+        public static Config _config;
 
         public static string folder = "Machines";
 
@@ -20,6 +21,7 @@ namespace CustomFarmingRedux
         {
             _helper = Helper;
             _monitor = Monitor;
+            _config = Helper.ReadConfig<Config>();
         }
     }
 }

@@ -8,6 +8,7 @@ using PyTK.Extensions;
 using Microsoft.Xna.Framework.Graphics;
 using SObject = StardewValley.Object;
 using Microsoft.Xna.Framework;
+using StardewValley.Objects;
 
 namespace CustomFarmingRedux
 {
@@ -103,7 +104,84 @@ namespace CustomFarmingRedux
         public bool prefix { get; set; } = false;
         public bool suffix { get; set; } = false;
         public bool colored { get; set; } = false;
+        public int[] color { get; set; } = null;
         public int time { get; set; }
         public int stack { get; set; } = 1;
+        public int quality { get; set; } = 0;
+        public bool custom { get; set; } = false;
+
+        public void consumeIngredients( List<List<Item>> items)
+        {
+  
+            List<IngredientBlueprint> ingredients = materials.toList(p => p);
+
+            for (int i = 0; i < materials.Count; i++)
+                for (int list = 0; list < items.Count; list++)
+                    if (ingredients.Count <= 0)
+                        return;
+                    else if (ingredients.Contains(materials[i]))
+                        if (items[list].Find(p => p.parentSheetIndex == materials[i].index && materials[i].quality > 0 && p is SObject o && o.quality >= materials[i].quality) is Item j)
+                        {
+                            j.Stack -= materials[i].stack;
+                            int ii = ingredients.FindIndex(p=> p == materials[i]);
+                            ingredients[ii].stack = (j.Stack >= 0) ? 0 : Math.Abs(j.Stack);
+                            if (ingredients[ii].stack == 0)
+                                ingredients.Remove(ingredients[ii]);
+                            if (j.Stack < 1)
+                                items[list].Remove(j);
+                        }
+        }
+
+        public bool hasIngredients(List<List<Item>> items)
+        {
+            List<IngredientBlueprint> ingredients = materials.toList(p => p);
+
+            for (int i = 0; i < materials.Count; i++)
+                for (int list = 0; list < items.Count; list++)
+                    if (ingredients.Count <= 0)
+                        return true;
+                    else if (ingredients.Contains(materials[i]))
+                        if (items[list].Find(p => p.parentSheetIndex == materials[i].index && materials[i].quality > 0 && p is SObject o && o.quality >= materials[i].quality) is Item j)
+                        {
+                            int ii = ingredients.FindIndex(p => p == materials[i]);
+                            ingredients[ii].stack = (j.Stack - ingredients[ii].stack >= 0) ? 0 : Math.Abs(j.Stack - ingredients[ii].stack);
+                            if (ingredients[ii].stack == 0)
+                                ingredients.Remove(ingredients[ii]);
+                        }
+
+            if (ingredients.Count <= 0)
+                return true;
+            else
+                return false;
+        }
+
+        public void consumeIngredients(List<Item> items)
+        {
+            consumeIngredients(new List<List<Item>>() { items });
+        }
+
+        public bool hasIngredients(List<Item> items)
+        {
+            return hasIngredients(new List<List<Item>>() { items });
+        }
+
+        public SObject createObject(Color color)
+        {
+            if (colored && color != Color.White)
+            {
+                ColoredObject c = new ColoredObject(index, stack, color);
+                c.quality = quality;
+                return c;
+            }
+            else
+                return createObject();
+        }
+
+        public SObject createObject()
+        {
+            SObject s = new SObject(Vector2.Zero, index, stack);
+            s.quality = quality;
+            return s;
+        }
     }
 }

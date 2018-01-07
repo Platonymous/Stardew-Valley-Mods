@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="CustomFarmingReduxMod.cs" />
     <Compile Include="CustomMachine.cs" />
     <Compile Include="CustomMachineBlueprint.cs" />

@@ -26,12 +26,15 @@ namespace CustomFarmingRedux
         public Texture2D _texture { get; set; }
         public string texture { get; set; }
         public int tileindex { get; set; } = 0;
-        public int readyindey { get; set; } = 0;
+        public int readyindex { get; set; } = 0;
         public int frames { get; set; } = 1;
         public int fps { get; set; } = 6;
         public bool showitem { get; set; } = false;
         public int[] itempos { get; set; }
+        public bool custom { get; set; } = false;
+        public int index { get; set; } = -1;
         public string folder;
         public string file;
+        public IngredientBlueprint starter { get; set; }
     }
 }
