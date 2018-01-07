@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using PyTK.Types;
 using PyTK;
+using PyTK.Extensions;
 
 namespace HarpOfYobaRedux
 {
@@ -22,46 +23,42 @@ namespace HarpOfYobaRedux
             if (Game1.currentLocation.isOutdoors || Game1.currentLocation.name.Equals("Greenhouse"))
             {
                 GameLocation gls = Game1.currentLocation;
-                List<Vector2> treetiles = new TerrainSelector<TerrainFeature>(t => (t is Tree || t is FruitTree || t is Grass || t is Bush)).keysIn(gls);
 
-                for (int i = 0; i < treetiles.Count; i++)
+                foreach(KeyValuePair<Vector2,TerrainFeature> entry in gls.terrainFeatures)
                 {
-                    if (gls.terrainFeatures[treetiles[i]] is Tree)
+                    if (entry.Value is Tree tree)
                     {
                         if (!playedToday)
-                        {
-                            Tree tree = gls.terrainFeatures[treetiles[i]] as Tree;
-                            tree.growthStage = (tree.growthStage < 4) ? tree.growthStage + 1 : tree.growthStage;
-                            gls.terrainFeatures[treetiles[i]] = tree;
-                        }
-                        (gls.terrainFeatures[treetiles[i]] as Tree).performUseAction(treetiles[i]);
+                            tree.growthStage = (tree.growthStage < 5) ? tree.growthStage + 1 : tree.growthStage;
+
+                        tree.performUseAction(entry.Key);
+                        continue;
                     }
 
-                    if (gls.terrainFeatures[treetiles[i]] is FruitTree)
+                    if (entry.Value is FruitTree ftree)
                     {
                         if (!playedToday)
                         {
-                            FruitTree tree = (gls.terrainFeatures[treetiles[i]] as FruitTree);
-                            tree.growthStage = (tree.growthStage <= 4) ? tree.growthStage + 1 : tree.growthStage;
-                            tree.daysUntilMature = tree.daysUntilMature - 7;
-                            gls.terrainFeatures[treetiles[i]] = tree;
+                            ftree.growthStage = (ftree.growthStage <= 5) ? ftree.growthStage + 1 : ftree.growthStage;
+                            ftree.daysUntilMature = ftree.daysUntilMature - 7;
                         }
-                       (gls.terrainFeatures[treetiles[i]] as FruitTree).performUseAction(treetiles[i]);
+                        ftree.performUseAction(entry.Key);
+                        continue;
                     }
 
-                    if (gls.terrainFeatures[treetiles[i]] is Grass)
+                    if (entry.Value is Grass grass)
                     {
                         if (!playedToday)
-                        {
-                            Grass grass = (gls.terrainFeatures[treetiles[i]] as Grass);
                             grass.numberOfWeeds = Math.Min(grass.numberOfWeeds + Game1.random.Next(1, 4), 4);
-                            gls.terrainFeatures[treetiles[i]] = grass;
-                        }
-                        (gls.terrainFeatures[treetiles[i]] as Grass).doCollisionAction(gls.terrainFeatures[treetiles[i]].getBoundingBox(treetiles[i]), 3, treetiles[i], Game1.player, Game1.currentLocation);
-                   }
+                        grass.doCollisionAction(gls.terrainFeatures[entry.Key].getBoundingBox(entry.Key), 3, entry.Key, Game1.player, Game1.currentLocation);
+                        continue;
+                    }
 
-                    if (gls.terrainFeatures[treetiles[i]] is Bush)
-                        (gls.terrainFeatures[treetiles[i]] as Bush).performUseAction(treetiles[i]);
+                    if (entry.Value is Bush bush)
+                    {
+                        bush.performUseAction(entry.Key);
+                        continue;
+                    }
                 }
                 priorRadius = Game1.player.magneticRadius;
                 Game1.player.magneticRadius += 2000;
