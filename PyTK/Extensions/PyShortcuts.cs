@@ -73,6 +73,18 @@ namespace PyTK.Extensions
             return t;
         }
 
+        public static T toVector<T>(this int[] arr)
+        {
+            if (typeof(T) == typeof(Vector2) && arr.Length > 1)
+                return (T) (object) new Vector2(arr[0], arr[1]);
+            if (typeof(T) == typeof(Vector3) && arr.Length > 2)
+                return (T)(object) new Vector3(arr[0], arr[1], arr[2]);
+            if (typeof(T) == typeof(Vector4) && arr.Length > 3)
+                return (T)(object)new Vector4(arr[0], arr[1], arr[2], arr[3]);
+            else
+                return (T) (object) null;
+        }
+
         public static int toInt(this string t)
         {
             return int.Parse(t);

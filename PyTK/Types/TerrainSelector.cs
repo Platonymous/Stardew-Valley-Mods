@@ -21,9 +21,8 @@ namespace PyTK.Types
         {
             if (location == null)
                 location = Game1.currentLocation;
-
-            List<Vector2> list = location.terrainFeatures.toList(t => predicate(t.Value) ? t.Key : Vector2.Zero);
-            list.Remove(Vector2.Zero);
+            List<Vector2> list = location.terrainFeatures.toList(t => predicate(t.Value) ? t.Key : new Vector2(-1,-1));
+            list.RemoveAll(p => p.X < 0);
             return list;
         }
 

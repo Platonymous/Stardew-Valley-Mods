@@ -10,7 +10,7 @@ namespace PyTK.Extensions
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
-        internal static void consumeIngredients(this CraftingRecipe current, List<List<Item>> items)
+        public static void consumeIngredients(this CraftingRecipe current, List<List<Item>> items)
         {
             Dictionary<int, int> recipeList = Helper.Reflection.GetField<Dictionary<int, int>>(current, "recipeList").GetValue();
             Dictionary<int, int> ingredients = recipeList.clone();
@@ -24,14 +24,14 @@ namespace PyTK.Extensions
                         {
                             j.Stack -= ingredients[i];
                             ingredients[i] = (j.Stack >= 0) ? 0 : Math.Abs(j.Stack);
-                            if (ingredients[i] == 1)
+                            if (ingredients[i] == 0)
                                 ingredients.Remove(i);
                             if (j.Stack < 1)
                                 items[list].Remove(j);
                         }
         }
 
-        internal static bool hasIngredients(this CraftingRecipe current, List<List<Item>> items)
+        public static bool hasIngredients(this CraftingRecipe current, List<List<Item>> items)
         {
             Dictionary<int, int> recipeList = Helper.Reflection.GetField<Dictionary<int, int>>(current, "recipeList").GetValue();
             Dictionary<int, int> ingredients = recipeList.clone();
@@ -47,15 +47,18 @@ namespace PyTK.Extensions
                             if (ingredients[i] == 0)
                                 ingredients.Remove(i);
                         }
-            return false;
+            if (ingredients.Count <= 0)
+                return true;
+            else
+                return false;
         }
 
-        internal static void consumeIngredients(this CraftingRecipe current, List<Item> items)
+        public static void consumeIngredients(this CraftingRecipe current, List<Item> items)
         {
             current.consumeIngredients(new List<List<Item>>() { items });
         }
 
-        internal static bool hasIngredients(this CraftingRecipe current, List<Item> items)
+        public static bool hasIngredients(this CraftingRecipe current, List<Item> items)
         {
             return current.hasIngredients(new List<List<Item>>() { items });
         }
