@@ -97,6 +97,30 @@ namespace PyTK.Extensions
             return t.ToDictionary(k => k.Key, v => v.Value);
         }
 
+        public static bool Exists<TKey, TValue>(this Dictionary<TKey, TValue> t, Func<KeyValuePair<TKey, TValue>, bool> predcate)
+        {
+            foreach (KeyValuePair<TKey, TValue> k in t)
+                if (predcate.Invoke(k))
+                    return true;
+            return false;
+        }
+
+        public static KeyValuePair<TKey, TValue> Find<TKey, TValue>(this Dictionary<TKey, TValue> t, Func<KeyValuePair<TKey,TValue>,bool> predcate)
+        {
+            foreach (KeyValuePair<TKey, TValue> k in t)
+                if (predcate.Invoke(k))
+                    return k;
+
+            return new KeyValuePair<TKey,TValue>((TKey) (object) null, (TValue) (object) null);
+        }
+
+        public static IEnumerable<KeyValuePair<TKey, TValue>> FindAll<TKey, TValue>(this Dictionary<TKey, TValue> t, Func<KeyValuePair<TKey, TValue>, bool> predcate)
+        {
+            foreach (KeyValuePair<TKey, TValue> k in t)
+                if (predcate.Invoke(k))
+                    yield return k;
+        }
+
         public static List<T> useAll<T>(this List<T> list, Action<T> action)
         {
             foreach (T item in list)

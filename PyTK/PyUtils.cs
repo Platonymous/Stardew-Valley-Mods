@@ -1,4 +1,5 @@
 ﻿using PyTK.Extensions;
+using PyTK.Types;
 using StardewValley;
 using StardewModdingAPI;
 using System;
@@ -10,6 +11,7 @@ using SObject = StardewValley.Object;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using System.Reflection;
+using System.IO;
 
 namespace PyTK
 {
@@ -41,6 +43,34 @@ namespace PyTK
             DelayedAction d = new DelayedAction(delay, () => action());
             Game1.delayedActions.Add(d);
             return d;
+        }
+
+        public static void loadContentPacks<TModel>(out List<TModel> packs, string folder, IMonitor monitor = null, string filesearch = "*.json") where TModel : class
+        {
+            packs = new List<TModel>();
+            string[] files = parseDir(folder, filesearch);
+            foreach (string file in files)
+            {
+                TModel pack = Helper.ReadJsonFile<TModel>(file);
+                packs.Add(pack);
+
+                if (pack is IContentPack p)
+                {
+                    p.fileName = new FileInfo(file).Name;
+                    p.folderName = new FileInfo(file).Directory.Name;
+
+                    if (monitor != null)
+                    {
+                        string author = p.author == "none" ? "" : " by " + p.author;
+                        monitor.Log(p.name + " " + p.version + author, LogLevel.Info);
+                    }
+                }
+            }
+        }
+
+        public static string[] parseDir(string path, string extension)
+        {
+            return Directory.GetFiles(path, extension, SearchOption.AllDirectories);
         }
     }
 }
