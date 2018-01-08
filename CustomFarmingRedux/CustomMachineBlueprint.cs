@@ -27,14 +27,17 @@ namespace CustomFarmingRedux
         public string texture { get; set; }
         public int tileindex { get; set; } = 0;
         public int readyindex { get; set; } = 0;
-        public int frames { get; set; } = 1;
+        public int frames { get; set; } = 0;
         public int fps { get; set; } = 6;
         public bool showitem { get; set; } = false;
         public int[] itempos { get; set; }
-        public bool custom { get; set; } = false;
         public int index { get; set; } = -1;
-        public string folder;
-        public string file;
+        public int tilewidth { get; set; } = 16;
+        public int tileheight { get; set; } = 32;
+        public bool water { get; set; } = false;
+        public CustomFarmingPack pack;
+        public string folder => pack.folderName;
+        public string file => pack.fileName;
         public IngredientBlueprint starter { get; set; }
     }
 }

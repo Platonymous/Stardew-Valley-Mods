@@ -43,9 +43,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="CustomFarmingPack.cs" />
     <Compile Include="CustomFarmingReduxMod.cs" />
     <Compile Include="CustomMachine.cs" />
     <Compile Include="CustomMachineBlueprint.cs" />
+    <Compile Include="CustomObject.cs" />
     <Compile Include="IngredientBlueprint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecipeBlueprint.cs" />
@@ -54,10 +56,12 @@
     <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
       <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
       <Name>Harmony</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\PyTK\PyTK.csproj">
       <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
       <Name>PyTK</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

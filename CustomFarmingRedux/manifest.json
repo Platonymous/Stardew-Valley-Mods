@@ -1,5 +1,5 @@
 {
-  "Name": "Custom Farming",
+  "Name": "Custom Farming Redux",
   "Author": "Platonymous",
   "Version": {
     "MajorVersion": 1,
@@ -8,7 +8,7 @@
     "Build": null
   },
   "Description": "Helper Mod for Custom Machine creation.",
-  "UniqueID": "Platonymous.CustomFarming",
+  "UniqueID": "Platonymous.CustomFarmingRedux",
   "EntryDll": "CustomFarmingRedux.dll",
   "Dependencies": [
     {

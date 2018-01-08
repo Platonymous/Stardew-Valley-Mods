@@ -19,12 +19,13 @@ namespace CustomFarmingRedux
         public string _category = "";
         public int _tileindex = -1;
         public int _index = -1;
+        public string id => name + "." + index + "." + quality + "." + stack;
         public string name
         {
             get
             {
                 if (_name == "")
-                    return Game1.objectInformation[_index];
+                    return Game1.objectInformation[_index].Split('/')[4];
                 else
                     return _name;
             }
@@ -79,9 +80,12 @@ namespace CustomFarmingRedux
         {
             set
             {
+                
                 int.TryParse(value, out _index);
-                if (_index == -1)
+                if (_index <= 0)
                     _index = Game1.objectInformation.getIndexByName(value);
+
+                CustomFarmingReduxMod._monitor.Log("item:" + value + " -> " + _index);
             }
         }
         public List<IngredientBlueprint> materials { get; set; }
@@ -109,46 +113,43 @@ namespace CustomFarmingRedux
         public int stack { get; set; } = 1;
         public int quality { get; set; } = 0;
         public bool custom { get; set; } = false;
+        public CustomMachineBlueprint mBlueprint;
 
         public void consumeIngredients( List<List<Item>> items)
         {
   
-            List<IngredientBlueprint> ingredients = materials.toList(p => p);
-
-            for (int i = 0; i < materials.Count; i++)
+            List<IngredientBlueprint> ingredients = materials.toList(p => p.clone());
+            foreach (IngredientBlueprint i in materials)
                 for (int list = 0; list < items.Count; list++)
-                    if (ingredients.Count <= 0)
-                        return;
-                    else if (ingredients.Contains(materials[i]))
-                        if (items[list].Find(p => p.parentSheetIndex == materials[i].index && materials[i].quality > 0 && p is SObject o && o.quality >= materials[i].quality) is Item j)
+                    if (ingredients.Exists(e => e.index == i.index))
+                        if (items[list].Find(p => p is SObject o && (o.parentSheetIndex == i.index || o.category == i.index) && o.quality >= i.quality) is Item j)
                         {
-                            j.Stack -= materials[i].stack;
-                            int ii = ingredients.FindIndex(p=> p == materials[i]);
-                            ingredients[ii].stack = (j.Stack >= 0) ? 0 : Math.Abs(j.Stack);
+                            j.Stack -= i.stack;
+                            int ii = ingredients.FindIndex(p=> p.index == i.index);
+                            ingredients[ii].stack = (j.Stack > 0) ? 0 : Math.Abs(j.Stack);
                             if (ingredients[ii].stack == 0)
                                 ingredients.Remove(ingredients[ii]);
-                            if (j.Stack < 1)
+                            if (j.Stack <= 0)
                                 items[list].Remove(j);
                         }
         }
 
         public bool hasIngredients(List<List<Item>> items)
         {
-            List<IngredientBlueprint> ingredients = materials.toList(p => p);
+            List<IngredientBlueprint> ingredients = materials.toList(p => p.clone());
 
-            for (int i = 0; i < materials.Count; i++)
+            foreach (IngredientBlueprint i in materials)
                 for (int list = 0; list < items.Count; list++)
-                    if (ingredients.Count <= 0)
-                        return true;
-                    else if (ingredients.Contains(materials[i]))
-                        if (items[list].Find(p => p.parentSheetIndex == materials[i].index && materials[i].quality > 0 && p is SObject o && o.quality >= materials[i].quality) is Item j)
+                    if (ingredients.Exists(e => e.index == i.index))
+                    {
+                        if (items[list].Find(p => p is SObject o && (o.parentSheetIndex == i.index || o.category == i.index) && o.quality >= i.quality) is Item j)
                         {
-                            int ii = ingredients.FindIndex(p => p == materials[i]);
-                            ingredients[ii].stack = (j.Stack - ingredients[ii].stack >= 0) ? 0 : Math.Abs(j.Stack - ingredients[ii].stack);
+                            int ii = ingredients.FindIndex(p => p.index == i.index);
+                            ingredients[ii].stack = (j.Stack - ingredients[ii].stack > 0) ? 0 : Math.Abs(j.Stack - ingredients[ii].stack);
                             if (ingredients[ii].stack == 0)
                                 ingredients.Remove(ingredients[ii]);
                         }
-
+                    }
             if (ingredients.Count <= 0)
                 return true;
             else
@@ -165,23 +166,31 @@ namespace CustomFarmingRedux
             return hasIngredients(new List<List<Item>>() { items });
         }
 
-        public SObject createObject(Color color)
+        private Color getColor(SObject input)
         {
-            if (colored && color != Color.White)
-            {
-                ColoredObject c = new ColoredObject(index, stack, color);
-                c.quality = quality;
-                return c;
-            }
+            if (color != null)
+                return new Color(color.toVector<Vector4>());
             else
-                return createObject();
+                return CustomObject.getColor(input);
         }
 
-        public SObject createObject()
+        public SObject createObject(SObject input)
         {
-            SObject s = new SObject(Vector2.Zero, index, stack);
+            if (!custom && colored)
+                return setNameAndQuality(new ColoredObject(index, stack, getColor(input)), input);
+            else if (!custom)
+                return setNameAndQuality(new SObject(Vector2.Zero, index, stack), input);
+            else
+                return new CustomObject(name, input, this);
+        }
+
+        private SObject setNameAndQuality(SObject s, SObject input)
+        {
             s.quality = quality;
+            s.name = (prefix) ? input.name + " " + s.name : s.name;
+            s.name = (suffix) ? s.name + " " + input.name : s.name;
             return s;
         }
+
     }
 }
