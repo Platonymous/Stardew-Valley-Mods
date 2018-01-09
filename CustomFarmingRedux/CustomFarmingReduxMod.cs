@@ -37,16 +37,17 @@ namespace CustomFarmingRedux
 
         private void loadPacks()
         {
-            PyUtils.loadContentPacks(out packs, Path.Combine(Helper.DirectoryPath, folder), Monitor);
+            PyUtils.loadContentPacks(out packs, Path.Combine(Helper.DirectoryPath, folder), SearchOption.AllDirectories, Monitor);
             machines = new List<CustomMachineBlueprint>();
             foreach (CustomFarmingPack pack in packs)
                 foreach (CustomMachineBlueprint blueprint in pack.machines)
-                {
-                    blueprint.pack = pack;
-                    machines.AddOrReplace(blueprint);
-                    foreach (RecipeBlueprint recipe in blueprint.production)
-                        recipe.mBlueprint = blueprint;
-                }
+                    {
+                        blueprint.pack = pack;
+                        machines.AddOrReplace(blueprint);
+                        if (blueprint.production != null)
+                            foreach (RecipeBlueprint recipe in blueprint.production)
+                                recipe.mBlueprint = blueprint;
+                    }
 
             Monitor.Log(packs.Count + " Content Packs with " + machines.Count + " machines found.", LogLevel.Trace);
         }

@@ -35,7 +35,7 @@ namespace CustomFarmingRedux
         }
         private bool active = true;
         private bool wasBuild = false;
-        private bool isWorking { get => active && (completionTime != null || blueprint.production == null); }
+        private bool isWorking { get => active && ((completionTime != null && activeRecipe != null) || blueprint.production == null); }
         private string id;
         private STime completionTime = null;
         private int tileindex;
@@ -52,7 +52,7 @@ namespace CustomFarmingRedux
             {
                 if (!isWorking)
                     if (readyForHarvest)
-                        _frame = blueprint.readyindex;
+                        _frame = blueprint.readyindex - tileindex;
                     else
                         _frame = 0;
 
@@ -119,10 +119,10 @@ namespace CustomFarmingRedux
         private RecipeBlueprint findRecipe(List<List<Item>> items)
         {
             RecipeBlueprint result = null;
-
-            foreach (RecipeBlueprint r in blueprint.production)
-                if (r.hasIngredients(items))
-                    result = r;
+            if (blueprint.production != null)
+                foreach (RecipeBlueprint r in blueprint.production)
+                    if (r.hasIngredients(items))
+                        result = r;
 
             return result;
         }
@@ -187,6 +187,9 @@ namespace CustomFarmingRedux
 
         private void getReadyForHarvest()
         {
+            if (blueprint.production == null || activeRecipe == null)
+                return;
+
             minutesUntilReady = -1;
             completionTime = null;
             heldObject = createProduce();
@@ -238,12 +241,12 @@ namespace CustomFarmingRedux
             if (!wasBuild)
                 return;
 
-            if (isWorking)
+            if (isWorking && completionTime != null)
                 minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
             else
                 startAutoProduction();
 
-            if (isWorking && STime.CURRENT >= completionTime)
+            if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
                 getReadyForHarvest();
 
             base.updateWhenCurrentLocation(time);
@@ -290,7 +293,7 @@ namespace CustomFarmingRedux
                 spriteBatch.Draw(tilesheet, Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize + Game1.tileSize / 2), (y * Game1.tileSize - Game1.tileSize - Game1.tileSize / 8) + num)), csourceRectangle, color * 0.75f, 0.0f, new Vector2(8f, 8f), Game1.pixelZoom, SpriteEffects.None, (float)(((y + 1) * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + tileLocation.X / 10000.0 + 0.0));
             }
 
-            if (blueprint.category == "Mailbox" && Game1.mailbox.Count > 0 && frame == 0)
+            if (blueprint.category == "Mailbox" && Game1.mailbox.Count > 0 && frame == 0 && animationFrames == 0)
             {
                 float num = (float)(4.0 * Math.Round(Math.Sin(DateTime.Now.TimeOfDay.TotalMilliseconds / 250.0), 2));
                 spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2((tileLocation.X * Game1.tileSize), (tileLocation.Y * Game1.tileSize - Game1.tileSize * 3 / 2 - 48) + num)), new Rectangle?(new Rectangle(141, 465, 20, 24)), Color.White * 0.75f, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, (float)((17 * Game1.tileSize) / 10000.0 + 9.99999997475243E-07 + 0.00680000009015203));
@@ -332,8 +335,6 @@ namespace CustomFarmingRedux
 
             if (completionTime != null)
                 data.Add("completionTime", completionTime.timestamp.ToString());
-            else
-                data.Add("completionTime", STime.CURRENT.timestamp.ToString());
 
             return data;
         }

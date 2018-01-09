@@ -45,10 +45,10 @@ namespace PyTK
             return d;
         }
 
-        public static void loadContentPacks<TModel>(out List<TModel> packs, string folder, IMonitor monitor = null, string filesearch = "*.json") where TModel : class
+        public static void loadContentPacks<TModel>(out List<TModel> packs, string folder, SearchOption option = SearchOption.AllDirectories, IMonitor monitor = null, string filesearch = "*.json") where TModel : class
         {
             packs = new List<TModel>();
-            string[] files = parseDir(folder, filesearch);
+            string[] files = Directory.GetFiles(folder, filesearch, option);
             foreach (string file in files)
             {
                 TModel pack = Helper.ReadJsonFile<TModel>(file);
@@ -68,9 +68,5 @@ namespace PyTK
             }
         }
 
-        public static string[] parseDir(string path, string extension)
-        {
-            return Directory.GetFiles(path, extension, SearchOption.AllDirectories);
-        }
     }
 }

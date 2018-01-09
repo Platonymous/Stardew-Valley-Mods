@@ -26,6 +26,7 @@ namespace CustomFarmingRedux
         private CustomMachineBlueprint mBlueprint => blueprint.mBlueprint;
         internal Color color;
         private string _name;
+        private string cname;
         internal Texture2D texture;
         private Rectangle tilesize = new Rectangle(0, 0, 16, 16);
         internal Rectangle sourceRectangle;
@@ -43,21 +44,55 @@ namespace CustomFarmingRedux
 
         private void build(string name, SObject input, RecipeBlueprint blueprint)
         {
+            loadBaseObjectInformation(blueprint.index);
             _name = name;
             this.name = (blueprint.prefix) ? input.name + " " + this.name : this.name;
             this.name = (blueprint.suffix) ? this.name + " " + input.name : this.name;
+            cname = name;
+            displayName = cname;
             this.blueprint = blueprint;
             parentSheetIndex = blueprint.index;
             this.input = input;
             stack = blueprint.stack;
             quality = blueprint.quality;
-            sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex);
             texture = Helper.Content.Load<Texture2D>($"{folder}/{mBlueprint.folder}/{blueprint.texture}");
-
-            if (blueprint.color != null)
-                color = new Color(blueprint.color.toVector<Vector4>());
+            sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex, 16, 16);
+            if (blueprint.colored)
+            {
+                if (blueprint.color != null)
+                    color = new Color(blueprint.color.toVector<Vector4>());
+                else
+                    color = getColor(input);
+            }
             else
-                color = getColor(input);
+            {
+                color = Color.White;
+            }
+            
+        }
+
+        public void loadBaseObjectInformation(int parentSheetIndex)
+        {
+            string str;
+            Game1.objectInformation.TryGetValue(parentSheetIndex, out str);
+            try
+            {
+                if (str != null)
+                {
+                    string[] strArray1 = str.Split('/');
+                    name = strArray1[0];
+                    price = Convert.ToInt32(strArray1[1]);
+                    edibility = Convert.ToInt32(strArray1[2]);
+                    string[] strArray2 = strArray1[3].Split(' ');
+                    type = strArray2[0];
+                    if (strArray2.Length > 1)
+                        category = Convert.ToInt32(strArray2[1]);
+                }
+            }
+            catch
+            {
+            }
+
         }
 
         public static Color getColor(SObject input)
@@ -70,11 +105,11 @@ namespace CustomFarmingRedux
 
             for (int x = sourceRectangle.X + 4; x < (sourceRectangle.X + sourceRectangle.Width); x++)
                 for(int y = sourceRectangle.Y + 4; y < (sourceRectangle.Y + sourceRectangle.Height); y++)
-                    colors.Add(data[x * texture.Height + y], 0);
+                    colors.AddOrReplace(data[x * texture.Height + y], 0);
 
-            foreach (Color c in colors.Keys)
-                foreach (Color d in colors.Keys)
-                    colors[c] += c.getDistanceTo(d);
+            for (int i = 0; i < colors.Keys.Count; i++)
+                for (int j = 0; j < colors.Keys.Count; j++)
+                    colors[colors.Keys.ElementAt(i)] += colors.Keys.ElementAt(i).getDistanceTo(colors.Keys.ElementAt(j));
 
             List<int> distances = colors.toList(k => k.Value);
             int mindist = distances.Min();
@@ -93,10 +128,12 @@ namespace CustomFarmingRedux
 
         public override Item getOne()
         {
-            return new CustomObject(name, input, blueprint);
+            return new CustomObject(_name, input, blueprint);
         }
 
-        public override string DisplayName { get => name; set => base.DisplayName = value; }
+        public override string DisplayName { get => cname; set => base.DisplayName = value; }
+
+        public override string Name => cname;
 
         public override string getDescription()
         {
