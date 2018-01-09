@@ -72,19 +72,15 @@ namespace PyTK.Types
         private int _year;
 
         private const int sMinute = 1;
-        private const int sHour = sMinute * 60;
-        private const int sDay = sHour * 24;
-        private const int sSeason = sDay * 28;
-        private const int sYear = sSeason * 4;
+        private const int sHour = sMinute * 60; //60
+        private const int sDay = sHour * 24; //1440
+        private const int sSeason = sDay * 28; // 40320
+        private const int sYear = sSeason * 4; // 161280
 
         public STime (int year, int season, int day, int timeOfDay)
+            :this(year,season,day, (int)Math.Floor((decimal)timeOfDay / 100), timeOfDay - ((int)Math.Floor((decimal)timeOfDay / 100) * 100))
         {
-            _year = year;
-            _day = day;
-            _season = season;
-            _hour = (int) Math.Floor((decimal) timeOfDay/100);
-            _minute = timeOfDay - (hour * 100);
-            setTimestamp();
+
         }
 
         public STime(int year, int season, int day, int hour, int minute)
@@ -140,21 +136,16 @@ namespace PyTK.Types
 
         private void setTimestamp()
         {
-            _timestamp = year * sYear + season * sSeason + day * sDay + hour * sHour + minute * sMinute;
+            _timestamp = (year * sYear) + (season * sSeason) + (day * sDay) + (hour * sHour) + (minute * sMinute);
         }
 
         private void setTimeFromTimestamp()
-        {
-            int time = timestamp;
-            _year = (int) Math.Floor((decimal)time / sYear);
-            time = timestamp - (year * sYear);
-            _season = (int)Math.Floor((decimal)time / sSeason);
-            time = timestamp - (season * sSeason);
-            _day = (int)Math.Floor((decimal)time / sDay);
-            time = timestamp - (day * sDay);
-            _hour = (int)Math.Floor((decimal)time / sHour);
-            time = timestamp - (hour * sHour);
-            _minute = (int)Math.Floor((decimal)time / sMinute);
+        { 
+            _year = (int) Math.Floor((decimal)timestamp / sYear);
+            _season = (int)Math.Floor((decimal)timestamp / sSeason) % 4; 
+            _day = (int)Math.Floor((decimal)timestamp / sDay) % 28;
+            _hour = (int)Math.Floor((decimal)timestamp / sHour) % 24;
+            _minute = (int)Math.Floor((decimal)timestamp / sMinute) % 60;
         }
 
         public int CompareTo(STime other)

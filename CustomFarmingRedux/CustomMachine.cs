@@ -34,6 +34,7 @@ namespace CustomFarmingRedux
             }
         }
         private bool active = true;
+        private bool wasBuild = false;
         private bool isWorking { get => active && (completionTime != null || blueprint.production == null); }
         private string id;
         private STime completionTime = null;
@@ -71,6 +72,7 @@ namespace CustomFarmingRedux
         public CustomMachine(CustomMachineBlueprint blueprint)
         {
             build(blueprint);
+            wasBuild = true;
         }
 
         private void build(CustomMachineBlueprint blueprint)
@@ -174,9 +176,9 @@ namespace CustomFarmingRedux
         {
             if (location is GameLocation)
                 foreach (SObject obj in location.objects.Values)
-                    if (obj is Chest c && c.items.Count < 24)
+                    if (obj is Chest c && c.playerChest == true && c.items.Count < 24)
                     {
-                        c.items.Add(o);
+                        c.addItem(o);
                         clear();
                         return true;
                     }
@@ -208,8 +210,11 @@ namespace CustomFarmingRedux
         private void startProduction(SObject obj, RecipeBlueprint recipe, List<List<Item>> items)
         {
             activeRecipe = recipe;
-            completionTime = STime.CURRENT + recipe.time;
-            minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
+            if (completionTime == null)
+            {
+                completionTime = STime.CURRENT + recipe.time;
+                minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
+            }
 
             if (starterRecipe != null)
                 starterRecipe.consumeIngredients(items);
@@ -230,8 +235,13 @@ namespace CustomFarmingRedux
 
         public override void updateWhenCurrentLocation(GameTime time)
         {
+            if (!wasBuild)
+                return;
+
             if (isWorking)
                 minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
+            else
+                startAutoProduction();
 
             if (isWorking && STime.CURRENT >= completionTime)
                 getReadyForHarvest();
@@ -348,6 +358,9 @@ namespace CustomFarmingRedux
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
+            if (additionalSaveData.ContainsKey("completionTime"))
+                completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
+
             build(machines.Find(cmb => additionalSaveData["id"] == cmb.fullid));
 
             if (additionalSaveData.ContainsKey("location"))
@@ -357,29 +370,19 @@ namespace CustomFarmingRedux
             }
 
             if (additionalSaveData.ContainsKey("recipe"))
-            {
-                foreach (RecipeBlueprint rb in blueprint.production)
-                    Monitor.Log(rb.id + " -> " + rb.name);
-
                 activeRecipe = blueprint.production.Find(r => r.id == additionalSaveData["recipe"]);
-                Monitor.Log("re1:" + additionalSaveData["recipe"] + " -> " + activeRecipe.id + ":" + activeRecipe.name + ":" + activeRecipe.index);
-            }
-            if (additionalSaveData.ContainsKey("completionTime"))
-            {
-                completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
-                if (completionTime.timestamp <= 0)
-                    completionTime = null;
-            }
 
+            if (additionalSaveData.ContainsKey("completionTime"))
+                completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
 
             Chest c = (Chest)replacement;
             tileLocation = c.tileLocation;
             if (c.items.Count > 0 && c.items[0] is SObject o)
                 heldObject = new SObject(Vector2.Zero,o.parentSheetIndex,o.stack);
-
-            
             updateWhenCurrentLocation(Game1.currentGameTime);
             startAutoProduction();
+            wasBuild = true;
+
         }
 
         public override void DayUpdate(GameLocation location)

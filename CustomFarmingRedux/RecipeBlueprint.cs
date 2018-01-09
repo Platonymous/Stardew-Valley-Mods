@@ -84,8 +84,6 @@ namespace CustomFarmingRedux
                 int.TryParse(value, out _index);
                 if (_index <= 0)
                     _index = Game1.objectInformation.getIndexByName(value);
-
-                CustomFarmingReduxMod._monitor.Log("item:" + value + " -> " + _index);
             }
         }
         public List<IngredientBlueprint> materials { get; set; }
