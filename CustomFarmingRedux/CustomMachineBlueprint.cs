@@ -26,7 +26,7 @@ namespace CustomFarmingRedux
         public Texture2D _texture { get; set; }
         public string texture { get; set; }
         public int tileindex { get; set; } = 0;
-        public int readyindex { get; set; } = 0;
+        public int readyindex { get; set; } = -1;
         public int frames { get; set; } = 0;
         public int fps { get; set; } = 6;
         public bool showitem { get; set; } = false;
@@ -35,6 +35,7 @@ namespace CustomFarmingRedux
         public int tilewidth { get; set; } = 16;
         public int tileheight { get; set; } = 32;
         public bool water { get; set; } = false;
+        public bool pulsate { get; set; } = true;
         public CustomFarmingPack pack;
         public string folder => pack.folderName;
         public string file => pack.fileName;
