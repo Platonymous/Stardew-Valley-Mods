@@ -119,7 +119,7 @@ namespace PyTK.Extensions
             return new AssetInjector<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>>(assetName, t).injectEdit();
         }
 
-        public static AssetInjector<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> injectInto<TDict, TKey, TValue>(this Dictionary<TKey, TValue> t, string assetName)
+        public static AssetInjector<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> injectInto<TKey, TValue>(this Dictionary<TKey, TValue> t, string assetName)
         {
             Func<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> merger = new Func<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>>(delegate (Dictionary<TKey, TValue> asset)
             {
