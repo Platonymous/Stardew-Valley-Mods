@@ -25,7 +25,7 @@ namespace CustomFarmingRedux
             get
             {
                 if (_name == "")
-                    return Game1.objectInformation[_index].Split('/')[4];
+                    return Game1.objectInformation[index].Split('/')[4];
                 else
                     return _name;
             }
@@ -38,8 +38,8 @@ namespace CustomFarmingRedux
         {
             get
             {
-                if (_description == "")
-                    return new SObject(Vector2.Zero, _index).getDescription();
+                if (_description == "" || _description == null)
+                    return Game1.objectInformation[index].Split('/')[5];
                 else
                     return _description;
             }
@@ -53,7 +53,7 @@ namespace CustomFarmingRedux
             get
             {
                 if (_category == "")
-                    return new SObject(Vector2.Zero, _index).getCategoryName();
+                    return new SObject(Vector2.Zero, index).getCategoryName();
                 else
                     return _category;
             }
@@ -67,7 +67,10 @@ namespace CustomFarmingRedux
             get
             {
                 if (_index == -1)
-                    return Game1.objectInformation.getIndexByName(_name);
+                {
+                    name = "";
+                    return Game1.objectInformation.getIndexByName(name);
+                }
                 else
                     return _index;
             }
@@ -120,7 +123,7 @@ namespace CustomFarmingRedux
             foreach (IngredientBlueprint i in materials)
                 for (int list = 0; list < items.Count; list++)
                     if (ingredients.Exists(e => e.index == i.index))
-                        if (items[list].Find(p => p is SObject o && (o.parentSheetIndex == i.index || o.category == i.index) && o.quality >= i.quality) is Item j)
+                        if (items[list].Find(p => fitsIngredient(p, i)) is Item j)
                         {
                             j.Stack -= i.stack;
                             int ii = ingredients.FindIndex(p=> p.index == i.index);
@@ -132,6 +135,11 @@ namespace CustomFarmingRedux
                         }
         }
 
+        private bool fitsIngredient(Item p, IngredientBlueprint i)
+        {
+            return p is SObject o && (o.parentSheetIndex == i.index || o.category == i.index) && o.quality >= i.quality && (i.quality >= 0 || o.quality < (i.quality * -1));
+        }
+
         public bool hasIngredients(List<List<Item>> items)
         {
             List<IngredientBlueprint> ingredients = materials.toList(p => p.clone());
@@ -140,7 +148,7 @@ namespace CustomFarmingRedux
                 for (int list = 0; list < items.Count; list++)
                     if (ingredients.Exists(e => e.index == i.index))
                     {
-                        if (items[list].Find(p => p is SObject o && (o.parentSheetIndex == i.index || o.category == i.index) && o.quality >= i.quality) is Item j)
+                        if (items[list].Find(p => fitsIngredient(p,i)) is Item j)
                         {
                             int ii = ingredients.FindIndex(p => p.index == i.index);
                             ingredients[ii].stack = (j.Stack - ingredients[ii].stack > 0) ? 0 : Math.Abs(j.Stack - ingredients[ii].stack);
