@@ -41,5 +41,10 @@ namespace CustomFarmingRedux
         public string folder => pack.folderName;
         public string file => pack.fileName;
         public IngredientBlueprint starter { get; set; }
+        public bool forsale { get; set; } = false;
+        public string shop { get; set; } = "Robin";
+        public int price { get; set; } = 100;
+        public string condition { get; set; }
+        public string crafting { get; set; }
     }
 }

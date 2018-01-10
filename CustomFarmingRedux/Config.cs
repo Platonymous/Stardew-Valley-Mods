@@ -8,6 +8,6 @@ namespace CustomFarmingRedux
 {
     public class Config
     {
-        public bool automation { get; set; } = true;
+        public bool automation { get; set; } = false;
     }
 }
