@@ -78,10 +78,13 @@ namespace CustomFarmingRedux
         private void build(CustomMachineBlueprint blueprint)
         {
             name = blueprint.name;
+            if (blueprint.readyindex < 0)
+                blueprint.readyindex = blueprint.tileindex;
             this.blueprint = blueprint;
             texture = Helper.Content.Load<Texture2D>($"{folder}/{blueprint.folder}/{blueprint.texture}");
             id = $"{blueprint.folder}.{blueprint.file}.{blueprint.id}";
             parentSheetIndex = -1;
+            bigCraftable = true;
             type = "Crafting";
             tilesize = new Rectangle(0, 0, blueprint.tilewidth, blueprint.tileheight);
             boundingBox = new Rectangle(0, 0, blueprint.tilewidth * 4, blueprint.tileheight * 4);
@@ -278,7 +281,10 @@ namespace CustomFarmingRedux
             else
                 frame = 0;
 
-            Vector2 vector2 = getScale() * Game1.pixelZoom;
+            if (isWorking && completionTime != null)
+                minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
+
+            Vector2 vector2 = (blueprint.pulsate) ? getScale() * Game1.pixelZoom  : new Vector2(0, 4) * Game1.pixelZoom;
             Vector2 local = Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize), (y * Game1.tileSize - Game1.tileSize)));
             Rectangle destinationRectangle = new Rectangle((int)(local.X - vector2.X / 2.0) + (shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)(local.Y - vector2.Y / 2.0) + (shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((tilesize.Width * 4) + (double)vector2.X), (int)((tilesize.Height * 4) + vector2.Y / 2.0));
             spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)(Math.Max(0.0f, ((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + x * 9.99999974737875E-06));
@@ -375,6 +381,8 @@ namespace CustomFarmingRedux
 
             if (additionalSaveData.ContainsKey("completionTime"))
                 completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
+            else
+                completionTime = STime.CURRENT;
 
             Chest c = (Chest)replacement;
             tileLocation = c.tileLocation;
@@ -487,6 +495,9 @@ namespace CustomFarmingRedux
         {
             if (heldObject != null)
                 return false;
+
+            if (heldObject == null)
+                clear();
 
             List<List<Item>> items = getItemLists(who);
             RecipeBlueprint recipe = findRecipe(maxed(dropIn));
