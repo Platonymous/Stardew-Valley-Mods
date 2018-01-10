@@ -46,9 +46,9 @@ namespace CustomFarmingRedux
         {
             loadBaseObjectInformation(blueprint.index);
             _name = name;
-            this.name = (blueprint.prefix) ? input.name + " " + this.name : this.name;
-            this.name = (blueprint.suffix) ? this.name + " " + input.name : this.name;
-            cname = name;
+            cname = (blueprint.prefix) ? input.name + " " + name : name;
+            cname = (blueprint.suffix) ? cname + " " + input.name : cname;
+            this.name = cname;
             displayName = cname;
             this.blueprint = blueprint;
             parentSheetIndex = blueprint.index;
@@ -103,17 +103,18 @@ namespace CustomFarmingRedux
             Rectangle sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, input.parentSheetIndex, 16, 16);
             Dictionary<Color, int> colors = new Dictionary<Color, int>();
 
-            for (int x = sourceRectangle.X + 4; x < (sourceRectangle.X + sourceRectangle.Width); x++)
-                for(int y = sourceRectangle.Y + 4; y < (sourceRectangle.Y + sourceRectangle.Height); y++)
-                    colors.AddOrReplace(data[x * texture.Height + y], 0);
-
+            for (int x = sourceRectangle.X + 6; x < (sourceRectangle.X + sourceRectangle.Width - 6); x++)
+                for (int y = sourceRectangle.Y + 6; y < (sourceRectangle.Y + sourceRectangle.Height - 4); y++)
+                    if (data[x * texture.Height + y].R != data[x * texture.Height + y].G && data[x * texture.Height + y].G != data[x * texture.Height + y].B && data[x * texture.Height + y].A == 255)
+                            colors.AddOrReplace(data[x * texture.Height + y], 0);
+            
             for (int i = 0; i < colors.Keys.Count; i++)
                 for (int j = 0; j < colors.Keys.Count; j++)
                     colors[colors.Keys.ElementAt(i)] += colors.Keys.ElementAt(i).getDistanceTo(colors.Keys.ElementAt(j));
-
+                    
             List<int> distances = colors.toList(k => k.Value);
             int mindist = distances.Min();
-            return colors.Find(k => k.Value == mindist).Key;
+            return colors.Find(k => k.Value == mindist).Key.setLight(120).setSaturation(150);
         }
 
         public override string getCategoryName()
