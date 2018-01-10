@@ -19,6 +19,8 @@ namespace CustomFarmingRedux
         public string _category = "";
         public int _tileindex = -1;
         public int _index = -1;
+        public int[] exclude;
+        public int[] include;
         public string id => name + "." + index + "." + quality + "." + stack;
         public string name
         {
@@ -90,7 +92,6 @@ namespace CustomFarmingRedux
             }
         }
         public List<IngredientBlueprint> materials { get; set; }
-        public Texture _texture { get; set; } = Game1.objectSpriteSheet;
         public string texture { get; set; }
         public int tileindex
         {
@@ -116,14 +117,15 @@ namespace CustomFarmingRedux
         public bool custom { get; set; } = false;
         public CustomMachineBlueprint mBlueprint;
 
-        public void consumeIngredients( List<List<Item>> items)
+        public void consumeIngredients( List<List<Item>> items, SObject dropin = null)
         {
-  
+            if (materials == null)
+                return;
             List<IngredientBlueprint> ingredients = materials.toList(p => p.clone());
             foreach (IngredientBlueprint i in materials)
                 for (int list = 0; list < items.Count; list++)
                     if (ingredients.Exists(e => e.index == i.index))
-                        if (items[list].Find(p => fitsIngredient(p, i)) is Item j)
+                        if (items[list].Find(p => fitsIngredient(p, i) && (dropin == null || p.parentSheetIndex == dropin.parentSheetIndex)) is Item j)
                         {
                             j.Stack -= i.stack;
                             int ii = ingredients.FindIndex(p=> p.index == i.index);
@@ -137,11 +139,14 @@ namespace CustomFarmingRedux
 
         private bool fitsIngredient(Item p, IngredientBlueprint i)
         {
-            return p is SObject o && (o.parentSheetIndex == i.index || o.category == i.index) && o.quality >= i.quality && (i.quality >= 0 || o.quality < (i.quality * -1));
+            return p is SObject o && (exclude == null || !exclude.Contains(o.parentSheetIndex)) && (o.parentSheetIndex == i.index || o.category == i.index || (include != null && (include.Contains(o.parentSheetIndex) || include.Contains(o.category)))) && o.quality >= i.quality && (i.quality >= 0 || o.quality < (i.quality * -1));
         }
 
         public bool hasIngredients(List<List<Item>> items)
         {
+            if (materials == null)
+                return true;
+
             List<IngredientBlueprint> ingredients = materials.toList(p => p.clone());
 
             foreach (IngredientBlueprint i in materials)
@@ -162,9 +167,9 @@ namespace CustomFarmingRedux
                 return false;
         }
 
-        public void consumeIngredients(List<Item> items)
+        public void consumeIngredients(List<Item> items,  SObject dropin)
         {
-            consumeIngredients(new List<List<Item>>() { items });
+            consumeIngredients(new List<List<Item>>() { items }, dropin);
         }
 
         public bool hasIngredients(List<Item> items)

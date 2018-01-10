@@ -54,13 +54,16 @@ namespace CustomFarmingRedux
             parentSheetIndex = blueprint.index;
             this.input = input;
             stack = blueprint.stack;
-            quality = blueprint.quality;
-            texture = Helper.Content.Load<Texture2D>($"{folder}/{mBlueprint.folder}/{blueprint.texture}");
+            quality = (blueprint.quality == -1) ? input.quality : blueprint.quality;
+            if (blueprint.texture != null)
+                texture = Helper.Content.Load<Texture2D>($"{folder}/{mBlueprint.folder}/{blueprint.texture}");
+            else
+                texture = Game1.objectSpriteSheet;
             sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex, 16, 16);
             if (blueprint.colored)
             {
                 if (blueprint.color != null)
-                    color = new Color(blueprint.color.toVector<Vector4>());
+                    color = new Color(blueprint.color[0], blueprint.color[1], blueprint.color[2], blueprint.color[3]);
                 else
                     color = getColor(input);
             }

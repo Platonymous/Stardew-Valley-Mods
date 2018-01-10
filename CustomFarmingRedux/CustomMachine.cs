@@ -35,7 +35,7 @@ namespace CustomFarmingRedux
         }
         private bool active = true;
         private bool wasBuild = false;
-        private bool isWorking { get => active && ((completionTime != null && activeRecipe != null) || blueprint.production == null); }
+        private bool isWorking { get => active && !readyForHarvest && ((completionTime != null && activeRecipe != null) || blueprint.production == null); }
         private string id;
         private STime completionTime = null;
         private int tileindex;
@@ -226,7 +226,7 @@ namespace CustomFarmingRedux
                 starterRecipe.consumeIngredients(items);
 
             if (recipe.materials != null)
-                recipe.consumeIngredients(items);
+                recipe.consumeIngredients(items, obj);
 
             if (obj != null)
             {
@@ -244,13 +244,11 @@ namespace CustomFarmingRedux
             if (!wasBuild)
                 return;
 
-            if (isWorking && completionTime != null)
-                minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
-            else
-                startAutoProduction();
-
             if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
                 getReadyForHarvest();
+            
+            if (!(isWorking && completionTime != null))
+                startAutoProduction();
 
             base.updateWhenCurrentLocation(time);
         }
@@ -282,7 +280,7 @@ namespace CustomFarmingRedux
                 frame = 0;
 
             if (isWorking && completionTime != null)
-                minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
+                minutesUntilReady = 100;
 
             Vector2 vector2 = (blueprint.pulsate) ? getScale() * Game1.pixelZoom  : new Vector2(0, 4) * Game1.pixelZoom;
             Vector2 local = Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize), (y * Game1.tileSize - Game1.tileSize)));
@@ -297,6 +295,12 @@ namespace CustomFarmingRedux
                 float num = (float)(4.0 * Math.Round(Math.Sin(DateTime.Now.TimeOfDay.TotalMilliseconds / 250.0), 2));
                 spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize - 8), (y * Game1.tileSize - Game1.tileSize * 3 / 2 - 16) + num)), new Rectangle(141, 465, 20, 24), Color.White * 0.75f, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, (float)(((y + 1) * Game1.tileSize) / 10000.0 + 9.99999997475243E-07 + tileLocation.X / 10000.0 + (parentSheetIndex == 105 ? 0.00150000001303852 : 0.0)));
                 spriteBatch.Draw(tilesheet, Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize + Game1.tileSize / 2), (y * Game1.tileSize - Game1.tileSize - Game1.tileSize / 8) + num)), csourceRectangle, color * 0.75f, 0.0f, new Vector2(8f, 8f), Game1.pixelZoom, SpriteEffects.None, (float)(((y + 1) * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + tileLocation.X / 10000.0 + 0.0));
+            }
+
+            if (blueprint.showitem && heldObject != null)
+            {
+                Rectangle displayDestinationRectangle = new Rectangle((int)(local.X - vector2.X / 2.0) + blueprint.itempos[0] + (shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)(local.Y - vector2.Y / 2.0) + blueprint.itempos[1] + (shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)(blueprint.itemzoom * ((int)(Game1.tileSize + vector2.X))), (int)(blueprint.itemzoom * ((int)((Game1.tileSize) + vector2.Y / 2.0))));
+                spriteBatch.Draw(heldObject is CustomObject co ?  co.texture : Game1.objectSpriteSheet, displayDestinationRectangle, heldObject is CustomObject cor ? cor.sourceRectangle : Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, heldObject.parentSheetIndex, 16, 16), Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)(Math.Max(0.0f, ((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + (x + 1) * 9.99999974737875E-06));
             }
 
             if (blueprint.category == "Mailbox" && Game1.mailbox.Count > 0 && frame == 0 && animationFrames == 0)
@@ -320,7 +324,7 @@ namespace CustomFarmingRedux
 
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, SFarmer f)
         {
-            //spriteBatch.Draw(texture, objectPosition, sourceRectangle, Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (f.getStandingY() + 2) / 10000f));
+
         }
 
         public override Item getOne()
@@ -387,7 +391,7 @@ namespace CustomFarmingRedux
             Chest c = (Chest)replacement;
             tileLocation = c.tileLocation;
             if (c.items.Count > 0 && c.items[0] is SObject o)
-                heldObject = new SObject(Vector2.Zero,o.parentSheetIndex,o.stack);
+                heldObject = (SObject) o.getOne();
             updateWhenCurrentLocation(Game1.currentGameTime);
             startAutoProduction();
             wasBuild = true;
@@ -511,7 +515,7 @@ namespace CustomFarmingRedux
             
             if (canProduce)
             {
-                startProduction(who.ActiveObject, findRecipe(dropIn), items);
+                startProduction(dropIn, findRecipe(dropIn), items);
                 Game1.playSound("Ship");
                 return false;
             }
@@ -534,22 +538,16 @@ namespace CustomFarmingRedux
 
         public override bool performToolAction(Tool t)
         {
-
-            if (t == null || !t.isHeavyHitter() || t is MeleeWeapon || !(t is Pickaxe))
-                return false;
-
             if (readyForHarvest)
             {
                 deliverProduce(Game1.player, false);
                 return false;
             }
             else if (heldObject != null)
-            {
-                Game1.playSound("hammer");
-                Game1.createItemDebris(heldObject.getOne(), tileLocation * Game1.tileSize, -1, null);
-                clear();
                 return false;
-            }
+
+            if (t == null || !t.isHeavyHitter() || t is MeleeWeapon || !(t is Pickaxe))
+                return false;           
 
             clear();
             location = null;

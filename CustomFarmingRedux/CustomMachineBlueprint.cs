@@ -30,7 +30,8 @@ namespace CustomFarmingRedux
         public int frames { get; set; } = 0;
         public int fps { get; set; } = 6;
         public bool showitem { get; set; } = false;
-        public int[] itempos { get; set; }
+        public int[] itempos { get; set; } = new int[] { 0, 0 };
+        public float itemzoom { get; set; } = 1;
         public int index { get; set; } = -1;
         public int tilewidth { get; set; } = 16;
         public int tileheight { get; set; } = 32;
