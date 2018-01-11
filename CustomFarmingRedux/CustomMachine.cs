@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
-using StardewModdingAPI.Utilities;
 using SFarmer = StardewValley.Farmer;
 using PyTK.Extensions;
 using PyTK.Types;
@@ -167,8 +166,8 @@ namespace CustomFarmingRedux
             {
                 List<Vector2> tiles = Utility.getAdjacentTileLocations(tileLocation);
                 if (location is GameLocation)
-                    foreach (SObject obj in location.objects.Values)
-                        if (obj is Chest c)
+                    foreach (Vector2 tile in tiles)
+                        if(location.objects.ContainsKey(tile) && location.objects[tile] is Chest c)
                             items.AddOrReplace(c.items);
             }
             
@@ -177,9 +176,10 @@ namespace CustomFarmingRedux
 
         private bool deliverToNearChest(SObject o)
         {
+            List<Vector2> tiles = Utility.getAdjacentTileLocations(tileLocation);
             if (location is GameLocation)
-                foreach (SObject obj in location.objects.Values)
-                    if (obj is Chest c && c.playerChest == true && c.items.Count < 24)
+                foreach (Vector2 tile in tiles)
+                    if (location.objects.ContainsKey(tile) && location.objects[tile] is Chest c && c.playerChest == true && c.items.Count < 24)
                     {
                         c.addItem(o);
                         clear();
@@ -210,7 +210,14 @@ namespace CustomFarmingRedux
             bool hasRecipe = recipe != null;
             bool hasStarter = hasStarterMaterials(items);
             if (hasRecipe && hasStarter && recipe.materials != null)
-                startProduction(recipe.materials[0].get(),recipe,items);
+            {
+                foreach (List<Item> list in items)
+                    foreach (Item item in list)
+                        if (recipe.materials.Find(m => m.index == item.parentSheetIndex || m.index == item.category) != null) {
+                            startProduction((SObject)item, recipe, items);
+                            return;
+                        }
+            }
         }
 
         private void startProduction(SObject obj, RecipeBlueprint recipe, List<List<Item>> items)

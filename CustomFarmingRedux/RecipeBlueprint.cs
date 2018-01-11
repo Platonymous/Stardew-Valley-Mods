@@ -2,10 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PyTK.Extensions;
-using Microsoft.Xna.Framework.Graphics;
 using SObject = StardewValley.Object;
 using Microsoft.Xna.Framework;
 using StardewValley.Objects;

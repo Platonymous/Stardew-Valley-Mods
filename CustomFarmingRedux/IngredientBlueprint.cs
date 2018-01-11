@@ -1,12 +1,5 @@
 ﻿using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SObject = StardewValley.Object;
 using PyTK.Extensions;
-using Microsoft.Xna.Framework;
 
 namespace CustomFarmingRedux
 {
@@ -50,11 +43,6 @@ namespace CustomFarmingRedux
             clone.stack = stack;
             clone.quality = quality;
             return clone;
-        }
-
-        public SObject get()
-        {
-            return new SObject(Vector2.Zero, index, stack);
         }
     }
 }
