@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleCommands\CcSaveHandler.cs" />
+    <Compile Include="ConsoleCommands\CcTime.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
     <Compile Include="Extensions\PyAssets.cs" />
     <Compile Include="Extensions\PyCrafting.cs" />

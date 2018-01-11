@@ -50,6 +50,7 @@ namespace PyTK
         {
             CcLocations.clearSpace().register();
             CcSaveHandler.cleanup().register();
+            CcTime.skip().register();
         }
 
         private void testing()
