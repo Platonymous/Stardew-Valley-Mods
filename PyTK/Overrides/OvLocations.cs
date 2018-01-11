@@ -8,7 +8,6 @@ using System.Reflection;
 using xTile.Dimensions;
 using xTile.ObjectModel;
 using xTile.Tiles;
-using SObject = StardewValley.Object;
 
 namespace PyTK.Overrides
 {
@@ -39,7 +38,7 @@ namespace PyTK.Overrides
                 }
             }
         }
-        
+
         [HarmonyPatch]
         internal class ActionFix
         {
