@@ -57,7 +57,7 @@ namespace CustomNPC
                         if (ts.Id.StartsWith("z"))
                         {
                             string file = new FileInfo(ts.ImageSource).Name;
-                            buildingTilesheets.Add(building.map + "_" + ts.Id, Helper.Content.Load<Texture2D>($"NPCs/{blueprint.fileDirectory}/" + file));
+                            buildingTilesheets.Add(building.map + "_" + ts.Id, Helper.Content.Load<Texture2D>($"{npcfolder}/{blueprint.fileDirectory}/" + file));
                             if (file.StartsWith("spring_")){
                                 buildingTilesheets.Add(building.map + "_" + ts.Id + "_summer", Helper.Content.Load<Texture2D>($"{npcfolder}/{blueprint.fileDirectory}/" + file.Replace("spring_","summer_")));
                                 buildingTilesheets.Add(building.map + "_" + ts.Id + "_fall", Helper.Content.Load<Texture2D>($"{npcfolder}/{blueprint.fileDirectory}/" + file.Replace("spring_", "fall_")));
@@ -692,13 +692,13 @@ namespace CustomNPC
 
         private AnimatedSprite getSprite(NPCBlueprint blueprint)
         {
-            AnimatedSprite sprite = new AnimatedSprite(Helper.Content.Load<Texture2D>(Path.Combine("Npcs", blueprint.fileDirectory, blueprint.sprite.Replace("spring_",Game1.currentSeason + "_"))), 0, Game1.tileSize / 4, Game1.tileSize * 2 / 4);
+            AnimatedSprite sprite = new AnimatedSprite(Helper.Content.Load<Texture2D>(Path.Combine(npcfolder, blueprint.fileDirectory, blueprint.sprite.Replace("spring_",Game1.currentSeason + "_"))), 0, Game1.tileSize / 4, Game1.tileSize * 2 / 4);
             return sprite;
         }
 
         private Texture2D getPortrait(NPCBlueprint blueprint)
         {
-            Texture2D texture = Helper.Content.Load<Texture2D>(Path.Combine("Npcs", blueprint.fileDirectory, blueprint.portrait));
+            Texture2D texture = Helper.Content.Load<Texture2D>(Path.Combine(npcfolder, blueprint.fileDirectory, blueprint.portrait));
             return texture;
         }
 
