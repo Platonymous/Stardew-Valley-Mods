@@ -92,6 +92,15 @@ myData.injectInto(@"Data/ObjectInformation");
 new Mail(id, text, attachements, AttachmentType.OBJECT).injectIntoMail();
 ```
 
+## Utilities
+##### Time
+```sh
+using PyTK.Types;
+
+STime inTwoHours = STime.CURRENT + 120;
+bool timeReached = STime.CURRENT > targetTime;
+```
+
 ## Frameworks
 ##### Custom TV
 ```sh
