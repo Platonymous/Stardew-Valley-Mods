@@ -69,8 +69,25 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Machines\Platonymous.Examples\Examples.json" />
+    <None Include="Machines\Platonymous.Mailbox\ComputerMailbox.json" />
+    <None Include="Machines\Platonymous.Mystical\TimeSphere.json" />
+    <None Include="Machines\Platonymous.NewMachines\NewMachines.json" />
     <None Include="manifest.json" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Machines\Platonymous.Examples\lemonade.png" />
+    <Content Include="Machines\Platonymous.Examples\machines.png" />
+    <Content Include="Machines\Platonymous.Examples\MoreMachines.png" />
+    <Content Include="Machines\Platonymous.Examples\MoreProduce.png" />
+    <Content Include="Machines\Platonymous.Examples\producetilesheet.png" />
+    <Content Include="Machines\Platonymous.Mailbox\mailbox.png" />
+    <Content Include="Machines\Platonymous.Mystical\mystical.png" />
+    <Content Include="Machines\Platonymous.NewMachines\newmachines.png" />
+    <Content Include="Machines\Platonymous.NewMachines\newmachines2.png" />
+    <Content Include="Machines\Platonymous.NewMachines\newproduce.png" />
+    <Content Include="Machines\Platonymous.NewMachines\preview.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
