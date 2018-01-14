@@ -7,6 +7,7 @@ namespace CustomFarmingRedux
     {
         public int _index = -1;
         public int quality { get; set; } = 0;
+        public int exactquality { get; set; } = -1;
         public int stack { get; set; } = 1;
         public int index
         {

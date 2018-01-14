@@ -46,6 +46,12 @@ namespace CustomFarmingRedux
             _name = name;
             cname = (blueprint.prefix) ? input.name + " " + name : name;
             cname = (blueprint.suffix) ? cname + " " + input.name : cname;
+            if (blueprint.insert)
+            {
+                string[] namesplit = cname.Split(' ');
+                namesplit[blueprint.insertpos] += " " + input.name;
+                cname = String.Join(" ", namesplit);
+            }
             this.name = cname;
             displayName = cname;
             this.blueprint = blueprint;
@@ -54,7 +60,7 @@ namespace CustomFarmingRedux
             stack = blueprint.stack;
             quality = (blueprint.quality == -1) ? input.quality : blueprint.quality;
             if (blueprint.texture != null)
-                texture = Helper.Content.Load<Texture2D>($"{folder}/{mBlueprint.folder}/{blueprint.texture}");
+                texture = Helper.Content.Load<Texture2D>($"{mBlueprint.pack.baseFolder}/{mBlueprint.folder}/{blueprint.texture}");
             else
                 texture = Game1.objectSpriteSheet;
             sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex, 16, 16);

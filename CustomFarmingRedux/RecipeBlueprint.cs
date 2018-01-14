@@ -52,7 +52,7 @@ namespace CustomFarmingRedux
             get
             {
                 if (_category == "")
-                    return new SObject(Vector2.Zero, index).getCategoryName();
+                    return Game1.objectInformation[index].Split('/')[3].Split(' ')[0];
                 else
                     return _category;
             }
@@ -106,12 +106,14 @@ namespace CustomFarmingRedux
         }
         public bool prefix { get; set; } = false;
         public bool suffix { get; set; } = false;
+        public bool insert { get; set; } = false;
+        public int insertpos { get; set; } = 0;
         public bool colored { get; set; } = false;
         public int[] color { get; set; } = null;
         public int time { get; set; }
         public int stack { get; set; } = 1;
         public int quality { get; set; } = 0;
-        public bool custom { get; set; } = false;
+        public bool custom { get => (texture != null && texture != "") || (_description != null && _description != ""); }
         public CustomMachineBlueprint mBlueprint;
 
         public void consumeIngredients( List<List<Item>> items, SObject dropin = null)
@@ -136,7 +138,7 @@ namespace CustomFarmingRedux
 
         private bool fitsIngredient(Item p, IngredientBlueprint i)
         {
-            return p is SObject o && (exclude == null || !exclude.Contains(o.parentSheetIndex)) && (o.parentSheetIndex == i.index || o.category == i.index || (include != null && (include.Contains(o.parentSheetIndex) || include.Contains(o.category)))) && o.quality >= i.quality && (i.quality >= 0 || o.quality < (i.quality * -1));
+            return p is SObject o && (exclude == null || !exclude.Contains(o.parentSheetIndex)) && (o.parentSheetIndex == i.index || o.category == i.index || (include != null && (include.Contains(o.parentSheetIndex) || include.Contains(o.category)))) && (i.exactquality == -1 || o.quality == i.exactquality) && o.quality >= i.quality && (i.quality >= 0 || o.quality < (i.quality * -1));
         }
 
         public bool hasIngredients(List<List<Item>> items)
@@ -195,8 +197,14 @@ namespace CustomFarmingRedux
         private SObject setNameAndQuality(SObject s, SObject input)
         {
             s.quality = quality;
-            s.name = (prefix) ? input.name + " " + s.name : s.name;
+            s.name = (prefix) ? input.name + " " + name : name;
             s.name = (suffix) ? s.name + " " + input.name : s.name;
+            if (insert)
+            {
+                string[] namesplit = s.name.Split(' ');
+                namesplit[insertpos] += " " + input.name;
+                s.name = String.Join(" ", namesplit);
+            }
             return s;
         }
 

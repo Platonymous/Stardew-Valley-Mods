@@ -17,6 +17,7 @@ namespace CustomFarmingRedux
         public string name { get; set; }
         public string description { get; set; }
         public string category { get; set; } = "Crafting";
+        public string legacy { get; set; } = "";
         public List<RecipeBlueprint> production { get; set; }
         public Texture2D _texture { get; set; }
         public string texture { get; set; }

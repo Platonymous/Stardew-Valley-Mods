@@ -19,7 +19,7 @@ namespace CustomFarmingRedux
         internal IModHelper Helper = CustomFarmingReduxMod._helper;
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
         internal Config config = CustomFarmingReduxMod._config;
-        internal string folder = CustomFarmingReduxMod.folder;
+        internal string folder => blueprint.pack.baseFolder;
         internal List<CustomMachineBlueprint> machines = CustomFarmingReduxMod.machines;
         internal static List<CustomMachine> activeMachines = new List<CustomMachine>();
 
@@ -80,14 +80,14 @@ namespace CustomFarmingRedux
             if (blueprint.readyindex < 0)
                 blueprint.readyindex = blueprint.tileindex;
             this.blueprint = blueprint;
-            texture = Helper.Content.Load<Texture2D>($"{folder}/{blueprint.folder}/{blueprint.texture}");
-            id = $"{blueprint.folder}.{blueprint.file}.{blueprint.id}";
+            texture = Helper.Content.Load<Texture2D>($"{blueprint.pack.baseFolder}/{blueprint.folder}/{blueprint.texture}");
+            id = blueprint.fullid;
             parentSheetIndex = -1;
             bigCraftable = true;
             type = "Crafting";
             tilesize = new Rectangle(0, 0, blueprint.tilewidth, blueprint.tileheight);
             boundingBox = new Rectangle(0, 0, blueprint.tilewidth * 4, blueprint.tileheight * 4);
-            skipFrame = 60 / blueprint.fps;
+            skipFrame = 60 / Math.Max(1, blueprint.fps);
             animationFrames = blueprint.frames;
             tileindex = blueprint.tileindex;
             if (blueprint.starter != null)
