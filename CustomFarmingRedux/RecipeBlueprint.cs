@@ -138,6 +138,9 @@ namespace CustomFarmingRedux
 
         private bool fitsIngredient(Item p, IngredientBlueprint i)
         {
+            if (p is SObject obj && i.index == -999)
+                return true;
+
             return p is SObject o && (exclude == null || !exclude.Contains(o.parentSheetIndex)) && (o.parentSheetIndex == i.index || o.category == i.index || (include != null && (include.Contains(o.parentSheetIndex) || include.Contains(o.category)))) && (i.exactquality == -1 || o.quality == i.exactquality) && o.quality >= i.quality && (i.quality >= 0 || o.quality < (i.quality * -1));
         }
 

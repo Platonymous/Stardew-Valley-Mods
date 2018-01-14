@@ -545,13 +545,21 @@ namespace CustomFarmingRedux
 
         public override bool performToolAction(Tool t)
         {
-            if (readyForHarvest)
+            if (heldObject != null)
             {
-                deliverProduce(Game1.player, false);
-                return false;
+                if (readyForHarvest)
+                {
+                    deliverProduce(Game1.player, false);
+                    return false;
+                }
+                else if (t is Pickaxe)
+                {
+                    deliverProduce(Game1.player, false);
+                }
+                else
+                    return false;
             }
-            else if (heldObject != null)
-                return false;
+
 
             if (t == null || !t.isHeavyHitter() || t is MeleeWeapon || !(t is Pickaxe))
                 return false;           

@@ -15,6 +15,7 @@ namespace CustomFarmingRedux
             }
         }
         public string name { get; set; }
+        public bool asdisplay { get; set; } = false;
         public string description { get; set; }
         public string category { get; set; } = "Crafting";
         public string legacy { get; set; } = "";

@@ -167,11 +167,11 @@ namespace CustomFarmingRedux
                 legacyMachine.texture = lPack.Tilesheet;
                 legacyMachine.fps = 6;
                 legacyMachine.showitem = lPack.displayItem;
-                legacyMachine.itempos = new int[] { lPack.displayItemX, lPack.displayIemY };
+                legacyMachine.itempos = new int[] { lPack.displayItemX, lPack.displayItemY };
                 legacyMachine.itemzoom = lPack.displayItemZoom;
                 legacyMachine.crafting = lPack.Crafting;
 
-                if (lPack.StarterMaterial != -1)
+                if (lPack.StarterMaterial > 0)
                 {
                     IngredientBlueprint starter = new IngredientBlueprint();
                     starter.index = lPack.StarterMaterial;
@@ -179,7 +179,10 @@ namespace CustomFarmingRedux
                     legacyMachine.starter = starter;
                 }
 
-                if (lPack.Produce != null)
+                if (lPack.Produce != null && lPack.Produce.ProduceID <= 0)
+                    legacyMachine.asdisplay = true;
+                
+                if (lPack.Produce != null && lPack.Produce.ProduceID > 0)
                 {
                     legacyMachine.production = new List<RecipeBlueprint>();
                     legacyMachine.legacy = lid;
@@ -246,6 +249,14 @@ namespace CustomFarmingRedux
                     if (blueprint.production != null)
                         foreach (RecipeBlueprint recipe in blueprint.production)
                             recipe.mBlueprint = blueprint;
+                    else if (blueprint.asdisplay)
+                    {
+                        blueprint.pulsate = false;
+                        blueprint.production = new List<RecipeBlueprint>();
+                        blueprint.production.Add(new RecipeBlueprint());
+                        blueprint.production[0].index = 0;
+                        blueprint.production[0].time = (STime.CURRENT + STime.YEAR * 1000).timestamp;
+                    }
 
                     if (blueprint.crafting != null)
                     {

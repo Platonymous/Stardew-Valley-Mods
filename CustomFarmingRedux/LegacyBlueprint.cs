@@ -35,7 +35,7 @@ namespace CustomFarmingRedux
         public List<LegacySpecialProduce> SpecialProduce = new List<LegacySpecialProduce>();
         public bool displayItem { get; set; } = false;
         public int displayItemX { get; set; } = 0;
-        public int displayIemY { get; set; } = 0;
+        public int displayItemY { get; set; } = 0;
         public float displayItemZoom { get; set; } = 1;
 
 
