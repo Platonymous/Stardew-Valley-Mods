@@ -42,7 +42,56 @@ namespace CustomFarmingRedux
             harmonyFix();
             SaveHandler.addPreprocessor(legacyFix);
             SaveHandler.addReplacementPreprocessor(fixLegacyObject);
-            
+            helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
+        }
+
+        private void replaceCustomFarming(string action, string[] param)
+        {
+            if (param[0] == "itemMenu" && Game1.activeClickableMenu is ItemGrabMenu itemMenu)
+            {
+                List<Item> remove = new List<Item>();
+                List<Item> additions = new List<Item>();
+
+                foreach (Item item in itemMenu.ItemsToGrabMenu.actualInventory)
+                    if (item is Chest chest && machines.Exists(m => m.fullid == chest.name || m.legacy == chest.name))
+                    {
+                        Item cf = new CustomMachine(machines.Find(m => m.fullid == chest.name || m.legacy == chest.name));
+                        additions.Add(cf);
+                        remove.Add(item);
+                    }
+
+                foreach (Item addition in additions)
+                    itemMenu.ItemsToGrabMenu.actualInventory.Add(addition);
+
+                foreach (Item j in remove)
+                    itemMenu.ItemsToGrabMenu.actualInventory.Remove(j);
+            }
+
+            if (param[0] == "shop" && Game1.activeClickableMenu is ShopMenu shop)
+            {
+                Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
+                List<Item> selling = Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
+                List<Item> remove = new List<Item>();
+                List<Item> additions = new List<Item>();
+
+                foreach (Item i in selling)
+                    if (i is Chest chest && machines.Exists(m => m.fullid == chest.name || m.legacy == chest.name))
+                    {
+                        Item cf = new CustomMachine(machines.Find(m => m.fullid == chest.name || m.legacy == chest.name));
+                        items.Add(cf, new int[] { chest.preservedParentSheetIndex, int.MaxValue });
+                        additions.Add(cf);
+                        remove.Add(i);
+                    }
+
+                foreach (Item addition in additions)
+                    selling.Add(addition);
+
+                foreach (Item j in remove)
+                {
+                    items.Remove(j);
+                    selling.Remove(j);
+                }
+            }
         }
 
         private static string legacyFix(string dataString)
