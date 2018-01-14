@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using PyTK.Extensions;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -24,10 +25,23 @@ namespace PyTK.CustomElementHandler
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
-        private static char seperator = '|';
-        private static char seperatorLegacy = '/';
-        private static char valueSeperator = '=';
-        private static string prefix = "CEHe";
+        public static char seperator = '|';
+        public static char seperatorLegacy = '/';
+        public static char valueSeperator = '=';
+        public static string prefix = "CEHe";
+
+        private static List<Func<string, string>> preProcessors = new List<Func<string, string>>();
+        private static List<Func<object, object>> objectPreProcessors = new List<Func<object, object>>();
+
+        public static void addPreprocessor(Func<string,string> pp)
+        {
+            preProcessors.AddOrReplace(pp);
+        }
+
+        public static void addReplacementPreprocessor(Func<object, object> pp)
+        {
+            objectPreProcessors.AddOrReplace(pp);
+        }
 
         internal static void setUpEventHandlers()
         {
@@ -142,14 +156,10 @@ namespace PyTK.CustomElementHandler
         {
             if (replacement is Chest chest)
             {
-                chest.playerChest = true;
-                chest.currentLidFrame = 131;
-                chest.bigCraftable = true;
-                chest.canBeSetDown = true;
-                chest.giftbox = false;
-                chest.frameCounter = -1;
-                chest.type = "Crafting";
-                return chest;
+                Chest rchest = new Chest(true);
+                rchest.name = chest.name;
+                rchest.items = chest.items;
+                return rchest;
             }
             return replacement;
         }
@@ -183,7 +193,7 @@ namespace PyTK.CustomElementHandler
 
         }
 
-        private static string[] splitElemets(string dataString)
+        public static string[] splitElemets(string dataString)
         {
             if (!dataString.Contains(seperator) && dataString.Contains(seperatorLegacy))
                 return dataString.Split(seperatorLegacy);
@@ -193,6 +203,10 @@ namespace PyTK.CustomElementHandler
 
         private static object rebuildElement(string dataString, object replacement)
         {
+            replacement = checkReplacement(replacement);
+            objectPreProcessors.useAll(o => replacement = o.Invoke(replacement));
+            preProcessors.useAll(p => dataString = p.Invoke(dataString));
+
             string[] data = splitElemets(dataString);
 
             try
@@ -245,7 +259,7 @@ namespace PyTK.CustomElementHandler
 
         private static object getReplacement(ISaveElement ise)
         {
-            object o = checkReplacement(ise.getReplacement());
+            object o = ise.getReplacement();
             setDataString(o, getReplacementName(ise));
             return o;
         }
