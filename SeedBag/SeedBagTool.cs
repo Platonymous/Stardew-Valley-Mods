@@ -6,11 +6,11 @@ using StardewValley;
 using StardewValley.Tools;
 using StardewValley.TerrainFeatures;
 
-using CustomElementHandler;
-
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using StardewValley.Objects;
+using SObject = StardewValley.Object;
+using PyTK.CustomElementHandler;
 
 namespace SeedBag
 {
@@ -36,14 +36,10 @@ namespace SeedBag
             if(attachments.Count() > 0)
             {
                 if(attachments[0] != null)
-                {
                     replacement.addItem(attachments[0]);
-                }
 
                 if (attachments[1] != null)
-                {
                     replacement.addItem(attachments[1]);
-                }
             }
             
             return replacement;
@@ -56,19 +52,12 @@ namespace SeedBag
             if (!chest.isEmpty())
             {
                 if(chest.items[0].category == -19)
-                {
-                    attachments[1] = (StardewValley.Object)chest.items[0];
-                }
+                    attachments[1] = (SObject)chest.items[0];
                 else
-                {
-                    attachments[0] = (StardewValley.Object)chest.items[0];
-                }
+                    attachments[0] = (SObject)chest.items[0];
 
                 if (chest.items.Count > 1)
-                {
-                    attachments[1] = (StardewValley.Object)chest.items[1];
-                }
-               
+                    attachments[1] = (SObject)chest.items[1];
             }
             
         }
@@ -81,12 +70,7 @@ namespace SeedBag
 
         public override string Name
         {
-            get
-            {
-
-                return this.name;
-
-            }
+            get => name;
         }
 
         public override bool canBeTrashed()
@@ -96,24 +80,37 @@ namespace SeedBag
 
         internal static void loadTextures()
         {
-            texture = SeedBagMod.mod.Helper.Content.Load<Texture2D>(@"Assets/seedbag.png");
-            attTexture = SeedBagMod.mod.Helper.Content.Load<Texture2D>(@"Assets/seedattachment.png");
-            att2Texture = SeedBagMod.mod.Helper.Content.Load<Texture2D>(@"Assets/fertilizerattachment.png");
+            texture = SeedBagMod._helper.Content.Load<Texture2D>(@"Assets/seedbag.png");
+            attTexture = SeedBagMod._helper.Content.Load<Texture2D>(@"Assets/seedattachment.png");
+            att2Texture = SeedBagMod._helper.Content.Load<Texture2D>(@"Assets/fertilizerattachment.png");
+        }
+
+
+        public override bool actionWhenPurchased()
+        {
+            return true;
+        }
+
+        public override Item getOne()
+        {
+            return new SeedBagTool();
         }
 
         private void build()
         {
+            if (texture == null)
+                loadTextures();
+
             name = "Seed Bag";
             description = "Empty";
 
             numAttachmentSlots = 2;
-            attachments = new StardewValley.Object[numAttachmentSlots];
+            attachments = new SObject[numAttachmentSlots];
             initialParentTileIndex = 77;
             currentParentTileIndex = 77;
             indexOfMenuItemView = 0;
             upgradeLevel = 5;
            
-
             instantUse = false;
             inUse = false;
         }
@@ -133,7 +130,6 @@ namespace SeedBag
                 Vector2 vector = f.getLocalPosition(Game1.viewport) + f.jitter + f.armOffset;
                 int num = (int)vector.Y - ((Game1.tileSize * 5)/2);
                 Game1.spriteBatch.Draw(texture, new Vector2(vector.X, (float)num), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(texture, Game1.tileSize / 4, Game1.tileSize / 4, this.indexOfMenuItemView)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom * scaleSize, SpriteEffects.None, Math.Max(0f, (float)(f.getStandingY() + Game1.tileSize / 2) / 10000f));
-
             }
         }
 
@@ -141,23 +137,19 @@ namespace SeedBag
         {
             int offset = 65;
             Rectangle attachementSourceRectangle = new Rectangle(0, 0, 64, 64);
-            b.Draw(attTexture, new Vector2((float)x, (float)y), new Microsoft.Xna.Framework.Rectangle?(attachementSourceRectangle), Microsoft.Xna.Framework.Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
+            b.Draw(attTexture, new Vector2(x, y), new Rectangle?(attachementSourceRectangle), Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
 
             Rectangle attachement2SourceRectangle = new Rectangle(0, 0, 64, 64);
-            b.Draw(att2Texture, new Vector2((float)x, (float)y + offset), new Microsoft.Xna.Framework.Rectangle?(attachement2SourceRectangle), Microsoft.Xna.Framework.Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
+            b.Draw(att2Texture, new Vector2(x, y + offset), new Rectangle?(attachement2SourceRectangle), Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
 
 
             if (attachments.Count() > 0)
             {
-                if(attachments[0] is StardewValley.Object)
-                {
-                    attachments[0].drawInMenu(b, new Vector2((float)x, (float)y), 1f);
-                }
+                if(attachments[0] is SObject)
+                    attachments[0].drawInMenu(b, new Vector2(x, y), 1f);
 
-                if (attachments[1] is StardewValley.Object)
-                {
-                    attachments[1].drawInMenu(b, new Vector2((float)x, (float)y + offset), 1f);
-                }
+                if (attachments[1] is SObject)
+                    attachments[1].drawInMenu(b, new Vector2(x, y + offset), 1f);
             }
         }
 
@@ -173,61 +165,51 @@ namespace SeedBag
             return base.beginUsing(location, x, y, who);
         }
 
-        public override bool canThisBeAttached(StardewValley.Object o)
+        public override bool canThisBeAttached(SObject o)
         {
             if (o == null || o.category == -74 || o.category == -19) { return true; } else { return false; }
         }
 
 
-        public override StardewValley.Object attach(StardewValley.Object o)
+        public override SObject attach(SObject o)
         {
-            StardewValley.Object priorAttachement = (StardewValley.Object)null;
+            SObject priorAttachement = null;
 
             if (o != null && o.category == -74 && attachments[0] != null)
-            {
-                priorAttachement = new StardewValley.Object(Vector2.Zero,attachments[0].parentSheetIndex,attachments[0].stack);
-            }
+                priorAttachement = new SObject(Vector2.Zero,attachments[0].parentSheetIndex,attachments[0].stack);
 
             if (o != null && o.category == -19 && attachments[1] != null)
-            {
-                priorAttachement = new StardewValley.Object(Vector2.Zero, attachments[1].parentSheetIndex, attachments[1].stack);
-            }
+                priorAttachement = new SObject(Vector2.Zero, attachments[1].parentSheetIndex, attachments[1].stack);
 
             if (o == null)
             {
                 if(attachments[0] != null)
                 {
-                    priorAttachement = new StardewValley.Object(Vector2.Zero, attachments[0].parentSheetIndex, attachments[0].stack);
-                    attachments[0] = (StardewValley.Object)null;
+                    priorAttachement = new SObject(Vector2.Zero, attachments[0].parentSheetIndex, attachments[0].stack);
+                    attachments[0] = null;
                 }else if (attachments[1] != null)
                 {
-                    priorAttachement = new StardewValley.Object(Vector2.Zero, attachments[1].parentSheetIndex, attachments[1].stack);
-                    attachments[1] = (StardewValley.Object)null;
+                    priorAttachement = new SObject(Vector2.Zero, attachments[1].parentSheetIndex, attachments[1].stack);
+                    attachments[1] = null;
                 }
 
                 Game1.playSound("dwop");
-
                 return priorAttachement;
             }
 
             if (canThisBeAttached(o))
             {
                 if(o.category == -74)
-                {
                     attachments[0] = o;
-                }
 
                 if (o.category == -19)
-                {
                     attachments[1] = o;
-                }
 
                 Game1.playSound("button1");
-
                 return priorAttachement;
             }
  
-            return (StardewValley.Object)null;
+            return null;
         }
 
         public override void DoFunction(GameLocation location, int x, int y, int power, StardewValley.Farmer who)
@@ -245,13 +227,9 @@ namespace SeedBag
             Vector2 vector = new Vector2((float)(x / Game1.tileSize), (float)(y / Game1.tileSize));
             List<Vector2> list = base.tilesAffected(vector, power, who);
 
-            
-            
-     
-            
             foreach (Vector2 current in list)
             {
-                if (location.terrainFeatures.ContainsKey(current) && location.terrainFeatures[current] is HoeDirt hd && hd.crop == null)
+                if (location.terrainFeatures.ContainsKey(current) && location.terrainFeatures[current] is HoeDirt hd && hd.crop == null && !location.objects.ContainsKey(current))
                 {
                     if (attachments[1] != null && hd.fertilizer <= 0)
                     {
@@ -280,14 +258,9 @@ namespace SeedBag
                             }
                         }
                     }
-
-                    
-
                 }
             }
-
         }
-
        
         public override string getDescription()
         {
@@ -308,7 +281,6 @@ namespace SeedBag
                 SpriteFont smallFont = Game1.smallFont;
                 int width = Game1.tileSize * 4 + Game1.tileSize / 4;
                 return Game1.parseText(text, smallFont, width);
-
             }
             else
             {
@@ -316,7 +288,6 @@ namespace SeedBag
                 SpriteFont smallFont = Game1.smallFont;
                 int width = Game1.tileSize * 4 + Game1.tileSize / 4;
                 return Game1.parseText(text, smallFont, width);
-               
             }
            
 
@@ -330,13 +301,6 @@ namespace SeedBag
         protected override string loadDescription()
         {
             return getDescription();
-            
         }
-
-
-
-       
-
-
     }
 }

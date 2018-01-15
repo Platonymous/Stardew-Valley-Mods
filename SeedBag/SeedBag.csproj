@@ -35,7 +35,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SeedBagTool.cs" />
-    <Compile Include="SeedBagDummy.cs" />
     <Compile Include="SeedBagMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -43,7 +42,6 @@
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="Assets\fertilizerattachment.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -56,9 +54,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CustomElementHandler\CustomElementHandler.csproj">
-      <Project>{7a31daf1-0ac8-48f7-bd2d-e861850adc72}</Project>
-      <Name>CustomElementHandler</Name>
+    <ProjectReference Include="..\PyTK\PyTK.csproj">
+      <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
+      <Name>PyTK</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
