@@ -28,7 +28,8 @@ namespace PyTK.CustomElementHandler
         public static char seperator = '|';
         public static char seperatorLegacy = '/';
         public static char valueSeperator = '=';
-        public static string prefix = "CEHe";
+        public static string oldPrefix = "CEHe";
+        public static string newPrefix = "PyTK";
 
         private static List<Func<string, string>> preProcessors = new List<Func<string, string>>();
         private static List<Func<object, object>> objectPreProcessors = new List<Func<object, object>>();
@@ -61,23 +62,23 @@ namespace PyTK.CustomElementHandler
         internal static void Rebuild()
         {
             OnBeforeRebuilding(EventArgs.Empty);
-            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(prefix), o => rebuildElement(getDataString(o), o));
-            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(prefix), o => rebuildElement(getDataString(o), o));
+            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
+            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
             OnFinishedRebuilding(EventArgs.Empty);
         }
 
         internal static void RebuildRev()
         {
             OnBeforeRebuilding(EventArgs.Empty);
-            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(prefix), o => rebuildElement(getDataString(o), o), true);
-            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(prefix), o => rebuildElement(getDataString(o), o), true);
+            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o), true);
+            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o), true);
             OnFinishedRebuilding(EventArgs.Empty);
         }
 
         internal static void Cleanup()
         {
-            RemoveAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(prefix));
-            RemoveAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(prefix));
+            RemoveAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix));
+            RemoveAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix));
         }
 
         private static void OnFinishedRebuilding(EventArgs e)
@@ -253,7 +254,7 @@ namespace PyTK.CustomElementHandler
         {
             string additionalSaveData = string.Join(seperator.ToString(), element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
             string type = getTypeName(element);
-            string name = prefix + seperator + cat + seperator + type + seperator + additionalSaveData;
+            string name = newPrefix + seperator + cat + seperator + type + seperator + additionalSaveData;
             return name;
         }
 
