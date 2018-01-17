@@ -114,7 +114,7 @@ namespace CustomFarmingRedux
                 if (machine == null)
                     return dataString;
 
-                dataString = SaveHandler.prefix + SaveHandler.seperator + "Object" + SaveHandler.seperator + "CustomFarmingRedux.CustomMachine, CustomFarmingRedux" + SaveHandler.seperator + "id" + SaveHandler.valueSeperator + machine.fullid;
+                dataString = SaveHandler.newPrefix + SaveHandler.seperator + "Object" + SaveHandler.seperator + "CustomFarmingRedux.CustomMachine, CustomFarmingRedux" + SaveHandler.seperator + "id" + SaveHandler.valueSeperator + machine.fullid;
                 _monitor.Log("Legacy machine converted: " + dataString, LogLevel.Trace);
                 return dataString;
             }
@@ -172,19 +172,30 @@ namespace CustomFarmingRedux
 
         private void loadPacks()
         {
+            List<CustomFarmingPack> newPacks = new List<CustomFarmingPack>();
             string machineDir = Path.Combine(Helper.DirectoryPath, folder);
             if (Directory.Exists(machineDir) && new DirectoryInfo(machineDir).GetDirectories().Length > 0)
-                PyUtils.loadContentPacks(out packs, machineDir, SearchOption.AllDirectories, Monitor);
+                PyUtils.loadContentPacks(out newPacks, machineDir, SearchOption.AllDirectories, Monitor);
             machines = new List<CustomMachineBlueprint>();
             Dictionary<string, string> toCrafting = new Dictionary<string, string>();
 
-            List<LegacyBlueprint> legacyPacks = new List<LegacyBlueprint>();
+            List<CustomFarmingPack> legacyPacks = new List<CustomFarmingPack>();
             string legacyDir = Path.Combine(Helper.DirectoryPath, legacyFolder);
             if(Directory.Exists(legacyDir) && new DirectoryInfo(legacyDir).GetDirectories().Length > 0)
                 PyUtils.loadContentPacks(out legacyPacks, legacyDir, SearchOption.AllDirectories, Monitor);
 
-            foreach (LegacyBlueprint lPack in legacyPacks)
+            legacyPacks.useAll(l => l.baseFolder = legacyFolder);
+
+            newPacks.AddRange(legacyPacks);
+
+            foreach (CustomFarmingPack lPack in newPacks)
             {
+                if (!lPack.legacy)
+                {
+                    packs.AddOrReplace(lPack);
+                    continue;
+                }
+                    
                 string lid = lPack.folderName + "." + lPack.fileName;
 
                 bool exists = false;
@@ -288,7 +299,7 @@ namespace CustomFarmingRedux
                 next.machines.Add(legacyMachine);
                 packs.Add(next);
             }
-
+            
             foreach (CustomFarmingPack pack in packs)
                 foreach (CustomMachineBlueprint blueprint in pack.machines)
                 {
