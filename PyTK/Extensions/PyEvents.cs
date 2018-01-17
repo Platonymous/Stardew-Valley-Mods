@@ -302,7 +302,7 @@ namespace PyTK.Extensions
         /// <returns>Returns the method.</returns>
         public static EventHandler<EventArgsClickableMenuChanged> addToNPCShop(this InventoryItem item, string shopkeeper)
         {
-            return item.addToShop((shop) => shop.portraitPerson.name == shopkeeper);
+            return item.addToShop((shop) => shop.portraitPerson is NPC npc && npc.name == shopkeeper);
         }
 
         /// <summary>Generates a method that adds this inventory to the furniture catalogue and adds it to MenuEvents.MenuChanged.</summary>

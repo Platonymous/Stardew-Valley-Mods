@@ -38,17 +38,17 @@ namespace PyTK.Extensions
 
         public static int getCurrency(this ShopMenu shop)
         {
-            return Helper.Reflection.GetPrivateValue<int>(shop, "currency");
+            return Helper.Reflection.GetField<int>(shop, "currency").GetValue();
         }
 
         public static List<Item> getForSale(this ShopMenu shop)
         {
-            return Helper.Reflection.GetPrivateValue<List<Item>>(shop, "forSale");
+            return Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
         }
 
         public static Dictionary<Item, int[]> getItemPriceAndStock(this ShopMenu shop)
         {
-            return Helper.Reflection.GetPrivateValue<Dictionary<Item, int[]>>(shop, "itemPriceAndStock");
+            return Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
         }
 
         public static List<Item> forSale(this List<InventoryItem> list)
