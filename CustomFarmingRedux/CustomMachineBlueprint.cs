@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
+using StardewValley;
 using System.Collections.Generic;
 
 
@@ -6,6 +8,9 @@ namespace CustomFarmingRedux
 {
     public class CustomMachineBlueprint
     {
+        internal IModHelper Helper = CustomFarmingReduxMod._helper;
+        internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
+
         public int id { get; set; }
         public string fullid
         {
@@ -43,5 +48,24 @@ namespace CustomFarmingRedux
         public int price { get; set; } = 100;
         public string condition { get; set; }
         public string crafting { get; set; }
+        public Texture2D texture2d { get; set; }
+
+        public Texture2D getTexture(IModHelper helper = null)
+        {
+            if (texture2d != null)
+                return texture2d;
+
+            if (helper == null)
+                helper = Helper;
+
+            if (texture2d == null)
+                if (texture == null || texture == "")
+                    texture2d = Game1.objectSpriteSheet;
+                else
+                    texture2d = helper.Content.Load<Texture2D>($"{pack.baseFolder}/{folder}/{texture}");
+
+            return texture2d;
+        }
+
     }
 }

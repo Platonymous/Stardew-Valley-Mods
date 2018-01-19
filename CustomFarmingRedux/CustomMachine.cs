@@ -80,7 +80,7 @@ namespace CustomFarmingRedux
             if (blueprint.readyindex < 0)
                 blueprint.readyindex = blueprint.tileindex;
             this.blueprint = blueprint;
-            texture = Helper.Content.Load<Texture2D>($"{blueprint.pack.baseFolder}/{blueprint.folder}/{blueprint.texture}");
+            texture = blueprint.getTexture();
             id = blueprint.fullid;
             parentSheetIndex = -1;
             bigCraftable = true;

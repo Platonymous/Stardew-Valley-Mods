@@ -23,11 +23,10 @@ namespace CustomFarmingRedux
         public static IModHelper _helper;
         public static IMonitor _monitor;
         public static List<CustomMachineBlueprint> machines = new List<CustomMachineBlueprint>();
-        public static List<CustomFarmingPack> packs = new List<CustomFarmingPack>();
         public static Config _config;
         public static string folder = "Machines";
         public static string legacyFolder = "MachinesCF1";
-        private static Dictionary<string, int> craftingrecipes = new Dictionary<string, int>();
+        internal static Dictionary<string, int> craftingrecipes = new Dictionary<string, int>();
 
         public override void Entry(IModHelper helper)
         {
@@ -43,6 +42,11 @@ namespace CustomFarmingRedux
             SaveHandler.addPreprocessor(legacyFix);
             SaveHandler.addReplacementPreprocessor(fixLegacyObject);
             helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
+        }
+
+        public override object GetApi()
+        {
+            return new CustomFarmingReduxAPI();
         }
 
         private void replaceCustomFarming(string action, string[] param)
@@ -161,7 +165,7 @@ namespace CustomFarmingRedux
                     {
                         if (craftingPage.pagesOfCraftingRecipes[i].Find(k => k.Value.name == blueprint.fullid) is KeyValuePair<ClickableTextureComponent, CraftingRecipe> kv && kv.Value != null && kv.Key != null)
                         {
-                            kv.Key.texture = Helper.Content.Load<Texture2D>($"{blueprint.pack.baseFolder}/{blueprint.folder}/{blueprint.texture}");
+                            kv.Key.texture = blueprint.getTexture();
                             kv.Key.sourceRect = Game1.getSourceRectForStandardTileSheet(kv.Key.texture, blueprint.tileindex, blueprint.tilewidth, blueprint.tileheight);
                             kv.Value.DisplayName = blueprint.name;
                             Helper.Reflection.GetField<string>(kv.Value, "description").SetValue(blueprint.description);
@@ -172,6 +176,8 @@ namespace CustomFarmingRedux
 
         private void loadPacks()
         {
+            List<CustomFarmingPack> packs = new List<CustomFarmingPack>();
+
             List<CustomFarmingPack> newPacks = new List<CustomFarmingPack>();
             string machineDir = Path.Combine(Helper.DirectoryPath, folder);
             if (Directory.Exists(machineDir) && new DirectoryInfo(machineDir).GetDirectories().Length > 0)

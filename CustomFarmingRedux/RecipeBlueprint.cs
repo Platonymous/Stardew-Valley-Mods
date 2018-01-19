@@ -6,11 +6,16 @@ using PyTK.Extensions;
 using SObject = StardewValley.Object;
 using Microsoft.Xna.Framework;
 using StardewValley.Objects;
+using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 
 namespace CustomFarmingRedux
 {
     public class RecipeBlueprint
     {
+        internal IModHelper Helper = CustomFarmingReduxMod._helper;
+        internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
+
         public string _name = "";
         public string _description = "";
         public string _category = "";
@@ -115,6 +120,7 @@ namespace CustomFarmingRedux
         public int quality { get; set; } = 0;
         public bool custom { get => (texture != null && texture != "") || (_description != null && _description != ""); }
         public CustomMachineBlueprint mBlueprint;
+        public Texture2D texture2d;
 
         public void consumeIngredients( List<List<Item>> items, SObject dropin = null)
         {
@@ -134,6 +140,23 @@ namespace CustomFarmingRedux
                             if (j.Stack <= 0)
                                 items[list].Remove(j);
                         }
+        }
+
+        public Texture2D getTexture(IModHelper helper = null)
+        {
+            if (texture2d != null)
+                return texture2d;
+
+            if (helper == null)
+                helper = Helper;
+
+            if (texture2d == null)
+                if (texture == null || texture == "")
+                    texture2d = Game1.objectSpriteSheet;
+                else
+                    texture2d = Helper.Content.Load<Texture2D>($"{mBlueprint.pack.baseFolder}/{mBlueprint.folder}/{texture}");
+
+            return texture2d;
         }
 
         private bool fitsIngredient(Item p, IngredientBlueprint i)

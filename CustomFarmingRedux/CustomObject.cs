@@ -59,10 +59,7 @@ namespace CustomFarmingRedux
             this.input = input;
             stack = blueprint.stack;
             quality = (blueprint.quality == -1) ? input.quality : blueprint.quality;
-            if (blueprint.texture != null)
-                texture = Helper.Content.Load<Texture2D>($"{mBlueprint.pack.baseFolder}/{mBlueprint.folder}/{blueprint.texture}");
-            else
-                texture = Game1.objectSpriteSheet;
+            texture = blueprint.getTexture();
             sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex, 16, 16);
             if (blueprint.colored)
             {
