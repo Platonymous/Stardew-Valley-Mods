@@ -68,6 +68,7 @@
     <Compile Include="Types\ConsoleCommand.cs" />
     <Compile Include="Types\DictionaryEntry.cs" />
     <Compile Include="Types\IContentPack.cs" />
+    <Compile Include="Types\ICustomContentAPI.cs" />
     <Compile Include="Types\InventoryItem.cs" />
     <Compile Include="Types\Mail.cs" />
     <Compile Include="Types\Range.cs" />
