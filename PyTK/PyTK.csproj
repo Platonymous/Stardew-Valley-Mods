@@ -52,7 +52,9 @@
     <Compile Include="ConsoleCommands\CcLocations.cs" />
     <Compile Include="CustomElementHandler\ISaveElement.cs" />
     <Compile Include="CustomElementHandler\SaveHandler.cs" />
+    <Compile Include="Overrides\FakeLongevityPrice.cs" />
     <Compile Include="Overrides\OvLocations.cs" />
+    <Compile Include="Overrides\OvLongevity.cs" />
     <Compile Include="Overrides\OvTV.cs" />
     <Compile Include="Types\AssetInjector.cs" />
     <Compile Include="Types\ButtonClick.cs" />
