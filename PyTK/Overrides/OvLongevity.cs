@@ -7,8 +7,16 @@ using System.Reflection;
 
 namespace PyTK.Overrides
 {
+    internal class FakeLongevityPrice
+    {
+        public void UpdateItem(int itemIndex, int updateType, Chest chest = null)
+        {
+
+        }
+    }
+
     [HarmonyPatch()]
-    public class LongevityFix
+    internal class LongevityFix
     {
         internal static MethodInfo TargetMethod()
         {
