@@ -232,6 +232,9 @@ namespace PyTK.CustomElementHandler
                         additionalSaveData.Add(entry[0], entry[1]);
                     }
 
+                if(newElement is ICustomObject ico)
+                    newElement = ico.recreate(additionalSaveData, replacement);
+     
                 newElement.rebuild(additionalSaveData, replacement);
 
                 return newElement;

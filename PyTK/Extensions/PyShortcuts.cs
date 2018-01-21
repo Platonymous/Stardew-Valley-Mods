@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using StardewValley;
 using PyTK.Types;
 using System;
+using System.Collections.Generic;
 
 namespace PyTK.Extensions
 {
@@ -83,6 +84,16 @@ namespace PyTK.Extensions
                 return (T)(object)new Vector4(arr[0], arr[1], arr[2], arr[3]);
             else
                 return (T) (object) null;
+        }
+
+        public static T toVector<T>(this List<int> arr)
+        {
+            return arr.ToArray().toVector<T>();
+        }
+
+        public static Color toColor(this Vector4 vec)
+        {
+            return new Color(vec.X, vec.Y, vec.Z, vec.W);
         }
 
         public static int toInt(this string t)

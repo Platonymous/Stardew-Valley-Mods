@@ -4,6 +4,8 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using xTile.ObjectModel;
+using System.Linq;
+using StardewValley;
 
 namespace PyTK.Extensions
 {
@@ -70,6 +72,11 @@ namespace PyTK.Extensions
                     list.Add(n);
 
             return list;
+        }
+
+        public static List<TOut> toList<TIn, TOut>(this TIn[] t, Func<TIn, TOut> conversion)
+        {
+            return toList(t.ToList(),conversion);
         }
 
         public static List<T> toList<T>(this List<T> t, Func<T, bool> predicate)
@@ -154,6 +161,15 @@ namespace PyTK.Extensions
 
         public static int getIndexByName(this Dictionary<int, string> dictionary, string name)
         {
+            if (name.StartsWith("startswith:"))
+                return (dictionary.Where(d => d.Value.Split('/')[0].StartsWith(name.Split(':')[1])).FirstOrDefault()).Key;
+
+            if (name.StartsWith("endswith:"))
+                return (dictionary.Where(d => d.Value.Split('/')[0].EndsWith(name.Split(':')[1])).FirstOrDefault()).Key;
+
+            if (name.StartsWith("contains:"))
+                return (dictionary.Where(d => d.Value.Split('/')[0].Contains(name.Split(':')[1])).FirstOrDefault()).Key;
+
             return (dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Key;
         }
     }

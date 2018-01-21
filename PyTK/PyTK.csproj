@@ -45,6 +45,10 @@
   <ItemGroup>
     <Compile Include="ConsoleCommands\CcSaveHandler.cs" />
     <Compile Include="ConsoleCommands\CcTime.cs" />
+    <Compile Include="CustomElementHandler\CraftingData.cs" />
+    <Compile Include="CustomElementHandler\CustomObjectData.cs" />
+    <Compile Include="CustomElementHandler\ICustomObject.cs" />
+    <Compile Include="CustomElementHandler\PySObject.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
     <Compile Include="Extensions\PyAssets.cs" />
     <Compile Include="Extensions\PyCrafting.cs" />
@@ -54,6 +58,7 @@
     <Compile Include="CustomElementHandler\SaveHandler.cs" />
     <Compile Include="Overrides\OvLocations.cs" />
     <Compile Include="Overrides\OvLongevity.cs" />
+    <Compile Include="Overrides\OvSpritebatch.cs" />
     <Compile Include="Overrides\OvTV.cs" />
     <Compile Include="Types\AssetInjector.cs" />
     <Compile Include="Types\ButtonClick.cs" />

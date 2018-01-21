@@ -35,6 +35,8 @@ namespace PyTK
 
             harmonyFix();
 
+            CustomObjectData.newBigObject("Platonymous.BigTest",Game1.bigCraftableSpriteSheet.clone().setSaturation(0),Color.Aquamarine,"Test Machine","Test Description", 24, craftingData: new CraftingData("Craftable Test Machine"));
+
             registerConsoleCommands();
             CustomTVMod.load();
             SaveHandler.setUpEventHandlers();
@@ -45,6 +47,7 @@ namespace PyTK
             var instance = HarmonyInstance.Create("Platonymous.PyTK");
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
+        
 
         private void registerConsoleCommands()
         {
@@ -55,6 +58,10 @@ namespace PyTK
 
         private void testing()
         {
+            new CustomObjectData("Platonymous.Ruby" + Color.Red.ToString(), "Rubici/250/-300/Minerals -2/A precious stone that is sought after for its rich color and beautiful fluster./Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Red, 16);
+            new CustomObjectData("Platonymous.Ruby" + Color.Blue.ToString(), "Rubici/250/-300/Minerals -2/A precious stone that is sought after for its rich color and beautiful fluster./Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Blue, 16);
+            new CustomObjectData("Platonymous.Ruby" + Color.White.ToString(), "Rubici/250/-300/Minerals -2/A precious stone that is sought after for its rich color and beautiful fluster./Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.White, 16);
+
             Keys.K.onPressed(() => Monitor.Log($"Played: {Game1.currentGameTime.TotalGameTime.Minutes} min"));
             ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log($"Number of Weeds: {o.numberOfWeeds}", LogLevel.Info));
             new InventoryItem(new Chest(true), 100).addToNPCShop("Pierre");
