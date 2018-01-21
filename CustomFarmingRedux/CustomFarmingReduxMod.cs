@@ -8,7 +8,6 @@ using PyTK.Types;
 using StardewValley;
 using StardewValley.Menus;
 using StardewModdingAPI.Events;
-using Microsoft.Xna.Framework.Graphics;
 using Harmony;
 using System.Reflection;
 using PyTK.CustomElementHandler;
@@ -324,19 +323,10 @@ namespace CustomFarmingRedux
                         blueprint.production[0].time = (STime.CURRENT + STime.YEAR * 1000).timestamp;
                     }
 
-                    if (blueprint.crafting != null)
-                    {
-                        toCrafting.AddOrReplace(blueprint.fullid, $"{blueprint.crafting}/Home/130/true/null/{blueprint.fullid}");
-                        craftingrecipes.AddOrReplace(blueprint.fullid, 0);
-                    }
-
                     if (blueprint.forsale && (blueprint.condition == null || PyTK.PyUtils.CheckEventConditions(blueprint.condition)))
                         new InventoryItem(new CustomMachine(blueprint), blueprint.price).addToNPCShop(blueprint.shop);
                 }
             
-            if (toCrafting.Count > 0)
-                toCrafting.injectInto($"Data/CraftingRecipes");
-
             Monitor.Log(packs.Count + " Content Packs with " + machines.Count + " machines found.", LogLevel.Trace);
         }
     }

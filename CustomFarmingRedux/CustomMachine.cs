@@ -14,7 +14,7 @@ using StardewValley.Tools;
 
 namespace CustomFarmingRedux
 {
-    public class CustomMachine : SObject, ISaveElement
+    public class CustomMachine : SObject, ICustomObject
     {
         internal IModHelper Helper = CustomFarmingReduxMod._helper;
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
@@ -46,6 +46,7 @@ namespace CustomFarmingRedux
         private RecipeBlueprint activeRecipe;
         private RecipeBlueprint starterRecipe;
         private GameLocation location;
+        private CustomObjectData data;
         private int frame {
             get
             {
@@ -68,6 +69,13 @@ namespace CustomFarmingRedux
 
         }
 
+        public CustomMachine(CustomObjectData data)
+        {
+            this.data = data;
+            build(machines.Find(m => m.fullid == data.id));
+            wasBuild = true;
+        }
+
         public CustomMachine(CustomMachineBlueprint blueprint)
         {
             build(blueprint);
@@ -76,13 +84,16 @@ namespace CustomFarmingRedux
 
         private void build(CustomMachineBlueprint blueprint)
         {
+            if(data == null)
+                data = CustomObjectData.collection.ContainsKey(blueprint.fullid) ? CustomObjectData.collection[blueprint.fullid] : new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, GetType(), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.name, blueprint.crafting));
+
             name = blueprint.name;
             if (blueprint.readyindex < 0)
                 blueprint.readyindex = blueprint.tileindex;
             this.blueprint = blueprint;
             texture = blueprint.getTexture();
             id = blueprint.fullid;
-            parentSheetIndex = -1;
+            parentSheetIndex = data.sdvId;
             bigCraftable = true;
             type = "Crafting";
             tilesize = new Rectangle(0, 0, blueprint.tilewidth, blueprint.tileheight);
@@ -574,5 +585,9 @@ namespace CustomFarmingRedux
             return false;
         }
 
+        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        {
+            return new CustomMachine();
+        }
     }
 }
