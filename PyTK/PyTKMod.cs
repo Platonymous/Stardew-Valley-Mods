@@ -35,8 +35,6 @@ namespace PyTK
 
             harmonyFix();
 
-            CustomObjectData.newBigObject("Platonymous.BigTest",Game1.bigCraftableSpriteSheet.clone().setSaturation(0),Color.Aquamarine,"Test Machine","Test Description", 24, craftingData: new CraftingData("Craftable Test Machine"));
-
             registerConsoleCommands();
             CustomTVMod.load();
             SaveHandler.setUpEventHandlers();
@@ -58,6 +56,7 @@ namespace PyTK
 
         private void testing()
         {
+            CustomObjectData.newBigObject("Platonymous.BigTest", Game1.bigCraftableSpriteSheet.clone().setSaturation(0), Color.Aquamarine, "Test Machine", "Test Description", 24, craftingData: new CraftingData("Craftable Test Machine"));
             new CustomObjectData("Platonymous.Ruby" + Color.Red.ToString(), "Rubici/250/-300/Minerals -2/A precious stone that is sought after for its rich color and beautiful fluster./Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Red, 16);
             new CustomObjectData("Platonymous.Ruby" + Color.Blue.ToString(), "Rubici/250/-300/Minerals -2/A precious stone that is sought after for its rich color and beautiful fluster./Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Blue, 16);
             new CustomObjectData("Platonymous.Ruby" + Color.White.ToString(), "Rubici/250/-300/Minerals -2/A precious stone that is sought after for its rich color and beautiful fluster./Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.White, 16);
