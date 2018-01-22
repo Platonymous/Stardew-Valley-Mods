@@ -35,6 +35,7 @@ namespace PyTK
 
             harmonyFix();
 
+            TimeEvents.AfterDayStarted += (a,b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
             registerConsoleCommands();
             CustomTVMod.load();
             SaveHandler.setUpEventHandlers();
@@ -56,10 +57,9 @@ namespace PyTK
 
         private void testing()
         {
-            CustomObjectData.newBigObject("Platonymous.BigTest", Game1.bigCraftableSpriteSheet.clone().setSaturation(0), Color.Aquamarine, "Test Machine", "Test Description", 24, craftingData: new CraftingData("Craftable Test Machine"));
-            new CustomObjectData("Platonymous.Ruby" + Color.Red.ToString(), "Rubici/250/-300/Minerals -2/A precious stone that is sought after for its rich color and beautiful fluster./Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Red, 16);
-            new CustomObjectData("Platonymous.Ruby" + Color.Blue.ToString(), "Rubici/250/-300/Minerals -2/A precious stone that is sought after for its rich color and beautiful fluster./Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Blue, 16);
-            new CustomObjectData("Platonymous.Ruby" + Color.White.ToString(), "Rubici/250/-300/Minerals -2/A precious stone that is sought after for its rich color and beautiful fluster./Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.White, 16);
+            CustomObjectData.newBigObject("Platonymous.BigTest", Game1.bigCraftableSpriteSheet.clone().setSaturation(0), Color.Aquamarine, "Test Machine", "Test Description", 24, craftingData: new CraftingData("Test Machine"));
+            CustomObjectData.newObject("Platonymous.Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Yellow, "Rubici", "Rubici Test", 16, "Rubici", "Minerals -2", 50, -300);
+            new CustomObjectData("Platonymous.Rubico" + Color.Red.ToString(), "Rubico/250/-300/Minerals -2/Rubico/A precious stone that is sought after for its rich color and beautiful fluster.", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Red, 16);
 
             Keys.K.onPressed(() => Monitor.Log($"Played: {Game1.currentGameTime.TotalGameTime.Minutes} min"));
             ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log($"Number of Weeds: {o.numberOfWeeds}", LogLevel.Info));

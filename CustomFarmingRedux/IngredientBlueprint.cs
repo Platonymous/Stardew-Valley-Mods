@@ -9,10 +9,14 @@ namespace CustomFarmingRedux
         public int quality { get; set; } = 0;
         public int exactquality { get; set; } = -1;
         public int stack { get; set; } = 1;
+        public string name { get; set; } = "";
         public int index
         {
             get
             {
+                if ((_index == 0 || _index == -1) && name != "")
+                    _index = Game1.objectInformation.getIndexByName(name);
+
                 return _index;
             }
             set
@@ -20,27 +24,13 @@ namespace CustomFarmingRedux
                 _index = value;
             }
         }
-        public string name
-        {
-            get
-            {
-                return Game1.objectInformation[_index].Split('/')[4];
-            }
-        }
-
-        public string item {
-            set
-            {
-                int.TryParse(value, out _index);
-                if (_index <= 0)
-                    Game1.objectInformation.getIndexByName(value);
-            }
-        }
         
         public IngredientBlueprint clone()
         {
             IngredientBlueprint clone = new IngredientBlueprint();
             clone.index = index;
+            clone.name = name;
+            clone.exactquality = exactquality;
             clone.stack = stack;
             clone.quality = quality;
             return clone;

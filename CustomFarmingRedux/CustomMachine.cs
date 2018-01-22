@@ -11,6 +11,7 @@ using SFarmer = StardewValley.Farmer;
 using PyTK.Extensions;
 using PyTK.Types;
 using StardewValley.Tools;
+using PyTK;
 
 namespace CustomFarmingRedux
 {
@@ -85,7 +86,7 @@ namespace CustomFarmingRedux
         private void build(CustomMachineBlueprint blueprint)
         {
             if(data == null)
-                data = CustomObjectData.collection.ContainsKey(blueprint.fullid) ? CustomObjectData.collection[blueprint.fullid] : new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, GetType(), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.name, blueprint.crafting));
+                data = CustomObjectData.collection.ContainsKey(blueprint.fullid) ? CustomObjectData.collection[blueprint.fullid] : new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, typeof(CustomMachine), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.name, blueprint.crafting));
 
             name = blueprint.name;
             if (blueprint.readyindex < 0)
@@ -138,6 +139,14 @@ namespace CustomFarmingRedux
                         result = r;
 
             return result;
+        }
+
+        private RecipeBlueprint findRecipeFor(Item item)
+        {
+            if (blueprint.production == null)
+                return null;
+
+            return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials[0]));
         }
 
         private RecipeBlueprint findRecipe(List<Item> items)
@@ -522,7 +531,7 @@ namespace CustomFarmingRedux
                 clear();
 
             List<List<Item>> items = getItemLists(who);
-            RecipeBlueprint recipe = findRecipe(maxed(dropIn));
+            RecipeBlueprint recipe = findRecipeFor(maxed(dropIn));
             bool hasRecipe = recipe != null;
             bool hasStarter = hasStarterMaterials(items);
             bool hasIngredients = hasRecipe && recipe.hasIngredients(items);
@@ -533,21 +542,21 @@ namespace CustomFarmingRedux
             
             if (canProduce)
             {
-                startProduction(dropIn, findRecipe(dropIn), items);
+                startProduction(dropIn, findRecipeFor(maxed(dropIn)), items);
                 Game1.playSound("Ship");
                 return false;
             }
 
             if(!hasStarter)
             {
-                Game1.showRedMessage($"Requires {blueprint.starter.stack} {blueprint.starter.name}.");
+                Game1.showRedMessage($"Requires {blueprint.starter.stack}x {(blueprint.starter.index > 0 ? Game1.objectInformation[blueprint.starter.index].Split('/')[4] : "Category " + blueprint.starter.index)}.");
                 return false;
             }
 
             if (!hasIngredients && hasRecipe)
             {
-                int stack = recipe.materials.Find(p => p.index == dropIn.parentSheetIndex).stack;
-                Game1.showRedMessage($"Requires {stack} {dropIn.name}.");
+                string ingredients = String.Join(",", recipe.materials.toList(m => m.stack + "x " + (m.index > 0 ? Game1.objectInformation[m.index].Split('/')[4] : "Category " + m.index)));
+                Game1.showRedMessage($"Missing Ingredients. ({ingredients})");
                 return false;
             }
 

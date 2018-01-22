@@ -70,17 +70,5 @@ namespace PyTK.CustomElementHandler
             else
                 return new PySObject(CustomObjectData.collection[additionalSaveData["id"]]);
         }
-
-        public override void updateWhenCurrentLocation(GameTime time)
-        {
-            parentSheetIndex = data.sdvId;
-            base.updateWhenCurrentLocation(time);
-        }
-
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
-        {
-            parentSheetIndex = data.sdvId;
-            base.drawInMenu(spriteBatch, location, scaleSize, transparency, layerDepth, drawStackNumber);
-        }
     }
 }

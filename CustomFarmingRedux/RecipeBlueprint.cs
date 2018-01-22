@@ -28,9 +28,9 @@ namespace CustomFarmingRedux
         {
             get
             {
-                if (_name == "")
-                    return Game1.objectInformation[index].Split('/')[4];
-                else
+                if (_name == "" && index > 0)
+                    _name = Game1.objectInformation[index].Split('/')[4];
+               
                     return _name;
             }
             set
@@ -57,9 +57,11 @@ namespace CustomFarmingRedux
             get
             {
                 if (_category == "")
-                    return Game1.objectInformation[index].Split('/')[3].Split(' ')[0];
-                else
-                    return _category;
+                {
+                    _category = Game1.objectInformation[index].Split('/')[3].Split(' ')[0];
+                }
+
+                return _category;
             }
             set
             {
@@ -70,29 +72,21 @@ namespace CustomFarmingRedux
         {
             get
             {
-                if (_index == -1)
-                {
-                    name = "";
-                    return Game1.objectInformation.getIndexByName(name);
-                }
+                if (_index <= 0 && item != "")
+                    _index = Game1.objectInformation.getIndexByName(item);
                 else
-                    return _index;
+                    if(_index <= 0 && name != "")
+                    _index = Game1.objectInformation.getIndexByName(name);
+
+                return _index;
             }
             set
             {
                 _index = value;
             }
         }
-        public string item
-        {
-            set
-            {
-                
-                int.TryParse(value, out _index);
-                if (_index <= 0)
-                    _index = Game1.objectInformation.getIndexByName(value);
-            }
-        }
+        public string item { get; set; } = "";
+
         public List<IngredientBlueprint> materials { get; set; }
         public string texture { get; set; }
         public int tileindex
@@ -159,7 +153,7 @@ namespace CustomFarmingRedux
             return texture2d;
         }
 
-        private bool fitsIngredient(Item p, IngredientBlueprint i)
+        internal bool fitsIngredient(Item p, IngredientBlueprint i)
         {
             if (p is SObject obj && i.index == -999)
                 return true;

@@ -6,12 +6,15 @@ using System.Collections.Generic;
 using xTile.ObjectModel;
 using System.Linq;
 using StardewValley;
+using StardewModdingAPI;
 
 namespace PyTK.Extensions
 {
     public static class PyCollections : object
     {
-        
+        internal static IModHelper Helper { get; } = PyTKMod._helper;
+        internal static IMonitor Monitor { get; } = PyTKMod._monitor;
+
         public static Dictionary<TKey, TValue> AddOrReplace<TKey, TValue>(this Dictionary<TKey, TValue> t, TKey key, TValue value)
         {
             if (!t.ContainsKey(key))

@@ -53,16 +53,16 @@ namespace PyTK.CustomElementHandler
                 if (_sdvId == -1 && collection.ContainsKey(id))
                     _sdvId = collection[id]._sdvId;
 
+                if (_sdvId == -1)
+                    _sdvId = getNewSDVId();
+
                 if (bigCraftable && _sdvId != -1)
                     if (Game1.bigCraftablesInformation.ContainsKey(_sdvId) && Game1.bigCraftablesInformation[_sdvId] != data)
-                        _sdvId = -1;
+                        _sdvId = getNewSDVId();
 
                 if (!bigCraftable && _sdvId != -1)
                     if (Game1.objectInformation.ContainsKey(_sdvId) && Game1.objectInformation[_sdvId] != data)
-                        _sdvId = -1;
-
-                if (_sdvId == -1)
-                    _sdvId = getNewSDVId();
+                        _sdvId = getNewSDVId();
 
                 if (craftingData != null)
                     craftingData.index = _sdvId;
@@ -90,13 +90,16 @@ namespace PyTK.CustomElementHandler
             string[] typeData = type.AssemblyQualifiedName.Split(',');
             this.type = typeData[0] + ", " + typeData[1];
             this.craftingData = craftingData;
-            craftingData.bigCraftable = bigCraftable;
 
-            _sdvId = sdvId;
+            if(craftingData != null)
+                craftingData.bigCraftable = bigCraftable;
 
-            collection.AddOrReplace(id,this);
+            sdvId = getNewSDVId();
+
+            collection.AddOrReplace(id, this);
+
             if(inventoryCheck == null)
-                inventoryCheck = new ItemSelector<Item>(i => collection.Exists(c => c.Value.sdvId == i.parentSheetIndex)).whenAddedToInventory(l => l.useAll(x => Game1.player.items[Game1.player.items.FindIndex(o => o == x)] = collection.Find(c => c.Value.sdvId == x.parentSheetIndex).Value.getObject(x)));
+                inventoryCheck = new ItemSelector<Item>(i => collection.Exists(c => c.Value.sdvId == i.parentSheetIndex && (!(i is SObject sobj) || sobj.bigCraftable == c.Value.bigCraftable))).whenAddedToInventory(l => l.useAll(x => Game1.player.items[Game1.player.items.FindIndex(o => o == x)] = collection.Find(c => c.Value.sdvId == x.parentSheetIndex && (!(x is SObject sobj) || sobj.bigCraftable == c.Value.bigCraftable)).Value.getObject(x)));
         }
 
         public int getIndexForId(string id)
@@ -118,12 +121,12 @@ namespace PyTK.CustomElementHandler
 
             if (bigCraftable)
             {
-                newIndex =  Math.Max(Game1.bigCraftablesInformation.Keys.Max(), minIndex) + 1;
+                newIndex = (Game1.bigCraftablesInformation.ContainsKey(_sdvId) && Game1.bigCraftablesInformation[_sdvId] == data) ? _sdvId : Math.Max(Math.Max(Game1.bigCraftablesInformation.Keys.Max() + 1, Game1.objectInformation.Keys.Max() + 1), minIndex);
                 Game1.bigCraftablesInformation.AddOrReplace(newIndex, data);
             }
             else
             {
-                newIndex = Math.Max(Game1.objectInformation.Keys.Max(), minIndex) + 1;
+                newIndex = (Game1.objectInformation.ContainsKey(_sdvId) && Game1.objectInformation[_sdvId] == data) ? _sdvId : Math.Max(Math.Max(Game1.bigCraftablesInformation.Keys.Max() + 1, Game1.objectInformation.Keys.Max() + 1), minIndex);
                 Game1.objectInformation.AddOrReplace(newIndex, data);
             }
 
@@ -178,8 +181,8 @@ namespace PyTK.CustomElementHandler
             if (displayName == "")
                 displayName = name;
 
-            List<string> data = new List<string> { name, displayName, price.ToString(), edibility.ToString(), type, description };
-            if (typeInfo != "")
+            List<string> data = new List<string> { name, price.ToString(), edibility.ToString(), type, displayName, description };
+            if (typeInfo != null && typeInfo != "")
                 data.Add(typeInfo);
 
             return new CustomObjectData(uniqueId, String.Join("/", data), texture, color, tileIndex, false, customType, craftingData);

@@ -50,6 +50,7 @@ namespace PyTK.CustomElementHandler
             this.field = field;
             this.delivery = delivery;
             this.index = index;
+            this.bigCraftable = bigCraftable;
         }
 
     }

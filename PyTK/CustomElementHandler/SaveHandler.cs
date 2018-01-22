@@ -77,8 +77,10 @@ namespace PyTK.CustomElementHandler
 
         internal static void Cleanup()
         {
-            RemoveAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix));
-            RemoveAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix));
+            Func<object, bool> predicate = o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix);
+            RemoveAllObjects(FindAllObjects(Game1.locations, Game1.game1), predicate);
+            RemoveAllObjects(FindAllObjects(Game1.player, Game1.game1),predicate);
+            Monitor.Log("Done");
         }
 
         private static void OnFinishedRebuilding(EventArgs e)
