@@ -34,11 +34,12 @@ namespace PyTK.Overrides
                     return;
 
                 Rectangle sr = sourceRectangle.Value;
+                Texture2D st = texture.clone();
 
-                if (!CustomObjectData.collection.Exists(a => a.Value.sdvSourceRectangle == sr))
+                if (!CustomObjectData.collection.Exists(a => a.Value.sdvSourceRectangle == sr && st == a.Value.sdvTexture))
                     return;
 
-                CustomObjectData data = CustomObjectData.collection.Find(a => a.Value.sdvSourceRectangle == sr).Value;
+                CustomObjectData data = CustomObjectData.collection.Find(a => a.Value.sdvSourceRectangle == sr && st == a.Value.sdvTexture).Value;
 
                 if (data.color != Color.White)
                     color = data.color.multiplyWith(color);

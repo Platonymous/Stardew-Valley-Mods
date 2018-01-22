@@ -27,6 +27,14 @@ namespace PyTK.CustomElementHandler
         public Color color;
         public int tileIndex;
 
+        public Texture2D sdvTexture
+        {
+            get
+            {
+                return bigCraftable ? Game1.bigCraftableSpriteSheet : Game1.objectSpriteSheet;
+            }
+        }
+
         private Item _obj;
         
         public Rectangle sourceRectangle
