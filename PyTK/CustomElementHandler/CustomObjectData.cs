@@ -173,7 +173,7 @@ namespace PyTK.CustomElementHandler
             return result;
         }
 
-        public static CustomObjectData newObject(string uniqueId, Texture2D texture, Color color, string name, string description, int tileIndex = 0, string displayName = "", string type = "Basic", int price = 100, int edibility = -300, string typeInfo = "", CraftingData craftingData = null)
+        public static CustomObjectData newObject(string uniqueId, Texture2D texture, Color color, string name, string description, int tileIndex = 0, string displayName = "", string type = "Basic", int price = 100, int edibility = -300, string typeInfo = "", CraftingData craftingData = null, Type customType = null)
         {
             if (displayName == "")
                 displayName = name;
@@ -182,10 +182,10 @@ namespace PyTK.CustomElementHandler
             if (typeInfo != "")
                 data.Add(typeInfo);
 
-            return new CustomObjectData(uniqueId, String.Join("/", data), texture, color, tileIndex, false, null, craftingData);
+            return new CustomObjectData(uniqueId, String.Join("/", data), texture, color, tileIndex, false, customType, craftingData);
         }
 
-        public static CustomObjectData newBigObject(string uniqueId, Texture2D texture, Color color, string name, string description, int tileIndex = 0, string displayName = "", bool lamp = false, int fragility = 0, bool indoors = true, bool outdoors = true, string type = "Crafting -9", int price = 100, int edibility = -300, CraftingData craftingData = null)
+        public static CustomObjectData newBigObject(string uniqueId, Texture2D texture, Color color, string name, string description, int tileIndex = 0, string displayName = "", bool lamp = false, int fragility = 0, bool indoors = true, bool outdoors = true, string type = "Crafting -9", int price = 100, int edibility = -300, CraftingData craftingData = null, Type customType = null)
         {
             if (displayName == "")
                 displayName = name;
@@ -196,7 +196,7 @@ namespace PyTK.CustomElementHandler
 
             data.Add(displayName);
 
-            return new CustomObjectData(uniqueId, String.Join("/", data), texture, color, tileIndex, true, null, craftingData);
+            return new CustomObjectData(uniqueId, String.Join("/", data), texture, color, tileIndex, true, customType, craftingData);
         }
         
     }

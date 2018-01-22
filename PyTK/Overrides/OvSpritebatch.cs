@@ -14,7 +14,6 @@ namespace PyTK.Overrides
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
-
         
         [HarmonyPatch]
         internal class SpriteBatchFixMono
