@@ -268,6 +268,11 @@ namespace CustomFarmingRedux
 
         public override void updateWhenCurrentLocation(GameTime time)
         {
+            if(tileLocation == Vector2.Zero)
+                if (!Game1.currentLocation.objects.ContainsKey(tileLocation) || Game1.currentLocation.objects[tileLocation] != this)
+                    if(Game1.currentLocation.objects.ContainsValue(this))
+                        tileLocation = Game1.currentLocation.objects.Find(k => k.Value == this).Key;
+
             if (!wasBuild)
                 return;
 
@@ -373,6 +378,8 @@ namespace CustomFarmingRedux
             if (completionTime != null)
                 data.Add("completionTime", completionTime.timestamp.ToString());
 
+            data.Add("tileLocation", tileLocation.X + "," + tileLocation.Y);
+
             return data;
         }
 
@@ -417,6 +424,9 @@ namespace CustomFarmingRedux
 
             Chest c = (Chest)replacement;
             tileLocation = c.tileLocation;
+
+            if(additionalSaveData.ContainsKey("tileLocation"))
+                tileLocation = additionalSaveData["tileLocation"].Split(',').toList(s => int.Parse(s)).toVector<Vector2>();
             if (c.items.Count > 0 && c.items[0] is SObject o)
                 heldObject = (SObject) o.getOne();
             updateWhenCurrentLocation(Game1.currentGameTime);
@@ -588,6 +598,10 @@ namespace CustomFarmingRedux
             location = null;
             activeMachines.Remove(this);
             Game1.playSound("hammer");
+
+            if (!Game1.currentLocation.objects.ContainsKey(tileLocation) || Game1.currentLocation.objects[tileLocation] != this)
+                tileLocation = Game1.currentLocation.objects.Find(k => k.Value == this).Key;
+
             Game1.createItemDebris(getOne(), tileLocation * Game1.tileSize, -1, null);
             Game1.currentLocation.objects.Remove(tileLocation);
 
