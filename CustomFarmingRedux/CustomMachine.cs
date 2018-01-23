@@ -11,7 +11,6 @@ using SFarmer = StardewValley.Farmer;
 using PyTK.Extensions;
 using PyTK.Types;
 using StardewValley.Tools;
-using PyTK;
 
 namespace CustomFarmingRedux
 {
