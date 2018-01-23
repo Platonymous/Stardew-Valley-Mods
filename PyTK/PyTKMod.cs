@@ -18,6 +18,7 @@ using Harmony;
 using System.Reflection;
 using StardewValley.Menus;
 using System.Collections.Generic;
+using PyTK.Overrides;
 
 namespace PyTK
 {
@@ -43,7 +44,8 @@ namespace PyTK
 
         private void harmonyFix()
         {
-            var instance = HarmonyInstance.Create("Platonymous.PyTK");
+            HarmonyInstance instance = HarmonyInstance.Create("Platonymous.PyTK");
+            OvSpritebatch.DrawFix1.init("SObject",typeof(SObject), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
         
