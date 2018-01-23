@@ -27,7 +27,6 @@ namespace PyTK.Extensions
 
         /* Checks */
 
-
         public static bool isLocation(this string t)
         {
             return Game1.getLocationFromName(t) is GameLocation;
