@@ -25,6 +25,10 @@ namespace PyTK.CustomElementHandler
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
+        private static bool ceh = false;
+
+        public static Type cehType;
+
         public static char seperator = '|';
         public static char seperatorLegacy = '/';
         public static char valueSeperator = '=';
@@ -33,6 +37,11 @@ namespace PyTK.CustomElementHandler
 
         private static List<Func<string, string>> preProcessors = new List<Func<string, string>>();
         private static List<Func<object, object>> objectPreProcessors = new List<Func<object, object>>();
+
+        private static bool hasSaveType(object o)
+        {
+            return (o is ISaveElement || ceh && o.GetType().GetInterfaces().Contains(cehType));
+        }
 
         public static void addPreprocessor(Func<string,string> pp)
         {
@@ -46,7 +55,12 @@ namespace PyTK.CustomElementHandler
 
         internal static void setUpEventHandlers()
         {
-            SaveEvents.BeforeSave += (s,e) => Replace();
+            ceh = Helper.ModRegistry.IsLoaded("Platonymous.CustomElementHandler");
+
+            if (ceh)
+                cehType = Type.GetType("CustomElementHandler.ISaveElement, CustomElementHandler");
+
+            SaveEvents.BeforeSave += (s, e) => Replace();
             SaveEvents.AfterSave += (s, e) => Rebuild();
             SaveEvents.AfterLoad += (s, e) => Rebuild();
         }
@@ -54,8 +68,8 @@ namespace PyTK.CustomElementHandler
         internal static void Replace()
         {
             OnBeforeRemoving(EventArgs.Empty);
-            ReplaceAllObjects<ISaveElement>(FindAllObjects(Game1.locations, Game1.game1), o => o is ISaveElement, o => getReplacement(o), true);
-            ReplaceAllObjects<ISaveElement>(FindAllObjects(Game1.player, Game1.game1), o => o is ISaveElement, o => getReplacement(o), true);
+            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
+            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
             OnFinishedRemoving(EventArgs.Empty);
         }
 
@@ -220,7 +234,7 @@ namespace PyTK.CustomElementHandler
 
                 object o = Activator.CreateInstance(T);
 
-                if (!(o is ISaveElement newElement))
+                if (!(hasSaveType(o)))
                     return replacement;
 
                 Dictionary<string, string> additionalSaveData = new Dictionary<string, string>();
@@ -234,12 +248,15 @@ namespace PyTK.CustomElementHandler
                         additionalSaveData.Add(entry[0], entry[1]);
                     }
 
-                if(newElement is ICustomObject ico)
-                    newElement = ico.recreate(additionalSaveData, replacement);
-     
-                newElement.rebuild(additionalSaveData, replacement);
+                if(o is ICustomObject ico)
+                    o = ico.recreate(additionalSaveData, replacement);
 
-                return newElement;
+                if (o is ISaveElement ise)
+                    ise.rebuild(additionalSaveData, replacement);
+                else
+                    cehRebuild(o, additionalSaveData, replacement);
+
+                return o;
             }
             catch (Exception e)
             {
@@ -247,6 +264,12 @@ namespace PyTK.CustomElementHandler
                 Monitor.Log("" + e.StackTrace, LogLevel.Error);
                 return replacement;
             }
+        }
+
+        private static void cehRebuild(object o, Dictionary<string,string> additionalSaveData, object replacement)
+        {
+            MethodInfo rebuild = cehType.GetMethods(BindingFlags.Instance | BindingFlags.Public).ToList().Find(m => m.Name == "rebuild");
+            rebuild.Invoke(o, new [] { additionalSaveData, replacement });
         }
 
         private static string getTypeName(object o)
@@ -263,10 +286,31 @@ namespace PyTK.CustomElementHandler
             return name;
         }
 
+        private static string getReplacementName(object element, string cat = "Item")
+        {
+            if (element is ISaveElement ise)
+                return getReplacementName(ise, cat);
+
+            string additionalSaveData = string.Join(seperator.ToString(), Helper.Reflection.GetMethod(element, "getAdditionalSaveData").Invoke<Dictionary<string,string>>().Select(x => x.Key + " = " + x.Value));
+            string type = getTypeName(element);
+            string name = newPrefix + seperator + cat + seperator + type + seperator + additionalSaveData;
+            return name;
+        }
+
         private static object getReplacement(ISaveElement ise)
         {
             object o = ise.getReplacement();
             setDataString(o, getReplacementName(ise));
+            return o;
+        }
+
+        private static object getReplacement(object element)
+        {
+            if (element is ISaveElement ise)
+                return getReplacement(ise);
+
+            object o = Helper.Reflection.GetMethod(element, "getReplacement").Invoke<object>();
+            setDataString(o, getReplacementName(element));
             return o;
         }
 
@@ -298,7 +342,7 @@ namespace PyTK.CustomElementHandler
 
         private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent)
         {
-            return FindAllInstances(obj, parent, new List<string>() { "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
+            return FindAllInstances(obj, parent, new List<string>() { "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
         }
 
         private static void ReplaceAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate, Func<TIn, object> replacer, bool reverse = false)
