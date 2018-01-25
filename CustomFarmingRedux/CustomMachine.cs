@@ -183,10 +183,16 @@ namespace CustomFarmingRedux
 
             if (config.automation)
             {
+                if (location is GameLocation)
+                    if (tileLocation == Vector2.Zero)
+                        if (!location.objects.ContainsKey(tileLocation) || location.objects[tileLocation] != this)
+                            if (location.objects.ContainsValue(this))
+                                tileLocation = location.objects.Find(k => k.Value == this).Key;
+
                 List<Vector2> tiles = Utility.getAdjacentTileLocations(tileLocation);
                 if (location is GameLocation)
                     foreach (Vector2 tile in tiles)
-                        if(location.objects.ContainsKey(tile) && location.objects[tile] is Chest c)
+                        if (location.objects.ContainsKey(tile) && location.objects[tile] is Chest c)
                             items.AddOrReplace(c.items);
             }
             
@@ -243,10 +249,9 @@ namespace CustomFarmingRedux
         {
             activeRecipe = recipe;
             if (completionTime == null)
-            {
                 completionTime = STime.CURRENT + recipe.time;
-                minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
-            }
+
+            minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
 
             if (starterRecipe != null)
                 starterRecipe.consumeIngredients(items);
@@ -281,7 +286,10 @@ namespace CustomFarmingRedux
             if (!(isWorking && completionTime != null))
                 startAutoProduction();
 
-            base.updateWhenCurrentLocation(time);
+           base.updateWhenCurrentLocation(time);
+
+            if (completionTime != null)
+                minutesUntilReady = Math.Max((completionTime - STime.CURRENT).timestamp,20);
         }
 
         public override string DisplayName { get => name; set => base.DisplayName = value; }
@@ -309,9 +317,6 @@ namespace CustomFarmingRedux
                 frame = 1;
             else
                 frame = 0;
-
-            if (isWorking && completionTime != null)
-                minutesUntilReady = 100;
 
             Vector2 vector2 = (blueprint.pulsate) ? getScale() * Game1.pixelZoom  : new Vector2(0, 4) * Game1.pixelZoom;
             Vector2 local = Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize), (y * Game1.tileSize - Game1.tileSize)));
