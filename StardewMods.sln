@@ -49,8 +49,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFurniture", "CustomFu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomNPC", "CustomNPC\CustomNPC.csproj", "{A188A699-1797-4D9D-9B60-823C95BAE59C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastForward", "GameSpeed\FastForward.csproj", "{5787EBA2-6489-4F44-8EC3-28351F6C80C8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomFurnitureAnywhere", "CustomFurnitureAnywhere\CustomFurnitureAnywhere.csproj", "{4B5FC017-74C2-4C03-9A55-41DCD90C489B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualize", "Visualize\Visualize.csproj", "{A9A81F01-58DD-4030-BB82-AE7E71D68D99}"
@@ -152,10 +150,6 @@ Global
 		{A188A699-1797-4D9D-9B60-823C95BAE59C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A188A699-1797-4D9D-9B60-823C95BAE59C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A188A699-1797-4D9D-9B60-823C95BAE59C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5787EBA2-6489-4F44-8EC3-28351F6C80C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5787EBA2-6489-4F44-8EC3-28351F6C80C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5787EBA2-6489-4F44-8EC3-28351F6C80C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5787EBA2-6489-4F44-8EC3-28351F6C80C8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4B5FC017-74C2-4C03-9A55-41DCD90C489B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4B5FC017-74C2-4C03-9A55-41DCD90C489B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B5FC017-74C2-4C03-9A55-41DCD90C489B}.Release|Any CPU.ActiveCfg = Release|Any CPU
