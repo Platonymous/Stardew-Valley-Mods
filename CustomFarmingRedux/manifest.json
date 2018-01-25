@@ -4,7 +4,7 @@
   "Version": {
     "MajorVersion": 2,
     "MinorVersion": 3,
-    "PatchVersion": 4,
+    "PatchVersion": 5,
     "Build": null
   },
   "Description": "Helper Mod for Custom Machine creation.",

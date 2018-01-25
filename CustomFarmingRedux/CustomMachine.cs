@@ -270,6 +270,11 @@ namespace CustomFarmingRedux
             return activeRecipe.createObject(heldObject);
         }
 
+        public override bool minutesElapsed(int minutes, GameLocation environment)
+        {
+            return false;
+        }
+
         public override void updateWhenCurrentLocation(GameTime time)
         {
             if(tileLocation == Vector2.Zero)
@@ -289,7 +294,7 @@ namespace CustomFarmingRedux
            base.updateWhenCurrentLocation(time);
 
             if (completionTime != null)
-                minutesUntilReady = Math.Max((completionTime - STime.CURRENT).timestamp,20);
+                minutesUntilReady = Math.Max((completionTime - STime.CURRENT).timestamp,0);
         }
 
         public override string DisplayName { get => name; set => base.DisplayName = value; }
