@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using StardewValley.Locations;
 using System.IO;
+using System.Reflection;
 
 namespace PyTK
 {
@@ -59,6 +60,18 @@ namespace PyTK
                     }
                 }
             }
+        }
+
+        internal static Type getTypeSDV(string type)
+        {
+            string prefix = "StardewValley.";
+            Type defaulSDV = Type.GetType(prefix + type + ", Stardew Valley");
+
+            if (defaulSDV != null)
+                return defaulSDV;
+            else
+                return Type.GetType(prefix + type + ", StardewValley");
+
         }
     }
 }

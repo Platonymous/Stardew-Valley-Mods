@@ -45,7 +45,7 @@ namespace PyTK
         private void harmonyFix()
         {
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.PyTK");
-            OvSpritebatch.DrawFix1.init("SObject",typeof(SObject), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
+            OvSpritebatch.DrawFix1.init("SObject",PyUtils.getTypeSDV("Object"), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
         

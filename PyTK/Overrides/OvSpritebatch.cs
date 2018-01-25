@@ -120,16 +120,18 @@ namespace PyTK.Overrides
         {
             public static void prefix(ref SObject __instance)
             {
-                CustomObjectData c;
+                CustomObjectData c = null;
 
                 if (dataChache.ContainsKey(__instance))
                     c = dataChache[__instance];
-                else
+                else if (!SaveHandler.hasSaveType(__instance) || __instance is IDrawFromCustomObjectData)
                 {
                     SObject obj = __instance;
-                    c = CustomObjectData.collection.Find(o => o.Value.sdvId == obj.parentSheetIndex && o.Value.bigCraftable == obj.bigCraftable).Value;
+                    c = __instance is IDrawFromCustomObjectData draw ? draw.data : CustomObjectData.collection.Find(o => o.Value.sdvId == obj.parentSheetIndex && o.Value.bigCraftable == obj.bigCraftable).Value;
                     dataChache.AddOrReplace(__instance, c);
                 }
+                else
+                    dataChache.AddOrReplace(__instance, c);
 
                 if (c != null)
                 {
@@ -138,9 +140,7 @@ namespace PyTK.Overrides
                     nextData = c;
                 }
                 else
-                {
                     replaceNext = false;
-                }
             }
 
             public static void postfix(ref SObject __instance)

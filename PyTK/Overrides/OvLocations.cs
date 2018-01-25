@@ -21,10 +21,7 @@ namespace PyTK.Overrides
         {
             internal static MethodInfo TargetMethod()
             {
-                if (Type.GetType("StardewValley.GameLocation, Stardew Valley") != null)
-                    return AccessTools.Method(Type.GetType("StardewValley.GameLocation, Stardew Valley"), "isActionableTile");
-                else
-                    return AccessTools.Method(Type.GetType("StardewValley.GameLocation, StardewValley"), "isActionableTile");
+                    return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "isActionableTile");
             }
 
             internal static void Postfix(GameLocation __instance, ref bool __result, int xTile, int yTile)
@@ -44,10 +41,7 @@ namespace PyTK.Overrides
         {
             internal static MethodInfo TargetMethod()
             {
-                if (Type.GetType("StardewValley.Game1, Stardew Valley") != null)
-                    return AccessTools.Method(Type.GetType("StardewValley.Game1, Stardew Valley"), "tryToCheckAt");
-                else
-                    return AccessTools.Method(Type.GetType("StardewValley.Game1, StardewValley"), "tryToCheckAt");
+                    return AccessTools.Method(PyUtils.getTypeSDV("Game1"), "tryToCheckAt");
             }
 
            

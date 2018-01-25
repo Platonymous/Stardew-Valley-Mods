@@ -38,7 +38,7 @@ namespace PyTK.CustomElementHandler
         private static List<Func<string, string>> preProcessors = new List<Func<string, string>>();
         private static List<Func<object, object>> objectPreProcessors = new List<Func<object, object>>();
 
-        private static bool hasSaveType(object o)
+        internal static bool hasSaveType(object o)
         {
             return (o is ISaveElement || ceh && o.GetType().GetInterfaces().Contains(cehType));
         }
@@ -94,7 +94,7 @@ namespace PyTK.CustomElementHandler
             Func<object, bool> predicate = o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix);
             RemoveAllObjects(FindAllObjects(Game1.locations, Game1.game1), predicate);
             RemoveAllObjects(FindAllObjects(Game1.player, Game1.game1),predicate);
-            Monitor.Log("Done");
+            Monitor.Log("Cleanup complete.");
         }
 
         private static void OnFinishedRebuilding(EventArgs e)
@@ -224,6 +224,7 @@ namespace PyTK.CustomElementHandler
             objectPreProcessors.useAll(o => replacement = o.Invoke(replacement));
             preProcessors.useAll(p => dataString = p.Invoke(dataString));
 
+            dataString = dataString.Replace(" " + valueSeperator.ToString() + " ", valueSeperator.ToString());
             string[] data = splitElemets(dataString);
 
             try
@@ -248,28 +249,29 @@ namespace PyTK.CustomElementHandler
                         additionalSaveData.Add(entry[0], entry[1]);
                     }
 
-                if(o is ICustomObject ico)
+                if (o is ICustomObject ico)
                     o = ico.recreate(additionalSaveData, replacement);
 
                 if (o is ISaveElement ise)
                     ise.rebuild(additionalSaveData, replacement);
                 else
-                    cehRebuild(o, additionalSaveData, replacement);
+                {
+                    Dictionary<string, string> cehAdditionalSaveData = new Dictionary<string, string>();
+                    foreach (KeyValuePair<string, string> k in additionalSaveData)
+                        cehAdditionalSaveData.Add(k.Key, k.Value);
+
+                    MethodInfo rebuild = cehType.GetMethods(BindingFlags.Instance | BindingFlags.Public).ToList().Find(m => m.Name == "rebuild");
+                    Monitor.Log(rebuild.Name + " - " + o.GetType().AssemblyQualifiedName);
+                    rebuild.Invoke(o, new[] { cehAdditionalSaveData, replacement });
+                }
 
                 return o;
             }
             catch (Exception e)
             {
-                Monitor.Log("Exception while rebuilding element: " + e.Message, LogLevel.Error);
-                Monitor.Log("" + e.StackTrace, LogLevel.Error);
+                Monitor.Log("Exception while rebuilding element: " + dataString, LogLevel.Trace);
                 return replacement;
             }
-        }
-
-        private static void cehRebuild(object o, Dictionary<string,string> additionalSaveData, object replacement)
-        {
-            MethodInfo rebuild = cehType.GetMethods(BindingFlags.Instance | BindingFlags.Public).ToList().Find(m => m.Name == "rebuild");
-            rebuild.Invoke(o, new [] { additionalSaveData, replacement });
         }
 
         private static string getTypeName(object o)

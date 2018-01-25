@@ -133,9 +133,7 @@ namespace PyTK.Extensions
 
         public static List<T> useAll<T>(this List<T> list, Action<T> action)
         {
-            foreach (T item in list)
-                action.Invoke(item);
-
+            list.ForEach(action);
             return list;
         }
 

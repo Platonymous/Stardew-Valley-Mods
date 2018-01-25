@@ -14,10 +14,7 @@ namespace PyTK.Overrides
         {
             internal static MethodInfo TargetMethod()
             {
-                if (Type.GetType("StardewValley.Objects.TV, Stardew Valley") != null)
-                    return AccessTools.Method(Type.GetType("StardewValley.Objects.TV, Stardew Valley"), "checkForAction");
-                else
-                    return AccessTools.Method(Type.GetType("StardewValley.Objects.TV, StardewValley"), "checkForAction");
+                    return AccessTools.Method(PyUtils.getTypeSDV("Objects.TV"), "checkForAction");
             }
 
             internal static bool Prefix(ref TV __instance, SFarmer who, bool justCheckingForActivity)

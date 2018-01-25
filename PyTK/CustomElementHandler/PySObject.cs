@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace PyTK.CustomElementHandler
 {
-    public class PySObject : SObject, ICustomObject
+    public class PySObject : SObject, ICustomObject, IDrawFromCustomObjectData
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;

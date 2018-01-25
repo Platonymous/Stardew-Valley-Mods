@@ -47,6 +47,7 @@
     <Compile Include="ConsoleCommands\CcTime.cs" />
     <Compile Include="CustomElementHandler\CraftingData.cs" />
     <Compile Include="CustomElementHandler\CustomObjectData.cs" />
+    <Compile Include="CustomElementHandler\IDrawFromCustomObjectData.cs" />
     <Compile Include="CustomElementHandler\ICustomObject.cs" />
     <Compile Include="CustomElementHandler\PySObject.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
