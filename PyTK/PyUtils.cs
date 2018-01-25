@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using StardewValley.Locations;
 using System.IO;
+using System.Linq;
+using StardewValley.Buildings;
 
 namespace PyTK
 {
@@ -20,13 +22,13 @@ namespace PyTK
 
         public static List<GameLocation> getAllLocationsAndBuidlings()
         {
-            List<GameLocation> list = Game1.locations;
+            List<GameLocation> list = Game1.locations.ToList();
 
-            for (int i = 0; i < Game1.locations.Count; i++)
-                if (Game1.locations[i] is BuildableGameLocation bgl)
-                    for (int j = 0; j < bgl.buildings.Count; j++)
-                        if (bgl.buildings[j].indoors != null)
-                            list.Add(bgl.buildings[j].indoors);
+            foreach (GameLocation location in Game1.locations)
+                if (location is BuildableGameLocation bgl)
+                    foreach (Building building in bgl.buildings)
+                        if (building.indoors != null)
+                            list.Add(building.indoors);
 
             return list;
         }
