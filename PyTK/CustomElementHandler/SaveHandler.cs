@@ -312,6 +312,9 @@ namespace PyTK.CustomElementHandler
                 return getReplacement(ise);
 
             object o = Helper.Reflection.GetMethod(element, "getReplacement").Invoke<object>();
+            if (element is TerrainFeature && !(o is FruitTree))
+                o = new FruitTree(628, 1);
+
             setDataString(o, getReplacementName(element));
             return o;
         }
@@ -364,7 +367,28 @@ namespace PyTK.CustomElementHandler
                             foreach (Vector2 k in dict.Keys.Reverse())
                                 if (dict[k] == obj)
                                 {
-                                    dict[k] = (SObject)replacer(item);
+                                    if (obj is SObject sobj && splitElemets(sobj.name).Count() > 2 && splitElemets(sobj.name)[1] == "Terrain")
+                                    {
+                                        GameLocation gl = PyUtils.getAllLocationsAndBuidlings().Find(l => l.objects == dict);
+                                        if (gl != null)
+                                        {
+                                            gl.terrainFeatures.AddOrReplace(k, (TerrainFeature)replacer(item));
+                                        }
+
+                                        dict.Remove(k);
+                                    }
+                                    else
+                                        dict[k] = (SObject)replacer(item);
+
+                                    break;
+                                }
+                        }
+                        else if (key is IDictionary<Vector2, TerrainFeature> dictT)
+                        {
+                            foreach (Vector2 k in dictT.Keys.Reverse())
+                                if (dictT[k] == obj)
+                                {
+                                    dictT[k] = (TerrainFeature)replacer(item);
                                     break;
                                 }
                         }
