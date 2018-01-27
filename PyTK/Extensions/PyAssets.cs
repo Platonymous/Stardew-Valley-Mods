@@ -101,7 +101,7 @@ namespace PyTK.Extensions
         {
             Func<Map, Map> merger = new Func<Map, Map>(delegate (Map asset)
             {
-                return t.mergeInto(asset, position, sourceRectangle);
+                return t.mergeInto(asset, position, sourceRectangle, true);
             });
 
             return new AssetInjector<Map, Map>(assetName, merger).injectEdit();

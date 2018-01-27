@@ -13,6 +13,7 @@ using System.IO;
 using PyTK.Types;
 using PyTK.Extensions;
 using xTile.Dimensions;
+using xTile.Format;
 
 namespace PyTK.Extensions
 {
@@ -44,6 +45,7 @@ namespace PyTK.Extensions
                 if (terrain.ContainsKey(t) && (terrain[t] is T))
                     return ((T) terrain[t]);
             }
+
             return null;
         }
 
@@ -95,7 +97,7 @@ namespace PyTK.Extensions
             return l;
         }
 
-        public static Map mergeInto(this Map t, Map map, Vector2 position, Microsoft.Xna.Framework.Rectangle? sourceArea, bool includeEmpty = false, bool properties = true)
+        public static Map mergeInto(this Map t, Map map, Vector2 position, Microsoft.Xna.Framework.Rectangle? sourceArea = null, bool includeEmpty = false, bool properties = true)
         {
             Microsoft.Xna.Framework.Rectangle sourceRectangle = sourceArea.HasValue ? sourceArea.Value : new Microsoft.Xna.Framework.Rectangle(0, 0, t.DisplayWidth / Game1.tileSize, t.DisplayHeight / Game1.tileSize);
 

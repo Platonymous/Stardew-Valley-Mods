@@ -19,6 +19,12 @@ using System.Reflection;
 using StardewValley.Menus;
 using System.Collections.Generic;
 using PyTK.Overrides;
+using System.IO;
+using xTile.Format;
+using System.Linq;
+using xTile;
+using xTile.Tiles;
+using PyTK.Tiled;
 
 namespace PyTK
 {
@@ -35,6 +41,7 @@ namespace PyTK
             //testing();
 
             harmonyFix();
+            FormatManager.Instance.RegisterMapFormat(new NewTiledTmxFormat());
 
             TimeEvents.AfterDayStarted += (a,b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
             registerConsoleCommands();
@@ -48,12 +55,12 @@ namespace PyTK
             OvSpritebatch.DrawFix1.init("SObject",PyUtils.getTypeSDV("Object"), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
-        
 
         private void registerConsoleCommands()
         {
             CcLocations.clearSpace().register();
             CcSaveHandler.cleanup().register();
+            CcSaveHandler.savecheck().register();
             CcTime.skip().register();
         }
 

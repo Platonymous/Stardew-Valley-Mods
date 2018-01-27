@@ -7,6 +7,8 @@ using StardewValley.Locations;
 using System.IO;
 using System.Linq;
 using StardewValley.Buildings;
+using System.Xml.Schema;
+using System.Xml;
 
 namespace PyTK
 {
@@ -56,14 +58,14 @@ namespace PyTK
 
                     if (monitor != null)
                     {
-                        string author = p.author == "none" ? "" : " by " + p.author;
+                        string author = p.author == "none" || p.author == null || p.author == "" ? "" : " by " + p.author;
                         monitor.Log(p.name + " " + p.version + author, LogLevel.Info);
                     }
                 }
             }
         }
 
-        internal static Type getTypeSDV(string type)
+        public static Type getTypeSDV(string type)
         {
             string prefix = "StardewValley.";
             Type defaulSDV = Type.GetType(prefix + type + ", Stardew Valley");
@@ -73,6 +75,31 @@ namespace PyTK
             else
                 return Type.GetType(prefix + type + ", StardewValley");
 
+        }
+
+        internal static void checkAllSaves()
+        {
+            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "StardewValley", "Saves");
+            string[] files = Directory.GetFiles(folder, "*", SearchOption.AllDirectories);
+            foreach (string file in files)
+            {
+                if(!file.Contains(".") && !file.Contains("old") && !file.Contains("SaveGame"))
+                {
+                        XmlReaderSettings settings = new XmlReaderSettings();
+
+                        XmlReader reader = XmlReader.Create(Path.Combine(Helper.DirectoryPath, file), settings);
+                    FileInfo info = new FileInfo(file);
+                    try
+                    {
+                        while (reader.Read());
+                        Monitor.Log( info.Directory.Name + "/" + info.Name + " (OK)");
+                    }
+                    catch (Exception e)
+                    {
+                        Monitor.Log("Error in " + info.Directory.Name + "/" + info.Name + ": " + e.Message,LogLevel.Error);
+                    }
+                }
+            }           
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using PyTK.Extensions;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Buildings;
+using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using System;
@@ -91,10 +93,32 @@ namespace PyTK.CustomElementHandler
 
         internal static void Cleanup()
         {
-            Func<object, bool> predicate = o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix);
+            Func<object, bool> predicate = o => cleanupPredicate(o);
             RemoveAllObjects(FindAllObjects(Game1.locations, Game1.game1), predicate);
             RemoveAllObjects(FindAllObjects(Game1.player, Game1.game1),predicate);
+
             Monitor.Log("Cleanup complete.");
+        }
+
+        private static bool cleanupPredicate(object o)
+        {
+            if(checkForErrorItem(o) || getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix))
+            {
+                if(o is Item i)
+                    Monitor.Log("Removing " + i.Name);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool checkForErrorItem(object o)
+        {
+            if (o is SObject obj && !(obj is ISaveElement) && obj.getDescription().Contains("???") && Game1.objectInformation.Values.ToList().Find(v => v.StartsWith(obj.name + "/")) == null)
+                return true;
+
+            return false;
         }
 
         private static void OnFinishedRebuilding(EventArgs e)
