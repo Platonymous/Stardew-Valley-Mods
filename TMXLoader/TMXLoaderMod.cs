@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using PyTK;
 using PyTK.Extensions;
 using PyTK.Tiled;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using xTile;
+using xTile.ObjectModel;
 
 namespace TMXLoader
 {
@@ -41,7 +43,14 @@ namespace TMXLoader
                     Monitor.Log(":" + map.Properties["Warp"] + ":");
                     map.inject("Maps/" + edit.name);
                     GameLocation location = new GameLocation(map, edit.name);
-                    SaveEvents.AfterLoad += (s,e) => Game1.locations.Add(new GameLocation(map, edit.name));
+                    if (map.Properties.ContainsKey("Outdoors") && map.Properties["Outdoors"] == "F")
+                    {
+                        location.isOutdoors = false;
+                        location.loadLights();
+                    }
+                        
+
+                    SaveEvents.AfterLoad += (s, e) => Game1.locations.Add(new GameLocation(map, edit.name) { isOutdoors = false });
                 }
 
                 foreach (MapEdit edit in pack.replaceMaps)
@@ -85,13 +94,13 @@ namespace TMXLoader
 
             string warps = "";
 
-            if (original != null && original.Properties.ContainsKey("Warp"))
+            if (original != null && original.Properties.ContainsKey("Warp") && !(removeWarps.Length > 0 && removeWarps[0] == "all"))
                 warps = original.Properties["Warp"];
 
             if(addWarps.Length > 0)
                 warps = ( warps.Length > 9 ? warps + " " : "") + String.Join(" ", addWarps);
 
-            if(removeWarps.Length > 0)
+            if(removeWarps.Length > 0 && removeWarps[0] != "all")
             {
                 foreach(string warp in removeWarps)
                 {
@@ -113,10 +122,10 @@ namespace TMXLoader
             {
                 string fileName = new FileInfo(file).Name;
                 string importPath = Path.Combine("Converter", "IN", fileName);
-                FileInfo importFile = new FileInfo(Path.Combine(inPath,fileName));
+                FileInfo importFile = new FileInfo(Path.Combine(inPath, fileName));
                 string exportPath = Path.Combine("Converter", "OUT", fileName.Replace(".xnb", ".tmx").Replace(".tbin", ".tmx"));
-                TMXContent.Convert(importPath, exportPath, Helper, ContentSource.ModFolder, Monitor);
-                importFile.Delete();
+                if (TMXContent.Convert(importPath, exportPath, Helper, ContentSource.ModFolder, Monitor))
+                    importFile.Delete();
             }
             Monitor.Log("..Done!", LogLevel.Trace);
         }
