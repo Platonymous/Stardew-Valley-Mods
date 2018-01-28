@@ -20,6 +20,7 @@ namespace PyTK.Tiled
 
         public static Map Load(string path, IModHelper helper)
         {
+            Dictionary<TileSheet, Texture2D> tilesheets = Helper.Reflection.GetField<Dictionary<TileSheet, Texture2D>>(Game1.mapDisplayDevice, "m_tileSheetTextures").GetValue();
             Map map = tmx2map(Path.Combine(helper.DirectoryPath,path));
             string fileName = new FileInfo(path).Name;
 
@@ -29,20 +30,21 @@ namespace PyTK.Tiled
                 string tileSheetPath = path.Replace(fileName, t.ImageSource + ".png");
 
                 FileInfo tileSheetFile = new FileInfo(Path.Combine(helper.DirectoryPath, tileSheetPath));
-                if (tileSheetFile.Exists)
+                FileInfo tileSheetFileVanilla = new FileInfo(Path.Combine(new DirectoryInfo(helper.DirectoryPath).Parent.Parent.FullName, "Content", t.ImageSource + ".xnb"));
+                if (tileSheetFile.Exists && !tileSheetFileVanilla.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource).Key == null)
                 {
-                   helper.Content.Load<Texture2D>(tileSheetPath).inject(t.ImageSource);
+                    helper.Content.Load<Texture2D>(tileSheetPath).inject(t.ImageSource);
                     if (t.ImageSource.Contains("spring_"))
                         foreach (string season in seasons)
                         {
                             string seasonPath = path.Replace(fileName, t.ImageSource.Replace("spring_", season));
                             FileInfo seasonFile = new FileInfo(Path.Combine(helper.DirectoryPath, seasonPath + ".png"));
-                            if (seasonFile.Exists)
-                                helper.Content.Load<Texture2D>(seasonPath).inject(t.ImageSource.Replace("spring_", season));
+                            if (seasonFile.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource.Replace("spring_", season)).Key == null)
+                                helper.Content.Load<Texture2D>(seasonPath + ".png").inject(t.ImageSource.Replace("spring_", season));
                         }
                 }
             }
-            map.LoadTileSheets(Game1.mapDisplayDevice);
+                map.LoadTileSheets(Game1.mapDisplayDevice);
             return map;
         }
 
@@ -122,7 +124,7 @@ namespace PyTK.Tiled
             }
         }
 
-        public static void Convert (string pathIn, string pathOut, IModHelper helper, ContentSource contentSource = ContentSource.ModFolder, IMonitor monitor = null)
+        public static bool Convert (string pathIn, string pathOut, IModHelper helper, ContentSource contentSource = ContentSource.ModFolder, IMonitor monitor = null)
         {
             if (!pathOut.EndsWith(".tmx"))
                 pathOut = pathOut + ".tmx";
@@ -141,18 +143,23 @@ namespace PyTK.Tiled
 
             if (monitor != null)
                 monitor.Log($"Converting {pathIn} -> {pathOut}", LogLevel.Trace);
+                return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Monitor.Log("Map Error" + ex.Message + ":" + ex.StackTrace);
+
                 try
                 {
                     string imagePath = pathOut.Replace(".tmx", ".png");
                     Texture2D image = helper.Content.Load<Texture2D>(pathIn);
                     image.SaveAsPng(new FileStream(Path.Combine(helper.DirectoryPath, imagePath), FileMode.Create), image.Width, image.Height);
+                    return true;
                 }
                 catch(Exception e)
                 {
-                    Monitor.Log(e.Message + ":" + e.StackTrace);
+                    Monitor.Log("Image Error" + e.Message + ":" + e.StackTrace);
+                    return false;
                 }
             }
         }
@@ -167,6 +174,17 @@ namespace PyTK.Tiled
             MemoryStream stream = new MemoryStream();
             FormatManager.Instance.BinaryFormat.Store(newMap, stream);
             return stream;
+        }
+
+        internal static Map tmx2map(string path)
+        {
+            Map newMap = FormatManager.Instance.LoadMap(path);
+
+            foreach (TileSheet t in newMap.TileSheets)
+                t.ImageSource = t.ImageSource.Contains(".png") ? t.ImageSource.Replace(".png","") : t.ImageSource;
+
+
+            return newMap;
         }
 
         internal static MemoryStream map2tmx(Map map)
@@ -186,14 +204,12 @@ namespace PyTK.Tiled
         internal static MemoryStream tbin2tmx(string path, IModHelper helper, ContentSource contentSource)
         {
             Map map = helper.Content.Load<Map>(path, contentSource);
-            map.LoadTileSheets(Game1.mapDisplayDevice);
             return map2tmx(map);
         }
 
         internal static MemoryStream xnb2tmx(string path, IModHelper helper, ContentSource contentSource)
         {
             Map map = helper.Content.Load<Map>(path, contentSource);
-            map.LoadTileSheets(Game1.mapDisplayDevice);
             return map2tmx(map);
         }
 
@@ -202,18 +218,6 @@ namespace PyTK.Tiled
             Map map = helper.Content.Load<Map>(path, contentSource);
             map.LoadTileSheets(Game1.mapDisplayDevice);
             return map2tbin(map);
-        }
-
-        internal static Map tmx2map(string path)
-        {
-            MemoryStream stream = tmx2tbin(path);
-            stream.Position = 0;
-            Map map = FormatManager.Instance.BinaryFormat.Load(stream);
-
-            foreach (TileSheet t in map.TileSheets)
-                t.ImageSource = !t.ImageSource.Contains(".png") ? t.ImageSource : t.ImageSource.Replace(".png", "");
-
-            return map;
         }
     }
 }
