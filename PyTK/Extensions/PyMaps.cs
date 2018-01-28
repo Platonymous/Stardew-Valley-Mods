@@ -83,6 +83,25 @@ namespace PyTK.Extensions
             return false;
         }
 
+        public static Map switchLayers(this Map t, string layer1, string layer2)
+        {
+            Layer newLayer1 = t.GetLayer(layer1);
+            Layer newLayer2 = t.GetLayer(layer2);
+
+            t.RemoveLayer(t.GetLayer(layer1));
+            t.RemoveLayer(t.GetLayer(layer2));
+
+            newLayer1.Id = layer2;
+            newLayer2.Id = layer1;
+            
+            t.AddLayer(newLayer1);
+            t.AddLayer(newLayer2);
+            
+            Monitor.Log($"Switched Layers: {layer1} <-> {layer2}");
+
+            return t;
+        }
+
         public static GameLocation clearArea(this GameLocation l, Microsoft.Xna.Framework.Rectangle area)
         {
 
@@ -97,7 +116,7 @@ namespace PyTK.Extensions
             return l;
         }
 
-        public static Map mergeInto(this Map t, Map map, Vector2 position, Microsoft.Xna.Framework.Rectangle? sourceArea = null, bool includeEmpty = false, bool properties = true)
+        public static Map mergeInto(this Map t, Map map, Vector2 position, Microsoft.Xna.Framework.Rectangle? sourceArea = null, bool includeEmpty = true, bool properties = true)
         {
             Microsoft.Xna.Framework.Rectangle sourceRectangle = sourceArea.HasValue ? sourceArea.Value : new Microsoft.Xna.Framework.Rectangle(0, 0, t.DisplayWidth / Game1.tileSize, t.DisplayHeight / Game1.tileSize);
 
