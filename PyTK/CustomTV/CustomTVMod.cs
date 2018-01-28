@@ -11,14 +11,15 @@ namespace PyTK.CustomTV
 {
     public static class CustomTVMod
     {
-        internal static IModHelper Helper { get; } = PyTKMod._helper;
-        internal static IMonitor Monitor { get; } = PyTKMod._monitor;
+        internal static IModHelper Helper { get => PyTKMod._helper; }
+        internal static IMonitor Monitor { get => PyTKMod._monitor; }
 
         private static string weatherString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13105");
         private static string fortuneString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13107");
         private static string queenString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13114");
         private static string landString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13111");
         private static string rerunString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13117");
+        private static bool hasLoaded = false;
 
         private static TemporaryAnimatedSprite tvScreen
         {
@@ -52,7 +53,10 @@ namespace PyTK.CustomTV
 
         internal static void load()
         {
-            loadDefaultChannels();
+            if (!hasLoaded)
+                loadDefaultChannels();
+
+            hasLoaded = true;
         }
 
         private static void loadDefaultChannels()
@@ -155,17 +159,19 @@ namespace PyTK.CustomTV
 
         public static void addChannel(TVChannel tvChannel)
         {
-                channels.AddOrReplace(tvChannel.id, tvChannel);
+            channels.AddOrReplace(tvChannel.id, tvChannel);
         }
 
         public static void changeAction(string id, Action<TV, TemporaryAnimatedSprite, SFarmer, string> action)
         {
+            load();
             if (channels.ContainsKey(id))
                 channels[id].action = action;
         }
 
         public static void removeKey(string key)
         {
+            load();
             channels.Remove(key);
         }
 
@@ -207,7 +213,7 @@ namespace PyTK.CustomTV
 
         public static void endProgram()
         {
-            if(tv != null)
+            if (tv != null)
                 tv.turnOffTV();
             tv = null;
         }
@@ -222,7 +228,5 @@ namespace PyTK.CustomTV
             else if (channels.ContainsKey(a))
                 channels[a].action.Invoke(tv, tvScreen, who, a);
         }
-
-
     }
 }
