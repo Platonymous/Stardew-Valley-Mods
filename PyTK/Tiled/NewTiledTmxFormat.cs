@@ -152,8 +152,10 @@ namespace PyTK.Tiled
             List<TiledTileSet> tileSets = this.TiledMap.TileSets;
             if (tileSets == null)
                 return;
+            
             Action<TiledTileSet> action1 = (Action<TiledTileSet>)(tileSet =>
            {
+               
                xTile.Dimensions.Size sheetSize = new xTile.Dimensions.Size();
                try
                {
@@ -164,6 +166,8 @@ namespace PyTK.Tiled
                {
                    throw new Exception("Unable to determine sheet size", ex);
                }
+               tileSet.TileWidth = 64;
+               tileSet.TileHeight = 64;
                TileSheet tileSheet = new TileSheet(tileSet.SheetName, map, tileSet.Image.Source, sheetSize, new xTile.Dimensions.Size(tileSet.TileWidth, tileSet.TileHeight))
                {
                    Spacing = new xTile.Dimensions.Size(tileSet.Spacing),
