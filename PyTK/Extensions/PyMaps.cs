@@ -97,8 +97,19 @@ namespace PyTK.Extensions
             t.AddLayer(newLayer1);
             t.AddLayer(newLayer2);
             
-            Monitor.Log($"Switched Layers: {layer1} <-> {layer2}");
+            return t;
+        }
 
+        public static Map switchTileBetweenLayers(this Map t, string layer1, string layer2, int x, int y)
+        {
+            Location tileLocation = new Location(x , y);
+
+            Tile tile1 = t.GetLayer(layer1).Tiles[tileLocation];
+            Tile tile2 = t.GetLayer(layer2).Tiles[tileLocation];
+
+            t.GetLayer(layer1).Tiles[tileLocation] = tile2;
+            t.GetLayer(layer2).Tiles[tileLocation] = tile1;
+            
             return t;
         }
 
