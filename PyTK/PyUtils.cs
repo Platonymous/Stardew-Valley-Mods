@@ -9,6 +9,9 @@ using System.Linq;
 using StardewValley.Buildings;
 using System.Xml.Schema;
 using System.Xml;
+using PyTK.Overrides;
+using Microsoft.Xna.Framework;
+using System.Reflection;
 
 namespace PyTK
 {
@@ -19,13 +22,39 @@ namespace PyTK
 
         public static bool CheckEventConditions(string conditions)
         {
-            return Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>(new object[] { "9999999/" + conditions }) != -1;
+            return checkEventConditions(conditions);
+        }
+
+        public static bool checkEventConditions(string conditions)
+        {
+            if (conditions == null || conditions == "")
+                return true;
+
+            bool result = false;
+            bool comparer = true;
+
+            if (conditions.StartsWith("NOT "))
+            {
+                conditions = conditions.Replace("NOT ", "");
+                comparer = false;
+            }
+
+            if (conditions.StartsWith("PC "))
+                result = checkPlayerConditions(conditions.Replace("PC ", ""));
+            else
+                result = Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>(new object[] { "9999999/" + conditions }) != -1;
+
+            return result == comparer;
+        }
+
+        public static bool checkPlayerConditions(string conditions)
+        {
+            return Helper.Reflection.GetField<bool>(Game1.player, conditions).GetValue();
         }
 
         public static List<GameLocation> getAllLocationsAndBuidlings()
         {
             List<GameLocation> list = Game1.locations.ToList();
-
             foreach (GameLocation location in Game1.locations)
                 if (location is BuildableGameLocation bgl)
                     foreach (Building building in bgl.buildings)
