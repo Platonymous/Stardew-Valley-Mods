@@ -18,13 +18,14 @@ namespace TMXLoader
     public class TMXLoaderMod : Mod
     {
         internal static string contentFolder = "Maps";
-
         public override void Entry(IModHelper helper)
         {
+            Monitor.Log("Environment:" + PyUtils.getContentFolder());
             exportAllMaps();
             convert();
             loadContentPacks();
             setTileActions();
+            
         }
 
         private void setTileActions()
@@ -117,7 +118,6 @@ namespace TMXLoader
                     string filePath = Path.Combine(contentFolder, pack.folderName, edit.file);
                     Map map = TMXContent.Load(filePath, Helper);
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
-                    Monitor.Log(":" + map.Properties["Warp"] + ":");
                     map.inject("Maps/" + edit.name);
                     addMoreMapLayers(map);
                     GameLocation location;
@@ -166,7 +166,6 @@ namespace TMXLoader
                 {
                     Map map = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
-                    Monitor.Log(":" + map.Properties["Warp"] + ":");
                     map.injectAs("Maps/" + edit.name);
                 }
             }
@@ -227,9 +226,9 @@ namespace TMXLoader
             string exportFolderPath = Path.Combine(Helper.DirectoryPath, "Converter", "FullMapExport");
             DirectoryInfo exportFolder = new DirectoryInfo(exportFolderPath);
             DirectoryInfo modFolder = new DirectoryInfo(Helper.DirectoryPath);
-            string contentPath = Path.Combine(modFolder.Parent.Parent.FullName, "Content");
+            string contentPath = PyUtils.getContentFolder();
 
-            if (!exportFolder.Exists)
+            if (!exportFolder.Exists && contentPath != null)
                 exportFolder.Create();
             else
                 return;

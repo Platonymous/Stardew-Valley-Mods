@@ -30,21 +30,17 @@ namespace PyTK.Tiled
                 string tileSheetPath = path.Replace(fileName, t.ImageSource + ".png");
 
                 FileInfo tileSheetFile = new FileInfo(Path.Combine(helper.DirectoryPath, tileSheetPath));
-                FileInfo tileSheetFileVanilla = new FileInfo(Path.Combine(new DirectoryInfo(helper.DirectoryPath).Parent.Parent.FullName, "Content", t.ImageSource + ".xnb"));
+                FileInfo tileSheetFileVanilla = new FileInfo(Path.Combine(PyUtils.getContentFolder(), "Content", t.ImageSource + ".xnb"));
                 if (tileSheetFile.Exists && !tileSheetFileVanilla.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource).Key == null)
                 {
                     helper.Content.Load<Texture2D>(tileSheetPath).inject(t.ImageSource);
-                    helper.Content.Load<Texture2D>(tileSheetPath).inject("Maps/" + t.ImageSource);
                     if (t.ImageSource.Contains("spring_"))
                         foreach (string season in seasons)
                         {
                             string seasonPath = path.Replace(fileName, t.ImageSource.Replace("spring_", season));
                             FileInfo seasonFile = new FileInfo(Path.Combine(helper.DirectoryPath, seasonPath + ".png"));
                             if (seasonFile.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource.Replace("spring_", season)).Key == null)
-                            {
-                                Monitor.Log("Injecting:" + t.ImageSource.Replace("spring_", season));
-                                helper.Content.Load<Texture2D>(seasonPath + ".png").inject("Maps/"+ t.ImageSource.Replace("spring_", season));
-                            }
+                                helper.Content.Load<Texture2D>(seasonPath + ".png").inject(t.ImageSource.Replace("spring_", season));
                         }
                 }
             }

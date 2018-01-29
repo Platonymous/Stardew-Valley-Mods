@@ -21,6 +21,23 @@ namespace PyTK
             return checkEventConditions(conditions);
         }
 
+        public static string getContentFolder()
+        {
+            string folder = Path.Combine(Environment.CurrentDirectory, Game1.content.RootDirectory);
+            DirectoryInfo directoryInfo = new DirectoryInfo(folder);
+
+            if (directoryInfo.Exists)
+                return folder;
+
+            folder = folder.Replace("MacOS", "Resources");
+
+            directoryInfo = new DirectoryInfo(folder);
+            if (directoryInfo.Exists)
+                return folder;
+
+            return null;
+        }
+
         public static bool checkEventConditions(string conditions)
         {
             if (conditions == null || conditions == "")

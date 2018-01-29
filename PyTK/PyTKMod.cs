@@ -22,13 +22,22 @@ using xTile.Format;
 using System.Linq;
 
 using PyTK.Tiled;
+using System.IO;
 
 namespace PyTK
 {
+
+    internal class Config
+    {
+        bool patchSpriteBatch { get; set; } = true;
+    }
+
     public class PyTKMod : Mod
     {
         internal static IModHelper _helper;
         internal static IMonitor _monitor;
+        internal static bool _activeSpriteBatchFix = true;
+        internal static string sdvContentFolder => PyUtils.getContentFolder();
 
         public override void Entry(IModHelper helper)
         {
@@ -44,6 +53,7 @@ namespace PyTK
             registerConsoleCommands();
             CustomTVMod.load();
             SaveHandler.setUpEventHandlers();
+
         }
 
         private void harmonyFix()

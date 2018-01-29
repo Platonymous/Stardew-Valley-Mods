@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PyTK.Types;
+using StardewValley;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace PyTK.Extensions
 {
@@ -12,11 +14,34 @@ namespace PyTK.Extensions
 
         public static Texture2D clone(this Texture2D t)
         {
-            Texture2D clone = new Texture2D(t.GraphicsDevice, t.Width, t.Height);
-            Color[] data = new Color[t.Width * t.Height];
-            t.GetData(data);
-            clone.SetData(data);
+            MemoryStream mem = new MemoryStream();
+            t.SaveAsPng(mem,t.Width,t.Height);
+            Texture2D clone = loadTextureData(mem);
             return clone;
+        }
+
+        public static Texture2D loadTextureData(Stream stream)
+        {
+            using (BinaryReader reader = new BinaryReader(stream))
+            {
+                var width = reader.ReadInt32();
+                var height = reader.ReadInt32();
+                var length = reader.ReadInt32();
+                var data = new Color[length];
+
+                for (int i = 0; i < data.Length; i++)
+                {
+                    var r = reader.ReadByte();
+                    var g = reader.ReadByte();
+                    var b = reader.ReadByte();
+                    var a = reader.ReadByte();
+                    data[i] = new Color(r, g, b, a);
+                }
+
+                var texture = new Texture2D(Game1.graphics.GraphicsDevice, width, height);
+                texture.SetData(data, 0, data.Length);
+                return texture;
+            }
         }
 
         public static Color clone(this Color t)
