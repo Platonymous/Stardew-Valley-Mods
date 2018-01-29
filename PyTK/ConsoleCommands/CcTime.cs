@@ -1,16 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using PyTK.Extensions;
-using PyTK.Types;
+﻿using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using StardewModdingAPI.Events;
 
 namespace PyTK.ConsoleCommands
 {

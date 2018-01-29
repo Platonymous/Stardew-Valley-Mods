@@ -1,6 +1,4 @@
-﻿
-using System;
-using PyTK.Types;
+﻿using PyTK.Types;
 using System.Collections.Generic;
 
 namespace TMXLoader

@@ -7,11 +7,7 @@ using StardewValley.Locations;
 using System.IO;
 using System.Linq;
 using StardewValley.Buildings;
-using System.Xml.Schema;
 using System.Xml;
-using PyTK.Overrides;
-using Microsoft.Xna.Framework;
-using System.Reflection;
 
 namespace PyTK
 {

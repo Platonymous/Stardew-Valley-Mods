@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using xTile.Dimensions;
-using SFarmer = StardewValley.Farmer;
-using PyTK.Overrides;
 using PyTK.Extensions;
 using Microsoft.Xna.Framework;
 using StardewValley;

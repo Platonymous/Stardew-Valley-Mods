@@ -36,7 +36,7 @@ namespace PyTK.Extensions
 
         public static Vector2 getTileAtMousePosition(this GameLocation t)
         {
-            return new Vector2((int)(Game1.getOldMouseX() + Game1.viewport.X) / Game1.tileSize, (int)(Game1.getOldMouseY() + Game1.viewport.Y) / Game1.tileSize);
+            return new Vector2((Game1.getOldMouseX() + Game1.viewport.X) / Game1.tileSize, (Game1.getOldMouseY() + Game1.viewport.Y) / Game1.tileSize);
         }
 
         /* Converter */
@@ -63,7 +63,7 @@ namespace PyTK.Extensions
 
         public static Point toPoint(this MouseState t)
         {
-            return new Point((int)t.X, (int)t.Y);
+            return new Point(t.X, t.Y);
         }
 
         public static Vector2 floorValues(this Vector2 t)

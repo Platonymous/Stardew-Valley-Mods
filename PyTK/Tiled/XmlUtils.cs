@@ -7,33 +7,33 @@ namespace PyTK.Tiled
     {
         public static XElement CreateNullElement(string name)
         {
-            return new XElement((XName)name);
+            return new XElement(name);
         }
 
         public static XObject If(bool condition, XObject elem)
         {
             if (!condition)
-                return (XObject)null;
+                return null;
             return elem;
         }
 
         public static XObject If(bool condition, XmlUtils.XObjectCreationDelegate objectCreation)
         {
             if (!condition)
-                return (XObject)null;
+                return null;
             return objectCreation();
         }
 
         public static bool HasOwnProperty(this XElement elem, string name)
         {
             if (!name.StartsWith("@"))
-                return elem.Element((XName)name) != null;
-            return elem.Attribute((XName)name.Substring(1)) != null;
+                return elem.Element(name) != null;
+            return elem.Attribute(name.Substring(1)) != null;
         }
 
         public static T Value<T>(this XElement elem)
         {
-            return (T)Convert.ChangeType((object)elem.Value, typeof(T));
+            return (T)Convert.ChangeType(elem.Value, typeof(T));
         }
 
         public static T Value<T>(this XElement elem, string elementName)
@@ -44,28 +44,28 @@ namespace PyTK.Tiled
             string str1;
             if (!elementName.StartsWith("@"))
             {
-                XElement xelement = elem.Element((XName)elementName);
-                str1 = xelement != null ? xelement.Value : (string)null;
+                XElement xelement = elem.Element(elementName);
+                str1 = xelement != null ? xelement.Value : null;
             }
             else
             {
-                XAttribute xattribute = elem.Attribute((XName)elementName.Substring(1));
-                str1 = xattribute != null ? xattribute.Value : (string)null;
+                XAttribute xattribute = elem.Attribute(elementName.Substring(1));
+                str1 = xattribute != null ? xattribute.Value : null;
             }
             string str2 = str1;
             if (str2 == null)
                 return default(T);
             if (type1 == typeof(int))
-                return (T)Convert.ChangeType((object)Utils.FromString(str2), type1);
+                return (T)Convert.ChangeType(Utils.FromString(str2), type1);
             Type type2 = Nullable.GetUnderlyingType(type1);
             if ((object)type2 == null)
                 type2 = type1;
             Type conversionType = type2;
             if (!conversionType.IsEnum)
-                return (T)Convert.ChangeType((object)str2, conversionType);
+                return (T)Convert.ChangeType(str2, conversionType);
             long result;
             if (long.TryParse(str2, out result))
-                return (T)(object)(ValueType)result;
+                return (T)(object)result;
             return str2.GetEnumByName<T>();
         }
 

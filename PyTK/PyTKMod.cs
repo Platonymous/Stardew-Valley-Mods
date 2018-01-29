@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
@@ -19,11 +18,9 @@ using System.Reflection;
 using StardewValley.Menus;
 using System.Collections.Generic;
 using PyTK.Overrides;
-using System.IO;
 using xTile.Format;
 using System.Linq;
-using xTile;
-using xTile.Tiles;
+
 using PyTK.Tiled;
 
 namespace PyTK

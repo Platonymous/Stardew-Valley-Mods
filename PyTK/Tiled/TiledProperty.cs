@@ -5,29 +5,28 @@ namespace PyTK.Tiled
     internal class TiledProperty : XmlObject, IXmlFormatable
     {
         public string Name { get; set; }
-
         public string Value { get; set; }
 
         public TiledProperty(string name, string value)
-          : base((XElement)null)
+          : base(null)
         {
-            this.Name = name;
-            this.Value = value;
+            Name = name;
+            Value = value;
         }
 
         public TiledProperty(XElement elem)
           : base(elem)
         {
-            this.Name = elem.Value<string>("@name");
-            this.Value = elem.Value<string>("@value");
+            Name = elem.Value<string>("@name");
+            Value = elem.Value<string>("@value");
         }
 
         public XElement ToXml()
         {
-            return new XElement((XName)"property", new object[2]
+            return new XElement("property", new object[2]
             {
-        (object) new XAttribute((XName) "name", (object) this.Name),
-        (object) new XAttribute((XName) "value", (object) this.Value)
+         new XAttribute( "name",  Name),
+         new XAttribute( "value",  Value)
             });
         }
     }

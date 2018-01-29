@@ -1,6 +1,5 @@
 ﻿using Harmony;
 using StardewValley.Objects;
-using System;
 using System.Reflection;
 using SFarmer = StardewValley.Farmer;
 using PyTK.CustomTV;

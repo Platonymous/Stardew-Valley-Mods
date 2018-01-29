@@ -23,14 +23,14 @@ namespace PyTK.Tiled
                 throw new InvalidOperationException();
             foreach (FieldInfo field in type2.GetFields())
             {
-                DescriptionAttribute customAttribute = Attribute.GetCustomAttribute((MemberInfo)field, typeof(DescriptionAttribute)) as DescriptionAttribute;
+                DescriptionAttribute customAttribute = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute;
                 if (customAttribute != null)
                 {
                     if (customAttribute.Description == name)
-                        return (T)field.GetValue((object)null);
+                        return (T)field.GetValue(null);
                 }
                 else if (field.Name == name)
-                    return (T)field.GetValue((object)null);
+                    return (T)field.GetValue(null);
             }
             return default(T);
         }
@@ -44,7 +44,7 @@ namespace PyTK.Tiled
             List<T> objList = new List<T>(values.Length);
             foreach (int num in values)
                 objList.Add((T)Enum.Parse(enumType, num.ToString()));
-            return (IEnumerable<T>)objList;
+            return objList;
         }
     }
 }

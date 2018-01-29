@@ -32,7 +32,7 @@ namespace PyTK.Tiled
                 return absolutePath;
             if (absolutePath.StartsWith(basePath))
                 return absolutePath.Remove(0, basePath.Length);
-            for (; basePath.Length > 0 && absolutePath.Length > 0 && (int)char.ToLower(basePath[0]) == (int)char.ToLower(absolutePath[0]); absolutePath = absolutePath.Remove(0, 1))
+            for (; basePath.Length > 0 && absolutePath.Length > 0 && char.ToLower(basePath[0]) == char.ToLower(absolutePath[0]); absolutePath = absolutePath.Remove(0, 1))
                 basePath = basePath.Remove(0, 1);
             int length = basePath.Split(new char[1]
             {

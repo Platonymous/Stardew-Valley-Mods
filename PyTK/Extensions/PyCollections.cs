@@ -1,11 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using PyTK.Types;
+﻿using PyTK.Types;
 using System.Linq;
 using System;
 using System.Collections.Generic;
 using xTile.ObjectModel;
-using System.Linq;
-using StardewValley;
 using StardewModdingAPI;
 
 namespace PyTK.Extensions

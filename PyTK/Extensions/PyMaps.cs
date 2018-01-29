@@ -11,9 +11,7 @@ using xTile.Tiles;
 using xTile.Layers;
 using System.IO;
 using PyTK.Types;
-using PyTK.Extensions;
 using xTile.Dimensions;
-using xTile.Format;
 
 namespace PyTK.Extensions
 {

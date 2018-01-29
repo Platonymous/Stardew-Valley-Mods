@@ -8,7 +8,7 @@ namespace PyTK.Tiled
 
         public XmlObject(XElement elem)
         {
-            this.XElement = elem;
+            XElement = elem;
         }
     }
 }

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using StardewValley;
 using SObject = StardewValley.Object;
 using StardewValley.Objects;
 using Microsoft.Xna.Framework;
 using PyTK.Extensions;
 using StardewModdingAPI;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace PyTK.CustomElementHandler
 {
