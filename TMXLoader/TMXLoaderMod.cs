@@ -149,7 +149,7 @@ namespace TMXLoader
                 {
                     string filePath = Path.Combine(contentFolder, pack.folderName, edit.file);
                     Map map = TMXContent.Load(filePath, Helper);
-                    addMoreMapLayers(map);
+                    
                     Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
                     Rectangle? sourceArea = null;
 
@@ -158,6 +158,7 @@ namespace TMXLoader
 
                     map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea);
                     editWarps(map, edit.addWarps, edit.removeWarps, original);
+                    addMoreMapLayers(map);
                     map.injectAs("Maps/" + edit.name);
                 }
 
