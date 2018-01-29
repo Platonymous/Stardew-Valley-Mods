@@ -3,9 +3,11 @@ using Microsoft.Xna.Framework.Input;
 using PyTK;
 using PyTK.Extensions;
 using PyTK.Tiled;
+using PyTK.Types;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using xTile;
 using xTile.ObjectModel;
+using xTile.Tiles;
 
 namespace TMXLoader
 {
@@ -26,6 +29,88 @@ namespace TMXLoader
             exportAllMaps();
             convert();
             loadContentPacks();
+            setTileActions();
+        }
+
+        private void setTileActions()
+        {
+            TileAction Lock = new TileAction("Lock", lockAction).register();
+            TileAction Say = new TileAction("Say", sayAction).register();
+            TileAction SwitchLayers = new TileAction("SwitchLayers", switchLayersAction).register();
+        }
+
+        private bool sayAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            List<string> text = action.Split(' ').ToList();
+            bool inDwarvish = false;
+            
+            if (text[1] == ("Dwarvish"))
+            {
+                text.RemoveAt(1);
+                if (!Game1.player.canUnderstandDwarves)
+                    inDwarvish = true;
+            }
+            text.RemoveAt(0);
+            action = String.Join(" ", text);
+            action = inDwarvish ? Dialogue.convertToDwarvish(action) : action;
+
+            Game1.drawDialogueNoTyping(action); return true;
+        }
+
+        private bool switchLayersAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            string[] actions = action.Split(' ');
+
+            foreach (string s in actions)
+            {
+                string[] layers = s.Split(':');
+                if (layers.Length > 1)
+                {
+                    if(layers.Length < 4)
+                        location.map.switchLayers(layers[0], layers[1]);
+                    else
+                    {
+                        string[] xStrings = layers[2].Split('-');
+                        string[] yStrings = layers[3].Split('-');
+                        Range xRange = new Range(int.Parse(xStrings[0]), int.Parse(xStrings.Last()) + 1);
+                        Range yRange = new Range(int.Parse(yStrings[0]), int.Parse(yStrings.Last()) + 1);
+
+                        foreach(int x in xRange.toArray())
+                            foreach(int y in yRange.toArray())
+                            {
+                                Monitor.Log(x + ":" + y);
+                                location.map.switchTileBetweenLayers(layers[0], layers[1], x, y);
+                            }
+                    }
+                }
+                    
+            }
+
+            return true;
+        }
+
+        private bool lockAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            string[] strings = action.Split(' ');
+
+            if (Game1.player.ActiveObject is Item i && i.parentSheetIndex == int.Parse(strings[2]) && i.Stack >= int.Parse(strings[1]))
+            {
+                int amount = int.Parse(strings[1]);
+                Game1.playSound("newArtifact");
+
+                if (i.Stack > amount)
+                    i.Stack -= amount;
+                else
+                    Game1.player.removeItemFromInventory(i);
+
+                TileAction.invokeCustomTileActions("Success", location, tile, layer);
+            }
+            else if (Game1.player.ActiveObject == null)
+                TileAction.invokeCustomTileActions("Default", location, tile, layer);
+            else
+                TileAction.invokeCustomTileActions("Failure", location, tile, layer);
+
+            return true;
         }
 
         private void loadContentPacks()
@@ -42,15 +127,17 @@ namespace TMXLoader
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
                     Monitor.Log(":" + map.Properties["Warp"] + ":");
                     map.inject("Maps/" + edit.name);
-                    GameLocation location = new GameLocation(map, edit.name);
+                    GameLocation location;
                     if (map.Properties.ContainsKey("Outdoors") && map.Properties["Outdoors"] == "F")
                     {
-                        location.isOutdoors = false;
+                        location = new GameLocation(map, edit.name) { isOutdoors = false };
                         location.loadLights();
+                        location.isOutdoors = false;
                     }
-                        
+                    else
+                        location = new GameLocation(map, edit.name);
 
-                    SaveEvents.AfterLoad += (s, e) => Game1.locations.Add(new GameLocation(map, edit.name) { isOutdoors = false });
+                    SaveEvents.AfterLoad += (s, e) => Game1.locations.Add(location);
                 }
 
                 foreach (MapEdit edit in pack.replaceMaps)
