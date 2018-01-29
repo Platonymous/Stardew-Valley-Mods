@@ -41,7 +41,7 @@ namespace PyTK.Extensions
         {
             EventHandler<TArgs> d = delegate (object sender, TArgs e)
             {
-                if (PyUtils.CheckEventConditions(conditions))
+                if (PyUtils.checkEventConditions(conditions))
                     t.Invoke(sender, e);
             };
 
@@ -67,7 +67,7 @@ namespace PyTK.Extensions
         {
             Action<TArgs> d = delegate (TArgs e)
             {
-                if (PyUtils.CheckEventConditions(conditions))
+                if (PyUtils.checkEventConditions(conditions))
                     t.Invoke(e);
             };
 
@@ -128,13 +128,13 @@ namespace PyTK.Extensions
         {
             EventHandler<TArgs> d = delegate (object sender, TArgs e)
             {
-                if (!checkAfter && PyUtils.CheckEventConditions(conditions))
+                if (!checkAfter && PyUtils.checkEventConditions(conditions))
                     t = null;
 
                 if (t != null)
                     t.Invoke(sender, e);
 
-                if (checkAfter && PyUtils.CheckEventConditions(conditions))
+                if (checkAfter && PyUtils.checkEventConditions(conditions))
                     t = null;
             };
 
@@ -166,13 +166,13 @@ namespace PyTK.Extensions
         {
             Action<T> d = delegate (T e)
             {
-                if (!checkAfter && PyUtils.CheckEventConditions(conditions))
+                if (!checkAfter && PyUtils.checkEventConditions(conditions))
                     t = null;
 
                 if (t != null)
                     t.Invoke(e);
 
-                if (checkAfter && PyUtils.CheckEventConditions(conditions))
+                if (checkAfter && PyUtils.checkEventConditions(conditions))
                     t = null;
             };
 
@@ -626,7 +626,7 @@ namespace PyTK.Extensions
                      foreach (Vector2 key in e.NewItems)
                          if (t.predicate(location.objects[key]))
                              keys.Add(key);
-
+  
                  action.Invoke(location, keys);
              };
 
@@ -693,7 +693,34 @@ namespace PyTK.Extensions
 
             return d.useAll(p => p.Key.terrainFeatures.CollectionChanged += p.Value);
         }
-        
+
+        /* Locations */
+
+        public static EventHandler<EventArgsCurrentLocationChanged> onEntry(this GameLocation t, EventHandler<EventArgsCurrentLocationChanged> handler)
+        {
+            EventHandler<EventArgsCurrentLocationChanged> d = delegate (object sender, EventArgsCurrentLocationChanged e)
+            {
+                if (e.NewLocation == t)
+                    handler.Invoke(sender, e);
+            };
+
+            LocationEvents.CurrentLocationChanged += d;
+
+            return d;
+        }
+
+        public static EventHandler<EventArgsCurrentLocationChanged> onExit(this GameLocation t, EventHandler<EventArgsCurrentLocationChanged> handler)
+        {
+            EventHandler<EventArgsCurrentLocationChanged> d = delegate (object sender, EventArgsCurrentLocationChanged e)
+            {
+                if (e.PriorLocation == t)
+                    handler.Invoke(sender, e);
+            };
+
+            LocationEvents.CurrentLocationChanged += d;
+
+            return d;
+        }
 
     }
 }
