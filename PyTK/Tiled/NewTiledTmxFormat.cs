@@ -295,15 +295,24 @@ namespace PyTK.Tiled
                Layer layer = map.GetLayer(objectGroup.Name);
                foreach (TiledObject tiledObject in objectGroup.Objects)
                {
-                   if (!(tiledObject.Name != "TileData"))
+                   if (tiledObject.Name == "TileData")
                    {
-                       Tile tile = layer.Tiles[tiledObject.XPos / 16, tiledObject.YPos / 16];
-                       List<TiledProperty> properties = tiledObject.Properties;
-                       if (properties != null)
-                       {
-                           Action<TiledProperty> action2 = (Action<TiledProperty>)(prop => tile.Properties[prop.Name] = (PropertyValue)prop.Value);
-                           properties.ForEach(action2);
-                       }
+                       int tileX = tiledObject.XPos / 16;
+                       int tileWidth =  tiledObject.Width / 16;
+                       int tileY = tiledObject.YPos / 16;
+                       int tileHeight = tiledObject.Height / 16;
+
+                       for (int x = tileX; x < tileX + tileWidth; x++)
+                           for (int y = tileY; y < tileY + tileHeight; y++)
+                           {
+                               Tile tile = layer.Tiles[x, y];
+                               List<TiledProperty> properties = tiledObject.Properties;
+                               if (properties != null)
+                               {
+                                   Action<TiledProperty> action2 = (Action<TiledProperty>)(prop => tile.Properties[prop.Name] = (PropertyValue)prop.Value);
+                                   properties.ForEach(action2);
+                               }
+                           }
                    }
                }
            });
