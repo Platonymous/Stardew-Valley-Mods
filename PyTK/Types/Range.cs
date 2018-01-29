@@ -4,21 +4,14 @@ using System.Collections.Generic;
 
 namespace PyTK.Types
 {
-    public class Range : IEnumerator<int>, IEnumerable
+    public class Range
     {
         public int X = 0;
         public int Y = 0;
-        private int[] _array
-        {
-            get
-            {
-                return toArray();
-            }
-        }
 
         public int this[int i]
         {
-            get { return _array[i]; }
+            get { return toArray()[i]; }
         }
 
         private int _index = 0;
@@ -84,12 +77,6 @@ namespace PyTK.Types
             return i >= X && i < Y;
         }
 
-        public bool MoveNext()
-        {
-            _index++;
-            return _index < length;
-        }
-
         public void Reset()
         {
             _index = 0;
@@ -100,29 +87,26 @@ namespace PyTK.Types
 
         }
 
-        public IEnumerator GetEnumerator()
+        public static Range Zero
         {
-            return clone();
-        }
-        
-        public static Range Zero {
             get
             {
                 return new Range(0);
             }
-         }
+        }
 
         public static Range Max
         {
             get
             {
-                return new Range(int.MinValue,int.MaxValue);
+                return new Range(int.MinValue, int.MaxValue);
             }
         }
 
-        public int Current => _array[_index];
-
-        object IEnumerator.Current => _array[_index];
+        public override string ToString()
+        {
+            return "{" + X + "-" + Y + "}";
+        }
 
         public static Range operator -(Range value1, Range value2)
         {
@@ -134,7 +118,8 @@ namespace PyTK.Types
             return new Range(Math.Min(value1.X, value2.X), Math.Max(value1.Y, value2.Y));
         }
 
-        public static Range operator -(Range value1, int value2) {
+        public static Range operator -(Range value1, int value2)
+        {
             return new Range(value1.X - value2, value1.Y - value2);
         }
 
@@ -152,7 +137,5 @@ namespace PyTK.Types
         {
             return new Range(value1.X / value2, value1.Y / value2);
         }
-
-
     }
 }
