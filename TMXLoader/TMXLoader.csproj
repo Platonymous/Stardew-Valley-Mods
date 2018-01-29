@@ -48,6 +48,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Examples\UlithiumDragon.CutContent\Bus%28people%29.tmx" />
+    <None Include="Examples\UlithiumDragon.CutContent\CityBus.json" />
+    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTemple.json" />
+    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleExterior.tmx" />
+    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleInterior.tmx" />
+    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleJunction01.tmx" />
+    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleLeftRoom01.tmx" />
+    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleRightRoom01.tmx" />
+    <None Include="Examples\UlithiumDragon.JungleTemple\Woods.tmx" />
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -57,6 +66,22 @@
       <Name>PyTK</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Examples\UlithiumDragon.CutContent\busPeople.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\cave.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\fall_JungleTempleoutdoorsTileSheet.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\fall_JungleTempleTileSheet.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\paths.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\SewerTiles.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\spring_JungleTempleoutdoorsTileSheet.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\spring_JungleTempleTileSheet.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\spring_outdoorsTileSheet.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\summer_JungleTempleoutdoorsTileSheet.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\summer_JungleTempleTileSheet.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\winter_JungleTempleoutdoorsTileSheet.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\winter_JungleTempleTileSheet.png" />
+    <Content Include="Examples\UlithiumDragon.JungleTemple\WizardHouseTiles.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.0.2\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
