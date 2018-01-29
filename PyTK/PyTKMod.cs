@@ -78,11 +78,13 @@ namespace PyTK
             Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", 74);
             Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129, 166));
 
-            Action<List<string>> tileActionTest = delegate (List<string> s)
-            {
-                s.Remove(s[0]);
-                Game1.activeClickableMenu = new DialogueBox(String.Join(" ", s));
-            };
+            Func<string, GameLocation, Vector2, string, bool> tileActionTest = (s, l, t, ly) =>
+             {
+                 List<string> strings = s.Split(' ').ToList();
+                 strings.Remove(strings[0]);
+                 Game1.activeClickableMenu = new DialogueBox(String.Join(" ", s));
+                 return true;
+             };
 
             Action mapMergeTest = delegate ()
             {
