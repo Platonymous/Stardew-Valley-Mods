@@ -1,38 +1,48 @@
 ﻿using Harmony;
 using Microsoft.Xna.Framework;
+using PyTK.Types;
+using StardewModdingAPI;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using xTile.Dimensions;
-using xTile.ObjectModel;
-using xTile.Tiles;
 
 namespace PyTK.Overrides
 {
     internal class OvLocations
     {
-        
-        internal static Dictionary<string, Func<List<string>, bool>> actions = new Dictionary<string, Func<List<string>, bool>>();
-        
+        internal static IModHelper Helper { get; } = PyTKMod._helper;
+        internal static IMonitor Monitor { get; } = PyTKMod._monitor;
+
+        [HarmonyPatch]
+        internal class TouchActionFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "performTouchAction");
+            }
+
+            internal static void Postfix(GameLocation __instance, string fullActionString, Vector2 playerStandingPosition)
+            {
+                if (TileAction.getCustomAction(fullActionString) is TileAction customAction)
+                    TileAction.invokeCustomTileActions("TouchAction", Game1.currentLocation, playerStandingPosition, "Back");
+            }
+        }
+
         [HarmonyPatch]
         internal class ActionableFix
         {
             internal static MethodInfo TargetMethod()
             {
-                    return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "isActionableTile");
+                return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "isActionableTile");
             }
 
             internal static void Postfix(GameLocation __instance, ref bool __result, int xTile, int yTile)
             {
-                if (__instance.doesTileHaveProperty(xTile, yTile, "Action", "Buildings") != null)
-                {
-                    List<string> prop = __instance.doesTileHaveProperty(xTile, yTile, "Action", "Buildings").Split(' ').ToList();
-
-                    if (actions.ContainsKey(prop[0]))
+                string conditions = __instance.doesTileHaveProperty(xTile, yTile, "Conditions", "Buildings");
+                string fallback = __instance.doesTileHaveProperty(xTile, yTile, "Fallback", "Buildings");
+               
+                if (__instance.doesTileHaveProperty(xTile, yTile, "Action", "Buildings") is string action)
+                    if (TileAction.getCustomAction(action, conditions, fallback) != null)
                         Game1.isInspectionAtCurrentCursorTile = true;
-                }
             }
         }
 
@@ -41,32 +51,36 @@ namespace PyTK.Overrides
         {
             internal static MethodInfo TargetMethod()
             {
-                    return AccessTools.Method(PyUtils.getTypeSDV("Game1"), "tryToCheckAt");
+                return AccessTools.Method(PyUtils.getTypeSDV("Game1"), "tryToCheckAt");
             }
 
-           
             internal static void Postfix(Vector2 grabTile, ref bool __result)
             {
                 GameLocation location = Game1.currentLocation;
                 if (!Utility.tileWithinRadiusOfPlayer((int)grabTile.X, (int)grabTile.Y, 1, Game1.player))
                     return;
-                string action = "";
 
-                PropertyValue propertyValue = null;
-                Tile tile = location.map.GetLayer("Buildings").PickTile(new Location((int) grabTile.X * Game1.tileSize, (int) grabTile.Y * Game1.tileSize), Game1.viewport.Size);
-                if (tile != null)
-                    tile.Properties.TryGetValue("Action", out propertyValue);
-                if (propertyValue != null && (location.currentEvent != null || location.isCharacterAtTile(grabTile + new Vector2(0.0f, 1f)) == null))
-                    action = propertyValue;
-
-                if (action == "")
-                    return;
-
-                List <string> prop = action.Split(' ').ToList();
-                if (actions.ContainsKey(prop[0]))
-                    __result = actions[prop[0]].Invoke(prop);
+                if (Game1.currentLocation.doesTileHaveProperty((int)grabTile.X, (int)grabTile.Y, "Action", "Buildings") is string action && TileAction.getCustomAction(action) is TileAction customAction)
+                    __result = TileAction.invokeCustomTileActions("Action", Game1.currentLocation, grabTile, "Buildings");
             }
-            
-        } 
+
+        }
+
+        internal class CrittersFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "tryToAddCritters");
+            }
+
+            internal static bool Prefix(GameLocation __instance)
+            {
+                if (__instance.map.Properties.ContainsKey("Outdoors") && __instance.map.Properties["Outdoors"] == "F")
+                    return false;
+                else
+                    return true;
+            }
+        }
+
     }
 }
