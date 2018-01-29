@@ -34,13 +34,17 @@ namespace PyTK.Tiled
                 if (tileSheetFile.Exists && !tileSheetFileVanilla.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource).Key == null)
                 {
                     helper.Content.Load<Texture2D>(tileSheetPath).inject(t.ImageSource);
+                    helper.Content.Load<Texture2D>(tileSheetPath).inject("Maps/" + t.ImageSource);
                     if (t.ImageSource.Contains("spring_"))
                         foreach (string season in seasons)
                         {
                             string seasonPath = path.Replace(fileName, t.ImageSource.Replace("spring_", season));
                             FileInfo seasonFile = new FileInfo(Path.Combine(helper.DirectoryPath, seasonPath + ".png"));
                             if (seasonFile.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource.Replace("spring_", season)).Key == null)
-                                helper.Content.Load<Texture2D>(seasonPath + ".png").inject(t.ImageSource.Replace("spring_", season));
+                            {
+                                Monitor.Log("Injecting:" + t.ImageSource.Replace("spring_", season));
+                                helper.Content.Load<Texture2D>(seasonPath + ".png").inject("Maps/"+ t.ImageSource.Replace("spring_", season));
+                            }
                         }
                 }
             }

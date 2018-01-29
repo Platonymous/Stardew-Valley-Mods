@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using PyTK;
 using PyTK.Extensions;
 using PyTK.Tiled;
@@ -7,16 +6,12 @@ using PyTK.Types;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using StardewValley.BellsAndWhistles;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using xTile;
-using xTile.ObjectModel;
-using xTile.Tiles;
+using xTile.Layers;
 
 namespace TMXLoader
 {
@@ -77,10 +72,7 @@ namespace TMXLoader
 
                         foreach(int x in xRange.toArray())
                             foreach(int y in yRange.toArray())
-                            {
-                                Monitor.Log(x + ":" + y);
                                 location.map.switchTileBetweenLayers(layers[0], layers[1], x, y);
-                            }
                     }
                 }
                     
@@ -127,6 +119,7 @@ namespace TMXLoader
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
                     Monitor.Log(":" + map.Properties["Warp"] + ":");
                     map.inject("Maps/" + edit.name);
+                    addMoreMapLayers(map);
                     GameLocation location;
                     if (map.Properties.ContainsKey("Outdoors") && map.Properties["Outdoors"] == "F")
                     {
@@ -137,6 +130,8 @@ namespace TMXLoader
                     else
                         location = new GameLocation(map, edit.name);
 
+                    location.seasonUpdate(Game1.currentSeason);
+
                     SaveEvents.AfterLoad += (s, e) => Game1.locations.Add(location);
                 }
 
@@ -144,6 +139,7 @@ namespace TMXLoader
                 {
                     string filePath = Path.Combine(contentFolder, pack.folderName, edit.file);
                     Map map = TMXContent.Load(filePath, Helper);
+                    addMoreMapLayers(map);
                     Map original = edit.retainWarps ? Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent) : map;
                     editWarps(map, edit.addWarps, edit.removeWarps, original);
                     map.injectAs("Maps/" + edit.name);
@@ -153,6 +149,7 @@ namespace TMXLoader
                 {
                     string filePath = Path.Combine(contentFolder, pack.folderName, edit.file);
                     Map map = TMXContent.Load(filePath, Helper);
+                    addMoreMapLayers(map);
                     Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
                     Rectangle? sourceArea = null;
 
@@ -172,6 +169,13 @@ namespace TMXLoader
                     map.injectAs("Maps/" + edit.name);
                 }
             }
+        }
+
+        private void addMoreMapLayers(Map map)
+        {
+            foreach(Layer layer in map.Layers)
+                if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
+                    maplayer.AfterDraw += (s,e) => layer.Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, Game1.pixelZoom);
         }
 
         private void editWarps(Map map, string[] addWarps, string[] removeWarps, Map original = null)
