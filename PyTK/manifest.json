@@ -1,0 +1,14 @@
+{
+  "Name": "PyTK",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 0,
+    "MinorVersion": 7,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "Description": "Platonymous Toolkit",
+  "UniqueID": "Platonymous.Toolkit",
+  "EntryDll": "PyTK.dll",
+  "UpdateKeys": [ "Nexus:1726" ]
+}

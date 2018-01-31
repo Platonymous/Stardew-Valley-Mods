@@ -10,6 +10,8 @@ using StardewValley.Menus;
 
 using Newtonsoft.Json.Linq;
 using Microsoft.Xna.Framework;
+using StardewValley.Objects;
+using System.Linq;
 
 namespace CustomFarming
 {
@@ -19,6 +21,7 @@ namespace CustomFarming
         public List<string> customFiles = new List<string>();
         public List<Item> customItems = new List<Item>();
         public string key;
+        private static Dictionary<string, ICustomFarmingObject> machinePile = new Dictionary<string, ICustomFarmingObject>();
         private Dictionary<string, simpleMachine> machinesForCrafting = new Dictionary<string, simpleMachine>();
 
         public override void Entry(IModHelper helper)
@@ -38,10 +41,59 @@ namespace CustomFarming
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
             PlayerEvents.InventoryChanged += PlayerEvents_InventoryChanged;
             GameEvents.FourthUpdateTick += GameEvents_FourthUpdateTick;
-           
-           
+
+            helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
+
         }
-    
+
+        private void replaceCustomFarming(string action, string[] param)
+        {
+            if (param[0] == "itemMenu" && Game1.activeClickableMenu is ItemGrabMenu itemMenu)
+            {
+                List<Item> remove = new List<Item>();
+                List<Item> additions = new List<Item>();
+
+                foreach (Item item in itemMenu.ItemsToGrabMenu.actualInventory)
+                    if (item is Chest chest && machinePile.Keys.Where(f => f.Equals(item.Name)).Any())
+                    {
+                        Item cf = (simpleMachine) machinePile[machinePile.Keys.Where(f => f.Equals(item.Name)).FirstOrDefault()];
+                        additions.Add(cf);
+                        remove.Add(item);
+                    }
+
+                foreach (Item addition in additions)
+                    itemMenu.ItemsToGrabMenu.actualInventory.Add(addition);
+
+                foreach (Item j in remove)
+                    itemMenu.ItemsToGrabMenu.actualInventory.Remove(j);
+            }
+
+            if (param[0] == "shop" && Game1.activeClickableMenu is ShopMenu shop)
+            {
+                Dictionary<Item, int[]> items = Helper.Reflection.GetPrivateValue<Dictionary<Item, int[]>>(shop, "itemPriceAndStock");
+                List<Item> selling = Helper.Reflection.GetPrivateValue<List<Item>>(shop, "forSale");
+                List<Item> remove = new List<Item>();
+                List<Item> additions = new List<Item>();
+
+                foreach (Item i in selling)
+                    if (i is Chest chest && machinePile.Keys.Where(f => f.Equals(i.Name)).Any())
+                    {
+                        Item cf = (simpleMachine) machinePile[machinePile.Keys.Where(f => f.Equals(i.Name)).FirstOrDefault()];
+                        items.Add(cf, new int[] { chest.preservedParentSheetIndex, int.MaxValue });
+                        additions.Add(cf);
+                        remove.Add(i);
+                    }
+
+                foreach (Item addition in additions)
+                    selling.Add(addition);
+
+                foreach (Item j in remove)
+                {
+                    items.Remove(j);
+                    selling.Remove(j);
+                }
+            }
+        }
 
         private void removeCraftingPage()
         {
@@ -174,13 +226,7 @@ namespace CustomFarming
         private void load()
         {            
             customFiles = new List<string>();
-            ParseDir(customContentFolder);
-            SaveHandler.loadFromFile("CustomFarmingMod");
-            if(SaveHandler.saveString != "")
-            {
-                SaveHandler.LoadAndReplace();
-            }
-            
+            ParseDir(customContentFolder);            
             buildMaschines();
             buildCraftingPage();
         }
@@ -274,15 +320,17 @@ namespace CustomFarming
                 dynamic loadJson = JObject.Parse(File.ReadAllText(file));
                 string type = (string)loadJson.Type;
                 string name = (string)loadJson.Name;
-                
+
                 string filename = Path.GetFileName(file);
                 string modFolder = Path.GetDirectoryName(file);
-               
+
                 Type T = Type.GetType(type);
 
                 ICustomFarmingObject newMachine = (ICustomFarmingObject)Activator.CreateInstance(T);
                 newMachine.build(modFolder, filename);
-
+                string key = new DirectoryInfo(modFolder).Name + "." + new FileInfo(file).Name;
+                if (!machinePile.ContainsKey(key))
+                    machinePile.Add(key, newMachine);
                 customItems.Add((Item)newMachine);
             }
   

@@ -4,12 +4,7 @@ namespace Portraiture
 {
     class PConfig
     {
-        public Keys changeKey { get; set; }
-
-        public PConfig()
-        {
-            changeKey = Keys.P;
-        }
-
+        public Keys changeKey { get; set; } = Keys.P;
+        public string active { get; set; } = "none";
     }
 }

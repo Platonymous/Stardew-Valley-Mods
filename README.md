@@ -42,5 +42,15 @@ Allows you to swim in the river, lake and ocean.
 # 14. Custom Furniture
 Add Custom Furniture via json file
 
+# 15. Custom NPC
+Add Custom NPCs via json and tsc/cvs files
+
+# 16. Visualize
+Add color profiles
+
+# 17. Sprinkles
+Activate sprinklers on click
+
+
 All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1) or via ModDrop : [Download](https://www.moddrop.com/)
 

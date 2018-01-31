@@ -2,6 +2,7 @@
 using StardewValley;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using PyTK;
 
 namespace HarpOfYobaRedux
 {
@@ -11,7 +12,6 @@ namespace HarpOfYobaRedux
         private Vector2 lastPosition;
         private GameLocation targetLocation;
         private Vector2 targetPosition;
-
 
         public TeleportMagic()
         {
@@ -32,9 +32,7 @@ namespace HarpOfYobaRedux
         private void start()
         {
             for (int index = 0; index < 12; ++index)
-            {
                 Game1.player.currentLocation.temporarySprites.Add(new TemporaryAnimatedSprite(354, (float)Game1.random.Next(25, 75), 6, 1, new Vector2((float)Game1.random.Next((int)Game1.player.position.X - Game1.tileSize * 4, (int)Game1.player.position.X + Game1.tileSize * 3), (float)Game1.random.Next((int)Game1.player.position.Y - Game1.tileSize * 4, (int)Game1.player.position.Y + Game1.tileSize * 3)), false, Game1.random.NextDouble() < 0.5));
-            }
 
             Game1.playSound("wand");
             Game1.displayFarmer = false;
@@ -45,6 +43,7 @@ namespace HarpOfYobaRedux
 
             new System.Drawing.Rectangle(Game1.player.GetBoundingBox().X, Game1.player.GetBoundingBox().Y, Game1.tileSize, Game1.tileSize).Inflate(Game1.tileSize * 3, Game1.tileSize * 3);
             int num1 = 0;
+
             for (int index = Game1.player.getTileX() + 8; index >= Game1.player.getTileX() - 8; --index)
             {
                 List<TemporaryAnimatedSprite> temporarySprites = Game1.player.currentLocation.temporarySprites;
@@ -72,14 +71,8 @@ namespace HarpOfYobaRedux
             lastLocation = Game1.currentLocation;
             lastPosition = new Vector2(Game1.player.getTileX(), Game1.player.getTileY());
 
-            DelayedAction startAction = new DelayedAction(6000);
-            startAction.behavior = new DelayedAction.delayedBehavior(start);
-
-            DelayedAction teleportAction = new DelayedAction(7000);
-            teleportAction.behavior = new DelayedAction.delayedBehavior(teleport);
-
-            Game1.delayedActions.Add(startAction);
-            Game1.delayedActions.Add(teleportAction);
+            PyUtils.setDelayedAction(6000, start);
+            PyUtils.setDelayedAction(7000, teleport);
         }
     }
 }

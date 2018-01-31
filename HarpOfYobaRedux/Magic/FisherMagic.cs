@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using StardewValley;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace HarpOfYobaRedux
@@ -27,7 +26,6 @@ namespace HarpOfYobaRedux
                 argsUnplayed = new object[] { 0, 5, 0, 0, 5000, 0, 0, 0, 0, 0, -3, 0, 2, "", "" };
             }
             
-
             Buff LuckFisher = (Buff) Activator.CreateInstance(typeof(Buff), argsPlayed);
 
             LuckFisher.description = "Fisherman";
@@ -45,10 +43,7 @@ namespace HarpOfYobaRedux
             LuckFisher.glow = Color.Azure;
 
             if (!Game1.buffsDisplay.hasBuff(999))
-            {
                 Game1.buffsDisplay.addOtherBuff(LuckFisher);
-            }
-
         }
     }
 }

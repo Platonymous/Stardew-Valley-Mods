@@ -4,12 +4,11 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 using System.Collections.Generic;
-using CustomElementHandler;
 using System;
 
 namespace CustomTV
 {
-    public class TVIntercept : Furniture, ISaveElement
+    public class TVIntercept : Furniture
     {
 
         public static string weatherString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13105");
@@ -26,6 +25,7 @@ namespace CustomTV
         private static Dictionary<string, Action<TV, TemporaryAnimatedSprite,StardewValley.Farmer,string>> actions = new Dictionary<string, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string>>();
 
         public IPrivateField<TemporaryAnimatedSprite> tvScreen;
+        public IPrivateField<TemporaryAnimatedSprite> tvOverlay;
         public static TVIntercept activeIntercept;
 
         public TVIntercept()
@@ -42,7 +42,7 @@ namespace CustomTV
         {
             this.tv = tv;
             tvScreen = CustomTVMod.Modhelper.Reflection.GetPrivateField<TemporaryAnimatedSprite>(tv, "screen");
-          
+            tvOverlay = CustomTVMod.Modhelper.Reflection.GetPrivateField<TemporaryAnimatedSprite>(tv, "screenOverlay");
         }
 
         public static void addChannel(string id, string name, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string> action)
@@ -161,7 +161,7 @@ namespace CustomTV
             Game1.player.Halt();
         }
 
-        public static void showProgram(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null)
+        public static void showProgram(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null, TemporaryAnimatedSprite overlay = null)
         {
             if(afterDialogues == null)
             {
@@ -169,6 +169,12 @@ namespace CustomTV
             }
             
             activeIntercept.tvScreen.SetValue(sprite);
+
+            if (overlay != null && activeIntercept != null && activeIntercept.tvOverlay != null)
+            {
+                activeIntercept.tvOverlay.SetValue(overlay);
+            }
+                
             Game1.drawObjectDialogue(Game1.parseText(text));
             Game1.afterDialogues = new Game1.afterFadeFunction(afterDialogues);
         }
@@ -291,6 +297,16 @@ namespace CustomTV
         {
             IPrivateMethod method = CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "getFortuneForecast");
             return method.Invoke<string>(new object[0]);
+        }	
+	
+        public override bool placementAction(GameLocation location, int x, int y, StardewValley.Farmer who = null)
+        {
+            bool _return = base.placementAction(location, x, y, who);
+            tv.tileLocation = base.tileLocation;
+            tv.boundingBox.X = base.boundingBox.X;
+            tv.boundingBox.Y = base.boundingBox.Y;
+            tv.updateDrawPosition();
+            return _return;
         }
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1f)

@@ -3,12 +3,17 @@
   "Author": "Platonymous",
   "Version": {
     "MajorVersion": 1,
-    "MinorVersion": 1,
-    "PatchVersion": 9,
+    "MinorVersion": 3,
+    "PatchVersion": 1,
     "Build": null
   },
   "Description": "Stops soil from decaying",
   "UniqueID": "Platonymous.NoSoilDecayRedux",
   "EntryDll": "NoSoilDecayRedux.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ],
   "UpdateKeys": [ "Nexus:1084" ]
 }

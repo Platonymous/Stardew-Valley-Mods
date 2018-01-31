@@ -1,76 +1,51 @@
 ﻿using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.TerrainFeatures;
-using System.Collections.Generic;
+using PyTK.Extensions;
+using PyTK.Types;
+using PyTK;
+using System;
 
 namespace HarpOfYobaRedux
 {
     class RainMagic : IMagic
     {
+        private int maxDist;
+        private Random r = new Random();
 
         public RainMagic()
         {
 
         }
 
-        private void waterCrops()
-        {
-
-            List<Vector2> hdtiles = new List<Vector2>();
-
-            GameLocation gl = Game1.currentLocation;
-
-            if(gl.terrainFeatures != null && gl.isOutdoors) { 
-
-            foreach (var keyV in gl.terrainFeatures.Keys)
-            {
-                if (gl.terrainFeatures[keyV] is HoeDirt)
-                {
-                    hdtiles.Add(keyV);
-                }
-            }
-            
-            for (int i = 0; i < hdtiles.Count; i++)
-            {
-                (gl.terrainFeatures[hdtiles[i]] as HoeDirt).state = 1;
-            }
-
-            }
-        }
-
-        public void startRain()
-        {
-            Game1.isRaining = true;
-        }
-
         public void doMagic(bool playedToday)
         {
-            
+            maxDist = playedToday ? 5 : 9;
+
             if (Game1.isRaining || !Game1.currentLocation.isOutdoors)
-            {
                 return;
-            }
+
             Game1.playSound("thunder_small");
 
-            DelayedAction startAction = new DelayedAction(500);
-            startAction.behavior = new DelayedAction.delayedBehavior(startRain);
-
-            DelayedAction rainAction = new DelayedAction(2000);
-            rainAction.behavior = new DelayedAction.delayedBehavior(waterCrops);
-
-            DelayedAction stopAction = new DelayedAction(6000);
-            stopAction.behavior = new DelayedAction.delayedBehavior(stopRaining);
-
-            Game1.delayedActions.Add(startAction);
-            Game1.delayedActions.Add(rainAction);
-            Game1.delayedActions.Add(stopAction);
-
+            PyUtils.setDelayedAction(500, () => Game1.isRaining = true);
+            PyUtils.setDelayedAction(2000, () => new TerrainSelector<HoeDirt>(h => h.state < 1).keysIn(Game1.currentLocation).useAll(k => water(k)));
+            PyUtils.setDelayedAction(6000, () => Game1.isRaining = false);
         }
 
-        private void stopRaining()
+        private double getDistance(Vector2 i, Vector2 j)
         {
-            Game1.isRaining = false;
+            float distX = Math.Abs(j.X - i.X);
+            float distY = Math.Abs(j.Y - i.Y);
+            double dist = Math.Sqrt((distX * distX) + (distY * distY));
+            return dist;
         }
+
+        private void water(Vector2 k)
+        {
+            if(getDistance(Game1.player.getTileLocation(), k) < maxDist)
+            (Game1.currentLocation.terrainFeatures[k] as HoeDirt).state = 1;
+        }
+
 
     }
 }

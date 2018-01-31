@@ -1,0 +1,39 @@
+{
+  "name": "Jungle Temmple",
+  "version": "1.0.0",
+  "author": "Ulithium Dragon",
+  "addMaps": [
+    {
+      "name": "JungleTempleExterior",
+      "file": "JungleTempleExterior.tmx",
+    },
+	{
+      "name": "JungleTempleInterior",
+      "file": "JungleTempleInterior.tmx",
+    },
+	{
+      "name": "JungleTempleJunction01",
+      "file": "JungleTempleJunction01.tmx",
+    },
+	{
+      "name": "JungleTempleLeftRoom01",
+      "file": "JungleTempleLeftRoom01.tmx",
+    },
+	{
+      "name": "JungleTempleRightRoom01",
+      "file": "JungleTempleRightRoom01.tmx",
+    }
+  ],
+  "mergeMaps": [
+    {
+      "name": "Woods",
+	  "file": "Woods.tmx",
+	  "sourceArea": [0,0,12,12],
+	  "position": [0,0],
+      "addWarps": [
+        "7 -1 JungleTempleExterior 14 34",
+		"8 -1 JungleTempleExterior 15 34"
+      ]
+    }
+  ]
+}

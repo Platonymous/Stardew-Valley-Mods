@@ -1,137 +1,62 @@
 ﻿using StardewValley;
 using StardewValley.TerrainFeatures;
+using SObject = StardewValley.Object;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using Microsoft.Xna.Framework;
-using StardewValley.Locations;
 using System.Collections.Generic;
-using StardewValley.Objects;
+using System.Linq;
+using PyTK;
+using PyTK.Extensions;
+using PyTK.Types;
 
 namespace NoSoilDecayRedux
 {
     public class NoSoilDecayReduxMod : Mod
     {
-        private GameLocation savelocation;
-        private Vector2 savepoint;
-        private bool hoeDirtReplaced;
+        private Dictionary<GameLocation, List<Vector2>> hoeDirtChache;
 
         public override void Entry(IModHelper helper)
         {
-            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged; ;
-            GameEvents.OneSecondTick += GameEvents_OneSecondTick;
-            SaveEvents.AfterSave += SaveEvents_AfterSave;
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            
         }
 
         private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
         {
-            loadHoeDirt();
-        }
-
-        private void SaveEvents_AfterSave(object sender, System.EventArgs e)
-        {
-            hoeDirtReplaced = false;
-        }
-
-        private void GameEvents_OneSecondTick(object sender, System.EventArgs e)
-        {
-            if(!hoeDirtReplaced && Game1.timeOfDay == 600 && Game1.activeClickableMenu == null)
+            hoeDirtChache = new Dictionary<GameLocation, List<Vector2>>();
+            foreach (var location in PyUtils.getAllLocationsAndBuidlings())
             {
-                loadHoeDirt();
-                hoeDirtReplaced = true;
+                hoeDirtChache[location] = location.terrainFeatures
+                    .Where(t => t.Value is HoeDirt)
+                    .Select(t => t.Key).ToList();
             }
 
+            new TerrainSelector<HoeDirt>().whenAddedToLocation((gl, list) => list.ForEach(v => hoeDirtChache[gl].AddOrReplace(v)));
+            new TileLocationSelector((l, v) => hoeDirtChache[l].Contains(v)).whenRemovedFromLocation(restoreTiles);
+
+            /* Legacy Fix */
+            "Town".toLocation().objects.Remove(new Vector2(2, 0));
         }
 
-        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
+        private void restoreTiles(GameLocation l, List<Vector2> list)
         {
-                saveHoeDirt();
-        }
-
-        private void saveHoeDirt()
-        {
-            savelocation = Game1.getLocationFromName("Town");
-            savepoint = new Vector2(2, 0);
-
-            List<string> saves = new List<string>();
-
-            List<GameLocation> gls = new List<GameLocation>();
-            gls.Add(Game1.getLocationFromName("Greenhouse"));
-            gls.Add(Game1.getFarm());
-
-
-            for (int i = 0; i < gls.Count; i++)
+            if (l != Game1.currentLocation)
             {
-                GameLocation location = gls[i];
-                foreach (Vector2 keyV in location.terrainFeatures.Keys)
+                foreach (Vector2 v in list)
                 {
-                    TerrainFeature terrain = location.terrainFeatures[keyV];
-
-                    if (terrain is HoeDirt)
-                    {
-                        saves.Add(location.name + "-" + keyV.X + "-" + keyV.Y);
-
-                    }
+                    l.terrainFeatures[v] = Game1.isRaining ? new HoeDirt(1) : new HoeDirt(0);
+                    if (l.objects.ContainsKey(v) && l.objects[v] is SObject o && 
+                        (o.name.Equals("Weeds") || o.name.Equals("Stone") || o.name.Equals("Twig")))
+                        l.objects.Remove(v);
                 }
             }
-
-            string savestring = string.Join("/", saves) + ">|ignore|-NoSoilDecayRedux";
-
-            Chest saveobject = new Chest(true);
-            saveobject.name = savestring;
-
-            
-            if (savelocation.objects.ContainsKey(savepoint))
+            else
             {
- 
-                savelocation.objects.Remove(savepoint);
+                foreach (Vector2 v in list)
+                    hoeDirtChache[l].Remove(v);
             }
-
-
-            savelocation.objects.Add(savepoint, saveobject);
-
         }
-
-        private void loadHoeDirt()
-        {
-            savelocation = Game1.getLocationFromName("Town");
-            savepoint = new Vector2(2, 0);
-
-            if (savelocation != null && savelocation.objects.ContainsKey(savepoint) && savelocation.objects[savepoint] is Chest)
-            {
-        
-                string[] hoedirttiles = savelocation.objects[savepoint].name.Split('>')[0].Split('/');
-
-                if(hoedirttiles.Length <= 1)
-                {
-                    return;
-                }
-
-                foreach(string hoedirt in hoedirttiles)
-                {
-                    string[] placement = hoedirt.Split('-');
-                    GameLocation location = Game1.getLocationFromName(placement[0]);
-                    Vector2 position = new Vector2(int.Parse(placement[1]), int.Parse(placement[2]));
-
-                  
-                    if (!location.terrainFeatures.ContainsKey(position) || !(location.terrainFeatures[position] is HoeDirt))
-                    {
-                        int state = Game1.isRaining ? 1 : 0;
-                        location.terrainFeatures[position] = new HoeDirt(state);
-                    }
-
-
-                }
-
-
-            }
-       
-
-        }
-
-        
-       
 
     }
+    
 }

@@ -1,66 +1,56 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
-using StardewModdingAPI;
 using StardewValley;
 using System.Collections.Generic;
 using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using StardewValley.Menus;
 
 namespace Portraiture
 {
     class TextureLoader
     {
         private static string contentFolder;
-        private static int activeFolder;
+        internal static int activeFolder;
         private static List<string> folders;
         static Dictionary<string, Texture2D> pTextures;
-        
+
         public static void loadTextures()
         {
+            Visualize.VisualizeMod.setProfileToVanilla();
+
             activeFolder = 0;
             contentFolder = Path.Combine(PortraitureMod.helper.DirectoryPath, "Portraits");
             folders = new List<string>();
             folders.Add("Vanilla");
             pTextures = new Dictionary<string, Texture2D>();
-            pTextures.Add("empty", PortraitureMod.helper.Content.Load<Texture2D>("empty.png", ContentSource.ModFolder));
             loadAllPortraits();
 
-            string loadConfig = loadConfigFile().Split('?')[0];
-            if (loadConfig == "")
-            {
+            string loadConfig = PortraitureMod.config.active;
+
+            if (loadConfig == "none")
                 if (folders.Count > 1)
-                {
                     loadConfig = folders[1];
-                }
                 else
-                {
                     loadConfig = folders[0];
-                }
-            }
-            activeFolder = folders.FindIndex(f => f == loadConfig);
+            else
+                activeFolder = folders.FindIndex(f => f == loadConfig);
 
-            if(activeFolder < 0)
-            {
-                activeFolder = folders.Count - 1;
-                saveConfig();
-            }
+            saveConfig();
 
+            Visualize.VisualizeMod.setProfile();
         }
 
-        public static Texture2D getCopy(Texture2D texture)
+        internal static Rectangle getSoureRectangle(Texture2D texture)
         {
-            Texture2D copy = new Texture2D(Game1.graphics.GraphicsDevice, texture.Width, texture.Height);
-            Color[] col = new Color[texture.Width * texture.Height];
-            texture.GetData<Color>(col);
-            copy.SetData<Color>(col);
-            return copy;
-        }
+            int textureSize = Math.Max(texture.Width / 2, 64);
+            int index = 0;
 
+            if (Game1.activeClickableMenu is DialogueBox box)
+                index = PortraitureMod.helper.Reflection.GetField<Dialogue>(box, "characterDialogue").GetValue().getPortraitIndex();
 
-        public static Texture2D getEmptyPortrait()
-        {
-            return pTextures["empty"];
+            return Game1.getSourceRectForStandardTileSheet(texture, index, textureSize, textureSize);
         }
 
         public static Texture2D getPortrait(string name)
@@ -68,93 +58,37 @@ namespace Portraiture
             activeFolder = Math.Max(activeFolder, 0);
 
             if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.name))
-            {
                 return pTextures[folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.name];
-            }
-            else if (pTextures.ContainsKey(folders[activeFolder] + ">" +name))
-            {
+            else if (pTextures.ContainsKey(folders[activeFolder] + ">" + name))
                 return pTextures[folders[activeFolder] + ">" + name];
-            }
-            else
-            {
-                return getVanillaPortrait(name);
-            }
             
-        }
-
-        public static void pushToVanilla(NPC c)
-        {
-            string key = "Vanilla>" + c.name;
-            if (c.Portrait is Texture2D t)
-            {
-                if (!pTextures.ContainsKey(key))
-                {
-                    pTextures.Add(key, t);
-                }
-
-                c.Portrait = pTextures["empty"];
-            }
-        }
-
-        public static Texture2D getVanillaPortrait(string name)
-        {
-            if (pTextures.ContainsKey("Vanilla>" + name))
-            {
-                return pTextures["Vanilla>" + name];
-            }
-            else
-            {
-                return Game1.getCharacterFromName(name).Portrait;
-            }
+            return null;
         }
 
         private static void loadAllPortraits()
         {
-            loadVanillaPortraits();
-
             foreach (string dir in Directory.EnumerateDirectories(contentFolder))
             {
                 string folderName = new DirectoryInfo(dir).Name;
-            
+
                 folders.Add(folderName);
-                foreach (string file in Directory.EnumerateFiles(dir,"*.*", SearchOption.TopDirectoryOnly).Where(s => s.EndsWith(".png") || s.EndsWith(".xnb"))){
-                    
+                foreach (string file in Directory.EnumerateFiles(dir, "*.*", SearchOption.TopDirectoryOnly).Where(s => s.EndsWith(".png") || s.EndsWith(".xnb")))
+                {
                     string fileName = Path.GetFileName(file);
                     string name = Path.GetFileNameWithoutExtension(file);
                     string extention = Path.GetExtension(file).ToLower();
-                    if (extention == "xnb")
-                    {
-                        fileName = name;
-                    }
-                    pTextures.Add(folderName + ">" + name, PortraitureMod.helper.Content.Load<Texture2D>(Path.Combine("Portraits",folderName,fileName)));
 
+                    if (extention == "xnb")
+                        fileName = name;
+
+                    if (!pTextures.ContainsKey(folderName + ">" + name))
+                        pTextures.Add(folderName + ">" + name, PortraitureMod.helper.Content.Load<Texture2D>($"Portraits/{folderName}/{fileName}"));
+                    else
+                        pTextures[folderName + ">" + name] = PortraitureMod.helper.Content.Load<Texture2D>($"Portraits/{folderName}/{fileName}");
                 }
             }
-            
         }
         
-        public static void loadVanillaPortraits()
-        {
-            foreach(NPC c in Utility.getAllCharacters())
-            {
-                if(c.Portrait is Texture2D t && c.Portrait != pTextures["empty"])
-                {
-                    string key = "Vanilla>" + c.name;
-                    if (pTextures.ContainsKey(key))
-                    {
-                        pTextures[key] = t;
-                    }
-                    else
-                    {
-                        pTextures.Add(key, t);
-                    }
-                   
-                    c.Portrait = pTextures["empty"];
-                }
-                
-            }
-        }
-
         public static string getFolderName()
         {
             return folders[activeFolder];
@@ -162,85 +96,19 @@ namespace Portraiture
 
         public static void nextFolder()
         {
-
             activeFolder++;
             if (folders.Count <= activeFolder)
-            {
                 activeFolder = 0;
-            }
 
             saveConfig();
         }
 
-
-        private static string loadConfigFile()
-        {
-            if (!(doesConfigExist()))
-            {
-                return "";
-            }
-            string filename = "Portraiture" + "_" + Game1.player.name + "_" + Game1.uniqueIDForThisGame + ".sav";
-
-            FileInfo fi = ensureFolderStructureExists(Game1.player.name, Game1.uniqueIDForThisGame, filename);
-
-            using (StreamReader sr = fi.OpenText())
-            {
-                return sr.ReadToEnd();
-
-            }
-        }
-
         private static void saveConfig()
         {
-            string filename = "Portraiture" + "_" + Game1.player.name + "_" + Game1.uniqueIDForThisGame + ".sav";
-            FileInfo fi = ensureFolderStructureExists(Game1.player.name, Game1.uniqueIDForThisGame, filename);
-
             string directoryName = folders[activeFolder];
-            string savstring = directoryName + "?";
-
-            using (StreamWriter sw = fi.CreateText())
-            {
-                sw.WriteLine(savstring);
-            }
-        }
-
-
-        private static FileInfo ensureFolderStructureExists(string PN, ulong GID, string tmpString)
-        {
-            string str = PN;
-            foreach (char c in str)
-            {
-                if (!char.IsLetterOrDigit(c))
-                    str = str.Replace(c.ToString() ?? "", "");
-            }
-            string path2 = Path.Combine(str + "_" + (object)GID, tmpString);
-            FileInfo fileInfo1 = new FileInfo(Path.Combine(Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "StardewValley"), "Saves"), path2));
-            if (!fileInfo1.Directory.Exists)
-                fileInfo1.Directory.Create();
-
-            return fileInfo1;
-        }
-
-        private static bool doesConfigExist()
-        {
-            string filename = "Portraiture" + "_" + Game1.player.name + "_" + Game1.uniqueIDForThisGame + ".sav";
-            string str = Game1.player.name;
-            foreach (char c in str)
-            {
-                if (!char.IsLetterOrDigit(c))
-                    str = str.Replace(c.ToString() ?? "", "");
-            }
-            string path2 = Path.Combine(str + "_" + (object)Game1.uniqueIDForThisGame, filename);
-            FileInfo fileInfo1 = new FileInfo(Path.Combine(Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "StardewValley"), "Saves"), path2));
-            if (!fileInfo1.Exists)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-
+            string savstring = directoryName;
+            PortraitureMod.config.active = savstring;
+            PortraitureMod.helper.WriteConfig(PortraitureMod.config);
         }
 
 

@@ -1,20 +1,17 @@
 ﻿using StardewValley;
 using StardewValley.Tools;
-
-using CustomElementHandler;
-
+using SObject = StardewValley.Object;
 using System;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-
+using PyTK.CustomElementHandler;
+using PyTK;
 
 namespace HarpOfYobaRedux
 {
     internal class Instrument : Tool, ISaveElement
     {
-
         private static Dictionary<string,Instrument> allInstruments;
         public string instrumentID;
         public bool owned;
@@ -26,7 +23,6 @@ namespace HarpOfYobaRedux
         private string priorMusic;
         private GameLocation priorLocation;
         public static Dictionary<string, string> allAdditionalSaveData;
-
 
         public Instrument()
         {
@@ -72,9 +68,7 @@ namespace HarpOfYobaRedux
         public Instrument(string id, Texture2D texture, string name, string description, IInstrumentAnimation animation)
         {
             if (allInstruments == null)
-            {
                 allInstruments = new Dictionary<string, Instrument>();
-            }
 
             this.animation = animation;
             this.name = name;
@@ -84,13 +78,11 @@ namespace HarpOfYobaRedux
             instrumentID = id;
 
             if (allInstruments.ContainsKey(id))
-            {
                 allInstruments.Remove(id);
-            }
+
             owned = false;
 
             allInstruments.Add(id,this);
-            
         }
 
         public Instrument(string id)
@@ -107,17 +99,14 @@ namespace HarpOfYobaRedux
             readyToPlay = true;
             cooldownTime = 60;
             numAttachmentSlots = 1;
-            attachments = new StardewValley.Object[numAttachmentSlots];
+            attachments = new SObject[numAttachmentSlots];
             owned = true;
             allInstruments[id].owned = true;
             instantUse = true;
             instrumentID = id;
 
             if (allAdditionalSaveData == null)
-            {
                 allAdditionalSaveData = new Dictionary<string, string>();
-            }
-
         }
 
         public override int attachmentSlots()
@@ -125,38 +114,32 @@ namespace HarpOfYobaRedux
             return numAttachmentSlots;
         }
 
-        public override bool canThisBeAttached(StardewValley.Object o)
+        public override bool canThisBeAttached(SObject o)
         {
             if (o is SheetMusic || o == null) { return true; } else { return false; }
         }
 
-        public override StardewValley.Object attach(StardewValley.Object o)
+        public override SObject attach(SObject o)
         {
-            StardewValley.Object priorAttachement = (StardewValley.Object) null;
+            SObject priorAttachement = null;
 
             if (attachments.Length > 0 && attachments[0] != null)
-            {
-                priorAttachement = (SheetMusic) attachments[0].getOne();
-            }
-        
+                priorAttachement = (SheetMusic)attachments[0].getOne();
 
             if (o is SheetMusic)
             {
-                    attachments[0] = o;
-                    Game1.playSound("button1");
-
-            return priorAttachement;
+                attachments[0] = o;
+                Game1.playSound("button1");
+                return priorAttachement;
             }
-            else if(o == null)
+            else if (o == null)
             {
-                attachments[0] = (StardewValley.Object)null;
+                attachments[0] = null;
                 Game1.playSound("dwop");
-
                 return priorAttachement;
             }
 
-           
-            return (StardewValley.Object)null;
+            return null;
         }
 
 
@@ -165,27 +148,22 @@ namespace HarpOfYobaRedux
             return this;
         }
 
-     
-
         public Dictionary<string, string> getAdditionalSaveData()
         {
             Dictionary<string, string> additionalSaveData = new Dictionary<string, string>();
-            
             additionalSaveData.Add("id", instrumentID);
 
             foreach (string key in allAdditionalSaveData.Keys)
-            {
                 additionalSaveData.Add(key, allAdditionalSaveData[key]);
-            }
 
             return additionalSaveData;
         }
 
-        public dynamic getReplacement()
+        public object getReplacement()
         {
             FishingRod replacement = new FishingRod(1);
             replacement.upgradeLevel = -1;
-            replacement.attachments = this.attachments;
+            replacement.attachments = attachments;
             return replacement;
         }
 
@@ -193,25 +171,19 @@ namespace HarpOfYobaRedux
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
             build(additionalSaveData["id"]);
-            this.attachments = (replacement as Tool).attachments;
+            attachments = (replacement as Tool).attachments;
             allInstruments[instrumentID].owned = true;
 
             foreach (string key in additionalSaveData.Keys)
-            {
                 if (key != "id" && !allAdditionalSaveData.ContainsKey(key))
-                {
                     allAdditionalSaveData.Add(key, additionalSaveData[key]);
-                }
-
-            }
-
         }
 
         public override string DisplayName { get => name; set => name = value; }
 
         public override string getDescription()
         {
-            string text = this.description;
+            string text = description;
             if (attachments.Length > 0 && attachments[0] is SheetMusic)
             {
                 text = (attachments[0] as SheetMusic).name;
@@ -243,10 +215,7 @@ namespace HarpOfYobaRedux
                 timeWhenReady = totalminutes + cooldownTime;
                 readyToPlay = false;
                 Game1.player.canMove = true;
-
                 play();
-
-                
             }
             else
             {
@@ -256,14 +225,8 @@ namespace HarpOfYobaRedux
 
         }
 
-        private void animatePlay()
-        {
-            animation.animate();
-        }
-
         private void doMagic()
         {
-            
             SheetMusic sheet = (SheetMusic)attachments[0];
             sheet.doMagic();
         }
@@ -271,46 +234,26 @@ namespace HarpOfYobaRedux
         private void play()
         {
             if (attachments[0] == null)
-            {
                 return;
-            }
 
             priorMusic = Game1.currentSong.Name;
             priorLocation = Game1.currentLocation;
 
             SheetMusic sheet = (SheetMusic)attachments[0];
 
-            DelayedAction startAction = new DelayedAction(1000);
-            startAction.behavior = new DelayedAction.delayedBehavior(animatePlay);
-
-            DelayedAction magicAction = new DelayedAction(sheet.lenght/2);
-            magicAction.behavior = new DelayedAction.delayedBehavior(doMagic);
-
-            DelayedAction stopMusicAction = new DelayedAction(sheet.lenght);
-            stopMusicAction.behavior = new DelayedAction.delayedBehavior(resetMusic);
-
-            DelayedAction stopAction = new DelayedAction(sheet.lenght + 1000);
-            stopAction.behavior = new DelayedAction.delayedBehavior(stop);
-
-            Game1.delayedActions.Add(startAction);
-            Game1.delayedActions.Add(stopMusicAction);
-            Game1.delayedActions.Add(stopAction);
-            Game1.delayedActions.Add(magicAction);
-
-            
+            PyUtils.setDelayedAction(1000, animation.animate);
+            PyUtils.setDelayedAction(sheet.lenght / 2, doMagic);
+            PyUtils.setDelayedAction(sheet.lenght, resetMusic);
+            PyUtils.setDelayedAction(sheet.lenght + 1000, stop);
 
             animation.preAnimation();
-            
             sheet.play();
-
         }
 
         private void stop()
         {
             if(priorLocation == null)
-            {
                 priorLocation = Game1.currentLocation;
-            }
             
             animation.stop();
             Delivery.checkForProgress(priorLocation, (SheetMusic)attachments[0]);
@@ -319,16 +262,13 @@ namespace HarpOfYobaRedux
         private void resetMusic()
         {
             if (Game1.currentLocation == priorLocation)
-            {
                 Game1.changeMusicTrack(priorMusic);
-            }
         }
 
         public new bool beginUsing(GameLocation location, int x, int y, StardewValley.Farmer who)
         {
             return false;
         }
-        
 
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
         {
@@ -341,18 +281,13 @@ namespace HarpOfYobaRedux
                 int minutes = timeOfDay - (hours * 100);
                 int totalminutes = hours * 60 + minutes;
                 minutesTillReady = timeWhenReady - totalminutes;
-                
 
                 int milliseconds = Game1.currentGameTime.TotalGameTime.Milliseconds;
 
                 if ( (milliseconds % 1000 >= 500) || readyToPlay)
-                {
                     alpha = 0.6f;
-                }
                 else
-                {
                     alpha = 0.4f;
-                }
 
                 if (minutesTillReady <= 0)
                 {
@@ -360,35 +295,29 @@ namespace HarpOfYobaRedux
                     minutesTillReady = 0;
                     alpha = 1f;
                 }
-
             }
 
-            Rectangle sourceRectangle = new Microsoft.Xna.Framework.Rectangle(32, 0, 16, 16);
-            spriteBatch.Draw(texture, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Microsoft.Xna.Framework.Rectangle?(sourceRectangle), Color.White * (alpha * transparency), 0.0f, new Vector2(8, 8), (float)Game1.pixelZoom * ((double)scaleSize < 0.2 ? scaleSize : scaleSize), SpriteEffects.None, layerDepth);
+            Rectangle sourceRectangle = new Rectangle(32, 0, 16, 16);
+            spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), new Rectangle?(sourceRectangle), Color.White * (alpha * transparency), 0.0f, new Vector2(8, 8), Game1.pixelZoom * (scaleSize < 0.2 ? scaleSize : scaleSize), SpriteEffects.None, layerDepth);
 
             if (!readyToPlay && Game1.activeClickableMenu == null)
-            {
-                Utility.drawTinyDigits(minutesTillReady/10, spriteBatch, location + new Vector2((float)(24 * scaleSize), (float)(40 * scaleSize / 2)), 4f * scaleSize, 1f, Microsoft.Xna.Framework.Color.White * alpha);
-            }
+                Utility.drawTinyDigits(minutesTillReady/10, spriteBatch, location + new Vector2((24 * scaleSize), (40 * scaleSize / 2)), 4f * scaleSize, 1f, Color.White * alpha);
 
         }
 
         public override void drawAttachments(SpriteBatch b, int x, int y)
         {
             Rectangle attachementSourceRectangle = new Rectangle(64, 0, 64, 64);
-            b.Draw(texture, new Vector2((float)x, (float)y), new Microsoft.Xna.Framework.Rectangle?(attachementSourceRectangle), Microsoft.Xna.Framework.Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
+            b.Draw(texture, new Vector2(x, y), new Rectangle?(attachementSourceRectangle), Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
 
             if (attachments.Length > 0 && attachments[0] != null)
-            {
-                attachments[0].drawInMenu(b, new Vector2((float)x, (float)y), 1f);
-            }
+                attachments[0].drawInMenu(b, new Vector2(x, y), 1f);
         }
 
         protected override string loadDisplayName()
         {
             return name;
         }
-
 
         protected override string loadDescription()
         {

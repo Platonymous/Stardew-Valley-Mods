@@ -12,9 +12,7 @@ namespace HarpOfYobaRedux
 
         public void doMagic(bool playedToday)
         {
-
             Buff buff = new Buff(22);
-
             buff.glow = Color.Orange;
             buff.description = "Adventure!";
             buff.millisecondsDuration = 15000 + Game1.random.Next(15000);
@@ -27,10 +25,7 @@ namespace HarpOfYobaRedux
             }
 
             if (!Game1.buffsDisplay.hasBuff(22))
-            {
                 Game1.buffsDisplay.addOtherBuff(buff);
-            }
-
         }
     }
 }

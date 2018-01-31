@@ -1,0 +1,19 @@
+{
+   "name": "Custom Farming Mailbox",
+   "author": "Platonymous",
+   "version": "1.0.0",
+   "machines":
+   [
+	   {
+		   "id": 0,
+		   "legacy": "Platonymous.Mailbox.ComputerMailbox.json",
+		   "name": "PC for Emails",
+		   "description": "A state of the art mailbox",
+		   "category": "Mailbox",
+		   "texture": "mailbox.png",
+		   "crafting": "388 30 787 5 335 1 334 1 336 1",
+		   "frames": 9,
+		   "pulsate": false
+		}
+   ]
+}

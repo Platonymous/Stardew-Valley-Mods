@@ -1,26 +1,26 @@
-﻿using StardewValley;
-using System.Collections.Generic;
-
+﻿using PyTK.Types;
+using StardewValley;
 
 namespace HarpOfYobaRedux
 {
-    internal class Letter
+    internal class Letter : Mail
     {
-        public string text;
-        public List<Item> items;
-        public string letterID;
-
+        public Item item;
 
         public Letter()
         {
 
         }
 
-        public Letter(string text, List<Item> items)
+        public Letter(string id, string text, Item item = null)
+            :base(id,text,388)
         {
-            this.letterID = items[0].Name;
-            this.text = text;
-            this.items = items;
+            if (item == null)
+                item = new SheetMusic(id);
+
+            this.id = "hoy_" + id;
+            this.item = item;
+            injectIntoMail();
         }
 
     }

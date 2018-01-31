@@ -1,0 +1,13 @@
+{
+  "Name": "Sprinkles",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 1,
+    "MinorVersion": 2,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "Description": "Activate Sprinklers in current location on click",
+  "UniqueID": "Platonymous.Sprinkles",
+  "EntryDll": "Sprinkles.dll"
+}
