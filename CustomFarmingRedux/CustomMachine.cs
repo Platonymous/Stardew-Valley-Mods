@@ -22,16 +22,11 @@ namespace CustomFarmingRedux
         internal string folder => blueprint.pack.baseFolder;
         internal List<CustomMachineBlueprint> machines = CustomFarmingReduxMod.machines;
         internal static List<CustomMachine> activeMachines = new List<CustomMachine>();
+        internal Texture2D texture { get; private set; }
+        internal Rectangle sourceRectangle => Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex + frame, tilesize.Width, tilesize.Height);
 
         private CustomMachineBlueprint blueprint;
 
-        private Texture2D texture;
-        private Rectangle sourceRectangle {
-            get
-            {
-               return Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex + frame, tilesize.Width, tilesize.Height);
-            }
-        }
         private bool active = true;
         private bool wasBuild = false;
         private bool isWorking { get => active && !readyForHarvest && ((completionTime != null && activeRecipe != null) || blueprint.production == null); }
@@ -195,7 +190,7 @@ namespace CustomFarmingRedux
                         if (location.objects.ContainsKey(tile) && location.objects[tile] is Chest c)
                             items.AddOrReplace(c.items);
             }
-            
+
             return items;
         }
 
@@ -287,7 +282,7 @@ namespace CustomFarmingRedux
 
             if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
                 getReadyForHarvest();
-            
+
             if (!(isWorking && completionTime != null))
                 startAutoProduction();
 
@@ -451,7 +446,7 @@ namespace CustomFarmingRedux
 
         public override bool checkForAction(SFarmer who, bool justCheckingForActivity = false)
         {
-            
+
             if (blueprint.category == "Mailbox")
             {
                 if (justCheckingForActivity)
@@ -471,7 +466,7 @@ namespace CustomFarmingRedux
             {
                 if (justCheckingForActivity)
                     return true;
-                
+
                 shakeTimer = 100;
 
                 if (specialVariable == 0)
@@ -486,7 +481,7 @@ namespace CustomFarmingRedux
 
             if (heldObject == null)
                 return (who.ActiveObject is SObject o && findRecipe(maxed(o)) != null && hasStarterMaterials(who.items));
-                
+
             if (!readyForHarvest)
                 return false;
 
@@ -555,10 +550,10 @@ namespace CustomFarmingRedux
             bool hasStarter = hasStarterMaterials(items);
             bool hasIngredients = hasRecipe && recipe.hasIngredients(items);
             bool canProduce = hasIngredients && hasStarter;
-            
+
             if (probe)
                 return canProduce;
-            
+
             if (canProduce)
             {
                 startProduction(dropIn, findRecipeFor(maxed(dropIn)), items);
