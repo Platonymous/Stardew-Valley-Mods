@@ -140,7 +140,7 @@ namespace CustomFarmingRedux
             if (blueprint.production == null)
                 return null;
 
-            return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials[0]));
+            return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials[0]) && rec.fitsIngredient(item, rec.materials[1]) && rec.fitsIngredient(item, rec.materials[2]) && rec.fitsIngredient(item, rec.materials[3]) && rec.fitsIngredient(item, rec.materials[4]) && rec.fitsIngredient(item, rec.materials[5]));
         }
 
         private RecipeBlueprint findRecipe(List<Item> items)
