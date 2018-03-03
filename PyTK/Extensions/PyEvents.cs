@@ -652,7 +652,7 @@ namespace PyTK.Extensions
 
                 if (e.Action == NotifyCollectionChangedAction.Add)
                     foreach (Vector2 key in e.NewItems)
-                        if (t.predicate(location.terrainFeatures[key]))
+                        if (location.terrainFeatures.ContainsKey(key) && t.predicate(location.terrainFeatures[key]))
                             keys.Add(key);
 
                 action.Invoke(location, keys);

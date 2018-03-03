@@ -169,6 +169,11 @@ namespace PyTK.CustomTV
                 channels[id].action = action;
         }
 
+        public static void removeChannel(string key)
+        {
+            removeKey(key);
+        }
+
         public static void removeKey(string key)
         {
             load();

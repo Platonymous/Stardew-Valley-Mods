@@ -20,9 +20,7 @@ using System.Collections.Generic;
 using PyTK.Overrides;
 using xTile.Format;
 using System.Linq;
-
 using PyTK.Tiled;
-using System.IO;
 
 namespace PyTK
 {
@@ -53,7 +51,6 @@ namespace PyTK
             registerConsoleCommands();
             CustomTVMod.load();
             SaveHandler.setUpEventHandlers();
-
         }
 
         private void harmonyFix()

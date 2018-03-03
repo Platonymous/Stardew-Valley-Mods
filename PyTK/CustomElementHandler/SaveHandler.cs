@@ -330,15 +330,18 @@ namespace PyTK.CustomElementHandler
 
         private static object getReplacement(object element)
         {
+            object replacement = element;
+
             if (element is ISaveElement ise)
-                return getReplacement(ise);
+                replacement = getReplacement(ise);
+            else
+                replacement = Helper.Reflection.GetMethod(element, "getReplacement").Invoke<object>();
 
-            object o = Helper.Reflection.GetMethod(element, "getReplacement").Invoke<object>();
-            if (element is TerrainFeature && !(o is FruitTree))
-                o = new FruitTree(628, 1);
+            if (element is TerrainFeature && !(replacement is FruitTree))
+                replacement = new FruitTree(628, 1);
 
-            setDataString(o, getReplacementName(element));
-            return o;
+            setDataString(replacement, getReplacementName(element));
+            return replacement;
         }
 
         private static void setDataString(object o, string dataString)
