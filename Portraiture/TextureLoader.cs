@@ -18,8 +18,6 @@ namespace Portraiture
 
         public static void loadTextures()
         {
-            Visualize.VisualizeMod.setProfileToVanilla();
-
             activeFolder = 0;
             contentFolder = Path.Combine(PortraitureMod.helper.DirectoryPath, "Portraits");
             folders = new List<string>();
@@ -38,18 +36,11 @@ namespace Portraiture
                 activeFolder = folders.FindIndex(f => f == loadConfig);
 
             saveConfig();
-
-            Visualize.VisualizeMod.setProfile();
         }
 
-        internal static Rectangle getSoureRectangle(Texture2D texture)
+        internal static Rectangle getSoureRectangle(Texture2D texture, int index = 0)
         {
             int textureSize = Math.Max(texture.Width / 2, 64);
-            int index = 0;
-
-            if (Game1.activeClickableMenu is DialogueBox box)
-                index = PortraitureMod.helper.Reflection.GetField<Dialogue>(box, "characterDialogue").GetValue().getPortraitIndex();
-
             return Game1.getSourceRectForStandardTileSheet(texture, index, textureSize, textureSize);
         }
 

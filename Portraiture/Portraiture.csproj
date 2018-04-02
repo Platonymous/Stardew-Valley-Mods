@@ -39,7 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PConfig.cs" />
-    <Compile Include="PortaitureVHandler.cs" />
+    <Compile Include="PortraitsFix.cs" />
     <Compile Include="PortraitureMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextureLoader.cs" />
@@ -49,10 +49,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Visualize\Visualize.csproj">
-      <Project>{a9a81f01-58dd-4030-bb82-ae7e71d68d99}</Project>
-      <Name>Visualize</Name>
-      <Private>False</Private>
+    <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
+      <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
+      <Name>Harmony</Name>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

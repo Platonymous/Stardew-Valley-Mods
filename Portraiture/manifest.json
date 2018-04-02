@@ -3,17 +3,12 @@
   "Author": "Platonymous",
   "Version": {
     "MajorVersion": 1,
-    "MinorVersion": 4,
-    "PatchVersion": 2,
+    "MinorVersion": 5,
+    "PatchVersion": 1,
     "Build": null
   },
   "Description": "Helper Mod for Portraits.",
   "UniqueID": "Platonymous.Portraiture",
   "EntryDll": "Portraiture.dll",
-  "UpdateKeys": [ "Nexus:999" ],
-  "Dependencies": [
-    {
-      "UniqueID": "Platonymous.Visualize"
-    }
-]
+  "UpdateKeys": [ "Nexus:999" ]
 }
