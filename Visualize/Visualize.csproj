@@ -60,6 +60,7 @@
     <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
       <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
       <Name>Harmony</Name>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
