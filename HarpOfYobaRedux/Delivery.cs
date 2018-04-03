@@ -17,7 +17,7 @@ namespace HarpOfYobaRedux
         public static void checkMail()
         {
             Letter nextLetter = checkForLetter();
-            if (nextLetter != null)
+            if (nextLetter != null && !Game1.mailbox.Contains(nextLetter.id))
                 Game1.mailbox.Enqueue(nextLetter.id);
         }
 
