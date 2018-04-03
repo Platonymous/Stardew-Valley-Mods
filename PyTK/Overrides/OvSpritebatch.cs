@@ -33,33 +33,25 @@ namespace PyTK.Overrides
                     return AccessTools.Method(typeof(FakeSpriteBatch), "DrawInternal");
             }
 
-            internal static void Prefix(ref SpriteBatch __instance, KeyValuePair<Texture2D, Rectangle?> __state, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth)
+            internal static bool Prefix(ref SpriteBatch __instance, KeyValuePair<Texture2D, Rectangle?> __state, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth)
             {
-                if (!replaceNext)
-                    return;
+                if (!replaceNext )
+                    return true;
 
                 __state = new KeyValuePair<Texture2D, Rectangle?>(texture, sourceRectangle);
 
                 if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle && texture == nextData.sdvTexture)
                 {
-                    texture = nextData.texture;
-                    sourceRectangle = nextData.sourceRectangle;
-                    color = nextData.color != Color.White ? nextData.color : color;
                     replaceNext = false;
+                    MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
+                    drawMethod.Invoke(__instance, new object[] { nextData.texture, destinationRectangle, true, nextData.sourceRectangle, nextData.color != Color.White ? nextData.color : color, rotation, origin, effect, depth });
+                    return false;
                 }
+
+                return true;
             }
 
-            internal static void Postfix(ref Texture2D texture, ref Rectangle? sourceRectangle, KeyValuePair<Texture2D, Rectangle?> __state)
-            {
-                if (!replaceNext)
-                    return;
-
-                if (__state.Key == null || !__state.Value.HasValue)
-                    return;
-
-                texture = __state.Key;
-                sourceRectangle = __state.Value; ;
-            }
+ 
         }
         
         [HarmonyPatch]
@@ -73,33 +65,25 @@ namespace PyTK.Overrides
                     return AccessTools.Method(typeof(FakeSpriteBatch), "InternalDraw");
             }
 
-            internal static void Prefix(ref SpriteBatch __instance, KeyValuePair<Texture2D,Rectangle?> __state, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
+            internal static bool Prefix(ref SpriteBatch __instance, KeyValuePair<Texture2D,Rectangle?> __state, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
             {
                 if (!replaceNext)
-                    return;
+                    return true;
 
                 __state = new KeyValuePair<Texture2D, Rectangle?>(texture, sourceRectangle);
                 
                 if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle && texture == nextData.sdvTexture)
                 {
-                    texture = nextData.texture;
-                    sourceRectangle = nextData.sourceRectangle;
-                    color = nextData.color != Color.White ? nextData.color : color;
                     replaceNext = false;
+                    MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics"), "InternalDraw");
+                    drawMethod.Invoke(__instance, new object[] { nextData.texture, destination, scaleDestination, nextData.sourceRectangle, nextData.color != Color.White ? nextData.color : color, rotation, origin, effects, depth });
+                    return false;
                 }
+
+                return true;
             }
 
-            internal static void Postfix(ref Texture2D texture, ref Rectangle? sourceRectangle, KeyValuePair<Texture2D, Rectangle?> __state)
-            {
-                if (!replaceNext)
-                    return;
 
-                if (__state.Key == null || !__state.Value.HasValue)
-                    return;
-
-                texture = __state.Key;
-                sourceRectangle = __state.Value;;
-            }
 
         }
 
