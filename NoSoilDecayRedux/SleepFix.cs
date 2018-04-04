@@ -15,6 +15,9 @@ namespace NoSoilDecayRedux
 
         internal static void Postfix(GameLocation __instance, ref Response answer)
         {
+            if (__instance.lastQuestionKey == null || answer == null || answer.responseKey == null)
+                    return;
+
             if (__instance.lastQuestionKey.ToLower() == "sleep" && answer.responseKey.ToLower() == "yes")
                 NoSoilDecayReduxMod.saveHoeDirt();
         }
