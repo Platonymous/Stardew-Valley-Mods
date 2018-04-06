@@ -3,8 +3,8 @@
   "Author": "Platonymous",
   "Version": {
     "MajorVersion": 2,
-    "MinorVersion": 3,
-    "PatchVersion": 6,
+    "MinorVersion": 4,
+    "PatchVersion": 0,
     "Build": null
   },
   "Description": "Helper Mod for Custom Machine creation.",
