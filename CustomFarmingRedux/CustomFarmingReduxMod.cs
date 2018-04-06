@@ -320,7 +320,7 @@ namespace CustomFarmingRedux
                         blueprint.production = new List<RecipeBlueprint>();
                         blueprint.production.Add(new RecipeBlueprint());
                         blueprint.production[0].index = 0;
-                        blueprint.production[0].time = (STime.CURRENT + STime.YEAR * 1000).timestamp;
+                        blueprint.production[0].time = 0;
                     }
 
                     CustomObjectData data = new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, typeof(CustomMachine), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.fullid, blueprint.crafting));

@@ -140,7 +140,7 @@ namespace CustomFarmingRedux
             if (blueprint.production == null)
                 return null;
 
-            return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials[0]));
+            return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials));
         }
 
         private RecipeBlueprint findRecipe(List<Item> items)
@@ -277,8 +277,11 @@ namespace CustomFarmingRedux
                     if(Game1.currentLocation.objects.ContainsValue(this))
                         tileLocation = Game1.currentLocation.objects.Find(k => k.Value == this).Key;
 
-            if (!wasBuild)
+            if (!wasBuild || blueprint.asdisplay)
+            {
+                shakeTimer = 0;
                 return;
+            }
 
             if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
                 getReadyForHarvest();
@@ -373,10 +376,10 @@ namespace CustomFarmingRedux
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("id", id);
 
-            if(location != null)
+            if (location != null)
                 data.Add("location", location.name);
 
-            if (activeRecipe != null)
+            if (activeRecipe != null && !blueprint.asdisplay)
                 data.Add("recipe", activeRecipe.id.ToString());
 
             if (completionTime != null)
@@ -436,7 +439,6 @@ namespace CustomFarmingRedux
             updateWhenCurrentLocation(Game1.currentGameTime);
             startAutoProduction();
             wasBuild = true;
-
         }
 
         public override void DayUpdate(GameLocation location)
@@ -536,6 +538,13 @@ namespace CustomFarmingRedux
             return false;
         }
 
+        private string getCatName(int cat)
+        {
+            SObject s = new SObject(Vector2.Zero, 399);
+            s.category = cat;
+            return s.getCategoryName();
+        }
+
         public override bool performObjectDropInAction(SObject dropIn, bool probe, SFarmer who)
         {
             if (heldObject != null)
@@ -543,6 +552,12 @@ namespace CustomFarmingRedux
 
             if (heldObject == null)
                 clear();
+
+            if (blueprint.asdisplay && dropIn is SObject d)
+            {
+                heldObject = (SObject) d.getOne();
+                return false;
+            }
 
             List<List<Item>> items = getItemLists(who);
             RecipeBlueprint recipe = findRecipeFor(maxed(dropIn));
@@ -563,13 +578,13 @@ namespace CustomFarmingRedux
 
             if(!hasStarter)
             {
-                Game1.showRedMessage($"Requires {blueprint.starter.stack}x {(blueprint.starter.index > 0 ? Game1.objectInformation[blueprint.starter.index].Split('/')[4] : "Category " + blueprint.starter.index)}.");
+                Game1.showRedMessage($"Requires {blueprint.starter.stack}x {(blueprint.starter.index > 0 ? Game1.objectInformation[blueprint.starter.index].Split('/')[4] : "Category " + getCatName(blueprint.starter.index))}.");
                 return false;
             }
 
             if (!hasIngredients && hasRecipe)
             {
-                string ingredients = String.Join(",", recipe.materials.toList(m => m.stack + "x " + (m.index > 0 ? Game1.objectInformation[m.index].Split('/')[4] : "Category " + m.index)));
+                string ingredients = String.Join(",", recipe.materials.toList(m => m.stack + "x " + (m.index > 0 ? Game1.objectInformation[m.index].Split('/')[4] : "Category " + getCatName(m.index))));
                 Game1.showRedMessage($"Missing Ingredients. ({ingredients})");
                 return false;
             }
@@ -579,7 +594,7 @@ namespace CustomFarmingRedux
 
         public override bool performToolAction(Tool t)
         {
-            if (heldObject != null)
+            if (heldObject != null && !blueprint.asdisplay)
             {
                 if (readyForHarvest)
                 {

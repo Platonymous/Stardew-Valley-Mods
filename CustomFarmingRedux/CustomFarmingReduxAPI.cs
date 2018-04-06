@@ -108,7 +108,7 @@ namespace CustomFarmingRedux
                         blueprint.production = new List<RecipeBlueprint>();
                         blueprint.production.Add(new RecipeBlueprint());
                         blueprint.production[0].index = 0;
-                        blueprint.production[0].time = (STime.CURRENT + STime.YEAR * 1000).timestamp;
+                        blueprint.production[0].time = 0;
                     }
 
                     if (blueprint.crafting != null)

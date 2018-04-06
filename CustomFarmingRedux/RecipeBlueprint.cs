@@ -134,6 +134,21 @@ namespace CustomFarmingRedux
                             if (j.Stack <= 0)
                                 items[list].Remove(j);
                         }
+
+            if(ingredients.Count > 0)
+                foreach (IngredientBlueprint i in materials)
+                    for (int list = 0; list < items.Count; list++)
+                        if (ingredients.Exists(e => e.index == i.index))
+                            if (items[list].Find(p => fitsIngredient(p, i)) is Item j)
+                            {
+                                j.Stack -= i.stack;
+                                int ii = ingredients.FindIndex(p => p.index == i.index);
+                                ingredients[ii].stack = (j.Stack > 0) ? 0 : Math.Abs(j.Stack);
+                                if (ingredients[ii].stack == 0)
+                                    ingredients.Remove(ingredients[ii]);
+                                if (j.Stack <= 0)
+                                    items[list].Remove(j);
+                            }
         }
 
         public Texture2D getTexture(IModHelper helper = null)
@@ -159,6 +174,20 @@ namespace CustomFarmingRedux
                 return true;
 
             return p is SObject o && (exclude == null || !exclude.Contains(o.parentSheetIndex)) && (o.parentSheetIndex == i.index || o.category == i.index || (include != null && (include.Contains(o.parentSheetIndex) || include.Contains(o.category)))) && (i.exactquality == -1 || o.quality == i.exactquality) && o.quality >= i.quality && (i.quality >= 0 || o.quality < (i.quality * -1));
+        }
+
+        internal bool fitsIngredient(Item p, List<IngredientBlueprint> l)
+        {
+            foreach (IngredientBlueprint i in l)
+            {
+                if (p is SObject obj && i.index == -999)
+                    return true;
+
+                if (p is SObject o && (exclude == null || !exclude.Contains(o.parentSheetIndex)) && (o.parentSheetIndex == i.index || o.category == i.index || (include != null && (include.Contains(o.parentSheetIndex) || include.Contains(o.category)))) && (i.exactquality == -1 || o.quality == i.exactquality) && o.quality >= i.quality && (i.quality >= 0 || o.quality < (i.quality * -1)))
+                    return true;
+            }
+
+            return false;
         }
 
         public bool hasIngredients(List<List<Item>> items)
