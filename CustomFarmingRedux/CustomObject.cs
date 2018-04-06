@@ -10,6 +10,7 @@ using StardewModdingAPI;
 using PyTK.Extensions;
 using PyTK.CustomElementHandler;
 using StardewValley.Objects;
+using System.IO;
 
 namespace CustomFarmingRedux
 {
@@ -104,21 +105,40 @@ namespace CustomFarmingRedux
             Texture2D texture = Game1.objectSpriteSheet;
             Color[] data = new Color[texture.Width * texture.Height];
             texture.GetData(data);
-            Rectangle sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, input.parentSheetIndex, 16, 16);
-            Dictionary<Color, int> colors = new Dictionary<Color, int>();
+            int w = 16;
+            int h = 16;
+            Rectangle sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, input.parentSheetIndex, w, h);
+            Color[] data2 = new Color[w * h];
 
-            for (int x = sourceRectangle.X + 6; x < (sourceRectangle.X + sourceRectangle.Width - 6); x++)
-                for (int y = sourceRectangle.Y + 6; y < (sourceRectangle.Y + sourceRectangle.Height - 4); y++)
-                    if (data[x * texture.Height + y].R != data[x * texture.Height + y].G && data[x * texture.Height + y].G != data[x * texture.Height + y].B && data[x * texture.Height + y].A == 255)
-                            colors.AddOrReplace(data[x * texture.Height + y], 0);
-            
-            for (int i = 0; i < colors.Keys.Count; i++)
-                for (int j = 0; j < colors.Keys.Count; j++)
-                    colors[colors.Keys.ElementAt(i)] += colors.Keys.ElementAt(i).getDistanceTo(colors.Keys.ElementAt(j));
-                    
-            List<int> distances = colors.toList(k => k.Value);
-            int mindist = distances.Min();
-            return colors.Find(k => k.Value == mindist).Key.setLight(120).setSaturation(150);
+            int x2 = sourceRectangle.X;
+            int y2 = sourceRectangle.Y;
+
+            int i = 0;
+            for (int x = x2; x < w + x2; x++)
+                for (int y = y2; y < h + y2; y++)
+                    data2[(y - y2) * w + (x - x2)] = data[y * texture.Width + x];
+
+            List<Color> colors = data2.ToList();
+            colors.RemoveAll(p => p == Color.White || p == Color.Black);
+
+            int R = (int)colors.toList(c => (int)c.R).Average();
+            int G = (int)colors.toList(c => (int)c.G).Average(); ;
+            int B = (int)colors.toList(c => (int)c.B).Average(); ;
+
+            int nR = R;
+            int nG = G;
+            int nB = B;
+
+            if (R >= G && R >= B)
+                nR = 255;
+
+            if (G >= B && G >= R)
+                nG = 255;
+
+            if (B >= R && B >= G)
+                nB = 255;
+
+            return new Color(nR, nG, nB);
         }
 
         public override string getCategoryName()
