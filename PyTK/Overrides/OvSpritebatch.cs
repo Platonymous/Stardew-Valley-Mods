@@ -43,6 +43,10 @@ namespace PyTK.Overrides
                 if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle && texture == nextData.sdvTexture)
                 {
                     replaceNext = false;
+
+                    if (nextData.texture == null)
+                        return false;
+
                     MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
                     drawMethod.Invoke(__instance, new object[] { nextData.texture, destinationRectangle, true, nextData.sourceRectangle, nextData.color != Color.White ? nextData.color : color, rotation, origin, effect, depth });
                     return false;
@@ -75,6 +79,10 @@ namespace PyTK.Overrides
                 if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle && texture == nextData.sdvTexture)
                 {
                     replaceNext = false;
+
+                    if (nextData.texture == null)
+                        return false;
+
                     MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics"), "InternalDraw");
                     drawMethod.Invoke(__instance, new object[] { nextData.texture, destination, scaleDestination, nextData.sourceRectangle, nextData.color != Color.White ? nextData.color : color, rotation, origin, effects, depth });
                     return false;

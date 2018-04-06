@@ -54,12 +54,13 @@ namespace PyTK.Extensions
             return t;
         }
 
-        public static List<T> toList<TKey,TValue, T>(this Dictionary<TKey, TValue> t, Func<KeyValuePair<TKey,TValue>,T> conversion)
+        public static List<T> toList<TKey, TValue, T>(this Dictionary<TKey, TValue> t, Func<KeyValuePair<TKey, TValue>, T> conversion)
         {
             List<T> list = new List<T>();
-            foreach (KeyValuePair<TKey, TValue> i in t)
-                if (conversion.Invoke(i) is T n)
-                    list.Add(n);
+            if (t.Count > 0)
+                foreach (KeyValuePair<TKey, TValue> i in t)
+                    if (conversion.Invoke(i) is T n)
+                        list.Add(n);
 
             return list;
         }
@@ -68,8 +69,7 @@ namespace PyTK.Extensions
         {
             List<TOut> list = new List<TOut>();
             foreach (TIn i in t)
-                if (conversion.Invoke(i) is TOut n)
-                    list.Add(n);
+                    list.Add(conversion.Invoke(i));
 
             return list;
         }

@@ -93,7 +93,7 @@ namespace PyTK
                 TModel pack = Helper.ReadJsonFile<TModel>(file);
                 packs.Add(pack);
 
-                if (pack is IContentPack p)
+                if (pack is Types.IContentPack p)
                 {
                     p.fileName = new FileInfo(file).Name;
                     p.folderName = new FileInfo(file).Directory.Name;
