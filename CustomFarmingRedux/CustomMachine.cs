@@ -567,7 +567,13 @@ namespace CustomFarmingRedux
             bool canProduce = hasIngredients && hasStarter;
 
             if (probe)
+            {
+                if (canProduce)
+                    heldObject = dropIn;
+
                 return canProduce;
+            }
+                
 
             if (canProduce)
             {
