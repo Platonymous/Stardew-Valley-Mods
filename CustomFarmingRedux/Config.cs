@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CustomFarmingRedux
+﻿namespace CustomFarmingRedux
 {
     public class Config
     {
         public bool automation { get; set; } = false;
+        public bool water { get; set; } = true;
+        public bool gold { get; set; } = true;
     }
 }

@@ -617,7 +617,13 @@ namespace CustomFarmingRedux
 
 
             if (t == null || !t.isHeavyHitter() || t is MeleeWeapon || !(t is Pickaxe))
-                return false;           
+                return false;
+
+            if (blueprint.asdisplay && heldObject != null)
+            {
+                heldObject = null;
+                return false;
+            }
 
             clear();
             location = null;

@@ -49,12 +49,14 @@
     <Compile Include="CustomMachine.cs" />
     <Compile Include="CustomMachineBlueprint.cs" />
     <Compile Include="CustomObject.cs" />
+    <Compile Include="GoldItem.cs" />
     <Compile Include="IngredientBlueprint.cs" />
     <Compile Include="LegacyBlueprint.cs" />
     <Compile Include="LegacyProduce.cs" />
     <Compile Include="LegacySpecialProduce.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecipeBlueprint.cs" />
+    <Compile Include="WaterItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
