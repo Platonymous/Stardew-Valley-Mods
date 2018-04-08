@@ -47,7 +47,7 @@ namespace PyTK
             harmonyFix();
             FormatManager.Instance.RegisterMapFormat(new NewTiledTmxFormat());
 
-            TimeEvents.AfterDayStarted += (a,b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
+            SaveHandler.BeforeRebuilding += (a,b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
             registerConsoleCommands();
             CustomTVMod.load();
             SaveHandler.setUpEventHandlers();
