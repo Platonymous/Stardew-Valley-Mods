@@ -47,7 +47,7 @@ namespace CustomFarmingRedux
 
             if(_config.water)
             {
-                new CustomObjectData("Platonymous.Water", "Water/1/2/Basic/Water/Plain drinking water.", Game1.objectSpriteSheet.getTile(247).setSaturation(0), Color.Aqua, type: typeof(WaterItem));
+                new CustomObjectData("Platonymous.Water", "Water/1/2/Cooking -7/Water/Plain drinking water./drink/0 0 0 0 0 0 0 0 0 0 0/0", Game1.objectSpriteSheet.getTile(247).setSaturation(0), Color.Aqua, type: typeof(WaterItem));
                 ButtonClick.ActionButton.onClick((pos) => clickedOnWateringCan(pos), (p) => convertWater());
             }
 
