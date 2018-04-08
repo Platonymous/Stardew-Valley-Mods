@@ -15,7 +15,7 @@ namespace PyTK.Extensions
         public static Texture2D clone(this Texture2D t)
         {
             MemoryStream mem = new MemoryStream();
-            t.SaveAsPng(mem,t.Width,t.Height);
+            t.SaveAsPng(mem, t.Width, t.Height);
             Texture2D clone = loadTextureData(mem);
             return clone;
         }
@@ -62,15 +62,43 @@ namespace PyTK.Extensions
             return redDifference * redDifference + greenDifference * greenDifference + blueDifference * blueDifference;
         }
 
-     
+
         /* Manipulation */
+
+        public static Texture2D getArea(this Texture2D t, Rectangle area)
+        {
+            Color[] data = new Color[t.Width * t.Height];
+            t.GetData(data);
+            int w = area.Width;
+            int h = area.Height;
+            Color[] data2 = new Color[w * h];
+
+            int x2 = area.X;
+            int y2 = area.Y;
+
+            int i = 0;
+            for (int x = x2; x < w + x2; x++)
+                for (int y = y2; y < h + y2; y++)
+                    data2[(y - y2) * w + (x - x2)] = data[y * t.Width + x];
+
+            Texture2D result = new Texture2D(t.GraphicsDevice, w, h);
+            result.SetData(data2);
+            return result;
+        }
+
+        public static Texture2D getTile(this Texture2D t, int index, int tileWidth = 16, int tileHeight = 16)
+        {
+            Rectangle sourceRectangle = Game1.getSourceRectForStandardTileSheet(t, index, tileWidth, tileHeight);
+            return t.getArea(sourceRectangle);
+        }
+
 
         public static Texture2D changeColor(this Texture2D t, ColorManipulation manipulation)
         {
             Color[] colorData = new Color[t.Width * t.Height];
             t.GetData(colorData);
             Texture2D newTexture = new Texture2D(t.GraphicsDevice, t.Width, t.Height);
-            
+
             for (int x = 0; x < t.Width; x++)
                 for (int y = 0; y < t.Height; y++)
                     colorData[x * t.Height + y] = changeColor(colorData[x * t.Height + y], manipulation);
@@ -94,7 +122,7 @@ namespace PyTK.Extensions
 
         public static Texture2D setLight(this Texture2D t, float light)
         {
-            ColorManipulation manipulation = new ColorManipulation(100,light);
+            ColorManipulation manipulation = new ColorManipulation(100, light);
             return t.changeColor(manipulation);
         }
 
@@ -147,7 +175,7 @@ namespace PyTK.Extensions
         public static Color setLight(this Color t, float light)
         {
             float l = light / 100;
-            t.R = (byte) Math.Min(t.R * l,255);
+            t.R = (byte)Math.Min(t.R * l, 255);
             t.G = (byte)Math.Min(t.G * l, 255);
             t.B = (byte)Math.Min(t.B * l, 255);
 

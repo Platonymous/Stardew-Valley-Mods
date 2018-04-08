@@ -425,8 +425,7 @@ namespace PyTK.Extensions
             return d;
         }
 
-
-        /// <summary>Wraps the the method so it only executes if the player clickes on the specified tileposition and adds it to InputEvents.ButtonPressed.</summary>
+        /// <summary>Wraps the the method so it only executes if the player clicks on the specified tileposition and adds it to InputEvents.ButtonPressed.</summary>
         /// <returns>Returns the wrapped method.</returns>
         public static EventHandler<EventArgsInput> onClick(this ButtonClick t, TileLocationSelector tile, Action<Vector2> handler)
         {
@@ -441,7 +440,55 @@ namespace PyTK.Extensions
             return d;
         }
 
-        /// <summary>Wraps the the method so it only executes if the player clickes on the specified tile and adds it to InputEvents.ButtonPressed.</summary>
+        /// <summary>Wraps the the method so it only executes if the player clicks on the specified on a position that matches the predicate adds it to InputEvents.ButtonPressed.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<EventArgsInput> onClick(this ButtonClick t, Func<Point,bool> predicate, Action<Point> handler)
+        {
+            EventHandler<EventArgsInput> d = delegate (object sender, EventArgsInput e)
+            {
+                bool isButton = t.Equals(ButtonClick.UseToolButton) ? e.IsUseToolButton : e.IsActionButton;
+                Point mousePosition = Game1.getMousePosition();
+                if (isButton && predicate.Invoke(mousePosition))
+                    handler.Invoke(mousePosition);
+            };
+
+            InputEvents.ButtonPressed += d;
+            return d;
+        }
+
+        /// <summary>Wraps the the method so it only executes if the player clicks on the screen position and adds it to InputEvents.ButtonPressed.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<EventArgsInput> onClick(this ButtonClick t, Point position, Action<Point> handler)
+        {
+            EventHandler<EventArgsInput> d = delegate (object sender, EventArgsInput e)
+            {
+                bool isButton = t.Equals(ButtonClick.UseToolButton) ? e.IsUseToolButton : e.IsActionButton;
+                Point mousePosition = Game1.getMousePosition();
+                if (isButton && mousePosition == position)
+                    handler.Invoke(position);
+            };
+
+            InputEvents.ButtonPressed += d;
+            return d;
+        }
+
+        /// <summary>Wraps the the method so it only executes if the player clicks on the screen area and adds it to InputEvents.ButtonPressed.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<EventArgsInput> onClick(this ButtonClick t, Rectangle area, Action<Point> handler)
+        {
+            EventHandler<EventArgsInput> d = delegate (object sender, EventArgsInput e)
+            {
+                bool isButton = t.Equals(ButtonClick.UseToolButton) ? e.IsUseToolButton : e.IsActionButton;
+                Point mousePosition = Game1.getMousePosition();
+                if (isButton && area.Contains(mousePosition))
+                    handler.Invoke(mousePosition);
+            };
+
+            InputEvents.ButtonPressed += d;
+            return d;
+        }
+
+        /// <summary>Wraps the the method so it only executes if the player clicks on the specified tile and adds it to InputEvents.ButtonPressed.</summary>
         /// <returns>Returns the wrapped method.</returns>
         public static EventHandler<EventArgsInput> onClick(this ButtonClick t, Vector2 tile, GameLocation location, Action<Vector2> handler)
         {

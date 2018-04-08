@@ -291,7 +291,7 @@ namespace PyTK.CustomElementHandler
             }
             catch (Exception e)
             {
-                Monitor.Log("Exception while rebuilding element: " + dataString, LogLevel.Trace);
+                Monitor.Log("Exception while rebuilding element: " + dataString + ":" +e.Message + ":" +e.StackTrace, LogLevel.Trace);
                 return replacement;
             }
         }

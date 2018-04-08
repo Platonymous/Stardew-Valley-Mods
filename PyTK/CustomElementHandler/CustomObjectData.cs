@@ -110,12 +110,12 @@ namespace PyTK.CustomElementHandler
                 inventoryCheck = new ItemSelector<Item>(i => collection.Exists(c => c.Value.sdvId == i.parentSheetIndex && (!(i is SObject sobj) || sobj.bigCraftable == c.Value.bigCraftable))).whenAddedToInventory(l => l.useAll(x => Game1.player.items[Game1.player.items.FindIndex(o => o == x)] = collection.Find(c => c.Value.sdvId == x.parentSheetIndex && (!(x is SObject sobj) || sobj.bigCraftable == c.Value.bigCraftable)).Value.getObject(x)));
         }
 
-        public int getIndexForId(string id)
+        public static int getIndexForId(string id)
         {
             return collection.Find(c => c.Value.id == id).Value.sdvId;
         }
 
-        public Item replaceItem(Item item)
+        public static Item replaceItem(Item item)
         {
             if (!collection.Exists(c => c.Value.sdvId == item.parentSheetIndex))
                 return item;

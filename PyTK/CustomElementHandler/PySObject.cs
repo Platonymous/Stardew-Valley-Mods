@@ -32,12 +32,12 @@ namespace PyTK.CustomElementHandler
             this.data = data;
         }
 
-        public Dictionary<string, string> getAdditionalSaveData()
+        public virtual Dictionary<string, string> getAdditionalSaveData()
         {
             return new Dictionary<string, string>() { { "id", data.id }, { "tileLocation", tileLocation.X + "," + tileLocation.Y }, { "name", name }, { "quality", quality.ToString() }, { "price", price.ToString() }, { "stack", stack.ToString() } };
         }
 
-        public object getReplacement()
+        public virtual object getReplacement()
         {
             return new Chest(true) { playerChoiceColor = Color.Magenta };
         }
@@ -50,7 +50,7 @@ namespace PyTK.CustomElementHandler
                 return new PySObject(data) { tileLocation = Vector2.Zero, name = name, price = price, quality = quality };
         }
 
-        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
+        public virtual void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
             tileLocation = additionalSaveData["tileLocation"].Split(',').toList(i => i.toInt()).toVector<Vector2>();
             price = additionalSaveData["price"].toInt();
@@ -59,7 +59,7 @@ namespace PyTK.CustomElementHandler
             quality = additionalSaveData["quality"].toInt();
         }
 
-        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        public virtual ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
         {
             CustomObjectData data = CustomObjectData.collection[additionalSaveData["id"]];
 
