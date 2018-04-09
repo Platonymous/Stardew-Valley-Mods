@@ -21,6 +21,7 @@ using PyTK.Overrides;
 using xTile.Format;
 using System.Linq;
 using PyTK.Tiled;
+using PyTK.Lua;
 
 namespace PyTK
 {
@@ -50,6 +51,7 @@ namespace PyTK
             SaveHandler.BeforeRebuilding += (a,b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
             registerConsoleCommands();
             CustomTVMod.load();
+            PyLua.init();
             SaveHandler.setUpEventHandlers();
         }
 
@@ -66,6 +68,7 @@ namespace PyTK
             CcSaveHandler.cleanup().register();
             CcSaveHandler.savecheck().register();
             CcTime.skip().register();
+            CcLua.runScript().register();
         }
 
         private void testing()

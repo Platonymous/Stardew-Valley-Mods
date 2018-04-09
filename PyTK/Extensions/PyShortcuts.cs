@@ -105,6 +105,12 @@ namespace PyTK.Extensions
             return t.ToLower().Equals("true");
         }
 
+        public static bool isNumber(this string t)
+        {
+            int x = -1;
+            return int.TryParse(t,out x);
+        }
+
         public static GameLocation toLocation(this string t)
         {
             return Game1.getLocationFromName(t);
