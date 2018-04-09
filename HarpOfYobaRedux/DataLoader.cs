@@ -30,6 +30,7 @@ namespace HarpOfYobaRedux
             new SheetMusic("adventure", texture, "Adventurer's Allegro", "An energizing tune", Microsoft.Xna.Framework.Color.LightCoral, "aerobics", 10000, new BoosterMagic());
             new SheetMusic("granpa", texture, "Farmer's Lullaby", "Stand on fertile ground", Microsoft.Xna.Framework.Color.Magenta, "grandpas_theme", 10000, new SeedMagic());
             new SheetMusic("time", texture, "Rondo of Time", "Play ahead to pass the time", Microsoft.Xna.Framework.Color.LightCyan, "50s", 10000, new TimeMagic());
+            new SheetMusic("lua", texture, "Lua Crescendo", "Play lua", Microsoft.Xna.Framework.Color.BlueViolet, "50s", 10000, new LuaMagic());
             loadLetters();
         }
 
