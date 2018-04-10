@@ -3,8 +3,8 @@
   "Author": "Platonymous",
   "Version": {
     "MajorVersion": 1,
-    "MinorVersion": 0,
-    "PatchVersion": 1,
+    "MinorVersion": 1,
+    "PatchVersion": 0,
     "Build": null
   },
   "Description": "Load TMX Maps into the Game",

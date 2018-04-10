@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MapEdit.cs" />
+    <Compile Include="TMXActions.cs" />
     <Compile Include="TMXContentPack.cs" />
     <Compile Include="TMXLoaderMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

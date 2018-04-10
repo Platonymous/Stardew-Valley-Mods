@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using PyTK;
 using PyTK.Extensions;
+using PyTK.Lua;
 using PyTK.Tiled;
 using PyTK.Types;
 using StardewModdingAPI;
@@ -12,6 +13,7 @@ using System.IO;
 using System.Linq;
 using xTile;
 using xTile.Layers;
+using xTile.ObjectModel;
 
 namespace TMXLoader
 {
@@ -25,85 +27,24 @@ namespace TMXLoader
             convert();
             loadContentPacks();
             setTileActions();
-            
+            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged;
+            PyLua.registerType(typeof(Map), false, true);
+            PyLua.registerType(typeof(TMXActions), false, false);
+            PyLua.addGlobal("TMX", new TMXActions());
+        }
+
+        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
+        {
+            if (e.NewLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
+                TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero,"Map");
         }
 
         private void setTileActions()
         {
-            TileAction Lock = new TileAction("Lock", lockAction).register();
-            TileAction Say = new TileAction("Say", sayAction).register();
-            TileAction SwitchLayers = new TileAction("SwitchLayers", switchLayersAction).register();
-        }
-
-        private bool sayAction(string action, GameLocation location, Vector2 tile, string layer)
-        {
-            List<string> text = action.Split(' ').ToList();
-            bool inDwarvish = false;
-            
-            if (text[1] == ("Dwarvish"))
-            {
-                text.RemoveAt(1);
-                if (!Game1.player.canUnderstandDwarves)
-                    inDwarvish = true;
-            }
-            text.RemoveAt(0);
-            action = String.Join(" ", text);
-            action = inDwarvish ? Dialogue.convertToDwarvish(action) : action;
-
-            Game1.drawDialogueNoTyping(action); return true;
-        }
-
-        private bool switchLayersAction(string action, GameLocation location, Vector2 tile, string layer)
-        {
-            string[] actions = action.Split(' ');
-
-            foreach (string s in actions)
-            {
-                string[] layers = s.Split(':');
-                if (layers.Length > 1)
-                {
-                    if(layers.Length < 4)
-                        location.map.switchLayers(layers[0], layers[1]);
-                    else
-                    {
-                        string[] xStrings = layers[2].Split('-');
-                        string[] yStrings = layers[3].Split('-');
-                        Range xRange = new Range(int.Parse(xStrings[0]), int.Parse(xStrings.Last()) + 1);
-                        Range yRange = new Range(int.Parse(yStrings[0]), int.Parse(yStrings.Last()) + 1);
-
-                        foreach(int x in xRange.toArray())
-                            foreach(int y in yRange.toArray())
-                                location.map.switchTileBetweenLayers(layers[0], layers[1], x, y);
-                    }
-                }
-                    
-            }
-
-            return true;
-        }
-
-        private bool lockAction(string action, GameLocation location, Vector2 tile, string layer)
-        {
-            string[] strings = action.Split(' ');
-
-            if (Game1.player.ActiveObject is Item i && i.parentSheetIndex == int.Parse(strings[2]) && i.Stack >= int.Parse(strings[1]))
-            {
-                int amount = int.Parse(strings[1]);
-                Game1.playSound("newArtifact");
-
-                if (i.Stack > amount)
-                    i.Stack -= amount;
-                else
-                    Game1.player.removeItemFromInventory(i);
-
-                TileAction.invokeCustomTileActions("Success", location, tile, layer);
-            }
-            else if (Game1.player.ActiveObject == null)
-                TileAction.invokeCustomTileActions("Default", location, tile, layer);
-            else
-                TileAction.invokeCustomTileActions("Failure", location, tile, layer);
-
-            return true;
+            TileAction Lock = new TileAction("Lock", TMXActions.lockAction).register();
+            TileAction Say = new TileAction("Say", TMXActions.sayAction).register();
+            TileAction SwitchLayers = new TileAction("SwitchLayers", TMXActions.switchLayersAction).register();
+            TileAction Lua = new TileAction("Lua", TMXActions.luaAction).register();
         }
 
         private void loadContentPacks()
@@ -113,6 +54,11 @@ namespace TMXLoader
 
             foreach (TMXContentPack pack in packs)
             {
+                if (pack.scripts.Count > 0)
+                    foreach (string script in pack.scripts)
+                        PyLua.loadScriptFromFile(Path.Combine(Helper.DirectoryPath, contentFolder, pack.folderName, script), pack.folderName);
+
+
                 foreach (MapEdit edit in pack.addMaps)
                 {
                     string filePath = Path.Combine(contentFolder, pack.folderName, edit.file);
@@ -149,9 +95,18 @@ namespace TMXLoader
                 {
                     string filePath = Path.Combine(contentFolder, pack.folderName, edit.file);
                     Map map = TMXContent.Load(filePath, Helper);
-                    
+
                     Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
                     Rectangle? sourceArea = null;
+
+                    foreach (KeyValuePair<string, PropertyValue> p in map.Properties)
+                        if (original.Properties.ContainsKey(p.Key))
+                            if (p.Key == "EntryAction")
+                                original.Properties[p.Key] = original.Properties[p.Key] + ";" + p.Value;
+                            else
+                                original.Properties[p.Key] = p.Value;
+                        else
+                            original.Properties.Add(p.Key, p.Value);
 
                     if (edit.sourceArea.Length == 4)
                         sourceArea = new Rectangle(edit.sourceArea[0], edit.sourceArea[1], edit.sourceArea[2], edit.sourceArea[3]);
