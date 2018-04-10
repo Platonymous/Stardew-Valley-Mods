@@ -20,7 +20,7 @@ namespace HarpOfYobaRedux
             
             Texture2D texture = loadTexture("tilesheet.png");
             new Instrument("harp", texture, "Harp of Yoba", "Add Sheet Music to play.",new HarpAnimation());
-            new SheetMusic("thunder", texture, "Serenade of Thunder", "Rain on me", Microsoft.Xna.Framework.Color.Blue, "AbigailFluteDuet", 10000, new RainMagic());
+            new SheetMusic("thunder", texture, "Serenade of Thunder", "Rain on me", Microsoft.Xna.Framework.Color.Blue, "AbigailFluteDuet", 10000, new LuaMagic());
             new SheetMusic("birthday", texture, "Birthday Sonata", "Popular on birthdays", Microsoft.Xna.Framework.Color.DarkBlue, "shimmeringbastion", 10000, new BirthdayMagic());
             new SheetMusic("wanderer", texture, "Ballad of the Wanderer", "Wander off and return", Microsoft.Xna.Framework.Color.Orange, "honkytonky", 10000, new TeleportMagic());
             new SheetMusic("yoba", texture, "Prelude to Yoba", "Can you hear the trees sing along", Microsoft.Xna.Framework.Color.ForestGreen, "wedding", 10000, new TreeMagic());
