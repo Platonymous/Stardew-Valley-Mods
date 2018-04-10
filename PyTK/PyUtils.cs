@@ -11,7 +11,7 @@ using System.Xml;
 
 namespace PyTK
 {
-    public static class PyUtils
+    public class PyUtils
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
@@ -19,6 +19,11 @@ namespace PyTK
         public static bool CheckEventConditions(string conditions)
         {
             return checkEventConditions(conditions);
+        }
+
+        public PyUtils()
+        {
+
         }
 
         public static string getContentFolder()

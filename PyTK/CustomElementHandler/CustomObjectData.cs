@@ -86,6 +86,12 @@ namespace PyTK.CustomElementHandler
 
         public string type { get; set; }
 
+
+        public CustomObjectData()
+        {
+
+        }
+
         public CustomObjectData(string id, string data, Texture2D texture, Color color, int tileIndex = 0, bool bigCraftable = false, Type type = null, CraftingData craftingData = null)
         {
             this.id = id;

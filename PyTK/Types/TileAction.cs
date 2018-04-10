@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using PyTK.Extensions;
 using Microsoft.Xna.Framework;
 using StardewValley;
+using xTile;
+using xTile.Layers;
+using xTile.Dimensions;
+using xTile.Tiles;
 
 namespace PyTK.Types
 {
@@ -44,42 +48,47 @@ namespace PyTK.Types
             return result;
         }
 
+        private static bool invokeAction(string actionString, GameLocation location, Vector2 tile, string layer, string conditions = "", string fallback = "")
+        {
+            bool result = true;
+            string[] tileActions = actionString.Split(';');
+            foreach (string action in tileActions)
+            {
+                string nextAction = action.Replace(" § ", "§");
+                if (nextAction.Contains("§"))
+                {
+                    string[] data = action.Split('§');
+                    string actionConditions = data[0];
+                    string successAction = data[1];
+                    string failAction = "---";
+
+                    if (data.Length > 2)
+                        failAction = data[2];
+
+                    if (PyUtils.checkEventConditions(actionConditions))
+                        nextAction = successAction;
+                    else
+                        nextAction = failAction;
+                }
+
+                if (getCustomAction(nextAction, conditions, fallback) is TileAction customAction)
+                    result = customAction.action(customAction.currentAction, location, tile, layer) && result;
+            }
+            return result;
+        }
+
         public static bool invokeCustomTileActions(string key, GameLocation location, Vector2 tile, string layer)
         {
             bool standartAction = (key == "Action" || key == "TouchAction");
-            string conditions = standartAction ? location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Conditions", layer) : "";
-            string fallback = standartAction ? location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Fallback", layer) : "";
+            bool mapAction = (layer == "Map");
+            string conditions = standartAction ? location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Conditions", layer) : mapAction ? location.map.Properties.ContainsKey("Conditions") ? location.map.Properties["Conditions"].ToString() : "" :"";
+            string fallback = standartAction ? location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Fallback", layer) : mapAction ? location.map.Properties.ContainsKey("Fallback") ? location.map.Properties["Fallback"].ToString() : "" : "";
 
             PyTKMod._monitor.Log("InvokeTileAction:" + key);
-            if (location.doesTileHaveProperty((int)tile.X, (int)tile.Y, key, layer) is string actionString)
-            {
-                bool result = true;
-                string[] tileActions = actionString.Split(';');
-                foreach (string action in tileActions)
-                {
-                    string nextAction = action.Replace(" § ", "§");
-                    if (nextAction.Contains("§"))
-                    {
-                        string[] data = action.Split('§');
-                        string actionConditions = data[0];
-                        string successAction = data[1];
-                        string failAction = "---";
-
-                        if (data.Length > 2)
-                            failAction = data[2];
-
-                        if (PyUtils.checkEventConditions(actionConditions))
-                            nextAction = successAction;
-                        else
-                            nextAction = failAction;
-                    }
-
-                    if (getCustomAction(nextAction, conditions, fallback) is TileAction customAction)
-                        result = customAction.action(customAction.currentAction, location, tile, layer) && result;
-                }
-                return result;
-            }
-
+            if (!mapAction && location.doesTileHaveProperty((int)tile.X, (int)tile.Y, key, layer) is string actionString)
+                return invokeAction(actionString, location, tile, layer, conditions, fallback);
+            else if (mapAction && location.map.Properties.ContainsKey(key))
+                return invokeAction(location.map.Properties[key].ToString(), location, tile, layer, conditions, fallback);
             return false;
         }
     }

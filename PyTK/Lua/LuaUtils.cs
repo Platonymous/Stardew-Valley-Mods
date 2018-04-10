@@ -1,7 +1,12 @@
-﻿using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework;
+using PyTK.Extensions;
+using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Minigames;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SObject = StardewValley.Object;
 
 
 namespace PyTK.Lua
@@ -21,7 +26,7 @@ namespace PyTK.Lua
         {
             List<string> tree = new List<string>(field.Split('.'));
             FieldInfo fieldInfo = null;
-
+                
             object currentBranch = root == null ? Game1.game1 : root;
 
             fieldInfo = typeof(Game1).GetField(tree[0], BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
@@ -47,6 +52,42 @@ namespace PyTK.Lua
             return o.GetType().ToString().Split(',')[0];
         }
 
+        public static string getFullObjectType(object o)
+        {
+            return o.GetType().AssemblyQualifiedName;
+        }
 
+        public static void registerTypeFromObject(object obj, bool showErrors = true, bool registerAssembly = false, Func<Type, bool> predicate = null)
+        {
+            PyLua.registerTypeFromObject(obj, showErrors, registerAssembly, predicate);
+        }
+
+        public static void registerTypeFromString(string fullTypeName, bool showErrors = true, bool registerAssembly = false, Func<Type, bool> predicate = null)
+        {
+            PyLua.registerTypeFromString(fullTypeName, showErrors, registerAssembly, predicate);
+        }
+
+        public static void loadGlobals()
+        {
+            PyLua.loadGlobals();
+        }
+
+        public static void addGlobal(string name, object obj)
+        {
+            PyLua.addGlobal(name, obj);
+        }
+
+        public static object getObjectByName(string name, bool bigCraftable = false)
+        {
+            int index = Game1.objectInformation.getIndexByName(name);
+            return getObjectByIndex(index, bigCraftable);
+        }
+
+        public static object getObjectByIndex(int index, bool bigCraftable = false)
+        {
+            if (bigCraftable)
+                return new SObject(Vector2.Zero, index);
+            return new SObject(index, 1);
+        }
     }
 }

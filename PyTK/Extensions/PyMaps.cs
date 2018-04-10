@@ -12,6 +12,7 @@ using xTile.Layers;
 using System.IO;
 using PyTK.Types;
 using xTile.Dimensions;
+using System;
 
 namespace PyTK.Extensions
 {
@@ -177,8 +178,12 @@ namespace PyTK.Extensions
                         if(properties)
                             foreach (var prop in sourceTile.Properties)
                                 newTile.Properties.Add(prop);
-
-                        mapLayer.Tiles[(int)_x.Y, (int)_y.Y] = newTile;
+                        try
+                        {
+                            mapLayer.Tiles[(int)_x.Y, (int)_y.Y] = newTile;
+                        }catch(Exception e){
+                            Monitor.Log($"{e.Message} ({map.DisplayWidth} -> {layer.Id} -> {_x.Y}:{_y.Y})");
+                        }
                     }
 
                 }
