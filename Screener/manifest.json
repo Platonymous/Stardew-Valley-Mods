@@ -1,0 +1,13 @@
+{
+  "Name": "Screener",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 1,
+    "MinorVersion": 0,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "Description": "Take screenshots from within the game",
+  "UniqueID": "Platonymous.Screener",
+  "EntryDll": "Screener.dll"
+}
