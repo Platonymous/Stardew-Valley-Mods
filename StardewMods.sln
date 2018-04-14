@@ -71,6 +71,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Screener", "Screener\Screen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcadePong", "ArcadePong\ArcadePong.csproj", "{35F9BEC0-4C51-47A2-8CC4-159108F3B5FD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snake", "Snake\Snake.csproj", "{0FEA4C7A-4228-41AA-B987-B773313F4582}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -200,6 +202,10 @@ Global
 		{35F9BEC0-4C51-47A2-8CC4-159108F3B5FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35F9BEC0-4C51-47A2-8CC4-159108F3B5FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35F9BEC0-4C51-47A2-8CC4-159108F3B5FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FEA4C7A-4228-41AA-B987-B773313F4582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FEA4C7A-4228-41AA-B987-B773313F4582}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FEA4C7A-4228-41AA-B987-B773313F4582}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FEA4C7A-4228-41AA-B987-B773313F4582}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
