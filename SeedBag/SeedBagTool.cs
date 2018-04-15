@@ -14,7 +14,7 @@ using PyTK.CustomElementHandler;
 
 namespace SeedBag
 {
-    class SeedBagTool : Hoe, ISaveElement
+    public class SeedBagTool : Hoe, ISaveElement
     {
 
         internal static Texture2D texture;
