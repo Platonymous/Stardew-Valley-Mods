@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using StardewValley.Buildings;
 using System.Xml;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace PyTK
 {
@@ -122,6 +124,21 @@ namespace PyTK
             else
                 return Type.GetType(prefix + type + ", StardewValley");
 
+        }
+
+        public static Texture2D getRectangle(int width, int height, Color color)
+        {
+            Texture2D rect = new Texture2D(Game1.graphics.GraphicsDevice, width, height);
+
+            Color[] data = new Color[width * height];
+            for (int i = 0; i < data.Length; ++i) data[i] = color;
+            rect.SetData(data);
+            return rect;
+        }
+
+        public static Texture2D getWhitePixel()
+        {
+            return getRectangle(1, 1, Color.White);
         }
 
         internal static void checkAllSaves()
