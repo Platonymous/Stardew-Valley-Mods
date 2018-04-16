@@ -63,6 +63,8 @@ Addon for the Pong mod by Cat
 # 21. Snake
 Adds a Snake Arcade to the Game
 
+Adds 2048 Arcade to the Game
+
 
 
 All Downloads: [Nexus Mods](http://www.nexusmods.com/stardewvalley/users/42440425/?tb=mods&pUp=1) or via ModDrop : [Download](https://www.moddrop.com/)
