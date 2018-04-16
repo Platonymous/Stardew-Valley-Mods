@@ -63,6 +63,7 @@ Addon for the Pong mod by Cat
 # 21. Snake
 Adds a Snake Arcade to the Game
 
+# 22. Arcade 2048
 Adds 2048 Arcade to the Game
 
 
