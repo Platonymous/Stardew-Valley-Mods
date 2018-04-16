@@ -1,0 +1,19 @@
+{
+  "Name": "Arcade 2048",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 1,
+    "MinorVersion": 0,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "Description": "Play 2048.",
+  "UniqueID": "Platonymous.2048",
+  "EntryDll": "Arcade2048.dll",
+  "UpdateKeys": [ "Nexus:2048" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ]
+}
