@@ -33,12 +33,10 @@ namespace PyTK.Overrides
                     return AccessTools.Method(typeof(FakeSpriteBatch), "DrawInternal");
             }
 
-            internal static bool Prefix(ref SpriteBatch __instance, KeyValuePair<Texture2D, Rectangle?> __state, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth)
+            internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth)
             {
                 if (!replaceNext )
                     return true;
-
-                __state = new KeyValuePair<Texture2D, Rectangle?>(texture, sourceRectangle);
 
                 if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle && texture == nextData.sdvTexture)
                 {
@@ -69,12 +67,10 @@ namespace PyTK.Overrides
                     return AccessTools.Method(typeof(FakeSpriteBatch), "InternalDraw");
             }
 
-            internal static bool Prefix(ref SpriteBatch __instance, KeyValuePair<Texture2D,Rectangle?> __state, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
+            internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
             {
                 if (!replaceNext)
                     return true;
-
-                __state = new KeyValuePair<Texture2D, Rectangle?>(texture, sourceRectangle);
                 
                 if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle && texture == nextData.sdvTexture)
                 {

@@ -129,8 +129,15 @@ namespace PyTK.Tiled
 
         public static bool Convert (string pathIn, string pathOut, IModHelper helper, ContentSource contentSource = ContentSource.ModFolder, IMonitor monitor = null)
         {
-            if (!pathOut.EndsWith(".tmx"))
+            if(!pathIn.EndsWith(".tbin") && !pathIn.EndsWith(".xnb") && !pathOut.EndsWith(".tmx"))
+            {
+                new FileInfo(Path.Combine(helper.DirectoryPath, pathIn)).CopyTo(Path.Combine(helper.DirectoryPath, pathOut),true);
+                return true;
+            }
+
+                if (!pathOut.EndsWith(".tmx"))
                 pathOut = pathOut + ".tmx";
+
 
             MemoryStream mem = null;
             try
