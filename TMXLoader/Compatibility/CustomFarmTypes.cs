@@ -7,6 +7,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Events;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using xTile;
@@ -114,12 +115,16 @@ namespace TMXLoader.Compatibility
             {
                 if (Game1.getFarm().map.Properties.ContainsKey("Greenhouse"))
                     if (TMXHelper.Reflection.GetField<int>(__instance, "whichEvent").GetValue() == 0)
-                        setUpGreenhouse(__instance);
+                        setUpGreenhouseJoja(__instance);
+                    else if (TMXHelper.Reflection.GetField<int>(__instance, "whichEvent").GetValue() == 1)
+                        setUpGreenhouseCC(__instance);
             }
 
-            internal static void setUpGreenhouse(WorldChangeEvent wce)
+            internal static void setUpGreenhouseJoja(WorldChangeEvent wce)
             {
                 Game1.currentLightSources.Clear();
+                Game1.getFarm().temporarySprites.Clear();
+
                 GameLocation location = Game1.getFarm();
 
                 string[] position = location.map.Properties["Greenhouse"].ToString().Split(',');
@@ -128,8 +133,6 @@ namespace TMXLoader.Compatibility
                 int sourceXTile = greenHousePosition.X;
                 int sourceYTile = greenHousePosition.Y - 2;
                 Game1.isRaining = false;
-
-                Game1.getFarm().temporarySprites.Clear();
 
                 location.temporarySprites.Add(new TemporaryAnimatedSprite(Game1.mouseCursors, new Rectangle(288, 1349, 19, 28), 150f, 5, 999, new Vector2((float)((sourceXTile - 3) * Game1.tileSize + 2 * Game1.pixelZoom), (float)((sourceYTile - 1) * Game1.tileSize - Game1.tileSize / 2)), false, false)
                 {
@@ -147,11 +150,49 @@ namespace TMXLoader.Compatibility
                     layerDepth = 0.0961f
                 });
 
-                Game1.currentLightSources.RemoveWhere(l => l.position.Equals(new Vector2((float)28, (float)13) * (float)Game1.tileSize));
-                Game1.currentLightSources.Add(new LightSource(4, new Vector2((float)sourceXTile, (float)sourceYTile) * (float)Game1.tileSize, 4f));
+                Game1.currentLightSources.Add(new LightSource(4, new Vector2(sourceXTile, sourceYTile) * Game1.tileSize, 4f));
                 Game1.viewport.X = Math.Max(0, Math.Min(location.map.DisplayWidth - Game1.viewport.Width, sourceXTile * Game1.tileSize - Game1.viewport.Width / 2));
                 Game1.viewport.Y = Math.Max(0, Math.Min(location.map.DisplayHeight - Game1.viewport.Height, sourceYTile * Game1.tileSize - Game1.viewport.Height / 2));
-            }       
+            }
+
+            internal static void setUpGreenhouseCC(WorldChangeEvent wce)
+            {
+                Game1.currentLightSources.Clear();
+                Game1.getFarm().temporarySprites.Clear();
+                GameLocation location = Game1.getFarm();
+
+                string[] position = location.map.Properties["Greenhouse"].ToString().Split(',');
+                Point greenHousePosition = new Point(int.Parse(position[0]), int.Parse(position[1]));
+
+                int sourceXTile = greenHousePosition.X;
+                int sourceYTile = greenHousePosition.Y - 2;
+                Game1.isRaining = false;
+
+                Utility.addSprinklesToLocation(location, sourceXTile, sourceYTile - 1, 7, 7, 15000, 150, Color.LightCyan, null, false);
+                Utility.addStarsAndSpirals(location, sourceXTile, sourceYTile - 1, 7, 7, 15000, 150, Color.White, null, false);
+                Game1.currentLightSources.Add(new LightSource(4, new Vector2(sourceXTile, sourceYTile) * Game1.tileSize, 4f, Color.DarkGoldenrod));
+                List<TemporaryAnimatedSprite> temporarySprites1 = location.temporarySprites;
+                TemporaryAnimatedSprite temporaryAnimatedSprite1 = new TemporaryAnimatedSprite(Game1.mouseCursors, new Rectangle(294, 1432, 16, 16), 300f, 4, 999, new Vector2((sourceXTile * Game1.tileSize), ((sourceYTile - 3) * Game1.tileSize - Game1.tileSize)), false, false);
+                temporaryAnimatedSprite1.scale = Game1.pixelZoom;
+                temporaryAnimatedSprite1.layerDepth = 1f;
+                int num1 = 1;
+                temporaryAnimatedSprite1.xPeriodic = num1 != 0;
+                double num2 = 2000.0;
+                temporaryAnimatedSprite1.xPeriodicLoopTime = (float)num2;
+                double num3 = (Game1.tileSize / 4);
+                temporaryAnimatedSprite1.xPeriodicRange = (float)num3;
+                int num4 = 1;
+                temporaryAnimatedSprite1.light = num4 != 0;
+                Color darkGoldenrod1 = Color.DarkGoldenrod;
+                temporaryAnimatedSprite1.lightcolor = darkGoldenrod1;
+                double num5 = 1.0;
+                temporaryAnimatedSprite1.lightRadius = (float)num5;
+                temporarySprites1.Add(temporaryAnimatedSprite1);
+
+                Game1.currentLightSources.Add(new LightSource(4, new Vector2(sourceXTile, sourceYTile) * Game1.tileSize, 4f));
+                Game1.viewport.X = Math.Max(0, Math.Min(location.map.DisplayWidth - Game1.viewport.Width, sourceXTile * Game1.tileSize - Game1.viewport.Width / 2));
+                Game1.viewport.Y = Math.Max(0, Math.Min(location.map.DisplayHeight - Game1.viewport.Height, sourceYTile * Game1.tileSize - Game1.viewport.Height / 2));
+            }
         }
 
         [HarmonyPatch]
@@ -195,7 +236,7 @@ namespace TMXLoader.Compatibility
                 if (warp != null)
                 {
                     warp.TargetX = greenHousePosition.X;
-                    warp.TargetY = greenHousePosition.Y;
+                    warp.TargetY = greenHousePosition.Y + 1;
                 }
 
             }
