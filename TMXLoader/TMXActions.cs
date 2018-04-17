@@ -38,6 +38,11 @@ namespace TMXLoader
             Game1.drawDialogueNoTyping(action); return true;
         }
 
+        public static void setLevel(int level)
+        {
+            TMXLoaderMod.levels.AddOrReplace(Game1.player, level);
+        }
+
         public static bool sayAction(string action)
         {
             return sayAction(action, Game1.currentLocation, Vector2.Zero, "Map");
@@ -46,8 +51,32 @@ namespace TMXLoader
         public static bool luaAction(string action, GameLocation location, Vector2 tile, string layer)
         {
             string[] a = action.Split(' ');
-            if(a.Length > 2)
-                PyLua.callFunction(a[1], a[2], new object[] { location, tile, layer });
+            if (a.Length > 2)
+                if (a[2] == "this")
+                {
+                    string id = location.name + "." + layer + "." + tile.Y + tile.Y;
+                    if (!PyLua.hasScript(id))
+                    {
+                        if (layer == "Map")
+                        {
+                            if (location.map.Properties.ContainsKey("Lua"))
+                                PyLua.loadScriptFromString(location.map.Properties["Lua"].ToString(), id);
+                            else
+                                PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Map.\")", id);
+                        }
+                        else
+                        {
+                            if (location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Lua", layer) is string lua)
+                                PyLua.loadScriptFromString(lua, id);
+                            else
+                                PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Tile.\")", id);
+                        }
+                    }
+
+                    PyLua.callFunction(id, a[2], new object[] { location, tile, layer });
+                }
+                else
+                    PyLua.callFunction(a[1], a[2], new object[] { location, tile, layer });
             return true;
         }
 

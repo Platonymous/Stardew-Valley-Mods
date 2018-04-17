@@ -10,18 +10,25 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using xTile;
 using xTile.Layers;
-using xTile.ObjectModel;
+using SFarmer = StardewValley.Farmer;
+using Harmony;
+using System.Reflection;
 
 namespace TMXLoader
 {
     public class TMXLoaderMod : Mod
     {
         internal static string contentFolder = "Maps";
+        internal static Dictionary<SFarmer, int> levels = new Dictionary<SFarmer, int>();
+        internal static IMonitor monitor;
+        internal static IModHelper helper;
+
         public override void Entry(IModHelper helper)
         {
+            TMXLoaderMod.helper = Helper;
+            monitor = Monitor;
             Monitor.Log("Environment:" + PyUtils.getContentFolder());
             exportAllMaps();
             convert();
@@ -31,6 +38,21 @@ namespace TMXLoader
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
+            SaveEvents.AfterLoad += (s,e) => levels.AddOrReplace(Game1.player, 0);
+            fixCompatibilities();
+            harmonyFix();
+        }
+
+        private void fixCompatibilities()
+        {
+            Compatibility.CustomFarmTypes.LoadingTheMaps();
+            SaveEvents.AfterLoad +=(s,e) => Compatibility.CustomFarmTypes.fixGreenhouseWarp();
+        }
+
+        private void harmonyFix()
+        {
+            HarmonyInstance instance = HarmonyInstance.Create("Platonymous.TMXLoader");
+            instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 
         private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
@@ -99,19 +121,10 @@ namespace TMXLoader
                     Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
                     Rectangle? sourceArea = null;
 
-                    foreach (KeyValuePair<string, PropertyValue> p in map.Properties)
-                        if (original.Properties.ContainsKey(p.Key))
-                            if (p.Key == "EntryAction")
-                                original.Properties[p.Key] = original.Properties[p.Key] + ";" + p.Value;
-                            else
-                                original.Properties[p.Key] = p.Value;
-                        else
-                            original.Properties.Add(p.Key, p.Value);
-
                     if (edit.sourceArea.Length == 4)
                         sourceArea = new Rectangle(edit.sourceArea[0], edit.sourceArea[1], edit.sourceArea[2], edit.sourceArea[3]);
 
-                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea);
+                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, true);
                     editWarps(map, edit.addWarps, edit.removeWarps, original);
                     addMoreMapLayers(map);
                     map.injectAs("Maps/" + edit.name);
@@ -126,11 +139,25 @@ namespace TMXLoader
             }
         }
 
+        
+
         private void addMoreMapLayers(Map map)
         {
-            foreach(Layer layer in map.Layers)
+            foreach (Layer layer in map.Layers)
                 if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
-                    maplayer.AfterDraw += (s,e) => layer.Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, Game1.pixelZoom);
+                {
+                    if(!layer.Properties.ContainsKey("Level"))
+                        maplayer.AfterDraw += (s, e) => layer.Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, Game1.pixelZoom);
+                    else
+                            maplayer.AfterDraw += (s, e) => {
+                                if (levels.ContainsKey(Game1.player) && levels[Game1.player] >= int.Parse(layer.Properties["Level"]))
+                                {
+                                    Game1.spriteBatch.Draw(PyUtils.getWhitePixel(), new Rectangle(0, 0, Game1.viewport.Width, Game1.viewport.Height), Color.Black * 0.5f);
+                                    layer.Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, Game1.pixelZoom);
+                                }
+                            };
+                }
+
         }
 
         private void editWarps(Map map, string[] addWarps, string[] removeWarps, Map original = null)
@@ -163,15 +190,24 @@ namespace TMXLoader
         {
             Monitor.Log("Converting..", LogLevel.Trace);
             string inPath = Path.Combine(Helper.DirectoryPath, "Converter", "IN");
-            string[] files = Directory.GetFiles(inPath, "*.*", SearchOption.TopDirectoryOnly);
-            foreach (string file in files)
+            
+
+            string[] directories = Directory.GetDirectories(inPath, "*.*",SearchOption.TopDirectoryOnly);
+
+            foreach (string dir in directories)
             {
-                string fileName = new FileInfo(file).Name;
-                string importPath = Path.Combine("Converter", "IN", fileName);
-                FileInfo importFile = new FileInfo(Path.Combine(inPath, fileName));
-                string exportPath = Path.Combine("Converter", "OUT", fileName.Replace(".xnb", ".tmx").Replace(".tbin", ".tmx"));
-                if (TMXContent.Convert(importPath, exportPath, Helper, ContentSource.ModFolder, Monitor))
-                    importFile.Delete();
+                DirectoryInfo inddir = new DirectoryInfo(dir);
+                DirectoryInfo outdir = new DirectoryInfo(dir.Replace("IN", "OUT"));
+                if (!outdir.Exists)
+                    outdir.Create();
+
+                foreach (FileInfo file in inddir.GetFiles())
+                {
+                    string importPath = Path.Combine("Converter","IN",inddir.Name,file.Name);
+                    string exportPath = Path.Combine("Converter", "OUT", inddir.Name, file.Name).Replace(".xnb", ".tmx").Replace(".tbin", ".tmx");
+                    if (TMXContent.Convert(importPath, exportPath, Helper, ContentSource.ModFolder, Monitor))
+                        file.Delete();
+                }
             }
             Monitor.Log("..Done!", LogLevel.Trace);
         }
@@ -217,5 +253,7 @@ namespace TMXLoader
                 TMXContent.Save(map, exportPath, true, Monitor);
             }
         }
+
+       
     }
 }
