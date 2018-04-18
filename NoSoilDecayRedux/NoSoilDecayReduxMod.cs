@@ -10,6 +10,7 @@ using PyTK;
 using PyTK.Extensions;
 using Harmony;
 using System.Reflection;
+using PyTK.Events;
 
 namespace NoSoilDecayRedux
 {
@@ -28,6 +29,7 @@ namespace NoSoilDecayRedux
             savetiles = Helper.ReadConfig<SaveTiles>();
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             TimeEvents.AfterDayStarted += (s,e) => restoreHoeDirt();
+            PyTimeEvents.OnSleepEvents += (s, e) => saveHoeDirt();
             harmonyFix();
         }
 

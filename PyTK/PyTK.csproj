@@ -55,6 +55,7 @@
     <Compile Include="CustomElementHandler\ICustomObject.cs" />
     <Compile Include="CustomElementHandler\PySObject.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
+    <Compile Include="Events\PyTimeEvents.cs" />
     <Compile Include="Extensions\PyAssets.cs" />
     <Compile Include="Extensions\PyCrafting.cs" />
     <Compile Include="Extensions\PyTextures.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="Overrides\OvLongevity.cs" />
     <Compile Include="Overrides\OvSpritebatch.cs" />
     <Compile Include="Overrides\OvTV.cs" />
+    <Compile Include="Overrides\OvSleep.cs" />
     <Compile Include="Tiled\EnumHelper.cs" />
     <Compile Include="Tiled\IXmlFormatable.cs" />
     <Compile Include="Tiled\NewTiledTmxFormat.cs" />

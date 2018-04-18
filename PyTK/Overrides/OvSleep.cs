@@ -1,25 +1,30 @@
 ﻿using Harmony;
-using PyTK;
+using PyTK.ConsoleCommands;
+using PyTK.Events;
+using PyTK.Types;
 using StardewValley;
 using System.Reflection;
 
-namespace NoSoilDecayRedux
+namespace PyTK.Overrides
 {
     [HarmonyPatch]
-        internal class SleepFix
+        internal class OvSleep
     {
+
         internal static MethodInfo TargetMethod()
         {
             return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "answerDialogue");
         }
 
-        internal static void Postfix(GameLocation __instance, ref Response answer)
+        internal static bool Prefix(GameLocation __instance, ref Response answer)
         {
             if (__instance.lastQuestionKey == null || answer == null || answer.responseKey == null)
-                    return;
+                    return true;
 
             if (__instance.lastQuestionKey.ToLower() == "sleep" && answer.responseKey.ToLower() == "yes")
-                NoSoilDecayReduxMod.saveHoeDirt();
+                PyTimeEvents.CallOnSleepEvents(null, new PyTimeEvents.EventArgsSleep(STime.CURRENT, false));
+
+            return true;
         }
     }
 }

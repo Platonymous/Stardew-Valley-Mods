@@ -1,0 +1,19 @@
+{
+  "Name": "SleepWorker",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 1,
+    "MinorVersion": 0,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "Description": "Skips time before you sleep",
+  "UniqueID": "Platonymous.SleepWorker",
+  "EntryDll": "SleepWorker.dll",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ],
+  "UpdateKeys": [ "Nexus:2062" ]
+}
