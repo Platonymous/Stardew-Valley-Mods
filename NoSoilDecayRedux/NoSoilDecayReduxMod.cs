@@ -29,7 +29,7 @@ namespace NoSoilDecayRedux
             savetiles = Helper.ReadConfig<SaveTiles>();
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             TimeEvents.AfterDayStarted += (s,e) => restoreHoeDirt();
-            PyTimeEvents.OnSleepEvents += (s, e) => saveHoeDirt();
+            PyTimeEvents.BeforeSleepEvents += (s, e) => saveHoeDirt();
             harmonyFix();
         }
 

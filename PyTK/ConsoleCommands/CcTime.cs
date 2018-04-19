@@ -26,19 +26,29 @@ namespace PyTK.ConsoleCommands
 
         public static void TimeSkip(string p, bool showTextInConsole = false)
         {
-            int t = Math.Min(Math.Max(int.Parse(p), Game1.timeOfDay), 2400);
-
-            if(showTextInConsole)
-                Monitor.Log("Return to the main window.", LogLevel.Info);
-
-            while (Game1.timeOfDay < t)
+            try
             {
-                update.Invoke(Game1.game1, new[] { Game1.currentGameTime });
-                if (Game1.CurrentEvent != null)
-                    Game1.CurrentEvent.skipEvent();
-                if (Game1.activeClickableMenu is DialogueBox db)
-                    db.closeDialogue();
+                int t = Math.Min(Math.Max(int.Parse(p), Game1.timeOfDay), 2400);
+
+                if (showTextInConsole)
+                    Monitor.Log("Return to the main window.", LogLevel.Info);
+
+                while (Game1.timeOfDay < t)
+                {
+                    update.Invoke(Game1.game1, new[] { Game1.currentGameTime });
+                    if (Game1.CurrentEvent != null)
+                        Game1.CurrentEvent.skipEvent();
+                    if (Game1.activeClickableMenu is DialogueBox db)
+                        db.closeDialogue();
+                    Game1.player.forceTimePass = true;
+                    Game1.player.freezePause = 1000;
+                }
             }
+            catch
+            {
+
+            }
+
         }
     }
 }

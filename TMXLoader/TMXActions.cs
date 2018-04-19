@@ -38,11 +38,6 @@ namespace TMXLoader
             Game1.drawDialogueNoTyping(action); return true;
         }
 
-        public static void setLevel(int level)
-        {
-            TMXLoaderMod.levels.AddOrReplace(Game1.player, level);
-        }
-
         public static bool sayAction(string action)
         {
             return sayAction(action, Game1.currentLocation, Vector2.Zero, "Map");

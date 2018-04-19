@@ -262,7 +262,10 @@ namespace CustomFarmingRedux
         }
         private SObject createProduce()
         {
-            return activeRecipe.createObject(heldObject);
+            if (!(heldObject is Chest))
+                return activeRecipe.createObject(heldObject);
+            else
+                return (SObject)SaveHandler.rebuildElement(heldObject.name, heldObject);
         }
 
         public override bool minutesElapsed(int minutes, GameLocation environment)
@@ -435,7 +438,7 @@ namespace CustomFarmingRedux
             if(additionalSaveData.ContainsKey("tileLocation"))
                 tileLocation = additionalSaveData["tileLocation"].Split(',').toList(s => int.Parse(s)).toVector<Vector2>();
             if (c.items.Count > 0 && c.items[0] is SObject o)
-                heldObject = (SObject) o.getOne();
+                heldObject = o;
             updateWhenCurrentLocation(Game1.currentGameTime);
             startAutoProduction();
             wasBuild = true;

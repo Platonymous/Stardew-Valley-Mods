@@ -1,30 +1,32 @@
 ﻿using System;
 using PyTK.Overrides;
 using PyTK.Types;
+using StardewValley;
 
 namespace PyTK.Events
 {
     public static class PyTimeEvents
     {
+        public static event EventHandler<EventArgsBeforeSleep> BeforeSleepEvents;
 
-        public static event EventHandler<EventArgs> OnSleepEvents;
-
-        public class EventArgsSleep : EventArgs
+        public class EventArgsBeforeSleep : EventArgs
         {
-            public EventArgsSleep(STime sleepTime, bool passedOut)
+            public EventArgsBeforeSleep(STime sleepTime, bool passedOut, ref Response response)
             {
                 SleepTime = sleepTime;
                 PassedOut = passedOut;
+                Response = response;
             }
 
             public bool PassedOut { get; }
             public STime SleepTime { get; }
+            public Response Response { get; set; }
+
         }
 
-
-        internal static void CallOnSleepEvents(object sender, EventArgsSleep e)
+        internal static void CallBeforeSleepEvents(object sender, EventArgsBeforeSleep e)
         {
-            OnSleepEvents?.Invoke(sender, e);
+            BeforeSleepEvents?.Invoke(sender, e);
         }
 
     }

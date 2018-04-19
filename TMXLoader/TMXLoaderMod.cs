@@ -21,7 +21,6 @@ namespace TMXLoader
     public class TMXLoaderMod : Mod
     {
         internal static string contentFolder = "Maps";
-        internal static Dictionary<SFarmer, int> levels = new Dictionary<SFarmer, int>();
         internal static IMonitor monitor;
         internal static IModHelper helper;
 
@@ -38,7 +37,6 @@ namespace TMXLoader
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
-            SaveEvents.AfterLoad += (s,e) => levels.AddOrReplace(Game1.player, 0);
             fixCompatibilities();
             harmonyFix();
         }
@@ -145,19 +143,7 @@ namespace TMXLoader
         {
             foreach (Layer layer in map.Layers)
                 if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
-                {
-                    if(!layer.Properties.ContainsKey("Level"))
                         maplayer.AfterDraw += (s, e) => layer.Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, Game1.pixelZoom);
-                    else
-                            maplayer.AfterDraw += (s, e) => {
-                                if (levels.ContainsKey(Game1.player) && levels[Game1.player] >= int.Parse(layer.Properties["Level"]))
-                                {
-                                    Game1.spriteBatch.Draw(PyUtils.getWhitePixel(), new Rectangle(0, 0, Game1.viewport.Width, Game1.viewport.Height), Color.Black * 0.5f);
-                                    layer.Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, Game1.pixelZoom);
-                                }
-                            };
-                }
-
         }
 
         private void editWarps(Map map, string[] addWarps, string[] removeWarps, Map original = null)

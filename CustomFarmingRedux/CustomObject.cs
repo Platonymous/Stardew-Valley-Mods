@@ -53,6 +53,7 @@ namespace CustomFarmingRedux
                 namesplit[blueprint.insertpos] += " " + input.name;
                 cname = String.Join(" ", namesplit);
             }
+            price =(blueprint.prefix || blueprint.suffix || blueprint.insert) ? price + input.price : price;
             this.name = cname;
             displayName = cname;
             this.blueprint = blueprint;
@@ -206,9 +207,10 @@ namespace CustomFarmingRedux
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
+            SObject lastInput = (SObject) (replacement as Chest).items.Find(i => i is SObject);
             CustomMachineBlueprint mBlueprint = machines.Find(cmb => additionalSaveData["mid"] == cmb.fullid);
             RecipeBlueprint blueprint = mBlueprint.production.Find(p => p.id.ToString() == additionalSaveData["id"]);
-            build(additionalSaveData["name"], (SObject) (replacement as Chest).items[0], blueprint);
+            build(additionalSaveData["name"], lastInput, blueprint);
             stack = int.Parse(additionalSaveData["stack"]);
         }
     }

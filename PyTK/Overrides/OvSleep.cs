@@ -1,5 +1,4 @@
 ﻿using Harmony;
-using PyTK.ConsoleCommands;
 using PyTK.Events;
 using PyTK.Types;
 using StardewValley;
@@ -8,7 +7,7 @@ using System.Reflection;
 namespace PyTK.Overrides
 {
     [HarmonyPatch]
-        internal class OvSleep
+    internal class OvBeforeSleep
     {
 
         internal static MethodInfo TargetMethod()
@@ -16,15 +15,14 @@ namespace PyTK.Overrides
             return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "answerDialogue");
         }
 
-        internal static bool Prefix(GameLocation __instance, ref Response answer)
+        internal static void Prefix(GameLocation __instance, ref Response answer)
         {
             if (__instance.lastQuestionKey == null || answer == null || answer.responseKey == null)
-                    return true;
+                return;
 
             if (__instance.lastQuestionKey.ToLower() == "sleep" && answer.responseKey.ToLower() == "yes")
-                PyTimeEvents.CallOnSleepEvents(null, new PyTimeEvents.EventArgsSleep(STime.CURRENT, false));
-
-            return true;
+                PyTimeEvents.CallBeforeSleepEvents(null, new PyTimeEvents.EventArgsBeforeSleep(STime.CURRENT, false, ref answer));
         }
     }
+ 
 }

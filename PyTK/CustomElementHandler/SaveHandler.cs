@@ -240,7 +240,7 @@ namespace PyTK.CustomElementHandler
             return dataString.Split(seperator);
         }
 
-        private static object rebuildElement(string dataString, object replacement)
+        public static object rebuildElement(string dataString, object replacement)
         {
             replacement = checkReplacement(replacement);
             objectPreProcessors.useAll(o => replacement = o.Invoke(replacement));
