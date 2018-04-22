@@ -1,0 +1,14 @@
+{
+  "Name": "PlanImporter",
+  "Author": "Platonymous",
+  "Version": {
+    "MajorVersion": 0,
+    "MinorVersion": 8,
+    "PatchVersion": 0,
+    "Build": null
+  },
+  "Description": "Import plans from stardew.info.",
+  "UniqueID": "Platonymous.PlanImporter",
+  "EntryDll": "PlanImporter.dll",
+  "UpdateKeys": [ "Nexus:999" ]
+}

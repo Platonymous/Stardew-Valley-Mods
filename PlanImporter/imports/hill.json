@@ -1,0 +1,7536 @@
+{
+  "tiles": [
+    {
+      "type": "steppingstone-path",
+      "y": "0",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "0",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "16",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "16",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "32",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "32",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "48",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "48",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "64",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "64",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "80",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "80",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "96",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "96",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "112",
+      "x": "352"
+    },
+    {
+      "type": "grass",
+      "y": "112",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "112",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "112",
+      "x": "656"
+    },
+    {
+      "type": "tree",
+      "y": "128",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "128",
+      "x": "352"
+    },
+    {
+      "type": "tree",
+      "y": "128",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "128",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "128",
+      "x": "544"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "128",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "128",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "352"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "384"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "400"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "448"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "480"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "496"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "512"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "528"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "144",
+      "x": "544"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "144",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "144",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "848"
+    },
+    {
+      "type": "grass",
+      "y": "144",
+      "x": "864"
+    },
+    {
+      "type": "tree",
+      "y": "160",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "160",
+      "x": "352"
+    },
+    {
+      "type": "tree",
+      "y": "160",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "160",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "160",
+      "x": "544"
+    },
+    {
+      "type": "grass",
+      "y": "160",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "160",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "160",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "160",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "160",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "160",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "160",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "160",
+      "x": "816"
+    },
+    {
+      "type": "grass",
+      "y": "160",
+      "x": "832"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "352"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "176",
+      "x": "544"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "176",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "176",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "800"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "816"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "832"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "848"
+    },
+    {
+      "type": "grass",
+      "y": "176",
+      "x": "864"
+    },
+    {
+      "type": "tree",
+      "y": "192",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "352"
+    },
+    {
+      "type": "tree",
+      "y": "192",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "192",
+      "x": "544"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "192",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "192",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "832"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "848"
+    },
+    {
+      "type": "grass",
+      "y": "192",
+      "x": "864"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "352"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "208",
+      "x": "544"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "208",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "208",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "832"
+    },
+    {
+      "type": "tulips",
+      "y": "208",
+      "x": "848"
+    },
+    {
+      "type": "grass",
+      "y": "208",
+      "x": "864"
+    },
+    {
+      "type": "tree",
+      "y": "224",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "224",
+      "x": "352"
+    },
+    {
+      "type": "tree",
+      "y": "224",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "224",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "224",
+      "x": "544"
+    },
+    {
+      "type": "grass",
+      "y": "224",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "224",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "224",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "224",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "224",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "224",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "224",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "224",
+      "x": "784"
+    },
+    {
+      "type": "tulips",
+      "y": "224",
+      "x": "832"
+    },
+    {
+      "type": "tulips",
+      "y": "224",
+      "x": "864"
+    },
+    {
+      "type": "grass",
+      "y": "224",
+      "x": "912"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "352"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "240",
+      "x": "544"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "240",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "240",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "688"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "752"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "768"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "832"
+    },
+    {
+      "type": "tulips",
+      "y": "240",
+      "x": "848"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "864"
+    },
+    {
+      "type": "grass",
+      "y": "240",
+      "x": "912"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "384"
+    },
+    {
+      "type": "tree",
+      "y": "256",
+      "x": "400"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "416"
+    },
+    {
+      "type": "tree",
+      "y": "256",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "256",
+      "x": "544"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "256",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "592"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "256",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "256",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "256",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "256",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "688"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "704"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "752"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "768"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "832"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "848"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "864"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "1120"
+    },
+    {
+      "type": "grass",
+      "y": "256",
+      "x": "1136"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "128"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "144"
+    },
+    {
+      "type": "grass",
+      "y": "272",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "272",
+      "x": "384"
+    },
+    {
+      "type": "grass",
+      "y": "272",
+      "x": "400"
+    },
+    {
+      "type": "grass",
+      "y": "272",
+      "x": "416"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "496"
+    },
+    {
+      "type": "grass",
+      "y": "272",
+      "x": "512"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "528"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "544"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "560"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "576"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "592"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "608"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "704"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "720"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "736"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "752"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "784"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "800"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "816"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "832"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "848"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "880"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "896"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "912"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "928"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "944"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "960"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "976"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1024"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1040"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1056"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1072"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1088"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1104"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1120"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1136"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1152"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1168"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1184"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1200"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1216"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1232"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1248"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "272",
+      "x": "1264"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "128"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "144"
+    },
+    {
+      "type": "tree",
+      "y": "288",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "384"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "400"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "448"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "464"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "512"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "528"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "544"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "560"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "576"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "592"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "624"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "640"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "288",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "704"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "720"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "736"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "752"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "784"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "800"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "816"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "832"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "848"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "880"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "896"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "912"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "928"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "944"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "960"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "976"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1024"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1040"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1056"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1072"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1088"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1104"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1120"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1136"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1152"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1168"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1184"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1200"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1216"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1232"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "288",
+      "x": "1248"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "304",
+      "x": "128"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "304",
+      "x": "144"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "384"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "400"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "448"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "480"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "304",
+      "x": "512"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "304",
+      "x": "528"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "544"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "800"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "816"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "832"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "848"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "864"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "304",
+      "x": "896"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "304",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "304",
+      "x": "1024"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "320",
+      "x": "144"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "320",
+      "x": "160"
+    },
+    {
+      "type": "tree",
+      "y": "320",
+      "x": "176"
+    },
+    {
+      "type": "tree",
+      "y": "320",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "320",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "320",
+      "x": "432"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "320",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "320",
+      "x": "512"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "320",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "320",
+      "x": "1024"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "336",
+      "x": "160"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "336",
+      "x": "176"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "352",
+      "x": "176"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "352",
+      "x": "192"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "352",
+      "x": "208"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "352",
+      "x": "288"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "352",
+      "x": "304"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "368",
+      "x": "304"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "384",
+      "x": "304"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "400",
+      "x": "304"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "400",
+      "x": "320"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "416",
+      "x": "320"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "416",
+      "x": "336"
+    },
+    {
+      "type": "road",
+      "y": "416",
+      "x": "352"
+    },
+    {
+      "type": "road",
+      "y": "416",
+      "x": "368"
+    },
+    {
+      "type": "road",
+      "y": "416",
+      "x": "384"
+    },
+    {
+      "type": "road",
+      "y": "416",
+      "x": "400"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "416",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "416",
+      "x": "512"
+    },
+    {
+      "type": "tree",
+      "y": "416",
+      "x": "592"
+    },
+    {
+      "type": "tree",
+      "y": "416",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "416",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "416",
+      "x": "1024"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "432",
+      "x": "336"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "432",
+      "x": "352"
+    },
+    {
+      "type": "road",
+      "y": "432",
+      "x": "368"
+    },
+    {
+      "type": "road",
+      "y": "432",
+      "x": "384"
+    },
+    {
+      "type": "road",
+      "y": "432",
+      "x": "400"
+    },
+    {
+      "type": "road",
+      "y": "432",
+      "x": "416"
+    },
+    {
+      "type": "road",
+      "y": "432",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "448"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "432",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "432",
+      "x": "512"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "528"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "544"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "624"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "640"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "752"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "768"
+    },
+    {
+      "type": "tree",
+      "y": "432",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "800"
+    },
+    {
+      "type": "tree",
+      "y": "432",
+      "x": "944"
+    },
+    {
+      "type": "tree",
+      "y": "432",
+      "x": "976"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "432",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "432",
+      "x": "1024"
+    },
+    {
+      "type": "tree",
+      "y": "432",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "432",
+      "x": "1104"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "352"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "368"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "384"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "400"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "448"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "512"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "528"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "544"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "624"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "640"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "704"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "720"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "752"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "768"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "800"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "976"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "448",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "1072"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "448",
+      "x": "1104"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "400"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "416"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "432"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "448"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "464"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "512"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "528"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "544"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "560"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "576"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "624"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "640"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "704"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "720"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "752"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "768"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "800"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "816"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "832"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "896"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "912"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "928"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "976"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1024"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1040"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1056"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1072"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1088"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1104"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1120"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1136"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1152"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "464",
+      "x": "1168"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "1184"
+    },
+    {
+      "type": "grass",
+      "y": "464",
+      "x": "1216"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "480",
+      "x": "592"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "480",
+      "x": "608"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "480",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "480",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "480",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "480",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "480",
+      "x": "704"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "720"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "752"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "768"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "800"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "816"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "832"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "848"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "896"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "912"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "928"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "976"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "480",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "480",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "1072"
+    },
+    {
+      "type": "stone-floor",
+      "y": "480",
+      "x": "1088"
+    },
+    {
+      "type": "stone-floor",
+      "y": "480",
+      "x": "1104"
+    },
+    {
+      "type": "stone-floor",
+      "y": "480",
+      "x": "1120"
+    },
+    {
+      "type": "stone-floor",
+      "y": "480",
+      "x": "1136"
+    },
+    {
+      "type": "stone-floor",
+      "y": "480",
+      "x": "1152"
+    },
+    {
+      "type": "stone-floor",
+      "y": "480",
+      "x": "1168"
+    },
+    {
+      "type": "stone-floor",
+      "y": "480",
+      "x": "1184"
+    },
+    {
+      "type": "stone-floor",
+      "y": "480",
+      "x": "1200"
+    },
+    {
+      "type": "grass",
+      "y": "480",
+      "x": "1216"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "704"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "720"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "736"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "752"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "784"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "800"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "816"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "832"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "848"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "896"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "912"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "928"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "976"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "496",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "1072"
+    },
+    {
+      "type": "stone-floor",
+      "y": "496",
+      "x": "1088"
+    },
+    {
+      "type": "wood-floor",
+      "y": "496",
+      "x": "1104"
+    },
+    {
+      "type": "wood-floor",
+      "y": "496",
+      "x": "1120"
+    },
+    {
+      "type": "wood-floor",
+      "y": "496",
+      "x": "1136"
+    },
+    {
+      "type": "wood-floor",
+      "y": "496",
+      "x": "1152"
+    },
+    {
+      "type": "wood-floor",
+      "y": "496",
+      "x": "1168"
+    },
+    {
+      "type": "wood-floor",
+      "y": "496",
+      "x": "1184"
+    },
+    {
+      "type": "stone-floor",
+      "y": "496",
+      "x": "1200"
+    },
+    {
+      "type": "grass",
+      "y": "496",
+      "x": "1216"
+    },
+    {
+      "type": "grass",
+      "y": "512",
+      "x": "720"
+    },
+    {
+      "type": "grass",
+      "y": "512",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "512",
+      "x": "752"
+    },
+    {
+      "type": "grass",
+      "y": "512",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "784"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "800"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "880"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "896"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "912"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "928"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "944"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "960"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "976"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "1024"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "1040"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "1056"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "512",
+      "x": "1072"
+    },
+    {
+      "type": "stone-floor",
+      "y": "512",
+      "x": "1088"
+    },
+    {
+      "type": "wood-floor",
+      "y": "512",
+      "x": "1104"
+    },
+    {
+      "type": "wood-floor",
+      "y": "512",
+      "x": "1120"
+    },
+    {
+      "type": "wood-floor",
+      "y": "512",
+      "x": "1136"
+    },
+    {
+      "type": "wood-floor",
+      "y": "512",
+      "x": "1152"
+    },
+    {
+      "type": "wood-floor",
+      "y": "512",
+      "x": "1168"
+    },
+    {
+      "type": "wood-floor",
+      "y": "512",
+      "x": "1184"
+    },
+    {
+      "type": "stone-floor",
+      "y": "512",
+      "x": "1200"
+    },
+    {
+      "type": "grass",
+      "y": "512",
+      "x": "1216"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "752"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "528",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "528",
+      "x": "784"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "528",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "896"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "912"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "928"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "976"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "528",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "528",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "1072"
+    },
+    {
+      "type": "stone-floor",
+      "y": "528",
+      "x": "1088"
+    },
+    {
+      "type": "wood-floor",
+      "y": "528",
+      "x": "1104"
+    },
+    {
+      "type": "wood-floor",
+      "y": "528",
+      "x": "1120"
+    },
+    {
+      "type": "wood-floor",
+      "y": "528",
+      "x": "1136"
+    },
+    {
+      "type": "wood-floor",
+      "y": "528",
+      "x": "1152"
+    },
+    {
+      "type": "wood-floor",
+      "y": "528",
+      "x": "1168"
+    },
+    {
+      "type": "wood-floor",
+      "y": "528",
+      "x": "1184"
+    },
+    {
+      "type": "stone-floor",
+      "y": "528",
+      "x": "1200"
+    },
+    {
+      "type": "grass",
+      "y": "528",
+      "x": "1216"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "544",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "544",
+      "x": "512"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "544",
+      "x": "528"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "544",
+      "x": "544"
+    },
+    {
+      "type": "tree",
+      "y": "544",
+      "x": "560"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "752"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "544",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "544",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "544",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "544",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "544",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "544",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "544",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "544",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "896"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "912"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "928"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "976"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "544",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "544",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "544",
+      "x": "1072"
+    },
+    {
+      "type": "stone-floor",
+      "y": "544",
+      "x": "1088"
+    },
+    {
+      "type": "stone-floor",
+      "y": "544",
+      "x": "1104"
+    },
+    {
+      "type": "stone-floor",
+      "y": "544",
+      "x": "1120"
+    },
+    {
+      "type": "stone-floor",
+      "y": "544",
+      "x": "1136"
+    },
+    {
+      "type": "stone-floor",
+      "y": "544",
+      "x": "1152"
+    },
+    {
+      "type": "stone-floor",
+      "y": "544",
+      "x": "1168"
+    },
+    {
+      "type": "stone-floor",
+      "y": "544",
+      "x": "1184"
+    },
+    {
+      "type": "stone-floor",
+      "y": "544",
+      "x": "1200"
+    },
+    {
+      "type": "grass",
+      "y": "560",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "560",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "512"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "528"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "544"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "560"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "560",
+      "x": "592"
+    },
+    {
+      "type": "tree",
+      "y": "560",
+      "x": "608"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "560",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "560",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "560",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "560",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "560",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "880"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "560",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "576",
+      "x": "512"
+    },
+    {
+      "type": "grass",
+      "y": "576",
+      "x": "528"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "576",
+      "x": "544"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "576",
+      "x": "560"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "576",
+      "x": "576"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "576",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "576",
+      "x": "624"
+    },
+    {
+      "type": "grass",
+      "y": "576",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "576",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "576",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "576",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "576",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "576",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "576",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "576",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "576",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "592",
+      "x": "512"
+    },
+    {
+      "type": "grass",
+      "y": "592",
+      "x": "528"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "592",
+      "x": "576"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "592",
+      "x": "592"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "592",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "592",
+      "x": "624"
+    },
+    {
+      "type": "tree",
+      "y": "592",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "592",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "592",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "592",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "592",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "592",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "592",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "592",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "592",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "608",
+      "x": "512"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "576"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "592"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "608"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "608",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "608",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "608",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "608",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "608",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "608",
+      "x": "880"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "624",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "624",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "624",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "624",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "624",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "928"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "976"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "992"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "1008"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "1072"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "624",
+      "x": "1104"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "640",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "640",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "640",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "640",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "640",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "928"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "976"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "992"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "1008"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "1072"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "640",
+      "x": "1104"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "656",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "656",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "656",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "656",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "656",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "928"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "976"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "992"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "1008"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "1072"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "656",
+      "x": "1104"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "672",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "672",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "672",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "672",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "672",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "976"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "992"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1008"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1072"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1104"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1120"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1136"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1152"
+    },
+    {
+      "type": "grass",
+      "y": "672",
+      "x": "1168"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "688",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "688",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "688",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "688",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "688",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "688",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "688",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "688",
+      "x": "1104"
+    },
+    {
+      "type": "grass",
+      "y": "688",
+      "x": "1120"
+    },
+    {
+      "type": "grass",
+      "y": "688",
+      "x": "1136"
+    },
+    {
+      "type": "grass",
+      "y": "688",
+      "x": "1152"
+    },
+    {
+      "type": "grass",
+      "y": "688",
+      "x": "1168"
+    },
+    {
+      "type": "grass",
+      "y": "688",
+      "x": "1184"
+    },
+    {
+      "type": "grass",
+      "y": "704",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "704",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "704",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "704",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "704",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "704",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "704",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "704",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "704",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "704",
+      "x": "1104"
+    },
+    {
+      "type": "grass",
+      "y": "704",
+      "x": "1120"
+    },
+    {
+      "type": "grass",
+      "y": "704",
+      "x": "1136"
+    },
+    {
+      "type": "grass",
+      "y": "704",
+      "x": "1152"
+    },
+    {
+      "type": "grass",
+      "y": "704",
+      "x": "1168"
+    },
+    {
+      "type": "grass",
+      "y": "704",
+      "x": "1184"
+    },
+    {
+      "type": "tree",
+      "y": "720",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "720",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "720",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "720",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "720",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "720",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "720",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "720",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "720",
+      "x": "1136"
+    },
+    {
+      "type": "grass",
+      "y": "720",
+      "x": "1152"
+    },
+    {
+      "type": "grass",
+      "y": "720",
+      "x": "1168"
+    },
+    {
+      "type": "grass",
+      "y": "720",
+      "x": "1184"
+    },
+    {
+      "type": "grass",
+      "y": "736",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "736",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "736",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "736",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "736",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "736",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "736",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "736",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "736",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "752",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "752",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "752",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "752",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "752",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "752",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "752",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "752",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "752",
+      "x": "880"
+    },
+    {
+      "type": "tree",
+      "y": "768",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "768",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "768",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "768",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "768",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "768",
+      "x": "784"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "800"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "816"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "832"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "848"
+    },
+    {
+      "type": "farmland",
+      "y": "768",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "768",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "784",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "784",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "784",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "784",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "784",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "784",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "784",
+      "x": "784"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "784",
+      "x": "880"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "784",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "784",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "240"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "256"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "272"
+    },
+    {
+      "type": "grass",
+      "y": "800",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "800",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "800",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "800",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "800",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "784"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "800"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "800",
+      "x": "896"
+    },
+    {
+      "type": "grass",
+      "y": "800",
+      "x": "912"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "800",
+      "x": "1008"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "144"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "160"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "240"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "256"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "272"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "288"
+    },
+    {
+      "type": "fence",
+      "y": "816",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "432"
+    },
+    {
+      "type": "tree",
+      "y": "816",
+      "x": "448"
+    },
+    {
+      "type": "tree",
+      "y": "816",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "816",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "800"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "816"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "832"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "848"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "880"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "896"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "912"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "928"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "960"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "976"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "816",
+      "x": "1008"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "1072"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "816",
+      "x": "1104"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "144"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "160"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "240"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "256"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "272"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "288"
+    },
+    {
+      "type": "fence",
+      "y": "832",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "448"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "832",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "688"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "704"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "816"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "832"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "848"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "864"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "880"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "896"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "912"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "928"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "944"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "960"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "976"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "832",
+      "x": "1008"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "1072"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "832",
+      "x": "1104"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "144"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "160"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "240"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "256"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "272"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "288"
+    },
+    {
+      "type": "fence",
+      "y": "848",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "432"
+    },
+    {
+      "type": "tree",
+      "y": "848",
+      "x": "448"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "464"
+    },
+    {
+      "type": "tree",
+      "y": "848",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "496"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "512"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "528"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "544"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "560"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "576"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "592"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "608"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "624"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "640"
+    },
+    {
+      "type": "farmland",
+      "y": "848",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "688"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "704"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "720"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "944"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "960"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "976"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "992"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "848",
+      "x": "1024"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "1040"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "1072"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "848",
+      "x": "1104"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "48"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "64"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "160"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "240"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "256"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "864",
+      "x": "272"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "864",
+      "x": "288"
+    },
+    {
+      "type": "fence",
+      "y": "864",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "448"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "464"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "864",
+      "x": "496"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "624"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "864",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "864",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "688"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "704"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "720"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "736"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "864",
+      "x": "1008"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "864",
+      "x": "1024"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "864",
+      "x": "1040"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "864",
+      "x": "1056"
+    },
+    {
+      "type": "grass",
+      "y": "864",
+      "x": "1088"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "48"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "64"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "240"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "256"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "272"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "288"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "304"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "320"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "336"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "352"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "368"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "384"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "400"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "432"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "448"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "464"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "480"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "496"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "512"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "688"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "704"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "720"
+    },
+    {
+      "type": "grass",
+      "y": "880",
+      "x": "736"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "1056"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "1072"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "1088"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "1104"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "1120"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "1136"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "1152"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "880",
+      "x": "1168"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "48"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "64"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "240"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "256"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "272"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "288"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "304"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "320"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "352"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "384"
+    },
+    {
+      "type": "fence",
+      "y": "896",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "448"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "464"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "512"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "528"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "544"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "560"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "576"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "592"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "608"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "896",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "688"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "704"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "720"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "752"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "1104"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "1120"
+    },
+    {
+      "type": "grass",
+      "y": "896",
+      "x": "1136"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "48"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "64"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "240"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "256"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "272"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "288"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "304"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "320"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "352"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "384"
+    },
+    {
+      "type": "fence",
+      "y": "912",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "432"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "912",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "912",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "672"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "688"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "704"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "720"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "736"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "752"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "768"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "784"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "800"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "1120"
+    },
+    {
+      "type": "grass",
+      "y": "912",
+      "x": "1136"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "48"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "64"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "240"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "256"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "272"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "288"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "304"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "320"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "352"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "384"
+    },
+    {
+      "type": "fence",
+      "y": "928",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "656"
+    },
+    {
+      "type": "grass",
+      "y": "928",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "688"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "704"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "720"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "736"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "752"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "768"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "784"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "800"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "816"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "832"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "848"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "928",
+      "x": "864"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "48"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "64"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "160"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "240"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "256"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "272"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "288"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "304"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "320"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "352"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "368"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "384"
+    },
+    {
+      "type": "fence",
+      "y": "944",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "944",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "944",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "944",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "944",
+      "x": "672"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "944",
+      "x": "688"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "48"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "64"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "80"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "96"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "112"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "128"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "144"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "160"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "176"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "192"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "208"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "224"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "240"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "256"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "272"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "288"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "304"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "320"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "336"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "352"
+    },
+    {
+      "type": "fence",
+      "y": "960",
+      "x": "416"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "576"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "592"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "608"
+    },
+    {
+      "type": "grass",
+      "y": "960",
+      "x": "624"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "960",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "960",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "976",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "976",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "992",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "992",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "1008",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "1008",
+      "x": "656"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "1024",
+      "x": "640"
+    },
+    {
+      "type": "steppingstone-path",
+      "y": "1024",
+      "x": "656"
+    }
+  ],
+  "buildings": [
+    {
+      "type": "barn",
+      "x": "304",
+      "y": "816"
+    },
+    {
+      "type": "coop",
+      "x": "1136",
+      "y": "624"
+    },
+    {
+      "type": "shed",
+      "x": "816",
+      "y": "416"
+    },
+    {
+      "type": "shed",
+      "x": "672",
+      "y": "192"
+    },
+    {
+      "type": "irid-sprinkler",
+      "x": "832",
+      "y": "736"
+    },
+    {
+      "type": "irid-sprinkler",
+      "x": "832",
+      "y": "656"
+    },
+    {
+      "type": "irid-sprinkler",
+      "x": "832",
+      "y": "576"
+    },
+    {
+      "type": "irid-sprinkler",
+      "x": "624",
+      "y": "656"
+    },
+    {
+      "type": "irid-sprinkler",
+      "x": "544",
+      "y": "656"
+    },
+    {
+      "type": "irid-sprinkler",
+      "x": "624",
+      "y": "736"
+    },
+    {
+      "type": "irid-sprinkler",
+      "x": "544",
+      "y": "736"
+    },
+    {
+      "type": "irid-sprinkler",
+      "x": "624",
+      "y": "816"
+    },
+    {
+      "type": "shed",
+      "x": "1120",
+      "y": "832"
+    },
+    {
+      "type": "irid-sprinkler",
+      "x": "544",
+      "y": "816"
+    },
+    {
+      "type": "silo",
+      "x": "48",
+      "y": "816"
+    },
+    {
+      "type": "silo",
+      "x": "96",
+      "y": "816"
+    },
+    {
+      "type": "water-obelisk",
+      "x": "656",
+      "y": "400"
+    },
+    {
+      "type": "earth-obelisk",
+      "x": "704",
+      "y": "400"
+    },
+    {
+      "type": "scarecrow",
+      "x": "592",
+      "y": "608"
+    },
+    {
+      "type": "scarecrow",
+      "x": "528",
+      "y": "864"
+    },
+    {
+      "type": "scarecrow",
+      "x": "528",
+      "y": "608"
+    },
+    {
+      "type": "scarecrow",
+      "x": "800",
+      "y": "784"
+    },
+    {
+      "type": "scarecrow",
+      "x": "800",
+      "y": "528"
+    },
+    {
+      "type": "scarecrow",
+      "x": "848",
+      "y": "160"
+    },
+    {
+      "type": "keg",
+      "x": "704",
+      "y": "240"
+    },
+    {
+      "type": "preserves",
+      "x": "848",
+      "y": "464"
+    },
+    {
+      "type": "keg",
+      "x": "1200",
+      "y": "464"
+    },
+    {
+      "type": "mill",
+      "x": "576",
+      "y": "128"
+    },
+    {
+      "type": "junimo-hut",
+      "x": "544",
+      "y": "592"
+    },
+    {
+      "type": "junimo-hut",
+      "x": "544",
+      "y": "864"
+    },
+    {
+      "type": "junimo-hut",
+      "x": "816",
+      "y": "784"
+    },
+    {
+      "type": "bee-hive",
+      "x": "896",
+      "y": "192"
+    },
+    {
+      "type": "bee-hive",
+      "x": "896",
+      "y": "208"
+    },
+    {
+      "type": "bee-hive",
+      "x": "896",
+      "y": "224"
+    },
+    {
+      "type": "bee-hive",
+      "x": "896",
+      "y": "240"
+    },
+    {
+      "type": "bee-hive",
+      "x": "896",
+      "y": "256"
+    },
+    {
+      "type": "bee-hive",
+      "x": "880",
+      "y": "256"
+    },
+    {
+      "type": "bee-hive",
+      "x": "880",
+      "y": "240"
+    },
+    {
+      "type": "bee-hive",
+      "x": "880",
+      "y": "224"
+    },
+    {
+      "type": "bee-hive",
+      "x": "880",
+      "y": "208"
+    },
+    {
+      "type": "bee-hive",
+      "x": "880",
+      "y": "192"
+    },
+    {
+      "type": "bee-hive",
+      "x": "816",
+      "y": "192"
+    },
+    {
+      "type": "bee-hive",
+      "x": "816",
+      "y": "208"
+    },
+    {
+      "type": "bee-hive",
+      "x": "816",
+      "y": "224"
+    },
+    {
+      "type": "bee-hive",
+      "x": "816",
+      "y": "240"
+    },
+    {
+      "type": "sprinkler",
+      "x": "848",
+      "y": "224"
+    },
+    {
+      "type": "bee-hive",
+      "x": "800",
+      "y": "256"
+    },
+    {
+      "type": "bee-hive",
+      "x": "800",
+      "y": "240"
+    },
+    {
+      "type": "bee-hive",
+      "x": "800",
+      "y": "224"
+    },
+    {
+      "type": "bee-hive",
+      "x": "800",
+      "y": "208"
+    },
+    {
+      "type": "apricot",
+      "x": "1200",
+      "y": "160"
+    },
+    {
+      "type": "cherry-tree",
+      "x": "1200",
+      "y": "208"
+    },
+    {
+      "type": "orange-tree",
+      "x": "160",
+      "y": "128"
+    },
+    {
+      "type": "peach",
+      "x": "800",
+      "y": "112"
+    },
+    {
+      "type": "peach",
+      "x": "736",
+      "y": "144"
+    },
+    {
+      "type": "apple",
+      "x": "1168",
+      "y": "304"
+    },
+    {
+      "type": "pomegranate",
+      "x": "1104",
+      "y": "304"
+    },
+    {
+      "type": "junimo-hut",
+      "x": "816",
+      "y": "512"
+    },
+    {
+      "type": "furnace",
+      "x": "1120",
+      "y": "496"
+    },
+    {
+      "type": "furnace",
+      "x": "1136",
+      "y": "496"
+    },
+    {
+      "type": "furnace",
+      "x": "1152",
+      "y": "496"
+    },
+    {
+      "type": "furnace",
+      "x": "1168",
+      "y": "496"
+    },
+    {
+      "type": "chest",
+      "x": "1184",
+      "y": "528"
+    },
+    {
+      "type": "chest",
+      "x": "1168",
+      "y": "528"
+    },
+    {
+      "type": "chest",
+      "x": "1152",
+      "y": "528"
+    },
+    {
+      "type": "chest",
+      "x": "1136",
+      "y": "528"
+    },
+    {
+      "type": "charcoal",
+      "x": "1104",
+      "y": "496"
+    },
+    {
+      "type": "scarecrow",
+      "x": "592",
+      "y": "864"
+    },
+    {
+      "type": "apricot",
+      "x": "80",
+      "y": "320"
+    },
+    {
+      "type": "apricot",
+      "x": "112",
+      "y": "336"
+    },
+    {
+      "type": "apricot",
+      "x": "112",
+      "y": "368"
+    },
+    {
+      "type": "apricot",
+      "x": "112",
+      "y": "400"
+    },
+    {
+      "type": "apricot",
+      "x": "112",
+      "y": "432"
+    },
+    {
+      "type": "apricot",
+      "x": "128",
+      "y": "448"
+    },
+    {
+      "type": "apricot",
+      "x": "144",
+      "y": "464"
+    },
+    {
+      "type": "apricot",
+      "x": "176",
+      "y": "464"
+    },
+    {
+      "type": "apricot",
+      "x": "208",
+      "y": "448"
+    },
+    {
+      "type": "apricot",
+      "x": "208",
+      "y": "496"
+    },
+    {
+      "type": "apricot",
+      "x": "176",
+      "y": "480"
+    },
+    {
+      "type": "apricot",
+      "x": "176",
+      "y": "432"
+    },
+    {
+      "type": "apricot",
+      "x": "160",
+      "y": "416"
+    },
+    {
+      "type": "apricot",
+      "x": "176",
+      "y": "400"
+    },
+    {
+      "type": "apricot",
+      "x": "160",
+      "y": "384"
+    },
+    {
+      "type": "apricot",
+      "x": "720",
+      "y": "944"
+    },
+    {
+      "type": "apricot",
+      "x": "736",
+      "y": "944"
+    },
+    {
+      "type": "apricot",
+      "x": "768",
+      "y": "944"
+    },
+    {
+      "type": "apricot",
+      "x": "704",
+      "y": "944"
+    },
+    {
+      "type": "apricot",
+      "x": "800",
+      "y": "944"
+    },
+    {
+      "type": "apricot",
+      "x": "832",
+      "y": "944"
+    },
+    {
+      "type": "apricot",
+      "x": "848",
+      "y": "944"
+    },
+    {
+      "type": "apricot",
+      "x": "880",
+      "y": "944"
+    },
+    {
+      "type": "apricot",
+      "x": "880",
+      "y": "928"
+    },
+    {
+      "type": "apricot",
+      "x": "896",
+      "y": "928"
+    },
+    {
+      "type": "worm-bin",
+      "x": "432",
+      "y": "432"
+    },
+    {
+      "type": "lighting-rod",
+      "x": "896",
+      "y": "160"
+    },
+    {
+      "type": "lighting-rod",
+      "x": "912",
+      "y": "160"
+    },
+    {
+      "type": "lighting-rod",
+      "x": "928",
+      "y": "160"
+    },
+    {
+      "type": "lighting-rod",
+      "x": "1088",
+      "y": "208"
+    },
+    {
+      "type": "lighting-rod",
+      "x": "1088",
+      "y": "192"
+    },
+    {
+      "type": "lighting-rod",
+      "x": "1088",
+      "y": "176"
+    },
+    {
+      "type": "lighting-rod",
+      "x": "880",
+      "y": "144"
+    },
+    {
+      "type": "crystal",
+      "x": "1104",
+      "y": "864"
+    },
+    {
+      "type": "recycling-machine",
+      "x": "400",
+      "y": "416"
+    },
+    {
+      "type": "recycling-machine",
+      "x": "384",
+      "y": "416"
+    },
+    {
+      "type": "recycling-machine",
+      "x": "368",
+      "y": "416"
+    },
+    {
+      "type": "gate",
+      "x": "416",
+      "y": "880"
+    },
+    {
+      "type": "shed",
+      "x": "1120",
+      "y": "416"
+    },
+    {
+      "type": "worm-bin",
+      "x": "416",
+      "y": "432"
+    },
+    {
+      "type": "bee-hive",
+      "x": "800",
+      "y": "192"
+    },
+    {
+      "type": "bee-hive",
+      "x": "816",
+      "y": "256"
+    }
+  ]
+}
