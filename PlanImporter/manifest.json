@@ -4,11 +4,11 @@
   "Version": {
     "MajorVersion": 0,
     "MinorVersion": 8,
-    "PatchVersion": 0,
+    "PatchVersion": 1,
     "Build": null
   },
   "Description": "Import plans from stardew.info.",
   "UniqueID": "Platonymous.PlanImporter",
   "EntryDll": "PlanImporter.dll",
-  "UpdateKeys": [ "Nexus:999" ]
+  "UpdateKeys": [ "Nexus:2071" ]
 }
