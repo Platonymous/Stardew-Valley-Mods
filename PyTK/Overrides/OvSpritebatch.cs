@@ -33,7 +33,7 @@ namespace PyTK.Overrides
                     return AccessTools.Method(typeof(FakeSpriteBatch), "DrawInternal");
             }
 
-            internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth)
+            internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth, ref bool autoFlush)
             {
                 if (!replaceNext )
                     return true;
@@ -46,7 +46,7 @@ namespace PyTK.Overrides
                         return false;
 
                     MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
-                    drawMethod.Invoke(__instance, new object[] { nextData.texture, destinationRectangle, true, nextData.sourceRectangle, nextData.color != Color.White ? nextData.color : color, rotation, origin, effect, depth });
+                    drawMethod.Invoke(__instance, new object[] { nextData.texture, destinationRectangle, nextData.sourceRectangle, nextData.color != Color.White ? nextData.color : color, rotation, origin, effect, depth, autoFlush });
                     return false;
                 }
 
