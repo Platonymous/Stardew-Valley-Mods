@@ -192,7 +192,7 @@ namespace PlanImporter
                 case "q-sprinkler": return new SObject(pos, 621, 1);
                 case "irid-sprinkler": return new SObject(pos, 645, 1);
                 case "scarecrow": return new SObject(pos, 8);
-                case "chest": return new Chest(pos) { playerChest = true };
+                case "chest": return new Chest(true) { tileLocation = pos };
                 case "furnace": return new SObject(pos, 13);
                 case "charcoal": return new SObject(pos, 114);
                 case "seed-maker": return new SObject(pos, 25);
