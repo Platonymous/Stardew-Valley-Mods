@@ -418,7 +418,7 @@ namespace PelicanTTS
                                     try { 
                                     Dialogue d = new Dialogue(text, Game1.getCharacterFromName(name));
                                     DialogueBox db = new DialogueBox(d);
-                                    List<string> dl = Helper.Reflection.GetPrivateValue<List<string>>(d, "dialogues");
+                                    List<string> dl = Helper.Reflection.GetField<List<string>>(d, "dialogues").GetValue();
                                     Monitor.Log("Dialog Length:" + dl.Count);
 
                                     while (dl.Count > 0)
@@ -457,7 +457,7 @@ namespace PelicanTTS
                                         }
                                         Monitor.Log(nextText);
                                         dl.RemoveAt(0);
-                                        Helper.Reflection.GetPrivateField<List<string>>(d, "dialogues").SetValue(dl);
+                                        Helper.Reflection.GetField<List<string>>(d, "dialogues").SetValue(dl);
                                     }
                                     }catch
                                     {

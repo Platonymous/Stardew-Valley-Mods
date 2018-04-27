@@ -74,15 +74,15 @@ namespace CustomFurniture
 
             if (param[0] == "shop" && Game1.activeClickableMenu is ShopMenu shop)
             {
-                Dictionary<Item, int[]> items = Helper.Reflection.GetPrivateValue<Dictionary<Item, int[]>>(shop, "itemPriceAndStock");
-                List<Item> selling = Helper.Reflection.GetPrivateValue<List<Item>>(shop, "forSale");
+                Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
+                List<Item> selling = Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
                 List<Item> remove = new List<Item>();
                 List<Item> additions = new List<Item>();
 
                 foreach (Item i in selling)
-                    if (i is Chest chest && furniturePile.Keys.Where(f => f.Equals(i.Name)).Any())
+                    if (i is Chest chest && furniturePile.Keys.Any(f => f.Equals(i.Name)))
                     {
-                        Item cf = furniturePile[furniturePile.Keys.Where(f => f.Equals(i.Name)).FirstOrDefault()];
+                        Item cf = furniturePile[furniturePile.Keys.FirstOrDefault(f => f.Equals(i.Name))];
                         items.Add(cf, new int[] { chest.preservedParentSheetIndex, int.MaxValue });
                         additions.Add(cf);
                         remove.Add(i);
@@ -151,7 +151,7 @@ namespace CustomFurniture
 
         private bool meetsConditions(string conditions)
         {
-            return (Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>(new object[] { "9999984/" + conditions }) != -1);
+            return (Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>("9999984/" + conditions) != -1);
         }
 
         private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
@@ -159,9 +159,9 @@ namespace CustomFurniture
             if (Game1.activeClickableMenu is ShopMenu)
             {
                 ShopMenu shop = (ShopMenu)Game1.activeClickableMenu;
-                Dictionary<Item, int[]> items = Helper.Reflection.GetPrivateValue<Dictionary<Item, int[]>>(shop, "itemPriceAndStock");
-                List<Item> selling = Helper.Reflection.GetPrivateValue<List<Item>>(shop, "forSale");
-                int currency = Helper.Reflection.GetPrivateValue<int>(shop, "currency");
+                Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
+                List<Item> selling = Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
+                int currency = Helper.Reflection.GetField<int>(shop, "currency").GetValue();
                 bool isCatalogue = (currency == 0 && selling.Count > 0 && selling[0] is Furniture);
                 string shopkeeper = "Robin";
 

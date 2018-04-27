@@ -93,9 +93,9 @@ namespace CustomNPC
             {
                 Type apiClass = Type.GetType("NPCMapLocations.MapModMain, NPCMapLocations");
 
-                IPrivateField<Dictionary<string, string>> indoorLocationsF = Helper.Reflection.GetPrivateField<Dictionary<string, string>>(apiClass, "indoorLocations");
-                IPrivateField<Dictionary<string, string>> startingLocationsF = Helper.Reflection.GetPrivateField<Dictionary<string, string>>(apiClass, "startingLocations");
-                IPrivateField<Dictionary<string, Double[]>> locationVectorsF = Helper.Reflection.GetPrivateField<Dictionary<string, Double[]>>(apiClass, "locationVectors");
+                IReflectedField<Dictionary<string, string>> indoorLocationsF = Helper.Reflection.GetField<Dictionary<string, string>>(apiClass, "indoorLocations");
+                IReflectedField<Dictionary<string, string>> startingLocationsF = Helper.Reflection.GetField<Dictionary<string, string>>(apiClass, "startingLocations");
+                IReflectedField<Dictionary<string, Double[]>> locationVectorsF = Helper.Reflection.GetField<Dictionary<string, Double[]>>(apiClass, "locationVectors");
 
                 Dictionary<string, string> indoorLocations = indoorLocationsF.GetValue();
                 Dictionary<string, string> startingLocations = startingLocationsF.GetValue();
@@ -222,9 +222,9 @@ namespace CustomNPC
                 return true;
 
             if (conditions.StartsWith("NOT"))
-                return !(Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>(new object[] { "9999984/" + conditions.Replace("NOT ", "") }) != -1);
+                return Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>("9999984/" + conditions.Replace("NOT ", "")) == -1;
 
-            return (Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>(new object[] { "9999984/" + conditions }) != -1);
+            return (Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>("9999984/" + conditions) != -1);
         }
 
         private void loadNPCs()
@@ -386,7 +386,7 @@ namespace CustomNPC
 
             if (Game1.CurrentEvent is Event && Game1.CurrentEvent.isFestival)
             {
-                GameLocation temp = (GameLocation)Helper.Reflection.GetPrivateValue<GameLocation>(Game1.CurrentEvent, "temporaryLocation");
+                GameLocation temp = Helper.Reflection.GetField<GameLocation>(Game1.CurrentEvent, "temporaryLocation").GetValue();
                 GameEvents.OneSecondTick += GameEvents_OneSecondTick;
             }
             else if (shoplocations.ContainsKey(Game1.currentLocation.name))
@@ -583,7 +583,7 @@ namespace CustomNPC
                         mapLayer.Tiles[(int)_x.Y, (int)_y.Y] = newTile;
 
                         if (location != null && (layer.Id == "Buildings" || layer.Id == "Front"))
-                            Helper.Reflection.GetPrivateMethod(location, "adjustMapLightPropertiesForLamp").Invoke(mapLayer.Tiles[(int)_x.Y, (int)_y.Y].TileIndex, (int)_x.Y, (int)_y.Y, mapLayer.Id);
+                            Helper.Reflection.GetMethod(location, "adjustMapLightPropertiesForLamp").Invoke(mapLayer.Tiles[(int)_x.Y, (int)_y.Y].TileIndex, (int)_x.Y, (int)_y.Y, mapLayer.Id);
 
                         foreach (var prop in sourceTile.Properties)
                             newTile.Properties.Add(prop);
@@ -624,7 +624,7 @@ namespace CustomNPC
                     int x = int.Parse(posString[0]);
                     int y = int.Parse(posString[1]);
                     int face = int.Parse(posString[2]);
-                    GameLocation temp = (GameLocation)Helper.Reflection.GetPrivateValue<GameLocation>(Game1.CurrentEvent, "temporaryLocation");
+                    GameLocation temp = Helper.Reflection.GetField<GameLocation>(Game1.CurrentEvent, "temporaryLocation").GetValue();
                     if (temp is GameLocation && Game1.CurrentEvent.actors.Find(n => n.name == blueprint.name) is null)
                     {
                         NPC anpc = new NPC(getSprite(blueprint), new Vector2((float)(x * Game1.tileSize), (float)(y * Game1.tileSize)), temp.Name, face, blueprint.name, (Dictionary<int, int[]>)null, getPortrait(blueprint), true);
@@ -960,7 +960,7 @@ namespace CustomNPC
         private void setupActorsForFlowerDanceMainEvent()
         {
             Event current = Game1.CurrentEvent;
-            GameLocation temp = (GameLocation)Helper.Reflection.GetPrivateValue<GameLocation>(Game1.CurrentEvent, "temporaryLocation");
+            GameLocation temp = (GameLocation)Helper.Reflection.GetField<GameLocation>(Game1.CurrentEvent, "temporaryLocation").GetValue();
             string[] split = new string[] { "loadActors", "MainEvent" };
             current.actors.Clear();
 
@@ -978,13 +978,13 @@ namespace CustomNPC
                         string key = source.ElementAt<KeyValuePair<string, string>>(index).Key;
 
                         if (key != null && Game1.getCharacterFromName(key, false) != null)
-                            Helper.Reflection.GetPrivateMethod(Game1.CurrentEvent, "addActor").Invoke(new object[] { key, x, y, facingDirection, temp });
+                            Helper.Reflection.GetMethod(Game1.CurrentEvent, "addActor").Invoke(key, x, y, facingDirection, temp);
                     }
         }
 
         private void setUpFlowerDanceMainEvent()
         {
-            Dictionary<string, string> festivalData = Helper.Reflection.GetPrivateValue<Dictionary<string, string>>(Game1.CurrentEvent, "festivalData");
+            Dictionary<string, string> festivalData = Helper.Reflection.GetField<Dictionary<string, string>>(Game1.CurrentEvent, "festivalData").GetValue();
 
             Game1.CurrentEvent.eventCommands = festivalData["mainEvent"].Split('/');
             Game1.CurrentEvent.CurrentCommand = 0;

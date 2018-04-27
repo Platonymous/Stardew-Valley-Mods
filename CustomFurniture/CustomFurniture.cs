@@ -58,7 +58,7 @@ namespace CustomFurniture
             counter = 0;
             tileLocation = tile;
 
-            CustomFurnitureMod.helper.Reflection.GetPrivateField<string>(this, "_description").SetValue(data.description);
+            CustomFurnitureMod.helper.Reflection.GetField<string>(this, "_description").SetValue(data.description);
 
             parentSheetIndex = data.index;
 
@@ -72,7 +72,7 @@ namespace CustomFurniture
             decorTypes.Add("bookcase");
             decorTypes.Add("other");
             string typename = data.type.Contains("table") ? "table" : decorTypes.Contains(data.type) ? "decor" : data.type;
-            furniture_type = data.type.Contains("table") ? 11 : decorTypes.Contains(data.type) ? 8 : CustomFurnitureMod.helper.Reflection.GetPrivateMethod(new Furniture(), "getTypeNumberFromName").Invoke<int>(new[] { data.type });
+            furniture_type = data.type.Contains("table") ? 11 : decorTypes.Contains(data.type) ? 8 : CustomFurnitureMod.helper.Reflection.GetMethod(new Furniture(), "getTypeNumberFromName").Invoke<int>(data.type);
             furniture_type = getTypeFromName(typename);
             defaultSourceRect = new Rectangle(data.index * 16 % texture.Width, data.index * 16 / texture.Width * 16, 1, 1);
             drawHeldObjectLow = false;

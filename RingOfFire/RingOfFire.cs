@@ -522,7 +522,7 @@ namespace RingOfFire
             price = Convert.ToInt32(strArray[1]);
             indexInTileSheet = 517;
             uniqueID = Game1.year + Game1.dayOfMonth + Game1.timeOfDay + this.indexInTileSheet + Game1.player.getTileX() + (int)Game1.stats.MonstersKilled + (int)Game1.stats.itemsCrafted;
-            RingOfFireMod.helper.Reflection.GetPrivateMethod(this, "loadDisplayFields").Invoke();
+            RingOfFireMod.helper.Reflection.GetMethod(this, "loadDisplayFields").Invoke();
             build();
         }
     }

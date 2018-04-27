@@ -176,8 +176,8 @@ namespace PelicanTTS
             else if (Game1.activeClickableMenu is LetterViewerMenu lvm)
             {
                 setVoice("default");
-                List<string> mailMessage = Helper.Reflection.GetPrivateValue<List<string>>(lvm, "mailMessage");
-                string letter = mailMessage[Helper.Reflection.GetPrivateValue<int>(lvm, "page")];
+                List<string> mailMessage = Helper.Reflection.GetField<List<string>>(lvm, "mailMessage").GetValue();
+                string letter = mailMessage[Helper.Reflection.GetField<int>(lvm, "page").GetValue()];
                 currentText = letter;
                 lastDialog = letter;
             }

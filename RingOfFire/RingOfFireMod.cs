@@ -44,8 +44,8 @@ namespace RingOfFire
             if (Game1.activeClickableMenu is ShopMenu)
             {
                 ShopMenu shop = (ShopMenu)Game1.activeClickableMenu;
-                Dictionary<Item, int[]> items = Helper.Reflection.GetPrivateValue<Dictionary<Item, int[]>>(shop, "itemPriceAndStock");
-                List<Item> selling = Helper.Reflection.GetPrivateValue<List<Item>>(shop, "forSale");
+                Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
+                List<Item> selling = Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
 
                 if (shop.portraitPerson == Game1.getCharacterFromName("Marlon") )
                 {

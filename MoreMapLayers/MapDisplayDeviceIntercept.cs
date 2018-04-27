@@ -24,7 +24,7 @@ namespace MoreMapLayers
         {
             
             device = xna;
-            textures = MoreMapLayers.helper.Reflection.GetPrivateValue<Dictionary<TileSheet, Texture2D>>(device, "m_tileSheetTextures");
+            textures = MoreMapLayers.helper.Reflection.GetField<Dictionary<TileSheet, Texture2D>>(device, "m_tileSheetTextures").GetValue();
         }
 
         public void BeginScene(SpriteBatch b)
