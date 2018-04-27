@@ -10,6 +10,7 @@
   "Description": "Takes Cat's Pong and puts it where it belongs.",
   "UniqueID": "Platonymous.ArcadePong",
   "EntryDll": "ArcadePong.dll",
+  "UpdateKeys": [ "Nexus:2044" ],
   "Dependencies": [
     {
       "UniqueID": "cat.Pong"
