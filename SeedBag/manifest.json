@@ -1,19 +1,15 @@
 {
   "Name": "Seed Bag",
   "Author": "Platonymous",
-  "Version": {
-    "MajorVersion": 1,
-    "MinorVersion": 2,
-    "PatchVersion": 0,
-    "Build": null
-  },
+  "Version": "1.2.0",
   "Description": "Adds a Seed Bag to the Game",
   "UniqueID": "Platonymous.SeedBag",
   "EntryDll": "SeedBag.dll",
+  "MinimumApiVersion": "2.6-beta",
+  "UpdateKeys": [ "Nexus:1133" ],
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit"
     }
-  ],
-  "UpdateKeys": [ "Nexus:1133" ]
+  ]
 }
