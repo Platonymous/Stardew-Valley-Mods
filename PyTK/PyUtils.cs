@@ -62,7 +62,7 @@ namespace PyTK
             if (conditions.StartsWith("PC "))
                 result = checkPlayerConditions(conditions.Replace("PC ", ""));
             else
-                result = Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>(new object[] { "9999999/" + conditions }) != -1;
+                result = Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) != -1;
 
             return result == comparer;
         }

@@ -1,19 +1,15 @@
 {
   "Name": "Custom Farming",
   "Author": "Platonymous",
-  "Version": {
-    "MajorVersion": 0,
-    "MinorVersion": 7,
-    "PatchVersion": 0,
-    "Build": null
-  },
+  "Version": "0.7.0",
   "Description": "Helper Mod for Custom Object creation.",
   "UniqueID": "Platonymous.CustomFarming",
   "EntryDll": "CustomFarming.dll",
+  "MinimumApiVersion": "2.6-beta",
+  "UpdateKeys": [ "Nexus:991" ],
   "Dependencies": [
     {
       "UniqueID": "Platonymous.CustomElementHandler"
     }
-  ],
-  "UpdateKeys": [ "Nexus:991" ]
+  ]
 }

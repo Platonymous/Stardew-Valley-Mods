@@ -1,14 +1,10 @@
 {
   "Name": "More Map Layers",
   "Author": "Platonymous",
-  "Version": {
-    "MajorVersion": 1,
-    "MinorVersion": 1,
-    "PatchVersion": 1,
-    "Build": null
-  },
+  "Version": "1.1.1",
   "Description": "Allows the use of additional layers on maps between Back and Buildings",
   "UniqueID": "Platonymous.MoreMapLayers",
   "EntryDll": "MoreMapLayers.dll",
+  "MinimumApiVersion": "2.6-beta",
   "UpdateKeys": [ "Nexus:1134" ]
 }

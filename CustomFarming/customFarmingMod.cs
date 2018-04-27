@@ -70,15 +70,15 @@ namespace CustomFarming
 
             if (param[0] == "shop" && Game1.activeClickableMenu is ShopMenu shop)
             {
-                Dictionary<Item, int[]> items = Helper.Reflection.GetPrivateValue<Dictionary<Item, int[]>>(shop, "itemPriceAndStock");
-                List<Item> selling = Helper.Reflection.GetPrivateValue<List<Item>>(shop, "forSale");
+                Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
+                List<Item> selling = Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
                 List<Item> remove = new List<Item>();
                 List<Item> additions = new List<Item>();
 
                 foreach (Item i in selling)
-                    if (i is Chest chest && machinePile.Keys.Where(f => f.Equals(i.Name)).Any())
+                    if (i is Chest chest && machinePile.Keys.Any(f => f.Equals(i.Name)))
                     {
-                        Item cf = (simpleMachine) machinePile[machinePile.Keys.Where(f => f.Equals(i.Name)).FirstOrDefault()];
+                        Item cf = (simpleMachine) machinePile[machinePile.Keys.FirstOrDefault(f => f.Equals(i.Name))];
                         items.Add(cf, new int[] { chest.preservedParentSheetIndex, int.MaxValue });
                         additions.Add(cf);
                         remove.Add(i);
@@ -125,20 +125,20 @@ namespace CustomFarming
            
             if (Game1.activeClickableMenu is GameMenu)
             {
-                List<IClickableMenu> gameMenuPages = Helper.Reflection.GetPrivateField<List<IClickableMenu>>(Game1.activeClickableMenu, "pages").GetValue();
+                List<IClickableMenu> gameMenuPages = Helper.Reflection.GetField<List<IClickableMenu>>(Game1.activeClickableMenu, "pages").GetValue();
 
                 foreach (IClickableMenu menu in gameMenuPages)
                 {
                     if (menu is CraftingPage)
                     {
                         
-                        Item heldItem = Helper.Reflection.GetPrivateField<Item>(menu, "heldItem").GetValue();
+                        Item heldItem = Helper.Reflection.GetField<Item>(menu, "heldItem").GetValue();
 
                         if (heldItem != null && heldItem is StardewValley.Object && machinesForCrafting.ContainsKey((heldItem as StardewValley.Object).name))
                         {
                             heldItem = machinesForCrafting[(heldItem as StardewValley.Object).name].getOne();
                             
-                            Helper.Reflection.GetPrivateField<Item>(menu, "heldItem").SetValue(heldItem);
+                            Helper.Reflection.GetField<Item>(menu, "heldItem").SetValue(heldItem);
                         }
 
 
@@ -171,7 +171,7 @@ namespace CustomFarming
             {
                
                 GameMenu activeMenu = (GameMenu) Game1.activeClickableMenu;
-                List<IClickableMenu> gameMenuPages = Helper.Reflection.GetPrivateField<List<IClickableMenu>>(activeMenu, "pages").GetValue();
+                List<IClickableMenu> gameMenuPages = Helper.Reflection.GetField<List<IClickableMenu>>(activeMenu, "pages").GetValue();
 
                foreach(IClickableMenu menu in gameMenuPages)
                 {
@@ -210,7 +210,7 @@ namespace CustomFarming
                     }
                 }
 
-                Helper.Reflection.GetPrivateField<List<IClickableMenu>>(Game1.activeClickableMenu, "pages").SetValue(gameMenuPages);
+                Helper.Reflection.GetField<List<IClickableMenu>>(Game1.activeClickableMenu, "pages").SetValue(gameMenuPages);
         
                 
             }

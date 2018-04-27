@@ -1,15 +1,11 @@
 {
   "Name": "TMXLoader",
   "Author": "Platonymous",
-  "Version": {
-    "MajorVersion": 1,
-    "MinorVersion": 2,
-    "PatchVersion": 1,
-    "Build": null
-  },
+  "Version": "1.2.1",
   "Description": "Load TMX Maps into the Game",
   "UniqueID": "Platonymous.TMXLoader",
   "EntryDll": "TMXLoader.dll",
+  "MinimumApiVersion": "2.6-beta",
   "UpdateKeys": [ "Nexus:1820" ],
   "Dependencies": [
     {
