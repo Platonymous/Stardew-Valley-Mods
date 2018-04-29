@@ -6,7 +6,9 @@ using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using SObject = StardewValley.Object;
+using Newtonsoft.Json;
 
 namespace PlanImporter
 {
@@ -18,6 +20,19 @@ namespace PlanImporter
         {
             loadContentPacks();
             Helper.ConsoleCommands.Add("plan", "Imports the contents of a planner export into your farm",(s,p) => importFarm(p));
+            Helper.ConsoleCommands.Add("planweb", "Imports the contents of a planner id from the web into your farm",(s,p) => importFarmWeb(p));
+        }
+
+        public void importFarmWeb(string[] p)
+        {
+            if (p.Length == 0)
+            {
+                Monitor.Log("No plan id provided", LogLevel.Warn);
+                return;
+            }
+
+            if(getPlanFromId(p[0]))
+                importFarm(p);
         }
 
         public void importFarm(string[] p)
@@ -38,7 +53,8 @@ namespace PlanImporter
 
             if (!Imports.ContainsKey(id))
             {
-                Monitor.Log("Could not find a plan with the id " + id, LogLevel.Warn);
+                Monitor.Log("Could not find a plan with the id " + id + ". Checking online..", LogLevel.Warn);
+                importFarmWeb(p);
                 return;
             }
             Import import = Imports[id];
@@ -234,6 +250,28 @@ namespace PlanImporter
                 case "junimo-hut": return new JunimoHut(new BluePrint("Junimo Hut"), pos);
                 case "Shed": return new Building(new BluePrint("Shed"), pos);
                 default: return null;
+            }
+        }
+
+        public bool getPlanFromId(string id)
+        {
+            try
+            {
+                string data = new WebClient().DownloadString("https://stardew.info/api/" + id);
+                File.WriteAllText(Path.Combine(Helper.DirectoryPath, "imports", id + ".json"), data);
+                Import import = JsonConvert.DeserializeObject<Import>(data);
+                import.id = id;
+                if (Imports.ContainsKey(import.id))
+                    Imports[import.id] = import;
+                else
+                    Imports.Add(import.id, import);
+                Monitor.Log("Web import successful.", LogLevel.Trace);
+                return true;
+            }
+            catch
+            {
+                Monitor.Log("Something went wrong. Check the ID or your internet connection.", LogLevel.Warn);
+                return false;
             }
         }
 
