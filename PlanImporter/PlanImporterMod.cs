@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using SObject = StardewValley.Object;
 using Newtonsoft.Json;
+using System;
 
 namespace PlanImporter
 {
@@ -72,7 +73,7 @@ namespace PlanImporter
 
             Monitor.Log("OK", LogLevel.Trace);
 
-            Monitor.Log("Importing: " + id, LogLevel.Trace);
+            Monitor.Log("Importing: " + id, LogLevel.Info);
             List<ImportTile> list = import.tiles;
             list.AddRange(import.buildings);
             foreach(ImportTile tile in list)
@@ -84,8 +85,8 @@ namespace PlanImporter
 
                     if (tf is FruitTree ft)
                     {
-                        ft.growthStage = 5;
-                        ft.daysUntilMature = 0;
+                        ft.growthStage.Value = 5;
+                        ft.daysUntilMature.Value = 0;
                     }
 
                     if (farm.terrainFeatures.ContainsKey(pos))
@@ -106,7 +107,7 @@ namespace PlanImporter
                 Building building = getBuilding(tile.type, pos);
                 if (building != null)
                 {
-                    building.daysOfConstructionLeft = 0;
+                    building.daysOfConstructionLeft.Value = 0;
                     farm.buildings.Add(building);
                 }
 
@@ -147,7 +148,7 @@ namespace PlanImporter
                 case "oak-tree": return new Tree(1, 5);
                 case "pine-tree": return new Tree(3, 5);
                 case "maple-tree": return new Tree(2, 5);
-                case "tree": Tree tree = new Tree(1, 5); tree.stump = true; tree.health = 5f; return tree;
+                case "tree": Tree tree = new Tree(1, 5); tree.stump.Value = true; tree.health.Value = 5f; return tree;
                 case "large-rock": return new ResourceClump(672, 2, 2,pos);
                 case "large-log": return new ResourceClump(600, 2, 2, pos);
                 case "large-stump": return new ResourceClump(602, 2, 2, pos);
@@ -208,7 +209,7 @@ namespace PlanImporter
                 case "q-sprinkler": return new SObject(pos, 621, 1);
                 case "irid-sprinkler": return new SObject(pos, 645, 1);
                 case "scarecrow": return new SObject(pos, 8);
-                case "chest": return new Chest(true) { tileLocation = pos };
+                case "chest": Chest c = new Chest(true); c.TileLocation = pos; return c;
                 case "furnace": return new SObject(pos, 13);
                 case "charcoal": return new SObject(pos, 114);
                 case "seed-maker": return new SObject(pos, 25);
@@ -242,7 +243,7 @@ namespace PlanImporter
                 case "well": return new Building(new BluePrint("Well"), pos);
                 case "coop": return new Coop(new BluePrint("Coop"), pos);
                 case "barn": return new Barn(new BluePrint("Barn"), pos);
-                case "stable": return new Stable(new BluePrint("Stable"),pos);
+                case "stable": return new Stable(Guid.NewGuid(), new BluePrint("Stable"), pos);
                 case "slime-hutch": return new Building(new BluePrint("Slime Hutch"), pos);
                 case "water-obelisk": return new Building(new BluePrint("Water Obelisk"), pos);
                 case "earth-obelisk": return new Building(new BluePrint("Earth Obelisk"), pos);
@@ -265,7 +266,7 @@ namespace PlanImporter
                     Imports[import.id] = import;
                 else
                     Imports.Add(import.id, import);
-                Monitor.Log("Web import successful.", LogLevel.Trace);
+                Monitor.Log("Web import successful.", LogLevel.Info);
                 return true;
             }
             catch
