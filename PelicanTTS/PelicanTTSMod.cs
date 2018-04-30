@@ -15,23 +15,19 @@ namespace PelicanTTS
 
         public override void Entry(IModHelper helper)
         {
-    
             string tmppath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "Content"), "TTS");
 
             if (Directory.Exists(Path.Combine(Helper.DirectoryPath, "TTS")))
             {
                 Monitor.Log("Setting up Speech Directory");
                 if (!Directory.Exists(tmppath))
-                {
-                    Directory.Move(Path.Combine(Helper.DirectoryPath, "TTS"), tmppath);
-                }
-                
+                    Directory.CreateDirectory(tmppath);
+
+                    //Directory.Move(Path.Combine(Helper.DirectoryPath, "TTS"), tmppath);
             }
 
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
-            
-
         }
 
         private void GameEvents_OneSecondTick(object sender, EventArgs e)
@@ -39,31 +35,19 @@ namespace PelicanTTS
             if (!greeted && Game1.timeOfDay == 600 && Game1.activeClickableMenu == null)
             {
                 ModConfig config = Helper.ReadConfig<ModConfig>();
-                if (config.polly == "on" && pollySetup)
-                {
-                    if (SpeechHandlerPolly.culturelang.ToLower() == "en")
-                    {
-                        performGreeting();
-                    }
-                }else
-                {
-                    if (SpeechHandler.culturelang.ToLower() == "en")
-                    {
-                        performGreeting();
-                    }
-                }
+                if (config.polly == "on" && pollySetup && SpeechHandlerPolly.culturelang.ToLower() == "en")
+                    performGreeting();
+                else if (SpeechHandler.culturelang.ToLower() == "en")
+                    performGreeting();
 
                 greeted = true;
-
             }
         }
 
 
         private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
         {
-
             greeted = false;
-
         }
 
         private static string dayNameFromDayOfSeason(int dayOfSeason)
@@ -112,22 +96,16 @@ namespace PelicanTTS
                 day += "th";
             }
 
-            string greeting = "Good Morning " + Game1.player.name + ". It is " + dayNameFromDayOfSeason(Game1.dayOfMonth) + " the " + day + " day of " + Game1.currentSeason + ". ";
+            string greeting = "Good Morning " + Game1.player.Name + ". It is " + dayNameFromDayOfSeason(Game1.dayOfMonth) + " the " + day + " day of " + Game1.currentSeason + ". ";
 
             if (birthday != null)
             {
-                string person = birthday.name;
+                string person = birthday.Name;
                 if (birthday == Game1.player.getSpouse())
-                {
-                    if (birthday.gender == 0)
-                    {
+                    if (birthday.Gender == 0)
                         person = "Your husband";
-                    }
                     else
-                    {
                         person = "Your wife";
-                    }
-                }
 
                 greeting += "Today is " + person + "'s birthday.";
             }
@@ -159,15 +137,10 @@ namespace PelicanTTS
             if (config.polly == "off" || !pollySetup)
             {
                 if (e.KeyPressed == Keys.F7)
-                {
                     SpeechHandler.showInstalledVoices();
-                }
 
                 if (e.KeyPressed == Keys.F8)
-                {
                     SpeechHandler.demoVoices();
-                }
-
             }
         }
 
@@ -177,27 +150,21 @@ namespace PelicanTTS
             ControlEvents.KeyPressed -= ControlEvents_KeyPressed;
             ModConfig config = Helper.ReadConfig<ModConfig>();
             if (config.polly == "on" && pollySetup)
-            {
                 SpeechHandlerPolly.stop();
-            }
             else
-            {
                 SpeechHandler.stop();
-            }
         }
 
         private void checkPollySetup()
         {
+            pollySetup = true;
             ModConfig config = Helper.ReadConfig<ModConfig>();
             string tmppath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "Content"), "TTS");
                 string file = Path.Combine(Path.Combine(tmppath, "default"), "speech191348702.mp3");
                 FileInfo fileInfo = new FileInfo(file);
 
                 if (fileInfo.Exists && config.lang.StartsWith("en"))
-                {
                     pollySetup = true;
-
-                }
             
         }
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
@@ -209,16 +176,12 @@ namespace PelicanTTS
             ModConfig config = Helper.ReadConfig<ModConfig>();
             if(config.polly == "on" && pollySetup)
             {
-               
-
                 SpeechHandlerPolly.Monitor = Monitor;
                 SpeechHandlerPolly.start(Helper);
                 
             }
             else
-            {
                 SpeechHandler.start(Helper,Monitor);
-            }
             
             GameEvents.OneSecondTick += GameEvents_OneSecondTick;
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;

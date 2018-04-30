@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace PelicanTTS
 {
-    
+ /*   
     class VoiceControl
     {
         private static SpeechRecognitionEngine rec;
@@ -187,5 +187,5 @@ namespace PelicanTTS
         }
 
       
-    }
+    }*/
 }
