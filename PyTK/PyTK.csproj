@@ -45,6 +45,7 @@
     <Compile Include="CustomElementHandler\CustomObjectData.cs" />
     <Compile Include="CustomElementHandler\IDrawFromCustomObjectData.cs" />
     <Compile Include="CustomElementHandler\ICustomObject.cs" />
+    <Compile Include="CustomElementHandler\NetReplacable.cs" />
     <Compile Include="CustomElementHandler\PySObject.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
     <Compile Include="Events\PyTimeEvents.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="Types\Mail.cs" />
     <Compile Include="Types\Range.cs" />
     <Compile Include="Types\STime.cs" />
+    <Compile Include="Types\StringWorldData.cs" />
     <Compile Include="Types\TerrainSelector.cs" />
     <Compile Include="Types\ItemSelector.cs" />
     <Compile Include="Types\TileAction.cs" />

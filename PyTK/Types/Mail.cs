@@ -50,9 +50,9 @@ namespace PyTK.Types
         }
 
 
-        public AssetInjector<Dictionary<string, string>, Dictionary<string, string>> injectIntoMail()
+        public AssetInjector<IDictionary<string, string>, IDictionary<string, string>> injectIntoMail()
         {
-            Func<Dictionary<string, string>, Dictionary<string, string>> merger = new Func<Dictionary<string, string>, Dictionary<string, string>>(delegate (Dictionary<string, string> asset)
+            Func<IDictionary<string, string>, IDictionary<string, string>> merger = new Func<IDictionary<string, string>, IDictionary<string, string>>(delegate (IDictionary<string, string> asset)
             {
                 string t = text;
                 string type = (attachmentType == AttachmentType.QUEST || attachmentType == AttachmentType.QUEST_COMPLETION) ? "quest" : (attachmentType == AttachmentType.TOOLS) ? "tools" : "object";
@@ -62,7 +62,7 @@ namespace PyTK.Types
                 return asset.AddOrReplace(id, t);
             });
 
-            return new AssetInjector<Dictionary<string, string>, Dictionary<string, string>>($"Data/mail", merger).injectEdit();
+            return new AssetInjector<IDictionary<string, string>, IDictionary<string, string>>($"Data/mail", merger).injectEdit();
         }
 
     }

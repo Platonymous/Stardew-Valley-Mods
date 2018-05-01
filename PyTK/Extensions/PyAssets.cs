@@ -109,24 +109,24 @@ namespace PyTK.Extensions
 
         /* Data */
 
-        public static AssetInjector<Dictionary<TKey, TValue>, IAssetInfo> inject<TKey, TValue>(this Dictionary<TKey, TValue> t, string assetName)
+        public static AssetInjector<IDictionary<TKey, TValue>, IAssetInfo> inject<TKey, TValue>(this IDictionary<TKey, TValue> t, string assetName)
         {
-            return new AssetInjector<Dictionary<TKey, TValue>, IAssetInfo>(assetName, t).injectLoad();
+            return new AssetInjector<IDictionary<TKey, TValue>, IAssetInfo>(assetName, t).injectLoad();
         }
 
-        public static AssetInjector<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> injectAs<TDict, TKey, TValue>(this Dictionary<TKey, TValue> t, string assetName)
+        public static AssetInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>> injectAs<TDict, TKey, TValue>(this IDictionary<TKey, TValue> t, string assetName)
         {
-            return new AssetInjector<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>>(assetName, t).injectEdit();
+            return new AssetInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>>(assetName, t).injectEdit();
         }
 
-        public static AssetInjector<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> injectInto<TKey, TValue>(this Dictionary<TKey, TValue> t, string assetName)
+        public static AssetInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>> injectInto<TKey, TValue>(this IDictionary<TKey, TValue> t, string assetName)
         {
-            Func<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> merger = new Func<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>>(delegate (Dictionary<TKey, TValue> asset)
+            Func<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>> merger = new Func<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>>(delegate (IDictionary<TKey, TValue> asset)
             {
                 return asset.AddOrReplace(t);
             });
 
-            return new AssetInjector<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>>(assetName, merger).injectEdit();
+            return new AssetInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>>(assetName, merger).injectEdit();
         }
     }
 }

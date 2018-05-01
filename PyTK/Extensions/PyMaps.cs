@@ -28,7 +28,7 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is GameLocation location)
             {
-                Dictionary<Vector2, SObject> objects = location.objects;
+                Dictionary<Vector2, SObject> objects = (Dictionary<Vector2, SObject>)location.objects.Pairs;
                 if (objects.ContainsKey(t) && (objects[t] is T))
                     return ((T) objects[t]);
             }
@@ -41,7 +41,7 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is GameLocation location)
             {
-                Dictionary<Vector2, TerrainFeature> terrain = location.terrainFeatures;
+                Dictionary<Vector2, TerrainFeature> terrain = (Dictionary < Vector2, TerrainFeature > ) location.terrainFeatures.FieldDict;
                 if (terrain.ContainsKey(t) && (terrain[t] is T))
                     return ((T) terrain[t]);
             }
@@ -55,7 +55,7 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is DecoratableLocation location)
             {
-                List<Furniture> furniture = location.furniture;
+                List<Furniture> furniture = new List<Furniture>(location.furniture);
                 return ((T) furniture.Find(f => f.getBoundingBox(t).Intersects(new Microsoft.Xna.Framework.Rectangle((int) t.X * Game1.tileSize, (int) t.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize))));
             }
             return null;
@@ -67,7 +67,7 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is GameLocation location)
             {
-                Dictionary<Vector2, SObject> objects = location.objects;
+                Dictionary<Vector2, SObject> objects = (Dictionary<Vector2, SObject>) location.objects.Pairs;
                 if (objects.ContainsKey(t))
                     return objects[t];
             }
@@ -120,7 +120,7 @@ namespace PyTK.Extensions
                 for (int y = area.Y; y < area.Height; y++)
                 {
                     l.objects.Remove(new Vector2(x, y));
-                    l.largeTerrainFeatures.Remove(l.largeTerrainFeatures.Find(p => p.tilePosition == new Vector2(x,y)));
+                    l.largeTerrainFeatures.Remove(new List<LargeTerrainFeature>(l.largeTerrainFeatures).Find(p => p.tilePosition.Value == new Vector2(x,y)));
                     l.terrainFeatures.Remove(new Vector2(x, y));
                 }
 

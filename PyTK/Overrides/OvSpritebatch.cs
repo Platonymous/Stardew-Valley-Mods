@@ -115,7 +115,7 @@ namespace PyTK.Overrides
                 else if (!SaveHandler.hasSaveType(__instance) || __instance is IDrawFromCustomObjectData)
                 {
                     SObject obj = __instance;
-                    c = __instance is IDrawFromCustomObjectData draw ? draw.data : CustomObjectData.collection.Find(o => o.Value.sdvId == obj.parentSheetIndex && o.Value.bigCraftable == obj.bigCraftable).Value;
+                    c = __instance is IDrawFromCustomObjectData draw ? draw.data : CustomObjectData.collection.Find(o => o.Value.sdvId == obj.ParentSheetIndex && o.Value.bigCraftable == obj.bigCraftable.Value).Value;
                     dataChache.AddOrReplace(__instance, c);
                 }
                 else

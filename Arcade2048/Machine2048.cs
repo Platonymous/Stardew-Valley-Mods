@@ -33,13 +33,13 @@ namespace Arcade2048
 
         public override Item getOne()
         {
-            return new Machine2048(data) { tileLocation = Vector2.Zero };
+            return new Machine2048(data) { TileLocation = Vector2.Zero };
         }
 
         public override ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
         {
             CustomObjectData data = CustomObjectData.collection[additionalSaveData["id"]];
-            return new Machine2048(CustomObjectData.collection[additionalSaveData["id"]], (replacement as Chest).tileLocation);
+            return new Machine2048(CustomObjectData.collection[additionalSaveData["id"]], (replacement as Chest).TileLocation);
         }
 
 

@@ -657,6 +657,7 @@ namespace PyTK.Extensions
             return d;
         }    
 
+        /*
         public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenAddedToLocation<T>(this ItemSelector<T> t, Action<GameLocation,List<Vector2>> action, GameLocation l = null) where T : SObject
         {
             List<GameLocation> gls = new List<GameLocation>();
@@ -683,8 +684,9 @@ namespace PyTK.Extensions
                 d.AddOrReplace(gl, (o, e) => a(gl, e));
 
             return d.useAll(p => p.Key.objects.CollectionChanged += p.Value);
-        }
+        }*/
 
+        /*
         public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenAddedToLocation<T>(this TerrainSelector<T> t, Action<GameLocation, List<Vector2>> action, GameLocation l = null) where T : TerrainFeature
         {
             List<GameLocation> gls = new List<GameLocation>();
@@ -711,8 +713,8 @@ namespace PyTK.Extensions
                 d.AddOrReplace(gl, (o, e) => a(gl, e));
 
             return d.useAll(p => p.Key.terrainFeatures.CollectionChanged += p.Value);
-        }
-
+        } */
+        /*
         public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenRemovedFromLocation(this TileLocationSelector t, Action<GameLocation, List<Vector2>> action)
         {
             List<GameLocation> gls = new List<GameLocation>();
@@ -739,7 +741,7 @@ namespace PyTK.Extensions
                 d.AddOrReplace(gl, (o, e) => a(gl, e));
 
             return d.useAll(p => p.Key.terrainFeatures.CollectionChanged += p.Value);
-        }
+        }*/
 
         /* Locations */
 

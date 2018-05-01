@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Netcode;
 using PyTK.Extensions;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Buildings;
+using StardewValley.Network;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using System;
@@ -21,9 +23,11 @@ namespace PyTK.CustomElementHandler
         public static event EventHandler BeforeRebuilding;
         public static event EventHandler BeforeRemoving;
         public static event EventHandler FinishedRemoving;
+        public static bool inSync = false;
 
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
+        internal static bool inSaveMode { get; set; } = false;
 
         private static bool ceh = false;
 
@@ -80,7 +84,7 @@ namespace PyTK.CustomElementHandler
             ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
             OnFinishedRebuilding(EventArgs.Empty);
         }
-
+     
         internal static void RebuildRev()
         {
             OnBeforeRebuilding(EventArgs.Empty);
@@ -96,6 +100,11 @@ namespace PyTK.CustomElementHandler
             RemoveAllObjects(FindAllObjects(Game1.player, Game1.game1),predicate);
 
             Monitor.Log("Cleanup complete.");
+        }
+
+        public static object RebuildObject(object obj)
+        {
+            return rebuildElement(getDataString(obj), obj);
         }
 
         private static bool cleanupPredicate(object o)
@@ -158,9 +167,11 @@ namespace PyTK.CustomElementHandler
                 return;
 
             exploredObjects.Add(value);
-
             IDictionary dict = value as IDictionary;
             IList list = value as IList;
+            ICollection col = value as ICollection;
+            OverlaidDictionary<Vector2, SObject> ovd = value as OverlaidDictionary<Vector2, SObject>;
+            NetObjectList<Item> noli = value as NetObjectList<Item>;
 
             if (dict != null)
                 foreach (object item in dict.Values)
@@ -168,6 +179,15 @@ namespace PyTK.CustomElementHandler
             else if (list != null)
                 foreach (object item in list)
                     FindAllInstances(item, propNames, exploredObjects, found, list);
+            else if(col != null)
+                foreach(object item in col)
+                    FindAllInstances(item, propNames, exploredObjects, found, col);
+            else if (ovd != null)
+                foreach (object item in ovd.Values)
+                    FindAllInstances(item, propNames, exploredObjects, found, ovd);
+            else if (noli != null)
+                foreach (object item in noli)
+                    FindAllInstances(item, propNames, exploredObjects, found, noli);
             else
             {
                 if (found.ContainsKey(parent))
@@ -197,7 +217,8 @@ namespace PyTK.CustomElementHandler
             {
                 Chest rchest = new Chest(true);
                 rchest.name = chest.name;
-                rchest.items = chest.items;
+                rchest.items.Clear();
+                rchest.items.AddRange(chest.items);
                 return rchest;
             }
             return replacement;
@@ -208,25 +229,25 @@ namespace PyTK.CustomElementHandler
             if (o is SObject obj)
                 return obj.name;
             if (o is Tool t)
-                return t.name;
+                return t.Name;
             if (o is Furniture f)
                 return f.name;
             if (o is Hat h)
-                return h.name;
+                return h.Name;
             if (o is Boots b)
-                return b.name;
+                return b.Name;
             if (o is Ring r)
-                return r.name;
+                return r.Name;
             if (o is Building bl)
-                return bl.nameOfIndoors;
+                return bl.nameOfIndoors.Value;
             if (o is GameLocation gl)
                 return (gl.lastQuestionKey != null) ? gl.lastQuestionKey : "not available";
             if (o is FarmAnimal a)
-                return a.name;
+                return a.Name;
             if (o is NPC n)
-                return n.name;
+                return n.Name;
             if (o is FruitTree ft)
-                return ft.fruitSeason;
+                return ft.fruitSeason.Value;
 
             return "not available";
 
@@ -349,30 +370,30 @@ namespace PyTK.CustomElementHandler
             if (o is SObject obj)
                 obj.name = dataString;
             if (o is Tool t)
-                t.name = dataString;
+                t.Name = dataString;
             if (o is Furniture f)
                 f.name = dataString;
             if (o is Hat h)
-                h.name = dataString;
+                h.Name = dataString;
             if (o is Boots b)
-                b.name = dataString;
+                b.Name = dataString;
             if (o is Ring r)
-                r.name = dataString;
+                r.Name = dataString;
             if (o is Building bl)
-                bl.nameOfIndoors = dataString;
+                bl.nameOfIndoors.Value = dataString;
             if (o is GameLocation gl)
                 gl.lastQuestionKey = dataString;
             if (o is FarmAnimal a)
-                a.name = dataString;
+                a.Name = dataString;
             if (o is NPC n)
-                n.name = dataString;
+                n.Name = dataString;
             if (o is FruitTree ft)
-                ft.fruitSeason = dataString;
+                ft.fruitSeason.Value = dataString;
         }
 
         private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent)
         {
-            return FindAllInstances(obj, parent, new List<string>() { "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
+            return FindAllInstances(obj, parent, new List<string>() { "Value", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
         }
 
         private static void ReplaceAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate, Func<TIn, object> replacer, bool reverse = false)
@@ -397,7 +418,10 @@ namespace PyTK.CustomElementHandler
                                         GameLocation gl = PyUtils.getAllLocationsAndBuidlings().Find(l => l.objects == dict);
                                         if (gl != null)
                                         {
-                                            gl.terrainFeatures.AddOrReplace(k, (TerrainFeature)replacer(item));
+                                            if (gl.terrainFeatures.ContainsKey(k))
+                                                gl.terrainFeatures[k] = (TerrainFeature)replacer(item);
+                                            else
+                                                gl.terrainFeatures.Add(k, (TerrainFeature)replacer(item));
                                         }
 
                                         dict.Remove(k);
@@ -405,6 +429,39 @@ namespace PyTK.CustomElementHandler
                                     else
                                         dict[k] = (SObject)replacer(item);
 
+                                    break;
+                                }
+                        }
+                        else if (key is OverlaidDictionary<Vector2, SObject> ovdict)
+                        {
+                            foreach (Vector2 k in ovdict.Keys.Reverse())
+                                if (ovdict[k] == obj)
+                                {
+                                    if (obj is SObject sobj && splitElemets(sobj.name).Count() > 2 && splitElemets(sobj.name)[1] == "Terrain")
+                                    {
+                                        GameLocation gl = PyUtils.getAllLocationsAndBuidlings().Find(l => l.objects == ovdict);
+                                        if (gl != null)
+                                        {
+                                            if (gl.terrainFeatures.ContainsKey(k))
+                                                gl.terrainFeatures[k] = (TerrainFeature)replacer(item);
+                                            else
+                                                gl.terrainFeatures.Add(k, (TerrainFeature)replacer(item));
+                                        }
+
+                                        ovdict.Remove(k);
+                                    }
+                                    else
+                                        ovdict[k] = (SObject)replacer(item);
+
+                                    break;
+                                }
+                        }
+                        else if (key is SerializableDictionary<Vector2, TerrainFeature> sdictT)
+                        {
+                            foreach (Vector2 k in sdictT.Keys.Reverse())
+                                if (sdictT[k] == obj)
+                                {
+                                    sdictT[k] = (TerrainFeature)replacer(item);
                                     break;
                                 }
                         }
@@ -423,6 +480,13 @@ namespace PyTK.CustomElementHandler
                             list.CopyTo(lobj,0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
                             list[index] = replacer(item);
+                        }
+                        else if (key is NetObjectList<Item> noli)
+                        {
+                            Item[] lobj = new Item[noli.Count];
+                            noli.CopyTo(lobj, 0);
+                            int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
+                            noli[index] = (Item) replacer(item);
                         }
                         else if (key is Array arr)
                         {
@@ -457,10 +521,33 @@ namespace PyTK.CustomElementHandler
                                     break;
                                 }
                         }
+                        else if (key is OverlaidDictionary<Vector2, SObject> ovdict)
+                        {
+                            foreach (Vector2 k in ovdict.Keys)
+                                if (ovdict[k] == obj)
+                                {
+                                    ovdict.Remove(k);
+                                    break;
+                                }
+                        }
+                        else if (key is SerializableDictionary<Vector2, TerrainFeature> sdict)
+                        {
+                            foreach (Vector2 k in sdict.Keys)
+                                if (sdict[k] == obj)
+                                {
+                                    sdict.Remove(k);
+                                    break;
+                                }
+                        }
                         else if (key is List<Item> list)
                         {
                             int index = list.FindIndex(p => p is TIn && p == obj);
                             list.RemoveAt(index);
+                        }
+                        else if (key is NetObjectList<Item> noli)
+                        {
+                            int index = noli.ToList<Item>().FindIndex(p => p is TIn && p == obj);
+                            noli.RemoveAt(index);
                         }
                         else if (key is List<Furniture> furniture)
                         {

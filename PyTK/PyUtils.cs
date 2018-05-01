@@ -10,6 +10,7 @@ using StardewValley.Buildings;
 using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PyTK.Extensions;
 
 namespace PyTK
 {
@@ -79,7 +80,7 @@ namespace PyTK
                 if (location is BuildableGameLocation bgl)
                     foreach (Building building in bgl.buildings)
                         if (building.indoors != null)
-                            list.Add(building.indoors);
+                            list.Add(building.indoors.Value);
 
             return list;
         }

@@ -13,7 +13,7 @@ namespace PyTK.ConsoleCommands
              {
                  if (Game1.currentLocation is GameLocation location)
                  {
-                     int o = location.objects.Count + location.largeTerrainFeatures.Count + location.terrainFeatures.Count;
+                     int o = location.objects.Count() + location.largeTerrainFeatures.Count + location.terrainFeatures.Count();
 
                      location.objects.Clear();
                      location.largeTerrainFeatures.Clear();

@@ -5,6 +5,8 @@ using StardewValley.Objects;
 using Microsoft.Xna.Framework;
 using PyTK.Extensions;
 using StardewModdingAPI;
+using Netcode;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace PyTK.CustomElementHandler
 {
@@ -13,6 +15,7 @@ namespace PyTK.CustomElementHandler
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
+        public SObject sObject;
         public CustomObjectData data { get; set; }
 
         public PySObject()
@@ -20,16 +23,25 @@ namespace PyTK.CustomElementHandler
 
         }
 
+
         public PySObject(CustomObjectData data)
             : base(data.sdvId,1)
         {
+            sObject = new SObject(data.sdvId, 1);
             this.data = data;
         }
 
         public PySObject(CustomObjectData data, Vector2 tileLocation)
             : base(tileLocation,data.sdvId)
         {
+            sObject = new SObject(tileLocation, data.sdvId);
             this.data = data;
+        }
+
+        public virtual void rebuildData()
+        {
+            if (CustomObjectData.collection.Find(c => c.Value.getObject().Name == Name) is KeyValuePair<string,CustomObjectData> cd)
+                data = cd.Value;
         }
 
         public virtual Dictionary<string, string> getAdditionalSaveData()
@@ -39,24 +51,57 @@ namespace PyTK.CustomElementHandler
 
         public virtual object getReplacement()
         {
-            return new Chest(true) { playerChoiceColor = Color.Magenta };
+            Chest c = new Chest(true);
+            c.playerChoiceColor.Value = Color.Magenta;
+            c.TileLocation = TileLocation;
+            return c;
+        }
+
+        public virtual void checkData()
+        {
+            if (data == null)
+                rebuildData();
+        }
+
+        public override void updateWhenCurrentLocation(GameTime time, GameLocation environment)
+        {
+            checkData();
+            base.updateWhenCurrentLocation(time, environment);
+        }
+
+        public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
+        {
+            checkData();
+            base.draw(spriteBatch, x, y, alpha);
+        }
+
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
+        {
+            checkData();
+            base.drawInMenu(spriteBatch, location, scaleSize, transparency, layerDepth, drawStackNumber, color, drawShadow);
+        }
+
+        public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, Farmer f)
+        {
+            checkData();
+            base.drawWhenHeld(spriteBatch, objectPosition, f);
         }
 
         public override Item getOne()
         {
             if(data.bigCraftable)
-                return new PySObject(data, Vector2.Zero) { name = name, price = price, quality = quality };
+                return new PySObject(data, Vector2.Zero) { name = name, Price = price, Quality = quality };
             else
-                return new PySObject(data) { tileLocation = Vector2.Zero, name = name, price = price, quality = quality };
+                return new PySObject(data) { TileLocation = Vector2.Zero, name = name, Price = price, Quality = quality };
         }
 
         public virtual void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
-            tileLocation = additionalSaveData["tileLocation"].Split(',').toList(i => i.toInt()).toVector<Vector2>();
-            price = additionalSaveData["price"].toInt();
-            name = additionalSaveData["name"];
-            stack = additionalSaveData["stack"].toInt();
-            quality = additionalSaveData["quality"].toInt();
+            TileLocation = additionalSaveData["tileLocation"].Split(',').toList(i => i.toInt()).toVector<Vector2>();
+            Price = additionalSaveData["price"].toInt();
+            Name = additionalSaveData["name"];
+            Stack = additionalSaveData["stack"].toInt();
+            Quality = additionalSaveData["quality"].toInt();
         }
 
         public virtual ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
