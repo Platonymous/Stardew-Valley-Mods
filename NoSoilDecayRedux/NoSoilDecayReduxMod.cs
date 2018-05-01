@@ -11,6 +11,7 @@ using PyTK.Extensions;
 using Harmony;
 using System.Reflection;
 using PyTK.Events;
+using Netcode;
 
 namespace NoSoilDecayRedux
 {
@@ -41,7 +42,7 @@ namespace NoSoilDecayRedux
 
         private static void SaveEvents_AfterLoad(object sender, System.EventArgs e)
         {
-            player = Game1.player.name + "_" + Game1.uniqueIDForThisGame.ToString();
+            player = Game1.player.Name + "_" + Game1.uniqueIDForThisGame.ToString();
             loadHoeDirt();
             restoreHoeDirt();
         }
@@ -49,22 +50,24 @@ namespace NoSoilDecayRedux
         private static void restoreHoeDirt()
         {
             foreach (GameLocation l in hoeDirtChache.Keys)
-                foreach (Vector2 v in hoeDirtChache[l])
+                if (l is GameLocation)
                 {
-                    if (!l.terrainFeatures.ContainsKey(v))
-                        l.terrainFeatures.Add(v, null);
-
-                    if (!(l.terrainFeatures[v] is HoeDirt))
+                    foreach (Vector2 v in hoeDirtChache[l])
                     {
-                        l.terrainFeatures[v] = Game1.isRaining ? new HoeDirt(1) : new HoeDirt(0);
-                        if (l.objects.ContainsKey(v) && l.objects[v] is SObject o && (o.name.Equals("Weeds") || o.name.Equals("Stone") || o.name.Equals("Twig")))
+                        if (!l.terrainFeatures.Keys.Contains(v))
+                            l.terrainFeatures.Add(v, new NetRef<TerrainFeature>(Game1.isRaining ? new HoeDirt(1) : new HoeDirt(0)));
+
+                        if (!(l.terrainFeatures[v] is HoeDirt))
+                            l.terrainFeatures[v] = new NetRef<TerrainFeature>(Game1.isRaining ? new HoeDirt(1) : new HoeDirt(0));
+
+                        if (l.objects.Keys.Contains(v) && l.objects[v] is SObject o && (o.Name.Equals("Weeds") || o.Name.Equals("Stone") || o.Name.Equals("Twig")))
                             l.objects.Remove(v);
+
                     }
 
                     foreach (SObject o in l.objects.Values)
                         if (o.name.Contains("Sprinkler"))
                             o.DayUpdate(l);
-
                 }
         }
 
@@ -73,15 +76,18 @@ namespace NoSoilDecayRedux
             hoeDirtChache = new Dictionary<GameLocation, List<Vector2>>();
             foreach (GameLocation location in PyUtils.getAllLocationsAndBuidlings())
             {
-                if (!hoeDirtChache.ContainsKey(location))
-                    hoeDirtChache.Add(location, new List<Vector2>());
+                if (location is GameLocation)
+                {
+                    if (!hoeDirtChache.ContainsKey(location))
+                        hoeDirtChache.Add(location, new List<Vector2>());
 
-                hoeDirtChache[location] = location.terrainFeatures
-                    .Where(t => t.Value is HoeDirt)
-                    .Select(t => t.Key).ToList();
+                    hoeDirtChache[location] = location.terrainFeatures.Keys
+                        .Where(t => location.terrainFeatures[t] is HoeDirt)
+                        .ToList();
+                }
             }
 
-            string savestring = string.Join(";",hoeDirtChache.toList(l => l.Key.name + ":" + string.Join(",", l.Value.toList(v => $"{v.X}-{v.Y}"))));
+            string savestring = string.Join(";",hoeDirtChache.toList(l => l.Key.Name + ":" + string.Join(",", l.Value.toList(v => $"{v.X}-{v.Y}"))));
 
             int index = savetiles.save.FindIndex(s => s.StartsWith(player + ">"));
 
@@ -111,7 +117,7 @@ namespace NoSoilDecayRedux
                     string locationname = loc.Split(':')[0];
                     loc.Replace(locationname + ":", "");
                     List<string> vstrings = new List<string>(loc.Split(','));
-                    GameLocation location = PyUtils.getAllLocationsAndBuidlings().Find(e => e.name == locationname);
+                    GameLocation location = PyUtils.getAllLocationsAndBuidlings().Find(e => e.Name == locationname);
 
                     if (location != null && !hoeDirtChache.ContainsKey(location))
                         hoeDirtChache.Add(location, new List<Vector2>());
