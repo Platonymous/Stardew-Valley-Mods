@@ -1,7 +1,7 @@
 {
   "Name": "Snake",
   "Author": "Platonymous",
-  "Version": "1.0.0",
+  "Version": "1.0.2",
   "Description": "Play Snake.",
   "UniqueID": "Platonymous.Snake",
   "EntryDll": "Snake.dll",

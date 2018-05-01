@@ -33,13 +33,13 @@ namespace Snake
 
         public override Item getOne()
         {
-            return new SnakeMachine(data) { tileLocation = Vector2.Zero };
+            return new SnakeMachine(data) { TileLocation = Vector2.Zero };
         }
 
         public override ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
         {
             CustomObjectData data = CustomObjectData.collection[additionalSaveData["id"]];
-            return new SnakeMachine(CustomObjectData.collection[additionalSaveData["id"]], (replacement as Chest).tileLocation);
+            return new SnakeMachine(CustomObjectData.collection[additionalSaveData["id"]], (replacement as Chest).TileLocation);
         }
 
 

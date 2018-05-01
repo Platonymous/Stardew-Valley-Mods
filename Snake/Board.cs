@@ -5,6 +5,7 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using static Snake.SnakeMinigame;
+using Netcode;
 
 namespace Snake
 {
@@ -93,7 +94,7 @@ namespace Snake
 
         public void SpawnCollectible()
         {
-            List<int> indexes = new List<KeyValuePair<int, string>>(Game1.objectInformation.FindAll(o => o.Value.Contains("Basic - 75") || o.Value.Contains("Basic -79"))).toList(i => i.Key);
+            List<int> indexes = new List<KeyValuePair<int, string>>(((Dictionary<int,string>)Game1.objectInformation).FindAll(o => o.Value.Contains("Basic - 75") || o.Value.Contains("Basic -79"))).toList(i => i.Key);
 
             int index = indexes[GameInstance.Random.Next(0,indexes.Count-1)];
 

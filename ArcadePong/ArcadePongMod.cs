@@ -77,7 +77,8 @@ namespace ArcadePong
         internal static void Prefix(Mod __instance, ref EventArgsInput e)
         {
             ArcadePongMod.pong = __instance;
-            e = new EventArgsInput(SButton.A, e.Cursor, false, false);
+    
+            e = new EventArgsInput(SButton.A, e.Cursor, false, false, new HashSet<SButton>());
         }
     }
 
