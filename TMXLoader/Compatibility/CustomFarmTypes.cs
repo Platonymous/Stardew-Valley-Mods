@@ -134,17 +134,17 @@ namespace TMXLoader.Compatibility
                 int sourceYTile = greenHousePosition.Y - 2;
                 Game1.isRaining = false;
 
-                location.temporarySprites.Add(new TemporaryAnimatedSprite(Game1.mouseCursors, new Rectangle(288, 1349, 19, 28), 150f, 5, 999, new Vector2((float)((sourceXTile - 3) * Game1.tileSize + 2 * Game1.pixelZoom), (float)((sourceYTile - 1) * Game1.tileSize - Game1.tileSize / 2)), false, false)
+                location.temporarySprites.Add(new TemporaryAnimatedSprite("LooseSprites\\Cursors", new Rectangle(288, 1349, 19, 28), 150f, 5, 999, new Vector2((float)((sourceXTile - 3) * Game1.tileSize + 2 * Game1.pixelZoom), (float)((sourceYTile - 1) * Game1.tileSize - Game1.tileSize / 2)), false, false)
                 {
                     scale = (float)Game1.pixelZoom,
                     layerDepth = 0.0961f
                 });
-                location.temporarySprites.Add(new TemporaryAnimatedSprite(Game1.mouseCursors, new Rectangle(288, 1377, 19, 28), 140f, 5, 999, new Vector2((float)((sourceXTile + 3) * Game1.tileSize - 4 * Game1.pixelZoom), (float)((sourceYTile - 2) * Game1.tileSize)), false, false)
+                location.temporarySprites.Add(new TemporaryAnimatedSprite("LooseSprites\\Cursors", new Rectangle(288, 1377, 19, 28), 140f, 5, 999, new Vector2((float)((sourceXTile + 3) * Game1.tileSize - 4 * Game1.pixelZoom), (float)((sourceYTile - 2) * Game1.tileSize)), false, false)
                 {
                     scale = (float)Game1.pixelZoom,
                     layerDepth = 0.0961f
                 });
-                location.temporarySprites.Add(new TemporaryAnimatedSprite(Game1.mouseCursors, new Rectangle(390, 1405, 18, 32), 1000f, 2, 999, new Vector2((float)(sourceXTile * Game1.tileSize + 2 * Game1.pixelZoom), (float)((sourceYTile - 3) * Game1.tileSize)), false, false)
+                location.temporarySprites.Add(new TemporaryAnimatedSprite("LooseSprites\\Cursors", new Rectangle(390, 1405, 18, 32), 1000f, 2, 999, new Vector2((float)(sourceXTile * Game1.tileSize + 2 * Game1.pixelZoom), (float)((sourceYTile - 3) * Game1.tileSize)), false, false)
                 {
                     scale = (float)Game1.pixelZoom,
                     layerDepth = 0.0961f
@@ -172,7 +172,7 @@ namespace TMXLoader.Compatibility
                 Utility.addStarsAndSpirals(location, sourceXTile, sourceYTile - 1, 7, 7, 15000, 150, Color.White, null, false);
                 Game1.currentLightSources.Add(new LightSource(4, new Vector2(sourceXTile, sourceYTile) * Game1.tileSize, 4f, Color.DarkGoldenrod));
                 List<TemporaryAnimatedSprite> temporarySprites1 = location.temporarySprites;
-                TemporaryAnimatedSprite temporaryAnimatedSprite1 = new TemporaryAnimatedSprite(Game1.mouseCursors, new Rectangle(294, 1432, 16, 16), 300f, 4, 999, new Vector2((sourceXTile * Game1.tileSize), ((sourceYTile - 3) * Game1.tileSize - Game1.tileSize)), false, false);
+                TemporaryAnimatedSprite temporaryAnimatedSprite1 = new TemporaryAnimatedSprite("LooseSprites\\Cursors", new Rectangle(294, 1432, 16, 16), 300f, 4, 999, new Vector2((sourceXTile * Game1.tileSize), ((sourceYTile - 3) * Game1.tileSize - Game1.tileSize)), false, false);
                 temporaryAnimatedSprite1.scale = Game1.pixelZoom;
                 temporaryAnimatedSprite1.layerDepth = 1f;
                 int num1 = 1;
@@ -218,7 +218,7 @@ namespace TMXLoader.Compatibility
 
                     string[] position = __instance.map.Properties["Greenhouse"].ToString().Split(',');
                     Point greenHousePosition = new Point(int.Parse(position[0]), int.Parse(position[1]));
-                    b.Draw(__instance.houseTextures, Game1.GlobalToLocal(Game1.viewport, new Vector2((greenHousePosition.X - 3) * 64f, (greenHousePosition.Y - 9) * 64f)), new Rectangle?(greenhouseSource), Color.White, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, 0.0704f);
+                    b.Draw(Farm.houseTextures, Game1.GlobalToLocal(Game1.viewport, new Vector2((greenHousePosition.X - 3) * 64f, (greenHousePosition.Y - 9) * 64f)), new Rectangle?(greenhouseSource), Color.White, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, 0.0704f);
                 }
             }
         }
@@ -232,7 +232,7 @@ namespace TMXLoader.Compatibility
                 Point greenHousePosition = new Point(int.Parse(position[0]), int.Parse(position[1]));
 
                 GameLocation greenhouse = Game1.getLocationFromName("Greenhouse");
-                Warp warp = greenhouse.warps.Find(w => w.TargetName == "Farm" && w.TargetX == 28 && w.TargetY == 16);
+                Warp warp = new List<Warp>(greenhouse.warps).Find(w => w.TargetName == "Farm" && w.TargetX == 28 && w.TargetY == 16);
                 if (warp != null)
                 {
                     warp.TargetX = greenHousePosition.X;

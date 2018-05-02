@@ -71,6 +71,9 @@ namespace PyTK.CustomElementHandler
 
         internal static void Replace()
         {
+            if (Game1.IsMultiplayer && Game1.IsClient)
+                return;
+
             OnBeforeRemoving(EventArgs.Empty);
             ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
             ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
@@ -79,6 +82,9 @@ namespace PyTK.CustomElementHandler
 
         internal static void Rebuild()
         {
+            if (Game1.IsMultiplayer && Game1.numberOfPlayers() > 1 && Game1.IsServer)
+                return;
+
             OnBeforeRebuilding(EventArgs.Empty);
             ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
             ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
@@ -87,6 +93,9 @@ namespace PyTK.CustomElementHandler
      
         internal static void RebuildRev()
         {
+            if (Game1.IsMultiplayer && Game1.numberOfPlayers() > 1 && Game1.IsServer)
+                return;
+
             OnBeforeRebuilding(EventArgs.Empty);
             ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o), true);
             ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o), true);

@@ -59,6 +59,7 @@
     <Compile Include="Lua\PyLua.cs" />
     <Compile Include="Overrides\OvLocations.cs" />
     <Compile Include="Overrides\OvLongevity.cs" />
+    <Compile Include="Overrides\OvServer.cs" />
     <Compile Include="Overrides\OvSpritebatch.cs" />
     <Compile Include="Overrides\OvTV.cs" />
     <Compile Include="Overrides\OvSleep.cs" />

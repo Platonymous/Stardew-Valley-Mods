@@ -48,8 +48,8 @@ namespace Portraiture
         {
             activeFolder = Math.Max(activeFolder, 0);
 
-            if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.name))
-                return pTextures[folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.name];
+            if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.Name))
+                return pTextures[folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.Name];
             else if (pTextures.ContainsKey(folders[activeFolder] + ">" + name))
                 return pTextures[folders[activeFolder] + ">" + name];
             
@@ -96,10 +96,13 @@ namespace Portraiture
 
         private static void saveConfig()
         {
-            string directoryName = folders[activeFolder];
-            string savstring = directoryName;
-            PortraitureMod.config.active = savstring;
-            PortraitureMod.helper.WriteConfig(PortraitureMod.config);
+            if (folders.Count > activeFolder && activeFolder >= 0)
+            {
+                string directoryName = folders[activeFolder];
+                string savstring = directoryName;
+                PortraitureMod.config.active = savstring;
+                PortraitureMod.helper.WriteConfig(PortraitureMod.config);
+            }
         }
 
 

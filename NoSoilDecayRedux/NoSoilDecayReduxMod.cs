@@ -117,8 +117,15 @@ namespace NoSoilDecayRedux
                     string locationname = loc.Split(':')[0];
                     loc.Replace(locationname + ":", "");
                     List<string> vstrings = new List<string>(loc.Split(','));
-                    GameLocation location = PyUtils.getAllLocationsAndBuidlings().Find(e => e.Name == locationname);
-
+                    GameLocation location;
+                    try
+                    {
+                         location = PyUtils.getAllLocationsAndBuidlings().Find(e => e.Name == locationname);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                     if (location != null && !hoeDirtChache.ContainsKey(location))
                         hoeDirtChache.Add(location, new List<Vector2>());
 

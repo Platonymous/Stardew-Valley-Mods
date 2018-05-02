@@ -26,7 +26,7 @@ namespace SeedBag
         public Dictionary<string, string> getAdditionalSaveData()
         {
             Dictionary<string, string> savedata = new Dictionary<string, string>();
-            savedata.Add("name", name);
+            savedata.Add("name", Name);
             return savedata;
         }
 
@@ -51,7 +51,7 @@ namespace SeedBag
             Chest chest = (Chest)replacement;
             if (!chest.isEmpty())
             {
-                if(chest.items[0].category == -19)
+                if(new List<Item>(chest.items)[0].Category == -19)
                     attachments[1] = (SObject)chest.items[0];
                 else
                     attachments[0] = (SObject)chest.items[0];
@@ -66,11 +66,6 @@ namespace SeedBag
             :base()
         {
             build();
-        }
-
-        public override string Name
-        {
-            get => name;
         }
 
         public override bool canBeTrashed()
@@ -96,41 +91,51 @@ namespace SeedBag
             return new SeedBagTool();
         }
 
+        public override void setNewTileIndexForUpgradeLevel()
+        {
+        }
+
+
         private void build()
         {
             if (texture == null)
                 loadTextures();
 
-            name = "Seed Bag";
+            Name = "Seed Bag";
             description = "Empty";
 
-            numAttachmentSlots = 2;
-            attachments = new SObject[numAttachmentSlots];
-            initialParentTileIndex = 77;
-            currentParentTileIndex = 77;
-            indexOfMenuItemView = 0;
-            upgradeLevel = 5;
+            numAttachmentSlots.Value = 2;
+            attachments.SetCount(numAttachmentSlots);
+            InitialParentTileIndex = 77;
+            CurrentParentTileIndex = 77;
+            IndexOfMenuItemView = 0;
+            UpgradeLevel = 5;
            
-            instantUse = false;
+            InstantUse = false;
             inUse = false;
+        }
+        public override void endUsing(GameLocation location, Farmer who)
+        {
+            base.endUsing(location, who);
         }
 
         public override int attachmentSlots()
         {
-            return numAttachmentSlots;
+            return numAttachmentSlots.Value;
         }
         
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
-            spriteBatch.Draw(texture, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(texture, Game1.tileSize / 4, Game1.tileSize / 4, this.indexOfMenuItemView)), Color.White * transparency, 0f, new Vector2((float)(Game1.tileSize / 4 / 2), (float)(Game1.tileSize / 4 / 2)), (float)Game1.pixelZoom * scaleSize, SpriteEffects.None, layerDepth);
+            spriteBatch.Draw(texture, location + new Vector2(32f, 32f), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(texture, 16, 16, this.IndexOfMenuItemView)), color * transparency, 0.0f, new Vector2(8f, 8f), 4f * scaleSize, SpriteEffects.None, layerDepth);
 
             if (inUse)
             {
                 StardewValley.Farmer f = Game1.player;
                 Vector2 vector = f.getLocalPosition(Game1.viewport) + f.jitter + f.armOffset;
                 int num = (int)vector.Y - ((Game1.tileSize * 5)/2);
-                Game1.spriteBatch.Draw(texture, new Vector2(vector.X, (float)num), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(texture, Game1.tileSize / 4, Game1.tileSize / 4, this.indexOfMenuItemView)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom * scaleSize, SpriteEffects.None, Math.Max(0f, (float)(f.getStandingY() + Game1.tileSize / 2) / 10000f));
+                spriteBatch.Draw(texture, new Vector2(vector.X, (float)num), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(Game1.toolSpriteSheet, 16, 16, this.IndexOfMenuItemView)), color * transparency, 0.0f, new Vector2(8f, 8f), 4f * scaleSize, SpriteEffects.None, Math.Max(0f, (float)(f.getStandingY() + Game1.tileSize / 2) / 10000f));
             }
+            
         }
 
         public override void drawAttachments(SpriteBatch b, int x, int y)
@@ -142,7 +147,6 @@ namespace SeedBag
             Rectangle attachement2SourceRectangle = new Rectangle(0, 0, 64, 64);
             b.Draw(att2Texture, new Vector2(x, y + offset), new Rectangle?(attachement2SourceRectangle), Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
 
-
             if (attachments.Count() > 0)
             {
                 if(attachments[0] is SObject)
@@ -151,6 +155,7 @@ namespace SeedBag
                 if (attachments[1] is SObject)
                     attachments[1].drawInMenu(b, new Vector2(x, y + offset), 1f);
             }
+            
         }
 
         public override bool onRelease(GameLocation location, int x, int y, StardewValley.Farmer who)
@@ -167,7 +172,7 @@ namespace SeedBag
 
         public override bool canThisBeAttached(SObject o)
         {
-            if (o == null || o.category == -74 || o.category == -19) { return true; } else { return false; }
+            if (o == null || o.Category == -74 || o.Category == -19) { return true; } else { return false; }
         }
 
 
@@ -175,21 +180,21 @@ namespace SeedBag
         {
             SObject priorAttachement = null;
 
-            if (o != null && o.category == -74 && attachments[0] != null)
-                priorAttachement = new SObject(Vector2.Zero,attachments[0].parentSheetIndex,attachments[0].stack);
+            if (o != null && o.Category == -74 && attachments[0] != null)
+                priorAttachement = new SObject(Vector2.Zero,attachments[0].ParentSheetIndex,attachments[0].Stack);
 
-            if (o != null && o.category == -19 && attachments[1] != null)
-                priorAttachement = new SObject(Vector2.Zero, attachments[1].parentSheetIndex, attachments[1].stack);
+            if (o != null && o.Category == -19 && attachments[1] != null)
+                priorAttachement = new SObject(Vector2.Zero, attachments[1].ParentSheetIndex, attachments[1].Stack);
 
             if (o == null)
             {
                 if(attachments[0] != null)
                 {
-                    priorAttachement = new SObject(Vector2.Zero, attachments[0].parentSheetIndex, attachments[0].stack);
+                    priorAttachement = new SObject(Vector2.Zero, attachments[0].ParentSheetIndex, attachments[0].Stack);
                     attachments[0] = null;
                 }else if (attachments[1] != null)
                 {
-                    priorAttachement = new SObject(Vector2.Zero, attachments[1].parentSheetIndex, attachments[1].stack);
+                    priorAttachement = new SObject(Vector2.Zero, attachments[1].ParentSheetIndex, attachments[1].Stack);
                     attachments[1] = null;
                 }
 
@@ -199,10 +204,10 @@ namespace SeedBag
 
             if (canThisBeAttached(o))
             {
-                if(o.category == -74)
+                if(o.Category == -74)
                     attachments[0] = o;
 
-                if (o.category == -19)
+                if (o.Category == -19)
                     attachments[1] = o;
 
                 Game1.playSound("button1");
@@ -212,9 +217,14 @@ namespace SeedBag
             return null;
         }
 
+        public override void leftClick(Farmer who)
+        {
+            base.leftClick(who);
+        }
+
         public override void DoFunction(GameLocation location, int x, int y, int power, StardewValley.Farmer who)
         {
-            if(attachments.Count() == 0 || (attachments[0] == null && attachments[1] == null))
+            if (attachments.Count == 0 || (attachments[0] == null && attachments[1] == null))
             {
                 Game1.showRedMessage("Out of seeds");
                 return;
@@ -231,12 +241,12 @@ namespace SeedBag
             {
                 if (location.terrainFeatures.ContainsKey(current) && location.terrainFeatures[current] is HoeDirt hd && hd.crop == null && !location.objects.ContainsKey(current))
                 {
-                    if (attachments[1] != null && hd.fertilizer <= 0)
+                    if (attachments[1] != null && hd.fertilizer.Value <= 0)
                     {
-                        if (hd.plant(attachments[1].ParentSheetIndex, (int)current.X, (int)current.Y, who, true))
+                        if (hd.plant(attachments[1].ParentSheetIndex, (int)current.X, (int)current.Y, who, true,location))
                         {
-                            attachments[1].stack--;
-                            if (attachments[1].stack == 0)
+                            attachments[1].Stack--;
+                            if (attachments[1].Stack == 0)
                             {
                                 attachments[1] = null;
                                 Game1.showRedMessage("Out of fertilizer");
@@ -247,10 +257,10 @@ namespace SeedBag
                     
                     if (attachments[0] != null)
                     {
-                        if (hd.plant(attachments[0].ParentSheetIndex, (int)current.X, (int)current.Y, who, false))
+                        if (hd.plant(attachments[0].ParentSheetIndex, (int)current.X, (int)current.Y, who, false,location))
                         {
-                            attachments[0].stack--;
-                            if (attachments[0].stack == 0)
+                            attachments[0].Stack--;
+                            if (attachments[0].Stack == 0)
                             {
                                 attachments[0] = null;
                                 Game1.showRedMessage("Out of seeds");
@@ -264,8 +274,7 @@ namespace SeedBag
        
         public override string getDescription()
         {
-
-            if (attachments.Count() > 0)
+            if (attachments.Count > 0)
             {
                 if(attachments[0] != null)
                 {
@@ -289,18 +298,8 @@ namespace SeedBag
                 int width = Game1.tileSize * 4 + Game1.tileSize / 4;
                 return Game1.parseText(text, smallFont, width);
             }
-           
 
         }
 
-        protected override string loadDisplayName()
-        {
-            return name;
-        }
-
-        protected override string loadDescription()
-        {
-            return getDescription();
-        }
     }
 }

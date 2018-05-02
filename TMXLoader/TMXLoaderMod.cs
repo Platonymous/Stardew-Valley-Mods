@@ -89,12 +89,12 @@ namespace TMXLoader
                     GameLocation location;
                     if (map.Properties.ContainsKey("Outdoors") && map.Properties["Outdoors"] == "F")
                     {
-                        location = new GameLocation(map, edit.name) { isOutdoors = false };
+                        location = new GameLocation(Path.Combine("Maps",edit.name), edit.name) { IsOutdoors = false };
                         location.loadLights();
-                        location.isOutdoors = false;
+                        location.IsOutdoors = false;
                     }
                     else
-                        location = new GameLocation(map, edit.name);
+                        location = new GameLocation(Path.Combine("Maps", edit.name), edit.name);
 
                     location.seasonUpdate(Game1.currentSeason);
 
