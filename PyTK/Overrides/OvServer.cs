@@ -43,7 +43,7 @@ namespace PyTK.Overrides
 
             internal static void Postfix()
             {
-                if (Game1.IsClient || Game1.numberOfPlayers() < 3)
+                if (Game1.IsServer)
                     SaveHandler.Rebuild();
             }
         }
