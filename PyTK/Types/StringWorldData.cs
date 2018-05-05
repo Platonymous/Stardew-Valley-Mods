@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PyTK.Types
 {
-    class StringWorldData : IWorldState
+    class StringWorldData //: IWorldState
     {
         public WorldDate Date => new WorldDate(Game1.year,Game1.currentSeason,Game1.dayOfMonth);
 

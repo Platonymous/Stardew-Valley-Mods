@@ -248,7 +248,7 @@ namespace PyTK.CustomElementHandler
             if (o is Ring r)
                 return r.Name;
             if (o is Building bl)
-                return bl.nameOfIndoors.Value;
+                return bl.nameOfIndoors;
             if (o is GameLocation gl)
                 return (gl.lastQuestionKey != null) ? gl.lastQuestionKey : "not available";
             if (o is FarmAnimal a)
@@ -389,7 +389,7 @@ namespace PyTK.CustomElementHandler
             if (o is Ring r)
                 r.Name = dataString;
             if (o is Building bl)
-                bl.nameOfIndoors.Value = dataString;
+                bl.nameOfIndoors.Replace(bl.nameOfIndoors, dataString);// = dataString;//nameOfIndoors = dataString;
             if (o is GameLocation gl)
                 gl.lastQuestionKey = dataString;
             if (o is FarmAnimal a)

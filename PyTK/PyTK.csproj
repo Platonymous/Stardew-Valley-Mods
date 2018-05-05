@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\source\repos\StardewMods_Mizzion\StardewMods_Mizzion\ArtifactSpotOverHaul\ArtifactSpotOverHaul\bin\Debug\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="MoonSharp.Interpreter, Version=2.0.0.0, Culture=neutral, PublicKeyToken=921e73ce94aa17f8, processorArchitecture=MSIL">
       <HintPath>..\packages\MoonSharp.2.0.0.0\lib\net40-client\MoonSharp.Interpreter.dll</HintPath>
     </Reference>
@@ -112,12 +116,6 @@
     <None Include="Examples.md" />
     <None Include="manifest.json" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
-      <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
-      <Name>Harmony</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
