@@ -38,7 +38,7 @@ namespace PyTK.Types
             this.id = id;
             this.text = text;
             this.attachmentType = attachmentType;
-            this.attachments = String.Join(" ", attachments.toList(a => a.parentSheetIndex + " " + a.Stack));
+            this.attachments = String.Join(" ", attachments.toList(a => a.ParentSheetIndex + " " + a.Stack));
         }
 
         public Mail(string id, string text, int attachment, AttachmentType attachmentType = AttachmentType.OBJECT)
