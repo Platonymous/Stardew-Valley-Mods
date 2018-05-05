@@ -42,7 +42,7 @@ namespace Aquaponics
             if(e.NewMenu is CarpenterMenu carpenter)
             {
                 MenuEvents.MenuClosed += MenuEvents_MenuClosed;
-                List<BluePrint> blueprints = Helper.Reflection.GetPrivateValue<List<BluePrint>>(carpenter, "blueprints");
+                List<BluePrint> blueprints = Helper.Reflection.GetField<List<BluePrint>>(carpenter, "blueprints").GetValue();
                 BluePrint newBuildongBluePrint = CreateGreenhouse();
                 blueprints.Add(newBuildongBluePrint);
                 Game1.activeClickableMenu = carpenter;
@@ -57,7 +57,7 @@ namespace Aquaponics
             {
                 if (carpenter.CurrentBlueprint.name == "Aquaponics")
                 {
-                    IPrivateField<Building> cBuilding = Helper.Reflection.GetPrivateField<Building>(carpenter, "currentBuilding");
+                    IReflectedField<Building> cBuilding = Helper.Reflection.GetField<Building>(carpenter, "currentBuilding");
 
                     if (!(cBuilding.GetValue() is Aquaponics))
                     {

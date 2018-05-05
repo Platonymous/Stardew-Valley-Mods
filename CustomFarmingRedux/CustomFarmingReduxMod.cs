@@ -14,6 +14,8 @@ using PyTK.CustomElementHandler;
 using StardewValley.Objects;
 using SObject = StardewValley.Object;
 using Microsoft.Xna.Framework;
+using System;
+using StardewValley.Tools;
 
 namespace CustomFarmingRedux
 {
@@ -26,6 +28,7 @@ namespace CustomFarmingRedux
         public static string folder = "Machines";
         public static string legacyFolder = "MachinesCF1";
         internal static Dictionary<string, int> craftingrecipes = new Dictionary<string, int>();
+
 
         public override void Entry(IModHelper helper)
         {
@@ -41,6 +44,86 @@ namespace CustomFarmingRedux
             SaveHandler.addPreprocessor(legacyFix);
             SaveHandler.addReplacementPreprocessor(fixLegacyObject);
             helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
+
+            if(_config.water)
+            {
+                new CustomObjectData("Platonymous.Water", "Water/1/2/Cooking -7/Water/Plain drinking water./drink/0 0 0 0 0 0 0 0 0 0 0/0", Game1.objectSpriteSheet.getTile(247).setSaturation(0), Color.Aqua, type: typeof(WaterItem));
+                ButtonClick.ActionButton.onClick((pos) => clickedOnWateringCan(pos), (p) => convertWater());
+            }
+
+            if (_config.gold)
+            {
+                new CustomObjectData("Platonymous.G", "G/1/-300/Basic/G/The common currency of Pelican Town.", Game1.mouseCursors.getArea(new Rectangle(280, 410, 16, 16)), Color.White, type: typeof(GoldItem));
+                ButtonClick.ActionButton.onClick((pos) => Game1.onScreenMenus.Exists(m => m is DayTimeMoneyBox && m.isWithinBounds(pos.X, pos.Y - 180) && m.isWithinBounds(pos.X, pos.Y) && m.isWithinBounds(pos.X, pos.Y + 50)), (p) => convertMoney());
+            }
+
+        }
+
+        private bool clickedOnWateringCan(Point pos)
+        {
+            if (Game1.activeClickableMenu is GameMenu g && g.currentTab == 0 && Game1.player.items.Exists(i => i is WateringCan))
+            {
+                List<IClickableMenu> pages = _helper.Reflection.GetField<List<IClickableMenu>>(g, "pages").GetValue();
+                if (pages.Find(p => p is InventoryPage) is InventoryPage ip && ip.inventory.inventory.Exists(c => ip.inventory.actualInventory[int.Parse(c.name)] is WateringCan && c.containsPoint(pos.X, pos.Y)))
+                    return true;
+            }
+            return false;
+        }
+
+        private void convertWater()
+        {
+            Item item = Game1.player.items.Find(i => i is WateringCan);
+
+            if(item is WateringCan wc)
+            {
+                List<IClickableMenu> pages = _helper.Reflection.GetField<List<IClickableMenu>>(Game1.activeClickableMenu, "pages").GetValue();
+                Item heldItem = _helper.Reflection.GetField<Item>(pages.Find(p => p is InventoryPage), "heldItem").GetValue();
+                
+          
+                if (heldItem is WaterItem s && wc.WaterLeft < wc.waterCanMax)
+                {
+                    int w = Math.Min(s.stack, wc.waterCanMax - wc.WaterLeft);
+                    s.stack -= w;
+                    if(s.stack <= 0)
+                        _helper.Reflection.GetField<Item>(pages.Find(p => p is InventoryPage), "heldItem").SetValue(null);
+                    
+                    wc.WaterLeft += w;
+                    Game1.playSound("slosh");
+                    return;
+                }
+                else if (wc.WaterLeft > 0 && heldItem == null)
+                {
+                    int a = Math.Min(10, wc.WaterLeft);
+                    wc.WaterLeft -= a;
+                    Game1.player.addItemByMenuIfNecessary(new SObject(CustomObjectData.getIndexForId("Platonymous.Water"), a));
+                    Game1.playSound("glug");
+                }
+            }
+        }
+
+        private void convertMoney()
+        {
+            if (Game1.player.ActiveObject != null)
+            {
+                if (Game1.player.ActiveObject is GoldItem s)
+                {
+                    Game1.player.money += s.stack;
+                    Game1.player.removeItemFromInventory(s);
+                    Game1.player.ActiveObject = null;
+                    Game1.playSound("sell");
+                }
+                return;
+            }
+
+            int a = Math.Min(999, Game1.player.money);
+            int g = Game1.objectInformation.getIndexByName("G");
+
+            if (a <= 0)
+                return;
+
+            Game1.player.money -= a;
+            Game1.player.addItemByMenuIfNecessary(new SObject(CustomObjectData.getIndexForId("Platonymous.G"), a));
+            Game1.playSound("purchase");
         }
 
         public override object GetApi()
@@ -320,7 +403,7 @@ namespace CustomFarmingRedux
                         blueprint.production = new List<RecipeBlueprint>();
                         blueprint.production.Add(new RecipeBlueprint());
                         blueprint.production[0].index = 0;
-                        blueprint.production[0].time = (STime.CURRENT + STime.YEAR * 1000).timestamp;
+                        blueprint.production[0].time = 0;
                     }
 
                     CustomObjectData data = new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, typeof(CustomMachine), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.fullid, blueprint.crafting));

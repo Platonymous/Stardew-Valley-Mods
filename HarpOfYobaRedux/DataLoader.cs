@@ -17,9 +17,10 @@ namespace HarpOfYobaRedux
 
         public static void load()
         {
+            
             Texture2D texture = loadTexture("tilesheet.png");
             new Instrument("harp", texture, "Harp of Yoba", "Add Sheet Music to play.",new HarpAnimation());
-            new SheetMusic("thunder", texture, "Serenade of Thunder", "Rain on me", Microsoft.Xna.Framework.Color.Blue, "AbigailFluteDuet", 10000, new RainMagic());
+            new SheetMusic("thunder", texture, "Serenade of Thunder", "Rain on me", Microsoft.Xna.Framework.Color.Blue, "AbigailFluteDuet", 10000, new LuaMagic());
             new SheetMusic("birthday", texture, "Birthday Sonata", "Popular on birthdays", Microsoft.Xna.Framework.Color.DarkBlue, "shimmeringbastion", 10000, new BirthdayMagic());
             new SheetMusic("wanderer", texture, "Ballad of the Wanderer", "Wander off and return", Microsoft.Xna.Framework.Color.Orange, "honkytonky", 10000, new TeleportMagic());
             new SheetMusic("yoba", texture, "Prelude to Yoba", "Can you hear the trees sing along", Microsoft.Xna.Framework.Color.ForestGreen, "wedding", 10000, new TreeMagic());
@@ -29,6 +30,7 @@ namespace HarpOfYobaRedux
             new SheetMusic("adventure", texture, "Adventurer's Allegro", "An energizing tune", Microsoft.Xna.Framework.Color.LightCoral, "aerobics", 10000, new BoosterMagic());
             new SheetMusic("granpa", texture, "Farmer's Lullaby", "Stand on fertile ground", Microsoft.Xna.Framework.Color.Magenta, "grandpas_theme", 10000, new SeedMagic());
             new SheetMusic("time", texture, "Rondo of Time", "Play ahead to pass the time", Microsoft.Xna.Framework.Color.LightCyan, "50s", 10000, new TimeMagic());
+            new SheetMusic("lua", texture, "Lua Crescendo", "Play lua", Microsoft.Xna.Framework.Color.BlueViolet, "50s", 10000, new LuaMagic());
             loadLetters();
         }
 

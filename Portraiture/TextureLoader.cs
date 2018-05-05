@@ -18,8 +18,6 @@ namespace Portraiture
 
         public static void loadTextures()
         {
-            Visualize.VisualizeMod.setProfileToVanilla();
-
             activeFolder = 0;
             contentFolder = Path.Combine(PortraitureMod.helper.DirectoryPath, "Portraits");
             folders = new List<string>();
@@ -38,18 +36,11 @@ namespace Portraiture
                 activeFolder = folders.FindIndex(f => f == loadConfig);
 
             saveConfig();
-
-            Visualize.VisualizeMod.setProfile();
         }
 
-        internal static Rectangle getSoureRectangle(Texture2D texture)
+        internal static Rectangle getSoureRectangle(Texture2D texture, int index = 0)
         {
             int textureSize = Math.Max(texture.Width / 2, 64);
-            int index = 0;
-
-            if (Game1.activeClickableMenu is DialogueBox box)
-                index = PortraitureMod.helper.Reflection.GetField<Dialogue>(box, "characterDialogue").GetValue().getPortraitIndex();
-
             return Game1.getSourceRectForStandardTileSheet(texture, index, textureSize, textureSize);
         }
 
@@ -57,8 +48,8 @@ namespace Portraiture
         {
             activeFolder = Math.Max(activeFolder, 0);
 
-            if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.name))
-                return pTextures[folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.name];
+            if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.Name))
+                return pTextures[folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.Name];
             else if (pTextures.ContainsKey(folders[activeFolder] + ">" + name))
                 return pTextures[folders[activeFolder] + ">" + name];
             
@@ -105,10 +96,13 @@ namespace Portraiture
 
         private static void saveConfig()
         {
-            string directoryName = folders[activeFolder];
-            string savstring = directoryName;
-            PortraitureMod.config.active = savstring;
-            PortraitureMod.helper.WriteConfig(PortraitureMod.config);
+            if (folders.Count > activeFolder && activeFolder >= 0)
+            {
+                string directoryName = folders[activeFolder];
+                string savstring = directoryName;
+                PortraitureMod.config.active = savstring;
+                PortraitureMod.helper.WriteConfig(PortraitureMod.config);
+            }
         }
 
 

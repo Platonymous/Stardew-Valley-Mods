@@ -1,14 +1,10 @@
 {
   "Name": "New Machines Pack for Custom Farming",
   "Author": "Platonymous",
-  "Version": {
-    "MajorVersion": 1,
-    "MinorVersion": 0,
-    "PatchVersion": 2,
-    "Build": null
-  },
+  "Version": "1.0.2",
   "Description": "Adds new Machines to the game",
   "UniqueID": "Platonymous.MachinePack",
   "EntryDll": "NewMachinesPack.dll",
-  "UpdateKeys": [ ]
+  "MinimumApiVersion": "2.6-beta",
+  "UpdateKeys": []
 }

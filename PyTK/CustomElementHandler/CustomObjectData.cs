@@ -86,6 +86,12 @@ namespace PyTK.CustomElementHandler
 
         public string type { get; set; }
 
+
+        public CustomObjectData()
+        {
+
+        }
+
         public CustomObjectData(string id, string data, Texture2D texture, Color color, int tileIndex = 0, bool bigCraftable = false, Type type = null, CraftingData craftingData = null)
         {
             this.id = id;
@@ -107,20 +113,20 @@ namespace PyTK.CustomElementHandler
             collection.AddOrReplace(id, this);
 
             if(inventoryCheck == null)
-                inventoryCheck = new ItemSelector<Item>(i => collection.Exists(c => c.Value.sdvId == i.parentSheetIndex && (!(i is SObject sobj) || sobj.bigCraftable == c.Value.bigCraftable))).whenAddedToInventory(l => l.useAll(x => Game1.player.items[Game1.player.items.FindIndex(o => o == x)] = collection.Find(c => c.Value.sdvId == x.parentSheetIndex && (!(x is SObject sobj) || sobj.bigCraftable == c.Value.bigCraftable)).Value.getObject(x)));
+                inventoryCheck = new ItemSelector<Item>(i => collection.Exists(c => c.Value.sdvId == i.ParentSheetIndex && (!(i is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable))).whenAddedToInventory(l => l.useAll(x => Game1.player.Items[new List<Item>(Game1.player.Items).FindIndex(o => o == x)] = collection.Find(c => c.Value.sdvId == x.ParentSheetIndex && (!(x is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable)).Value.getObject(x)));
         }
 
-        public int getIndexForId(string id)
+        public static int getIndexForId(string id)
         {
             return collection.Find(c => c.Value.id == id).Value.sdvId;
         }
 
-        public Item replaceItem(Item item)
+        public static Item replaceItem(Item item)
         {
-            if (!collection.Exists(c => c.Value.sdvId == item.parentSheetIndex))
+            if (!collection.Exists(c => c.Value.sdvId == item.ParentSheetIndex))
                 return item;
 
-            return collection.Find(c => c.Value.sdvId == item.parentSheetIndex).Value.getObject();
+            return collection.Find(c => c.Value.sdvId == item.ParentSheetIndex).Value.getObject();
         }
 
         public int getNewSDVId()
@@ -175,9 +181,9 @@ namespace PyTK.CustomElementHandler
 
                 if (item is SObject sobj && result is SObject)
                 {
-                    (result as SObject).quality = sobj.quality;
-                    (result as SObject).price = sobj.price;
-                    (result as SObject).name = sobj.name;
+                    (result as SObject).Quality = sobj.Quality;
+                    (result as SObject).Price = sobj.Price;
+                    (result as SObject).Name = sobj.Name;
                 }
             }
 

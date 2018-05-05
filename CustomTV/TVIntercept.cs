@@ -24,8 +24,8 @@ namespace CustomTV
 
         private static Dictionary<string, Action<TV, TemporaryAnimatedSprite,StardewValley.Farmer,string>> actions = new Dictionary<string, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string>>();
 
-        public IPrivateField<TemporaryAnimatedSprite> tvScreen;
-        public IPrivateField<TemporaryAnimatedSprite> tvOverlay;
+        public IReflectedField<TemporaryAnimatedSprite> tvScreen;
+        public IReflectedField<TemporaryAnimatedSprite> tvOverlay;
         public static TVIntercept activeIntercept;
 
         public TVIntercept()
@@ -41,8 +41,8 @@ namespace CustomTV
              : base(tv.parentSheetIndex, tv.tileLocation)
         {
             this.tv = tv;
-            tvScreen = CustomTVMod.Modhelper.Reflection.GetPrivateField<TemporaryAnimatedSprite>(tv, "screen");
-            tvOverlay = CustomTVMod.Modhelper.Reflection.GetPrivateField<TemporaryAnimatedSprite>(tv, "screenOverlay");
+            tvScreen = CustomTVMod.Modhelper.Reflection.GetField<TemporaryAnimatedSprite>(tv, "screen");
+            tvOverlay = CustomTVMod.Modhelper.Reflection.GetField<TemporaryAnimatedSprite>(tv, "screenOverlay");
         }
 
         public static void addChannel(string id, string name, Action<TV, TemporaryAnimatedSprite, StardewValley.Farmer, string> action)
@@ -232,15 +232,15 @@ namespace CustomTV
 
         private string getFortuneTellerOpening()
         {
-            IPrivateMethod method =  CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "getFortuneTellerOpening");
-            return method.Invoke<string>(new object[0]);
+            IReflectedMethod method =  CustomTVMod.Modhelper.Reflection.GetMethod(tv, "getFortuneTellerOpening");
+            return method.Invoke<string>();
             
         }
 
         private string getWeatherChannelOpening()
         {
-            IPrivateMethod method = CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "getWeatherChannelOpening");
-            return method.Invoke<string>(new object[0]);
+            IReflectedMethod method = CustomTVMod.Modhelper.Reflection.GetMethod(tv, "getWeatherChannelOpening");
+            return method.Invoke<string>();
         }
 
         public float getScreenSizeModifier()
@@ -265,38 +265,38 @@ namespace CustomTV
 
         private void setWeatherOverlay()
         {
-            IPrivateMethod method = CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "setWeatherOverlay");
-            method.Invoke(new object[0]);
+            IReflectedMethod method = CustomTVMod.Modhelper.Reflection.GetMethod(tv, "setWeatherOverlay");
+            method.Invoke();
         }
 
         private string getTodaysTip()
         {
-            IPrivateMethod method = CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "getTodaysTip");
-            return method.Invoke<string>(new object[0]);
+            IReflectedMethod method = CustomTVMod.Modhelper.Reflection.GetMethod(tv, "getTodaysTip");
+            return method.Invoke<string>();
         }
 
         private string[] getWeeklyRecipe()
         {
-            IPrivateMethod method = CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "getWeeklyRecipe");
-            return method.Invoke<string[]>(new object[0]);
+            IReflectedMethod method = CustomTVMod.Modhelper.Reflection.GetMethod(tv, "getWeeklyRecipe");
+            return method.Invoke<string[]>();
         }
 
         private string getWeatherForecast()
         {
-            IPrivateMethod method = CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "getWeatherForecast");
-            return method.Invoke<string>(new object[0]);
+            IReflectedMethod method = CustomTVMod.Modhelper.Reflection.GetMethod(tv, "getWeatherForecast");
+            return method.Invoke<string>();
         }
 
         private void setFortuneOverlay()
         {
-            IPrivateMethod method = CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "setFortuneOverlay");
-            method.Invoke(new object[0]);
+            IReflectedMethod method = CustomTVMod.Modhelper.Reflection.GetMethod(tv, "setFortuneOverlay");
+            method.Invoke();
         }
 
         private string getFortuneForecast()
         {
-            IPrivateMethod method = CustomTVMod.Modhelper.Reflection.GetPrivateMethod(tv, "getFortuneForecast");
-            return method.Invoke<string>(new object[0]);
+            IReflectedMethod method = CustomTVMod.Modhelper.Reflection.GetMethod(tv, "getFortuneForecast");
+            return method.Invoke<string>();
         }	
 	
         public override bool placementAction(GameLocation location, int x, int y, StardewValley.Farmer who = null)
@@ -328,7 +328,7 @@ namespace CustomTV
         {
            
             tv = new TV(((TV) replacement).parentSheetIndex, ((TV)replacement).tileLocation);
-            tvScreen = CustomTVMod.Modhelper.Reflection.GetPrivateField<TemporaryAnimatedSprite>(tv, "screen");
+            tvScreen = CustomTVMod.Modhelper.Reflection.GetField<TemporaryAnimatedSprite>(tv, "screen");
 
             tileLocation = tv.tileLocation;
             parentSheetIndex = tv.parentSheetIndex;

@@ -425,8 +425,7 @@ namespace PyTK.Extensions
             return d;
         }
 
-
-        /// <summary>Wraps the the method so it only executes if the player clickes on the specified tileposition and adds it to InputEvents.ButtonPressed.</summary>
+        /// <summary>Wraps the the method so it only executes if the player clicks on the specified tileposition and adds it to InputEvents.ButtonPressed.</summary>
         /// <returns>Returns the wrapped method.</returns>
         public static EventHandler<EventArgsInput> onClick(this ButtonClick t, TileLocationSelector tile, Action<Vector2> handler)
         {
@@ -441,7 +440,55 @@ namespace PyTK.Extensions
             return d;
         }
 
-        /// <summary>Wraps the the method so it only executes if the player clickes on the specified tile and adds it to InputEvents.ButtonPressed.</summary>
+        /// <summary>Wraps the the method so it only executes if the player clicks on the specified on a position that matches the predicate adds it to InputEvents.ButtonPressed.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<EventArgsInput> onClick(this ButtonClick t, Func<Point,bool> predicate, Action<Point> handler)
+        {
+            EventHandler<EventArgsInput> d = delegate (object sender, EventArgsInput e)
+            {
+                bool isButton = t.Equals(ButtonClick.UseToolButton) ? e.IsUseToolButton : e.IsActionButton;
+                Point mousePosition = Game1.getMousePosition();
+                if (isButton && predicate.Invoke(mousePosition))
+                    handler.Invoke(mousePosition);
+            };
+
+            InputEvents.ButtonPressed += d;
+            return d;
+        }
+
+        /// <summary>Wraps the the method so it only executes if the player clicks on the screen position and adds it to InputEvents.ButtonPressed.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<EventArgsInput> onClick(this ButtonClick t, Point position, Action<Point> handler)
+        {
+            EventHandler<EventArgsInput> d = delegate (object sender, EventArgsInput e)
+            {
+                bool isButton = t.Equals(ButtonClick.UseToolButton) ? e.IsUseToolButton : e.IsActionButton;
+                Point mousePosition = Game1.getMousePosition();
+                if (isButton && mousePosition == position)
+                    handler.Invoke(position);
+            };
+
+            InputEvents.ButtonPressed += d;
+            return d;
+        }
+
+        /// <summary>Wraps the the method so it only executes if the player clicks on the screen area and adds it to InputEvents.ButtonPressed.</summary>
+        /// <returns>Returns the wrapped method.</returns>
+        public static EventHandler<EventArgsInput> onClick(this ButtonClick t, Rectangle area, Action<Point> handler)
+        {
+            EventHandler<EventArgsInput> d = delegate (object sender, EventArgsInput e)
+            {
+                bool isButton = t.Equals(ButtonClick.UseToolButton) ? e.IsUseToolButton : e.IsActionButton;
+                Point mousePosition = Game1.getMousePosition();
+                if (isButton && area.Contains(mousePosition))
+                    handler.Invoke(mousePosition);
+            };
+
+            InputEvents.ButtonPressed += d;
+            return d;
+        }
+
+        /// <summary>Wraps the the method so it only executes if the player clicks on the specified tile and adds it to InputEvents.ButtonPressed.</summary>
         /// <returns>Returns the wrapped method.</returns>
         public static EventHandler<EventArgsInput> onClick(this ButtonClick t, Vector2 tile, GameLocation location, Action<Vector2> handler)
         {
@@ -610,6 +657,7 @@ namespace PyTK.Extensions
             return d;
         }    
 
+        /*
         public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenAddedToLocation<T>(this ItemSelector<T> t, Action<GameLocation,List<Vector2>> action, GameLocation l = null) where T : SObject
         {
             List<GameLocation> gls = new List<GameLocation>();
@@ -636,8 +684,9 @@ namespace PyTK.Extensions
                 d.AddOrReplace(gl, (o, e) => a(gl, e));
 
             return d.useAll(p => p.Key.objects.CollectionChanged += p.Value);
-        }
+        }*/
 
+        /*
         public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenAddedToLocation<T>(this TerrainSelector<T> t, Action<GameLocation, List<Vector2>> action, GameLocation l = null) where T : TerrainFeature
         {
             List<GameLocation> gls = new List<GameLocation>();
@@ -652,7 +701,7 @@ namespace PyTK.Extensions
 
                 if (e.Action == NotifyCollectionChangedAction.Add)
                     foreach (Vector2 key in e.NewItems)
-                        if (t.predicate(location.terrainFeatures[key]))
+                        if (location.terrainFeatures.ContainsKey(key) && t.predicate(location.terrainFeatures[key]))
                             keys.Add(key);
 
                 action.Invoke(location, keys);
@@ -664,8 +713,8 @@ namespace PyTK.Extensions
                 d.AddOrReplace(gl, (o, e) => a(gl, e));
 
             return d.useAll(p => p.Key.terrainFeatures.CollectionChanged += p.Value);
-        }
-
+        } */
+        /*
         public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenRemovedFromLocation(this TileLocationSelector t, Action<GameLocation, List<Vector2>> action)
         {
             List<GameLocation> gls = new List<GameLocation>();
@@ -692,7 +741,7 @@ namespace PyTK.Extensions
                 d.AddOrReplace(gl, (o, e) => a(gl, e));
 
             return d.useAll(p => p.Key.terrainFeatures.CollectionChanged += p.Value);
-        }
+        }*/
 
         /* Locations */
 

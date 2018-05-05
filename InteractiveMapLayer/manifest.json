@@ -1,14 +1,10 @@
 {
   "Name": "Interactive Map Layer",
   "Author": "Platonymous",
-  "Version": {
-    "MajorVersion": 0,
-    "MinorVersion": 1,
-    "PatchVersion": 1,
-    "Build": null
-  },
+  "Version": "0.1.1",
   "Description": "Adds more interactivity to maps",
   "UniqueID": "Platonymous.InteractiveMapLayer",
   "EntryDll": "InteractiveMapLayer.dll",
+  "MinimumApiVersion": "2.6-beta",
   "UpdateKeys": [ ]
 }

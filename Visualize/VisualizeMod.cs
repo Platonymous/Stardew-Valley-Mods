@@ -94,6 +94,9 @@ namespace Visualize
         {
             Effects.textureCache = new Dictionary<Texture2D, Texture2D>();
             Effects.colorCache = new Dictionary<Color, Color>();
+            Effects.tintColorCache = new Dictionary<Color, Color>();
+            Effects.lastData = null;
+            Effects.lastNewData = null;
         }
 
         public static void addHandler(IVisualizeHandler handler)
@@ -145,29 +148,6 @@ namespace Visualize
                 palette = new List<Color>();
         }
 
-        internal static void loadShader(Profile profile)
-        {
-            if (profile.shaderType != "none")
-            {
-                if (shaderChache.ContainsKey(profile.shaderType))
-                    shader = shaderChache[profile.shaderType];
-                else
-                    try
-                    {
-                        Type T = Type.GetType(profile.shaderType);
-                        Effect effectType = (Effect)Activator.CreateInstance(T);
-                        shader = effectType;
-                        shaderChache.Add(profile.shaderType, effectType);
-                    }
-                    catch (Exception e)
-                    {
-                        _monitor.Log("Exception loading Shader Type: " + e.Message, LogLevel.Error);
-                        _monitor.Log("" + e.StackTrace, LogLevel.Error);
-                    }
-            }
-            else
-                shader = null;
-        }
 
         internal static void setActiveProfile(Profile profile = null)
         {
@@ -181,7 +161,6 @@ namespace Visualize
             if (profile == null && profiles.Count > 0)
                 profile = profiles.Exists(p => p.id == "Platonymous.Original") ? profiles.Find(p => p.id == "Platonymous.Original") : profiles[0];
 
-            loadShader(profile);
             loadPalette(profile);
             _activeProfile = profile;
             active = true;

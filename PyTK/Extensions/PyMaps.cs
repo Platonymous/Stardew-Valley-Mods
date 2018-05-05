@@ -12,6 +12,8 @@ using xTile.Layers;
 using System.IO;
 using PyTK.Types;
 using xTile.Dimensions;
+using System;
+using xTile.ObjectModel;
 
 namespace PyTK.Extensions
 {
@@ -26,7 +28,7 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is GameLocation location)
             {
-                Dictionary<Vector2, SObject> objects = location.objects;
+                Dictionary<Vector2, SObject> objects = (Dictionary<Vector2, SObject>)location.objects.Pairs;
                 if (objects.ContainsKey(t) && (objects[t] is T))
                     return ((T) objects[t]);
             }
@@ -39,7 +41,7 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is GameLocation location)
             {
-                Dictionary<Vector2, TerrainFeature> terrain = location.terrainFeatures;
+                Dictionary<Vector2, TerrainFeature> terrain = (Dictionary < Vector2, TerrainFeature > ) location.terrainFeatures.FieldDict;
                 if (terrain.ContainsKey(t) && (terrain[t] is T))
                     return ((T) terrain[t]);
             }
@@ -53,7 +55,7 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is DecoratableLocation location)
             {
-                List<Furniture> furniture = location.furniture;
+                List<Furniture> furniture = new List<Furniture>(location.furniture);
                 return ((T) furniture.Find(f => f.getBoundingBox(t).Intersects(new Microsoft.Xna.Framework.Rectangle((int) t.X * Game1.tileSize, (int) t.Y * Game1.tileSize, Game1.tileSize, Game1.tileSize))));
             }
             return null;
@@ -65,7 +67,7 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is GameLocation location)
             {
-                Dictionary<Vector2, SObject> objects = location.objects;
+                Dictionary<Vector2, SObject> objects = (Dictionary<Vector2, SObject>) location.objects.Pairs;
                 if (objects.ContainsKey(t))
                     return objects[t];
             }
@@ -118,7 +120,7 @@ namespace PyTK.Extensions
                 for (int y = area.Y; y < area.Height; y++)
                 {
                     l.objects.Remove(new Vector2(x, y));
-                    l.largeTerrainFeatures.Remove(l.largeTerrainFeatures.Find(p => p.tilePosition == new Vector2(x,y)));
+                    l.largeTerrainFeatures.Remove(new List<LargeTerrainFeature>(l.largeTerrainFeatures).Find(p => p.tilePosition.Value == new Vector2(x,y)));
                     l.terrainFeatures.Remove(new Vector2(x, y));
                 }
 
@@ -133,12 +135,24 @@ namespace PyTK.Extensions
                 if (!map.hasTileSheet(tilesheet))
                     map.AddTileSheet(new TileSheet(tilesheet.Id, map, tilesheet.ImageSource, tilesheet.SheetSize, tilesheet.TileSize));
 
+            if(properties)
+            foreach (KeyValuePair<string, PropertyValue> p in t.Properties)
+                if (map.Properties.ContainsKey(p.Key))
+                    if (p.Key == "EntryAction")
+                        map.Properties[p.Key] = map.Properties[p.Key] + ";" + p.Value;
+                    else
+                        map.Properties[p.Key] = p.Value;
+                else
+                    map.Properties.Add(p);
+
             for (Vector2 _x = new Vector2(sourceRectangle.X, position.X); _x.X < sourceRectangle.Width; _x += new Vector2(1, 1))
             {
                 for (Vector2 _y = new Vector2(sourceRectangle.Y, position.Y); _y.X < sourceRectangle.Height; _y += new Vector2(1, 1))
                 {
                     foreach (Layer layer in t.Layers)
                     {
+                        
+
                         Tile sourceTile = layer.Tiles[(int)_x.X, (int)_y.X];
                         Layer mapLayer = map.GetLayer(layer.Id);
 
@@ -147,7 +161,14 @@ namespace PyTK.Extensions
                             map.InsertLayer(new Layer(layer.Id, map, map.Layers[0].LayerSize, map.Layers[0].TileSize), map.Layers.Count);
                             mapLayer = map.GetLayer(layer.Id);
                         }
-                        
+
+                        if (properties)
+                            foreach (var prop in layer.Properties)
+                                if (!mapLayer.Properties.ContainsKey(prop.Key))
+                                    mapLayer.Properties.Add(prop);
+                                else
+                                    mapLayer.Properties[prop.Key] = prop.Value;
+
                         if (sourceTile == null)
                         {
                             if (includeEmpty)
@@ -177,8 +198,12 @@ namespace PyTK.Extensions
                         if(properties)
                             foreach (var prop in sourceTile.Properties)
                                 newTile.Properties.Add(prop);
-
-                        mapLayer.Tiles[(int)_x.Y, (int)_y.Y] = newTile;
+                        try
+                        {
+                            mapLayer.Tiles[(int)_x.Y, (int)_y.Y] = newTile;
+                        }catch(Exception e){
+                            Monitor.Log($"{e.Message} ({map.DisplayWidth} -> {layer.Id} -> {_x.Y}:{_y.Y})");
+                        }
                     }
 
                 }

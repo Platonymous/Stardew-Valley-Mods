@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using PyTK.Extensions;
 using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -26,7 +26,48 @@ namespace CustomFarmingRedux
             return machine;
         }
 
-        public void addContentPack(string folderName, string fileName, IModHelper helper = null, Dictionary<string,string> options = null)
+        /// <summary>Get whether a given item is a custom object or machine from Custom Farming Redux.</summary>
+        /// <param name="item">The item instance.</param>
+        public bool isCustom(Item item)
+        {
+            return item is CustomMachine || item is CustomObject;
+        }
+
+        /// <summary>Get the spritesheet texture for a custom object or machine (if applicable).</summary>
+        /// <param name="item">The item instance.</param>
+        public Texture2D getSpritesheet(Item item)
+        {
+            switch (item)
+            {
+                case CustomMachine machine:
+                    return machine.texture;
+
+                case CustomObject obj:
+                    return obj.texture;
+
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>Get the spritesheet source area for a custom object or machine (if applicable).</summary>
+        /// <param name="item">The item instance.</param>
+        public Rectangle? getSpriteSourceArea(Item item)
+        {
+            switch (item)
+            {
+                case CustomMachine machine:
+                    return machine.sourceRectangle;
+
+                case CustomObject obj:
+                    return obj.sourceRectangle;
+
+                default:
+                    return null;
+            }
+        }
+
+        public void addContentPack(string folderName, string fileName, IModHelper helper = null, Dictionary<string, string> options = null)
         {
             if (helper == null)
                 helper = Helper;
@@ -67,7 +108,7 @@ namespace CustomFarmingRedux
                         blueprint.production = new List<RecipeBlueprint>();
                         blueprint.production.Add(new RecipeBlueprint());
                         blueprint.production[0].index = 0;
-                        blueprint.production[0].time = (STime.CURRENT + STime.YEAR * 1000).timestamp;
+                        blueprint.production[0].time = 0;
                     }
 
                     if (blueprint.crafting != null)

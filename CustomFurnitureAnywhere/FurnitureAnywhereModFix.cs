@@ -36,7 +36,7 @@ namespace CustomFurnitureAnywhere
  
                 if (e.OldItem != null && e.OldItem is AnywhereCustomFurniture)
                 {
-                    CustomFurnitureAnywhereMod.modhelper.Reflection.GetPrivateMethod(__instance, "RestoreVanillaObjects").Invoke();
+                    CustomFurnitureAnywhereMod.modhelper.Reflection.GetMethod(__instance, "RestoreVanillaObjects").Invoke();
                     return false;
                 }
             

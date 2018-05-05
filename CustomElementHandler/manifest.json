@@ -1,14 +1,10 @@
 {
   "Name": "Custom Element Handler",
   "Author": "Platonymous",
-  "Version": {
-    "MajorVersion": 1,
-    "MinorVersion": 5,
-    "PatchVersion": 1,
-    "Build": null
-  },
+  "Version": "1.5.1",
   "Description": "SaveHandler for Custom Objects",
   "UniqueID": "Platonymous.CustomElementHandler",
   "EntryDll": "CustomElementHandler.dll",
+  "MinimumApiVersion": "2.6-beta",
   "UpdateKeys": [ "Nexus:1068" ]
 }

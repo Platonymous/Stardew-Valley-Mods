@@ -11,7 +11,6 @@ namespace HarpOfYobaRedux
     class RainMagic : IMagic
     {
         private int maxDist;
-        private Random r = new Random();
 
         public RainMagic()
         {

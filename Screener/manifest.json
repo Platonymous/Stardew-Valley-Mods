@@ -1,0 +1,10 @@
+{
+  "Name": "Screener",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Take screenshots from within the game",
+  "UniqueID": "Platonymous.Screener",
+  "EntryDll": "Screener.dll",
+  "MinimumApiVersion": "2.6-beta",
+  "UpdateKeys": []
+}

@@ -22,16 +22,11 @@ namespace CustomFarmingRedux
         internal string folder => blueprint.pack.baseFolder;
         internal List<CustomMachineBlueprint> machines = CustomFarmingReduxMod.machines;
         internal static List<CustomMachine> activeMachines = new List<CustomMachine>();
+        internal Texture2D texture { get; private set; }
+        internal Rectangle sourceRectangle => Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex + frame, tilesize.Width, tilesize.Height);
 
         private CustomMachineBlueprint blueprint;
 
-        private Texture2D texture;
-        private Rectangle sourceRectangle {
-            get
-            {
-               return Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex + frame, tilesize.Width, tilesize.Height);
-            }
-        }
         private bool active = true;
         private bool wasBuild = false;
         private bool isWorking { get => active && !readyForHarvest && ((completionTime != null && activeRecipe != null) || blueprint.production == null); }
@@ -145,7 +140,7 @@ namespace CustomFarmingRedux
             if (blueprint.production == null)
                 return null;
 
-            return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials[0]));
+            return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials));
         }
 
         private RecipeBlueprint findRecipe(List<Item> items)
@@ -195,7 +190,7 @@ namespace CustomFarmingRedux
                         if (location.objects.ContainsKey(tile) && location.objects[tile] is Chest c)
                             items.AddOrReplace(c.items);
             }
-            
+
             return items;
         }
 
@@ -267,7 +262,10 @@ namespace CustomFarmingRedux
         }
         private SObject createProduce()
         {
-            return activeRecipe.createObject(heldObject);
+            if (!(heldObject is Chest))
+                return activeRecipe.createObject(heldObject);
+            else
+                return (SObject)SaveHandler.rebuildElement(heldObject.name, heldObject);
         }
 
         public override bool minutesElapsed(int minutes, GameLocation environment)
@@ -282,12 +280,15 @@ namespace CustomFarmingRedux
                     if(Game1.currentLocation.objects.ContainsValue(this))
                         tileLocation = Game1.currentLocation.objects.Find(k => k.Value == this).Key;
 
-            if (!wasBuild)
+            if (!wasBuild || blueprint.asdisplay)
+            {
+                shakeTimer = 0;
                 return;
+            }
 
             if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
                 getReadyForHarvest();
-            
+
             if (!(isWorking && completionTime != null))
                 startAutoProduction();
 
@@ -378,10 +379,10 @@ namespace CustomFarmingRedux
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("id", id);
 
-            if(location != null)
+            if (location != null)
                 data.Add("location", location.name);
 
-            if (activeRecipe != null)
+            if (activeRecipe != null && !blueprint.asdisplay)
                 data.Add("recipe", activeRecipe.id.ToString());
 
             if (completionTime != null)
@@ -437,11 +438,10 @@ namespace CustomFarmingRedux
             if(additionalSaveData.ContainsKey("tileLocation"))
                 tileLocation = additionalSaveData["tileLocation"].Split(',').toList(s => int.Parse(s)).toVector<Vector2>();
             if (c.items.Count > 0 && c.items[0] is SObject o)
-                heldObject = (SObject) o.getOne();
+                heldObject = o;
             updateWhenCurrentLocation(Game1.currentGameTime);
             startAutoProduction();
             wasBuild = true;
-
         }
 
         public override void DayUpdate(GameLocation location)
@@ -451,7 +451,7 @@ namespace CustomFarmingRedux
 
         public override bool checkForAction(SFarmer who, bool justCheckingForActivity = false)
         {
-            
+
             if (blueprint.category == "Mailbox")
             {
                 if (justCheckingForActivity)
@@ -471,7 +471,7 @@ namespace CustomFarmingRedux
             {
                 if (justCheckingForActivity)
                     return true;
-                
+
                 shakeTimer = 100;
 
                 if (specialVariable == 0)
@@ -486,7 +486,7 @@ namespace CustomFarmingRedux
 
             if (heldObject == null)
                 return (who.ActiveObject is SObject o && findRecipe(maxed(o)) != null && hasStarterMaterials(who.items));
-                
+
             if (!readyForHarvest)
                 return false;
 
@@ -541,6 +541,13 @@ namespace CustomFarmingRedux
             return false;
         }
 
+        private string getCatName(int cat)
+        {
+            SObject s = new SObject(Vector2.Zero, 399);
+            s.category = cat;
+            return s.getCategoryName();
+        }
+
         public override bool performObjectDropInAction(SObject dropIn, bool probe, SFarmer who)
         {
             if (heldObject != null)
@@ -549,16 +556,28 @@ namespace CustomFarmingRedux
             if (heldObject == null)
                 clear();
 
+            if (blueprint.asdisplay && dropIn is SObject d)
+            {
+                heldObject = (SObject) d.getOne();
+                return false;
+            }
+
             List<List<Item>> items = getItemLists(who);
             RecipeBlueprint recipe = findRecipeFor(maxed(dropIn));
             bool hasRecipe = recipe != null;
             bool hasStarter = hasStarterMaterials(items);
             bool hasIngredients = hasRecipe && recipe.hasIngredients(items);
             bool canProduce = hasIngredients && hasStarter;
-            
+
             if (probe)
+            {
+                if (canProduce)
+                    heldObject = dropIn;
+
                 return canProduce;
-            
+            }
+                
+
             if (canProduce)
             {
                 startProduction(dropIn, findRecipeFor(maxed(dropIn)), items);
@@ -568,13 +587,13 @@ namespace CustomFarmingRedux
 
             if(!hasStarter)
             {
-                Game1.showRedMessage($"Requires {blueprint.starter.stack}x {(blueprint.starter.index > 0 ? Game1.objectInformation[blueprint.starter.index].Split('/')[4] : "Category " + blueprint.starter.index)}.");
+                Game1.showRedMessage($"Requires {blueprint.starter.stack}x {(blueprint.starter.index > 0 ? Game1.objectInformation[blueprint.starter.index].Split('/')[4] : "Category " + getCatName(blueprint.starter.index))}.");
                 return false;
             }
 
             if (!hasIngredients && hasRecipe)
             {
-                string ingredients = String.Join(",", recipe.materials.toList(m => m.stack + "x " + (m.index > 0 ? Game1.objectInformation[m.index].Split('/')[4] : "Category " + m.index)));
+                string ingredients = String.Join(",", recipe.materials.toList(m => m.stack + "x " + (m.index > 0 ? Game1.objectInformation[m.index].Split('/')[4] : "Category " + getCatName(m.index))));
                 Game1.showRedMessage($"Missing Ingredients. ({ingredients})");
                 return false;
             }
@@ -584,7 +603,7 @@ namespace CustomFarmingRedux
 
         public override bool performToolAction(Tool t)
         {
-            if (heldObject != null)
+            if (heldObject != null && !blueprint.asdisplay)
             {
                 if (readyForHarvest)
                 {
@@ -601,7 +620,13 @@ namespace CustomFarmingRedux
 
 
             if (t == null || !t.isHeavyHitter() || t is MeleeWeapon || !(t is Pickaxe))
-                return false;           
+                return false;
+
+            if (blueprint.asdisplay && heldObject != null)
+            {
+                heldObject = null;
+                return false;
+            }
 
             clear();
             location = null;

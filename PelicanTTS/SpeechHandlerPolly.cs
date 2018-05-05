@@ -118,9 +118,9 @@ namespace PelicanTTS
             speakerName = name;
             NPC speaker = Game1.getCharacterFromName(name);
 
-            if (speaker != null && speaker.gender == 0)
+            if (speaker != null && speaker.Gender == 0)
             {
-                if (speaker.age == 0)
+                if (speaker.Age == 0)
                 {
                     currentVoice = VoiceId.Joey;
                 }
@@ -132,9 +132,9 @@ namespace PelicanTTS
             }
 
 
-            if (speaker != null && speaker.gender == 1)
+            if (speaker != null && speaker.Gender == 1)
             {
-                if (speaker.age == 0)
+                if (speaker.Age == 0)
                 {
                     currentVoice = VoiceId.Kendra;
                 }
@@ -213,7 +213,7 @@ namespace PelicanTTS
 
                 if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
                 {
-                    setVoice(Game1.currentSpeaker.name);
+                    setVoice(Game1.currentSpeaker.Name);
                 }
                 else
                 {
@@ -261,18 +261,18 @@ namespace PelicanTTS
 
 
                 if (currentText.StartsWith("+"))
-                {
                     continue;
-                }
 
               
                 currentText = currentText.Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "");
+
+                /*
                 if (Game1.player.isMarried())
-                {
                     currentText = currentText.Replace(" " + Game1.player.spouse + " ", " your spouse ").Replace(" " + Game1.player.spouse, " your spouse").Replace(Game1.player.spouse + " ", "Your spouse ");
-                }
-                currentText.Replace(" " + Game1.player.name + " ", " Farmer ").Replace(" " + Game1.player.name, " Farmer").Replace(Game1.player.name + " ", "Farmer ");
-                
+
+                currentText.Replace(" " + Game1.player.Name + " ", " Farmer ").Replace(" " + Game1.player.Name, " Farmer").Replace(Game1.player.Name + " ", "Farmer ");
+                */
+
                 int hash = currentText.GetHashCode();
                 ensureFolderStructureExists(Path.Combine(Path.Combine(tmppath, speakerName), "speech.mp3"));
                 string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".mp3");
@@ -418,7 +418,7 @@ namespace PelicanTTS
                                     try { 
                                     Dialogue d = new Dialogue(text, Game1.getCharacterFromName(name));
                                     DialogueBox db = new DialogueBox(d);
-                                    List<string> dl = Helper.Reflection.GetPrivateValue<List<string>>(d, "dialogues");
+                                    List<string> dl = Helper.Reflection.GetField<List<string>>(d, "dialogues").GetValue();
                                     Monitor.Log("Dialog Length:" + dl.Count);
 
                                     while (dl.Count > 0)
@@ -457,7 +457,7 @@ namespace PelicanTTS
                                         }
                                         Monitor.Log(nextText);
                                         dl.RemoveAt(0);
-                                        Helper.Reflection.GetPrivateField<List<string>>(d, "dialogues").SetValue(dl);
+                                        Helper.Reflection.GetField<List<string>>(d, "dialogues").SetValue(dl);
                                     }
                                     }catch
                                     {

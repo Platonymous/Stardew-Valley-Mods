@@ -1,15 +1,12 @@
 {
   "Name": "Capitalism",
   "Author": "Platonymous",
-  "Version": {
-    "MajorVersion": 0,
-    "MinorVersion": 1,
-    "PatchVersion": 1,
-    "Build": null
-  },
+  "Version": "0.1.1",
   "Description": "Test Mod",
   "UniqueID": "Platonymous.Capitalism",
   "EntryDll": "Capitalism.dll",
+  "MinimumApiVersion": "2.6-beta",
+  "UpdateKeys": [],
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Visualize"

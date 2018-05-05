@@ -5,7 +5,7 @@
   "addMaps": [
     {
       "name": "CityBus",
-      "file": "Bus(People).tmx",
+      "file": "Bus(people).tmx",
       "addWarps": [
         "2 7 BusStop 12 9"
       ]

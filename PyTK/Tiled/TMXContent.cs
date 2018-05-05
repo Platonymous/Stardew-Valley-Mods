@@ -40,7 +40,10 @@ namespace PyTK.Tiled
                             string seasonPath = path.Replace(fileName, t.ImageSource.Replace("spring_", season));
                             FileInfo seasonFile = new FileInfo(Path.Combine(helper.DirectoryPath, seasonPath + ".png"));
                             if (seasonFile.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource.Replace("spring_", season)).Key == null)
+                            {
                                 helper.Content.Load<Texture2D>(seasonPath + ".png").inject(t.ImageSource.Replace("spring_", season));
+                                helper.Content.Load<Texture2D>(seasonPath + ".png").inject("Maps/" + t.ImageSource.Replace("spring_", season));
+                            }
                         }
                 }
             }
@@ -126,8 +129,15 @@ namespace PyTK.Tiled
 
         public static bool Convert (string pathIn, string pathOut, IModHelper helper, ContentSource contentSource = ContentSource.ModFolder, IMonitor monitor = null)
         {
-            if (!pathOut.EndsWith(".tmx"))
+            if(!pathIn.EndsWith(".tbin") && !pathIn.EndsWith(".xnb") && !pathOut.EndsWith(".tmx"))
+            {
+                new FileInfo(Path.Combine(helper.DirectoryPath, pathIn)).CopyTo(Path.Combine(helper.DirectoryPath, pathOut),true);
+                return true;
+            }
+
+                if (!pathOut.EndsWith(".tmx"))
                 pathOut = pathOut + ".tmx";
+
 
             MemoryStream mem = null;
             try

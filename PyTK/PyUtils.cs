@@ -8,10 +8,13 @@ using System.IO;
 using System.Linq;
 using StardewValley.Buildings;
 using System.Xml;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using PyTK.Extensions;
 
 namespace PyTK
 {
-    public static class PyUtils
+    public class PyUtils
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
@@ -19,6 +22,11 @@ namespace PyTK
         public static bool CheckEventConditions(string conditions)
         {
             return checkEventConditions(conditions);
+        }
+
+        public PyUtils()
+        {
+
         }
 
         public static string getContentFolder()
@@ -55,7 +63,7 @@ namespace PyTK
             if (conditions.StartsWith("PC "))
                 result = checkPlayerConditions(conditions.Replace("PC ", ""));
             else
-                result = Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>(new object[] { "9999999/" + conditions }) != -1;
+                result = Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) != -1;
 
             return result == comparer;
         }
@@ -72,7 +80,7 @@ namespace PyTK
                 if (location is BuildableGameLocation bgl)
                     foreach (Building building in bgl.buildings)
                         if (building.indoors != null)
-                            list.Add(building.indoors);
+                            list.Add(building.indoors.Value);
 
             return list;
         }
@@ -93,7 +101,7 @@ namespace PyTK
                 TModel pack = Helper.ReadJsonFile<TModel>(file);
                 packs.Add(pack);
 
-                if (pack is IContentPack p)
+                if (pack is Types.IContentPack p)
                 {
                     p.fileName = new FileInfo(file).Name;
                     p.folderName = new FileInfo(file).Directory.Name;
@@ -117,6 +125,21 @@ namespace PyTK
             else
                 return Type.GetType(prefix + type + ", StardewValley");
 
+        }
+
+        public static Texture2D getRectangle(int width, int height, Color color)
+        {
+            Texture2D rect = new Texture2D(Game1.graphics.GraphicsDevice, width, height);
+
+            Color[] data = new Color[width * height];
+            for (int i = 0; i < data.Length; ++i) data[i] = color;
+            rect.SetData(data);
+            return rect;
+        }
+
+        public static Texture2D getWhitePixel()
+        {
+            return getRectangle(1, 1, Color.White);
         }
 
         internal static void checkAllSaves()

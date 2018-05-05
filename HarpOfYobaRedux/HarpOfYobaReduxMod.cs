@@ -14,9 +14,13 @@ namespace HarpOfYobaRedux
     {
         private DataLoader data;
         public static Config config;
+        public static IMonitor monitor;
+        public static IModHelper helper;
 
         public override void Entry(IModHelper helper)
         {
+            monitor = Monitor;
+            HarpOfYobaReduxMod.helper = Helper;
             config = Helper.ReadConfig<Config>();
             new ConsoleCommand("hoy_cheat", "Get all sheets without doing anything.", (c, p) => cheat(p)).register();
             SaveHandler.BeforeRebuilding += SaveHandler_BeforeRebuilding;
@@ -42,6 +46,9 @@ namespace HarpOfYobaRedux
                     items.AddOrReplace(new Instrument("harp"));
                 else if (SheetMusic.allSheets.ContainsKey(s))
                     items.AddOrReplace(new SheetMusic(s));
+                else if (s == "allsheets")
+                    foreach(string sheet in SheetMusic.allSheets.Keys)
+                        items.AddOrReplace(new SheetMusic(sheet));
             }
             if(items.Count > 0)
                 Game1.activeClickableMenu = new ItemGrabMenu(items);

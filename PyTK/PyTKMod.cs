@@ -20,9 +20,9 @@ using System.Collections.Generic;
 using PyTK.Overrides;
 using xTile.Format;
 using System.Linq;
-
 using PyTK.Tiled;
-using System.IO;
+using PyTK.Lua;
+using Netcode;
 
 namespace PyTK
 {
@@ -49,11 +49,11 @@ namespace PyTK
             harmonyFix();
             FormatManager.Instance.RegisterMapFormat(new NewTiledTmxFormat());
 
-            TimeEvents.AfterDayStarted += (a,b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
+            SaveHandler.BeforeRebuilding += (a,b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
             registerConsoleCommands();
             CustomTVMod.load();
+            PyLua.init();
             SaveHandler.setUpEventHandlers();
-
         }
 
         private void harmonyFix()
@@ -69,6 +69,7 @@ namespace PyTK
             CcSaveHandler.cleanup().register();
             CcSaveHandler.savecheck().register();
             CcTime.skip().register();
+            CcLua.runScript().register();
         }
 
         private void testing()

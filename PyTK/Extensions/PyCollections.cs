@@ -12,7 +12,7 @@ namespace PyTK.Extensions
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
-        public static Dictionary<TKey, TValue> AddOrReplace<TKey, TValue>(this Dictionary<TKey, TValue> t, TKey key, TValue value)
+        public static IDictionary<TKey, TValue> AddOrReplace<TKey, TValue>(this IDictionary<TKey, TValue> t, TKey key, TValue value)
         {
             if (!t.ContainsKey(key))
                 t.Add(key, value);
@@ -32,7 +32,7 @@ namespace PyTK.Extensions
             return t;
         }
 
-        public static Dictionary<TKey, TValue> AddOrReplace<TKey, TValue>(this Dictionary<TKey, TValue> t, Dictionary<TKey, TValue> dict)
+        public static IDictionary<TKey, TValue> AddOrReplace<TKey, TValue>(this IDictionary<TKey, TValue> t, IDictionary<TKey, TValue> dict)
         {
             foreach(KeyValuePair<TKey,TValue> k in dict)
                 t.AddOrReplace(k.Key, k.Value);
@@ -40,7 +40,7 @@ namespace PyTK.Extensions
             return t;
         }
 
-        public static List<T> AddOrReplace<T>(this List<T> t, T item)
+        public static IList<T> AddOrReplace<T>(this List<T> t, T item)
         {
             if (!t.Contains(item))
                 t.Add(item);
@@ -54,12 +54,13 @@ namespace PyTK.Extensions
             return t;
         }
 
-        public static List<T> toList<TKey,TValue, T>(this Dictionary<TKey, TValue> t, Func<KeyValuePair<TKey,TValue>,T> conversion)
+        public static List<T> toList<TKey, TValue, T>(this IDictionary<TKey, TValue> t, Func<KeyValuePair<TKey, TValue>, T> conversion)
         {
             List<T> list = new List<T>();
-            foreach (KeyValuePair<TKey, TValue> i in t)
-                if (conversion.Invoke(i) is T n)
-                    list.Add(n);
+            if (t.Count > 0)
+                foreach (KeyValuePair<TKey, TValue> i in t)
+                    if (conversion.Invoke(i) is T n)
+                        list.Add(n);
 
             return list;
         }
@@ -68,8 +69,7 @@ namespace PyTK.Extensions
         {
             List<TOut> list = new List<TOut>();
             foreach (TIn i in t)
-                if (conversion.Invoke(i) is TOut n)
-                    list.Add(n);
+                    list.Add(conversion.Invoke(i));
 
             return list;
         }
@@ -104,7 +104,7 @@ namespace PyTK.Extensions
             return t.ToDictionary(k => k.Key, v => v.Value);
         }
 
-        public static bool Exists<TKey, TValue>(this Dictionary<TKey, TValue> t, Func<KeyValuePair<TKey, TValue>, bool> predcate)
+        public static bool Exists<TKey, TValue>(this IDictionary<TKey, TValue> t, Func<KeyValuePair<TKey, TValue>, bool> predcate)
         {
             foreach (KeyValuePair<TKey, TValue> k in t)
                 if (predcate.Invoke(k))
@@ -112,7 +112,7 @@ namespace PyTK.Extensions
             return false;
         }
 
-        public static KeyValuePair<TKey, TValue> Find<TKey, TValue>(this Dictionary<TKey, TValue> t, Func<KeyValuePair<TKey,TValue>,bool> predcate)
+        public static KeyValuePair<TKey, TValue> Find<TKey, TValue>(this IDictionary<TKey, TValue> t, Func<KeyValuePair<TKey,TValue>,bool> predcate)
         {
             foreach (KeyValuePair<TKey, TValue> k in t)
                 if (predcate.Invoke(k))
@@ -134,7 +134,7 @@ namespace PyTK.Extensions
             return list;
         }
 
-        public static Dictionary<TKey,TValue> useAll<TKey,TValue>(this Dictionary<TKey, TValue> dict, Action<KeyValuePair<TKey,TValue>> action)
+        public static IDictionary<TKey,TValue> useAll<TKey,TValue>(this IDictionary<TKey, TValue> dict, Action<KeyValuePair<TKey,TValue>> action)
         {
             foreach (KeyValuePair<TKey,TValue> entry in dict)
                 action.Invoke(entry);
@@ -142,22 +142,22 @@ namespace PyTK.Extensions
             return dict;
         }
 
-        public static string Join<TKey,TValue>(this Dictionary<TKey,TValue> t, char keySeperator = '|', char valueSeperator = '=')
+        public static string Join<TKey,TValue>(this IDictionary<TKey,TValue> t, char keySeperator = '|', char valueSeperator = '=')
         {
             return String.Join(keySeperator.ToString(), t.toList(p => p.Key + valueSeperator.ToString() + p.Value));
         }
 
-        public static Dictionary<TKey, TValue> ToDictionary<TKey,TValue>(this string dict, string joinedString, Func<string, TKey> keyConverter, Func<string, TValue> valueConverter, char keySeperator = '|', char valueSeperator = '=')
+        public static IDictionary<TKey, TValue> ToDictionary<TKey,TValue>(this string dict, string joinedString, Func<string, TKey> keyConverter, Func<string, TValue> valueConverter, char keySeperator = '|', char valueSeperator = '=')
         {
             return new List<string>(joinedString.Split(keySeperator)).toDictionary(p => new DictionaryEntry<TKey, TValue>(keyConverter(p.Split(valueSeperator)[0]), valueConverter(p.Split(valueSeperator)[1])));
         }
 
-        public static Dictionary<string, string> ToDictionary(this string dict, string joinedString, char keySeperator = '|', char valueSeperator = '=')
+        public static IDictionary<string, string> ToDictionary(this string dict, string joinedString, char keySeperator = '|', char valueSeperator = '=')
         {
             return new List<string>(joinedString.Split(keySeperator)).toDictionary(p => new DictionaryEntry<string, string>(p.Split(valueSeperator)[0],p.Split(valueSeperator)[1]));
         }
 
-        public static int getIndexByName(this Dictionary<int, string> dictionary, string name)
+        public static int getIndexByName(this IDictionary<int, string> dictionary, string name)
         {
             if (name.StartsWith("startswith:"))
                 return (dictionary.Where(d => d.Value.Split('/')[0].StartsWith(name.Split(':')[1])).FirstOrDefault()).Key;

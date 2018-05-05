@@ -66,6 +66,7 @@ namespace PyTK.Overrides
 
         }
 
+        [HarmonyPatch]
         internal class CrittersFix
         {
             internal static MethodInfo TargetMethod()

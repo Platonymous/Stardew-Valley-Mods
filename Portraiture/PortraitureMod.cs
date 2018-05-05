@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Harmony;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -7,7 +8,7 @@ using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.IO;
-using Visualize;
+using System.Reflection;
 
 namespace Portraiture
 {
@@ -18,7 +19,6 @@ namespace Portraiture
         private static Mod instance;
         internal static PConfig config;
         internal static Texture2D activeTexure;
-        private static IVisualizeHandler vHandler = new PortaitureVHandler();
         
         public override void Entry(IModHelper help)
         {
@@ -27,13 +27,19 @@ namespace Portraiture
             config = Helper.ReadConfig<PConfig>();
             string customContentFolder = Path.Combine(helper.DirectoryPath, "Portraits");
             displayAlpha = 0;
-            VisualizeMod.addHandler(vHandler);
-            
+
             if (!Directory.Exists(customContentFolder))
                 Directory.CreateDirectory(customContentFolder);
 
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+            harmonyFix();
+        }
+
+        private void harmonyFix()
+        {
+            HarmonyInstance instance = HarmonyInstance.Create("Platonymous.Portraiture");
+            instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 
         private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
