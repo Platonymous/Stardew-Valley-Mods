@@ -17,7 +17,8 @@ namespace PyTK.Overrides
 
             internal static void Prefix()
             {
-                    SaveHandler.Replace();
+                PyTKMod._monitor.Log("Players:" + Game1.numberOfPlayers());
+                SaveHandler.Replace();
             }
 
             internal static void Postfix()
@@ -43,7 +44,7 @@ namespace PyTK.Overrides
 
             internal static void Postfix()
             {
-                if (Game1.IsServer)
+                if (Game1.IsClient || Game1.numberOfPlayers() < 2)
                     SaveHandler.Rebuild();
             }
         }
