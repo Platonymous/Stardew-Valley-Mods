@@ -101,7 +101,6 @@
     <Compile Include="Types\Mail.cs" />
     <Compile Include="Types\Range.cs" />
     <Compile Include="Types\STime.cs" />
-    <Compile Include="Types\StringWorldData.cs" />
     <Compile Include="Types\TerrainSelector.cs" />
     <Compile Include="Types\ItemSelector.cs" />
     <Compile Include="Types\TileAction.cs" />

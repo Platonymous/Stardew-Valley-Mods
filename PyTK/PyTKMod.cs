@@ -22,7 +22,6 @@ using xTile.Format;
 using System.Linq;
 using PyTK.Tiled;
 using PyTK.Lua;
-using Netcode;
 
 namespace PyTK
 {
