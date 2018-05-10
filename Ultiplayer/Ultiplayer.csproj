@@ -46,6 +46,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="farmhands\.farmhands">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -57,11 +60,6 @@
       <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
       <Name>Harmony</Name>
       <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
-      <Name>PyTK</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
