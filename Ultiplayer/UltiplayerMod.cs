@@ -129,8 +129,9 @@ namespace Ultiplayer
                 long id = farmer.Value.UniqueMultiplayerID;
                 approve();
                 Multiplayer multiplayer = (Multiplayer) typeof(Game1).GetField("multiplayer", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
-                farmer.Value.currentLocation = Game1.getLocationFromName("BusStop");
-                farmer.Value.Position = new Vector2(704f, 704f);
+                farmer.Value.currentLocation = Game1.getLocationFromName("FarmHouse");
+                farmer.Value.homeLocation.Value = "FarmHouse";
+                farmer.Value.Position = new Vector2(640f, 320f);
                 multiplayer.addPlayer(farmer);
                 multiplayer.broadcastPlayerIntroduction(farmer);
                 __instance.sendServerIntroduction(id);
@@ -178,9 +179,9 @@ namespace Ultiplayer
             farmhand.Value.UniqueMultiplayerID = Utility.RandomLong(rnd);
             farmhand.Value.questLog.Add((Quest)(Quest.getQuestFromId(9) as SocializeQuest));
             farmhand.Value.farmName.Value = Game1.MasterPlayer.farmName.Value;
-            farmhand.Value.homeLocation.Value = "BusStop";
-            farmhand.Value.currentLocation = Game1.getLocationFromName("BusStop");
-            farmhand.Value.Position = new Vector2(704f, 704f);
+            farmhand.Value.homeLocation.Value = "FarmHouse";
+            farmhand.Value.currentLocation = Game1.getLocationFromName("FarmHouse");
+            farmhand.Value.Position = new Vector2(640f, 320f);
             return farmhand;
         }
 
@@ -204,8 +205,9 @@ namespace Ultiplayer
             foreach (NetRef<Farmer> f in farmers)
                 if ((!f.Value.isActive() || multiplayer.isDisconnecting(f.Value.UniqueMultiplayerID)) && authCheck(userID, f.Value))
                 {
-                    f.Value.currentLocation = Game1.getLocationFromName("BusStop");
-                    f.Value.Position = new Vector2(704f, 704f);
+                    f.Value.currentLocation = Game1.getLocationFromName("FarmHouse");
+                    f.Value.homeLocation.Value = "FarmHouse";
+                    f.Value.Position = new Vector2(640f, 320f);
                     netRefList.Add(f);
                 }
 
