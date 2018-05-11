@@ -10,83 +10,101 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Network;
 using StardewValley.Quests;
-//using PyTK;
-//using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI.Events;
+using StardewValley.Tools;
+using xTile.Dimensions;
+using xTile;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using StardewValley.Menus;
+using StardewValley.Locations;
+using StardewValley.Buildings;
 
 namespace Ultiplayer
 {
     public class UltiplayerMod : Mod
     {
+        #region fields
         internal static IModHelper help;
         internal static IMonitor mon;
-        public static Random rnd;
-        public static List<NetRef<Farmer>> farmers;
-        public static string farmhandDirectory;
+        internal static Random rnd;
+        internal static List<NetRef<Farmer>> farmers;
+        internal static string farmhandDirectory;
+        internal static bool ultiplayer;
+        #endregion
 
+        #region init
         public override void Entry(IModHelper helper)
         {
             help = Helper;
             mon = Monitor;
             rnd = new Random();
+            ultiplayer = false;
+            farmers = new List<NetRef<Farmer>>();
             farmhandDirectory = Path.Combine(help.DirectoryPath, "farmhands");
+
+            #region harmony
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.Ultiplayer");
             instance.PatchAll(Assembly.GetExecutingAssembly());
-            farmers = new List<NetRef<Farmer>>();
-           
-            /* 
-            
-            Keys.K.onPressed(() =>
-            {
-                mon.Log("Checking farmers:" + farmers.Count);
-                foreach (NetRef<Farmer> f in farmers)
-                {
-                    mon.Log(f.Value.Name + ":" + f.Value.UniqueMultiplayerID);
-                }
-            });
+            #endregion
 
-           Keys.L.onPressed(() =>
-            {
-                mon.Log("Checking Multiplayer:" + Game1.otherFarmers.Count);
-                
-                foreach (Farmer f in Game1.otherFarmers.Values)
-                {
-                    mon.Log(f.Name + ":" + f.UniqueMultiplayerID);
-                }
-            });
-            
-             */
-
-            TimeEvents.AfterDayStarted += (s,e) => SyncFarmhands();
+            #region events
+            TimeEvents.AfterDayStarted += (s, e) => SyncFarmhands();
             SaveEvents.AfterLoad += (s, e) => LoadFarmhands();
+            ControlEvents.KeyPressed += (s, e) => keyPressed(e.KeyPressed);
+            GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
+            #endregion
         }
 
-        public static Type getTypeSDV(string type)
+        #region ui
+
+        private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
         {
-            string prefix = "StardewValley.";
-            Type defaulSDV = Type.GetType(prefix + type + ", Stardew Valley");
+            string message = ultiplayer ? "Ultiplayer activated" : "Ultiplayer deactivated";
 
-            if (defaulSDV != null)
-                return defaulSDV;
-            else
-                return Type.GetType(prefix + type + ", StardewValley");
-
+            if (Game1.activeClickableMenu is TitleMenu)
+                Game1.spriteBatch.DrawString(Game1.smallFont, Game1.parseText(message, Game1.smallFont, 640), new Vector2(8f, (float)((double)Game1.viewport.Height - (double)Game1.smallFont.MeasureString(Game1.parseText(message, Game1.smallFont, 640)).Y - 4.0)), Color.Red);
         }
+        #endregion
+
+        #endregion
+
+        #region inputHandling
+
+        internal void keyPressed(Keys key)
+        {
+            if (Game1.activeClickableMenu is TitleMenu t && key == Keys.U)
+            {
+                ultiplayer = !ultiplayer;
+                mon.Log(ultiplayer ? "Ultiplayer activated" : "Ultiplayer deactivated", LogLevel.Info);
+            }
+        }
+
+        #endregion
+
+        #region FarmHand sync
 
         private static void LoadFarmhands()
         {
+            if (!ultiplayer)
+                return;
+
+            farmers = new List<NetRef<Farmer>>();
             string[] files = Directory.GetFiles(farmhandDirectory, "*." + Game1.uniqueIDForThisGame + ".xml", SearchOption.TopDirectoryOnly);
             foreach (string file in files)
             {
                 FileStream fs = new FileStream(file, FileMode.Open);
-                Farmer f = (Farmer) SaveGame.farmerSerializer.Deserialize(fs);
+                Farmer f = (Farmer)SaveGame.farmerSerializer.Deserialize(fs);
                 farmers.Add(new NetRef<Farmer>(f));
             }
+            
         }
-
 
         private static void SyncFarmhands(long id = 0)
         {
+            if (!ultiplayer)
+                return;
+
             mon.Log("SyncFarmhands");
             foreach (Farmer f in Game1.otherFarmers.Values)
                 if (farmers.Find(fh => (id == 0 || f.UniqueMultiplayerID == id) && fh.Value.UniqueMultiplayerID == f.UniqueMultiplayerID) is NetRef<Farmer> nfh)
@@ -96,7 +114,11 @@ namespace Ultiplayer
                     FileStream fs = new FileStream(path, FileMode.Create);
                     SaveGame.farmerSerializer.Serialize(fs, f);
                 }
-        }           
+        }
+
+        #endregion
+
+        #region overrides
 
         [HarmonyPatch]
         internal class ServerFix
@@ -108,13 +130,14 @@ namespace Ultiplayer
 
             internal static bool Prefix(GameServer __instance, string userID, Action<OutgoingMessage> sendMessage)
             {
-                mon.Log("sendAvailableFarmhands:" + userID + ":" + sendMessage.ToString());
-                sendAvailableFarmhands(userID, sendMessage);
-                return false;
-             }
+                if (!ultiplayer)
+                    return true;
+
+                return sendAvailableFarmhands(userID, sendMessage);
+            }
         }
 
- 
+
         [HarmonyPatch]
         internal class ServerFix2
         {
@@ -125,12 +148,13 @@ namespace Ultiplayer
 
             internal static bool Prefix(GameServer __instance, string userID, NetFarmerRoot farmer, Action<OutgoingMessage> sendMessage, Action approve)
             {
-                mon.Log("checkFarmhandRequest:" + userID + ":" + farmer.Value.Name);               
+                if (!ultiplayer || farmer.Value.homeLocation.Value != "FarmHouse")
+                    return true;
+
                 long id = farmer.Value.UniqueMultiplayerID;
                 approve();
-                Multiplayer multiplayer = (Multiplayer) typeof(Game1).GetField("multiplayer", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+                Multiplayer multiplayer = (Multiplayer)typeof(Game1).GetField("multiplayer", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
                 farmer.Value.currentLocation = Game1.getLocationFromName("FarmHouse");
-                farmer.Value.homeLocation.Value = "FarmHouse";
                 farmer.Value.Position = new Vector2(640f, 320f);
                 multiplayer.addPlayer(farmer);
                 multiplayer.broadcastPlayerIntroduction(farmer);
@@ -151,6 +175,9 @@ namespace Ultiplayer
 
             internal static void Prefix(GameServer __instance, ref List<Farmer> files)
             {
+                if (!ultiplayer)
+                    return;
+
                 files.ForEach(file => file.slotCanHost = true);
             }
 
@@ -166,13 +193,16 @@ namespace Ultiplayer
 
             internal static void Prefix(Multiplayer __instance)
             {
+                if (!ultiplayer)
+                    return;
+
                 List<long> disc = help.Reflection.GetField<List<long>>(__instance, "disconnectingFarmers").GetValue();
                 foreach (long id in disc)
                     SyncFarmhands(id);
             }
         }
 
-            public static NetRef<Farmer> getNewFarmHand()
+        internal static NetRef<Farmer> getNewFarmHand()
         {
             NetRef<Farmer> farmhand = new NetRef<Farmer>();
             farmhand.Value = new Farmer(new FarmerSprite((string)null), new Vector2(0.0f, 0.0f), 1, "", Farmer.initialTools(), true);
@@ -185,7 +215,23 @@ namespace Ultiplayer
             return farmhand;
         }
 
-        public static bool authCheck(string userID, Farmer farmhand)
+        #endregion
+
+        #region override helper
+
+        internal static Type getTypeSDV(string type)
+        {
+            string prefix = "StardewValley.";
+            Type defaulSDV = Type.GetType(prefix + type + ", Stardew Valley");
+
+            if (defaulSDV != null)
+                return defaulSDV;
+            else
+                return Type.GetType(prefix + type + ", StardewValley");
+
+        }
+
+        internal static bool authCheck(string userID, Farmer farmhand)
         {
             if (!Game1.options.enableFarmhandCreation && !farmhand.isCustomized.Value)
                 return false;
@@ -194,13 +240,27 @@ namespace Ultiplayer
             return true;
         }
 
+        internal static IEnumerable<Cabin> cabins()
+        {
+            if (Game1.getFarm() != null)
+                foreach (Building building in Game1.getFarm().buildings)
+                    if (building.daysOfConstructionLeft.Value <= 0 && building.indoors.Value is Cabin)
+                        yield return building.indoors.Value as Cabin;
+        }
 
-        public static void sendAvailableFarmhands(string userID, Action<OutgoingMessage> sendMessage)
+        internal static bool sendAvailableFarmhands(string userID, Action<OutgoingMessage> sendMessage)
         {
             mon.Log("sendAvailableFarmhands:" + userID);
 
             Multiplayer multiplayer = (Multiplayer)typeof(Game1).GetField("multiplayer", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
             List<NetRef<Farmer>> netRefList = new List<NetRef<Farmer>>();
+
+            foreach (Cabin cabin in cabins())
+                if (cabin.getFarmhand() is NetRef<Farmer> farmhand && ((!farmhand.Value.isActive() || multiplayer.isDisconnecting(farmhand.Value.UniqueMultiplayerID)) && authCheck(userID, farmhand.Value)))
+                    netRefList.Add(farmhand);
+
+            if (netRefList.Count > 0)
+                return true;
 
             foreach (NetRef<Farmer> f in farmers)
                 if ((!f.Value.isActive() || multiplayer.isDisconnecting(f.Value.UniqueMultiplayerID)) && authCheck(userID, f.Value))
@@ -210,8 +270,6 @@ namespace Ultiplayer
                     f.Value.Position = new Vector2(640f, 320f);
                     netRefList.Add(f);
                 }
-
-            mon.Log("Found:" + netRefList.Count);
 
             if (netRefList.Count < 1)
             {
@@ -235,7 +293,8 @@ namespace Ultiplayer
                         {
                             netRef.Serializer = SaveGame.farmerSerializer;
                             netRef.WriteFull(writer);
-                        }catch(Exception e)
+                        }
+                        catch (Exception e)
                         {
                             mon.Log(e.Message + ":" + e.StackTrace);
                         }
@@ -250,9 +309,13 @@ namespace Ultiplayer
             (object) memoryStream.ToArray()
                     }));
                 }
-                
+
 
             }
+
+            return false;
         }
+        #endregion
     }
+
 }
