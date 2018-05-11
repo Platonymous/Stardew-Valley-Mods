@@ -78,6 +78,7 @@ namespace Ultiplayer
                 ultiplayer = !ultiplayer;
                 mon.Log(ultiplayer ? "Ultiplayer activated" : "Ultiplayer deactivated", LogLevel.Info);
             }
+
         }
 
         #endregion
@@ -119,6 +120,82 @@ namespace Ultiplayer
         #endregion
 
         #region overrides
+
+        internal static Dictionary<long, OutgoingMessage> cache = new Dictionary<long, OutgoingMessage>();
+        internal static Dictionary<long,int> peers = new Dictionary<long, int>();
+
+        [HarmonyPatch]
+        internal class ServerSpeedFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(getTypeSDV("Network.GameServer"), "sendMessage",new[] { typeof(long), typeof(OutgoingMessage) });
+            }
+
+            internal static bool Prefix(GameServer __instance, long peerId, OutgoingMessage message)
+            {
+                return skipMessage(peerId, message);
+            }
+        }
+
+        internal static double getDistance(Vector2 p1, Vector2 p2)
+        {
+            float distX = Math.Abs(p1.X - p2.X);
+            float distY = Math.Abs(p1.Y - p2.Y);
+            double dist = Math.Sqrt((distX * distX) + (distY * distY));
+            return dist;
+        }
+
+        internal static bool skipMessage(long peerId, OutgoingMessage message)
+        {
+            if (!ultiplayer)
+                return true;
+
+            if (int.Parse(message.MessageType.ToString()) != 0)
+                return true;
+
+                if (!peers.ContainsKey(peerId))
+                peers.Add(peerId, 5);
+
+
+            Farmer compare = Game1.player;
+
+                if (message.Data[0] is Byte[] b)
+                    compare = message.SourceFarmer;
+
+
+            if (Game1.otherFarmers[peerId] == compare || (int.Parse(message.MessageType.ToString()) == 0 && (Game1.otherFarmers[peerId].currentLocation != compare.currentLocation || getDistance(new Vector2(compare.position.X, compare.position.Y), new Vector2(Game1.otherFarmers[peerId].position.X, Game1.otherFarmers[peerId].position.Y)) > 900)))
+            {
+                if (peers[peerId] <= 0)
+                    return false;
+                else
+                {
+                    peers[peerId]--;
+                    return true;
+                }
+            }
+            else
+            {
+                peers[peerId] = 5;
+                return true;
+            } 
+        }
+
+        [HarmonyPatch]
+        internal class FarmerFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(getTypeSDV("Multiplayer"), "receiveTeamDelta");
+            }
+
+            internal static bool Prefix(Farmer __instance)
+            {
+                List<INetSerializable>  list = help.Reflection.GetField<List<INetSerializable>>(__instance.NetFields, "fields").GetValue();
+                return false;
+
+            }
+        }
 
         [HarmonyPatch]
         internal class ServerFix
