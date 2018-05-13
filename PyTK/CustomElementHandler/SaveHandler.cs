@@ -402,7 +402,7 @@ namespace PyTK.CustomElementHandler
 
         private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent)
         {
-            return FindAllInstances(obj, parent, new List<string>() { "Value", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
+            return FindAllInstances(obj, parent, new List<string>() { "value", "Value", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
         }
 
         private static void ReplaceAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate, Func<TIn, object> replacer, bool reverse = false)
