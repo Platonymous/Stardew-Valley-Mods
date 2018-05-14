@@ -44,15 +44,18 @@ namespace PyTK
             _monitor = Monitor;
 
             //testing();
+            //messageTest()
 
             harmonyFix();
             FormatManager.Instance.RegisterMapFormat(new NewTiledTmxFormat());
 
-            SaveHandler.BeforeRebuilding += (a,b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
+            SaveHandler.BeforeRebuilding += (a, b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
             registerConsoleCommands();
             CustomTVMod.load();
             PyLua.init();
             SaveHandler.setUpEventHandlers();
+
+            
         }
 
         private void harmonyFix()
@@ -69,6 +72,52 @@ namespace PyTK
             CcSaveHandler.savecheck().register();
             CcTime.skip().register();
             CcLua.runScript().register();
+
+            new ConsoleCommand("send", "sends a message to all players: send [address] [message]", (s, p) =>
+            {
+                if (p.Length < 2)
+                    Monitor.Log("Missing address or message.", LogLevel.Alert);
+                else
+                {
+
+                    string address = p[0];
+                    List<string> parts = new List<string>(p);
+                    parts.Remove(p[0]);
+                    string message = String.Join(" ", p);
+                    PyUtils.sendMPString(address, message);
+                    Monitor.Log("OK", LogLevel.Info);
+                }
+
+            }).register();
+
+            new ConsoleCommand("messages", "lists all new messages on a specified address: messages [address]", (s, p) =>
+            {
+                if (p.Length == 0)
+                    Monitor.Log("Missing address", LogLevel.Alert);
+                else
+                {
+                    List<MPStringMessage> messages = PyUtils.getNewMPStringMessages(p[0]);
+                    foreach (MPStringMessage msg in messages)
+                        Monitor.Log($"From {msg.sender.Name} : {msg.message}", LogLevel.Info);
+
+                    Monitor.Log("OK", LogLevel.Info);
+                }
+
+            }).register();
+        }
+
+        private void messageTest()
+        {
+            PyUtils.sendMPString("Platonymous.PyTK.Test", "TestMessage");
+            TimeEvents.TimeOfDayChanged += (s, e) => 
+            {
+                foreach(MPStringMessage msg in PyUtils.getNewMPStringMessages("Platonymous.PyTK.Test"))
+                {
+                    string message = msg.message;
+                    string sender = msg.sender.Name;
+                    //Do Something;
+                } 
+            };
         }
 
         private void testing()

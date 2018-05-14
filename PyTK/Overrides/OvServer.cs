@@ -1,6 +1,7 @@
 ﻿using Harmony;
 using PyTK.CustomElementHandler;
 using StardewValley;
+using StardewValley.Network;
 using System.Reflection;
 
 namespace PyTK.Overrides
@@ -46,6 +47,44 @@ namespace PyTK.Overrides
             {
                 if (Game1.IsClient || Game1.numberOfPlayers() < 2)
                     SaveHandler.Rebuild();
+            }
+        }
+
+        [HarmonyPatch]
+        internal class ServerFix3
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("Network.GameServer"), "processIncomingMessage");
+            }
+
+            internal static bool Prefix(IncomingMessage message)
+            {
+                if (message.MessageType == 99)
+                    PyUtils.receiveMPString(message);
+                else
+                    return true;
+
+                return false;
+            }
+        }
+
+        [HarmonyPatch]
+        internal class ClientFix1
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("Network.Client"), "processIncomingMessage");
+            }
+
+            internal static bool Prefix(IncomingMessage message)
+            {
+                if (message.MessageType == 99)
+                    PyUtils.receiveMPString(message);
+                else
+                    return true;
+
+                return false;
             }
         }
     }

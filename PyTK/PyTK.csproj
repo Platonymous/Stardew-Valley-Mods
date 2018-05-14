@@ -99,6 +99,7 @@
     <Compile Include="Types\ICustomContentAPI.cs" />
     <Compile Include="Types\InventoryItem.cs" />
     <Compile Include="Types\Mail.cs" />
+    <Compile Include="Types\MPStringMessage.cs" />
     <Compile Include="Types\Range.cs" />
     <Compile Include="Types\STime.cs" />
     <Compile Include="Types\TerrainSelector.cs" />
