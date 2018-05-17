@@ -248,7 +248,7 @@ namespace PyTK.CustomElementHandler
             if (o is Ring r)
                 return r.Name;
             if (o is Building bl)
-                return bl.nameOfIndoors.Value;
+                return bl.nameOfIndoors;
             if (o is GameLocation gl)
                 return (gl.lastQuestionKey != null) ? gl.lastQuestionKey : "not available";
             if (o is FarmAnimal a)
@@ -388,8 +388,8 @@ namespace PyTK.CustomElementHandler
                 b.Name = dataString;
             if (o is Ring r)
                 r.Name = dataString;
-            if (o is Building bl)
-                bl.nameOfIndoors.Value = dataString;
+            /* if (o is Building bl)
+                bl.nameOfIndoors = dataString; */
             if (o is GameLocation gl)
                 gl.lastQuestionKey = dataString;
             if (o is FarmAnimal a)
@@ -402,7 +402,7 @@ namespace PyTK.CustomElementHandler
 
         private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent)
         {
-            return FindAllInstances(obj, parent, new List<string>() { "Value", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
+            return FindAllInstances(obj, parent, new List<string>() { "value", "Value", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
         }
 
         private static void ReplaceAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate, Func<TIn, object> replacer, bool reverse = false)

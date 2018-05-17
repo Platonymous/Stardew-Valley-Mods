@@ -21,7 +21,6 @@ namespace SeedBag
         private static Texture2D attTexture;
         private static Texture2D att2Texture;
         private bool inUse;
-        
 
         public Dictionary<string, string> getAdditionalSaveData()
         {

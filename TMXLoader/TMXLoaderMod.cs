@@ -33,7 +33,7 @@ namespace TMXLoader
             convert();
             loadContentPacks();
             setTileActions();
-            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged;
+            PlayerEvents.Warped += LocationEvents_CurrentLocationChanged;
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
@@ -53,7 +53,7 @@ namespace TMXLoader
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 
-        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
+        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsPlayerWarped e)
         {
             if (e.NewLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
                 TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero,"Map");

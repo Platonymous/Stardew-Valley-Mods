@@ -79,6 +79,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SleepWorker", "SleepWorker\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanImporter", "PlanImporter\PlanImporter.csproj", "{BB50602A-0133-4B63-B22F-66E62A965BB5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ultiplayer", "Ultiplayer\Ultiplayer.csproj", "{49FF09B4-84E3-4F1C-BEF2-0A33E7CEDDDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -362,6 +364,14 @@ Global
 		{BB50602A-0133-4B63-B22F-66E62A965BB5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BB50602A-0133-4B63-B22F-66E62A965BB5}.Release|x86.ActiveCfg = Release|Any CPU
 		{BB50602A-0133-4B63-B22F-66E62A965BB5}.Release|x86.Build.0 = Release|Any CPU
+		{49FF09B4-84E3-4F1C-BEF2-0A33E7CEDDDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49FF09B4-84E3-4F1C-BEF2-0A33E7CEDDDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49FF09B4-84E3-4F1C-BEF2-0A33E7CEDDDC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{49FF09B4-84E3-4F1C-BEF2-0A33E7CEDDDC}.Debug|x86.Build.0 = Debug|Any CPU
+		{49FF09B4-84E3-4F1C-BEF2-0A33E7CEDDDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49FF09B4-84E3-4F1C-BEF2-0A33E7CEDDDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49FF09B4-84E3-4F1C-BEF2-0A33E7CEDDDC}.Release|x86.ActiveCfg = Release|Any CPU
+		{49FF09B4-84E3-4F1C-BEF2-0A33E7CEDDDC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -744,29 +744,29 @@ namespace PyTK.Extensions
         }*/
 
         /* Locations */
-
-        public static EventHandler<EventArgsCurrentLocationChanged> onEntry(this GameLocation t, EventHandler<EventArgsCurrentLocationChanged> handler)
+        
+        public static EventHandler<EventArgsPlayerWarped> onEntry(this GameLocation t, EventHandler<EventArgsPlayerWarped> handler)
         {
-            EventHandler<EventArgsCurrentLocationChanged> d = delegate (object sender, EventArgsCurrentLocationChanged e)
+            EventHandler<EventArgsPlayerWarped> d = delegate (object sender, EventArgsPlayerWarped e)
             {
                 if (e.NewLocation == t)
                     handler.Invoke(sender, e);
             };
 
-            LocationEvents.CurrentLocationChanged += d;
+            PlayerEvents.Warped += d;
 
             return d;
         }
 
-        public static EventHandler<EventArgsCurrentLocationChanged> onExit(this GameLocation t, EventHandler<EventArgsCurrentLocationChanged> handler)
+        public static EventHandler<EventArgsPlayerWarped> onExit(this GameLocation t, EventHandler<EventArgsPlayerWarped> handler)
         {
-            EventHandler<EventArgsCurrentLocationChanged> d = delegate (object sender, EventArgsCurrentLocationChanged e)
+            EventHandler<EventArgsPlayerWarped> d = delegate (object sender, EventArgsPlayerWarped e)
             {
                 if (e.PriorLocation == t)
                     handler.Invoke(sender, e);
             };
 
-            LocationEvents.CurrentLocationChanged += d;
+            PlayerEvents.Warped += d;
 
             return d;
         }

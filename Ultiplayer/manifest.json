@@ -1,0 +1,10 @@
+{
+  "Name": "Ultiplayer",
+  "Author": "Platonymous",
+  "Version": "0.2.4",
+  "Description": "Allows for as many Farmhands as you like.",
+  "UniqueID": "Platonymous.Ultiplayer",
+  "EntryDll": "Ultiplayer.dll",
+  "MinimumApiVersion": "2.6-beta",
+  "UpdateKeys": [ "Nexus:" ]
+}
