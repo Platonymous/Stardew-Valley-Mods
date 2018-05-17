@@ -31,6 +31,8 @@ namespace Ultiplayer
         internal static List<NetRef<Farmer>> farmers;
         internal static string farmhandDirectory;
         internal static bool ultiplayer;
+        internal const int maxDistance = 810000;
+        internal const int overflow = 6;
         #endregion
 
         #region init
@@ -142,7 +144,7 @@ namespace Ultiplayer
         {
             float distX = Math.Abs(p1.X - p2.X);
             float distY = Math.Abs(p1.Y - p2.Y);
-            double dist = Math.Sqrt((distX * distX) + (distY * distY));
+            double dist = (distX * distX) + (distY * distY);
             return dist;
         }
 
@@ -151,11 +153,14 @@ namespace Ultiplayer
             if (!ultiplayer)
                 return true;
 
-            if (int.Parse(message.MessageType.ToString()) != 0)
+            mon.Log(message.MessageType + ":" + message.GetHashCode());
+            mon.Log((message.MessageType == 0).ToString());
+            
+            if (message.MessageType != 0)
                 return true;
 
                 if (!peers.ContainsKey(peerId))
-                peers.Add(peerId, 5);
+                peers.Add(peerId, overflow);
 
 
             Farmer compare = Game1.player;
@@ -164,19 +169,19 @@ namespace Ultiplayer
                     compare = message.SourceFarmer;
 
 
-            if (Game1.otherFarmers[peerId] == compare || (int.Parse(message.MessageType.ToString()) == 0 && (Game1.otherFarmers[peerId].currentLocation != compare.currentLocation || getDistance(new Vector2(compare.position.X, compare.position.Y), new Vector2(Game1.otherFarmers[peerId].position.X, Game1.otherFarmers[peerId].position.Y)) > 900)))
+            if (Game1.otherFarmers[peerId] == compare || (int.Parse(message.MessageType.ToString()) == 0 && (Game1.otherFarmers[peerId].currentLocation != compare.currentLocation || getDistance(new Vector2(compare.position.X, compare.position.Y), new Vector2(Game1.otherFarmers[peerId].position.X, Game1.otherFarmers[peerId].position.Y)) > maxDistance)))
             {
-                if (peers[peerId] <= 0)
-                    return false;
-                else
-                {
-                    peers[peerId]--;
+                peers[peerId]--;
+                
+                if (peers[peerId] > 0)
                     return true;
-                }
+                else
+                    return false;
+                
             }
             else
             {
-                peers[peerId] = 5;
+                peers[peerId] = overflow;
                 return true;
             } 
         }
