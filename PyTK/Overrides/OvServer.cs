@@ -61,7 +61,7 @@ namespace PyTK.Overrides
             internal static bool Prefix(IncomingMessage message)
             {
                 if (message.MessageType == 99)
-                    PyUtils.receiveMPString(message);
+                    PyNet.receiveMessage(message);
                 else
                     return true;
 
@@ -80,7 +80,7 @@ namespace PyTK.Overrides
             internal static bool Prefix(IncomingMessage message)
             {
                 if (message.MessageType == 99)
-                    PyUtils.receiveMPString(message);
+                    PyNet.receiveMessage(message);
                 else
                     return true;
 
