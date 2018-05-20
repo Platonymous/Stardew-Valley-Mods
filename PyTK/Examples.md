@@ -140,7 +140,7 @@ public void callPingResponders()
 		else
 			Monitor.Log(farmer.Name + ": No Answer", LogLevel.Error);
 		}
-	});
+	}
 }
 
 PyResponder<int,int> staminaResponder = new PyResponder<int, int>("PytK.StaminaRequest", (stamina) =>
@@ -153,7 +153,7 @@ PyResponder<int,int> staminaResponder = new PyResponder<int, int>("PytK.StaminaR
                     return stamina;
                 }
 
-            }, 8));
+            }, 8);
 			
 staminaResponder.start();
 
