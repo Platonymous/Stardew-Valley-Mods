@@ -104,6 +104,7 @@ bool timeReached = STime.CURRENT > targetTime;
 ## Multiplayer
 ##### Messaging
 ```sh
+using PyTK;
 using PyTK.Types;
 
 //send Messages
