@@ -101,6 +101,49 @@ STime inTwoHours = STime.CURRENT + 120;
 bool timeReached = STime.CURRENT > targetTime;
 ```
 
+## Multiplayer
+##### Messaging
+```sh
+using PyTK.Types;
+
+//send Messages
+PyNet.sendMessage("MyMod.MyAddress","mydata");
+
+//receive Messages
+List<MPMessage> messages = PyNet.getNewMessages(p[0]).ToList();
+		   
+//use Messenger
+PyMessenger<MyClass> messenger = new PyMessenger<MyClass>("MyMod.MyMessengerAddress");
+MyClass envelope = new MyClass(params);
+messenger.send(envelope, SerializationType.JSON);
+List<MyClass> messages = messenger.receive().ToList();
+
+// Responder
+PyResponder pingResponder = new PyResponder<bool, long>("PytK.Ping", (s) =>
+           {
+               return true;
+           }, 1);
+		   
+pingResponder.start(1);		   
+
+public void callPingResponders()
+{
+	foreach (Farmer farmer in Game1.otherFarmers.Values)
+	{
+		long t = Game1.currentGameTime.TotalGameTime.Milliseconds;
+		var ping = PyNet.sendRequestToFarmer<bool>("PytK.Ping", t, farmer);
+		ping.Wait();
+		long r = Game1.currentGameTime.TotalGameTime.Milliseconds;
+		if (ping.Result)
+			Monitor.Log(farmer.Name + ": " + (r - t) + "ms", LogLevel.Info);
+		else
+			Monitor.Log(farmer.Name + ": No Answer", LogLevel.Error);
+		}
+	});
+}
+
+```
+
 ## Frameworks
 ##### Custom TV
 ```sh
