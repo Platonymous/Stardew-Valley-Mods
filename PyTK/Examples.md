@@ -110,7 +110,7 @@ using PyTK.Types;
 PyNet.sendMessage("MyMod.MyAddress","mydata");
 
 //receive Messages
-List<MPMessage> messages = PyNet.getNewMessages(p[0]).ToList();
+List<MPMessage> messages = PyNet.getNewMessages("MyMod.MyAddress").ToList();
 		   
 //use Messenger
 PyMessenger<MyClass> messenger = new PyMessenger<MyClass>("MyMod.MyMessengerAddress");
