@@ -115,7 +115,6 @@ namespace PyTK
                     Monitor.Log("Missing address or message.", LogLevel.Alert);
                 else
                 {
-
                     string address = p[0];
                     List<string> parts = new List<string>(p);
                     parts.Remove(p[0]);
