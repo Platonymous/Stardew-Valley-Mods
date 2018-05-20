@@ -120,19 +120,19 @@ messenger.send(envelope, SerializationType.JSON);
 List<MyClass> messages = messenger.receive().ToList();
 
 // Responder
-PyResponder pingResponder = new PyResponder<bool, long>("PytK.Ping", (s) =>
+PyResponder<bool,long> pingResponder = new PyResponder<bool, long>("PytK.Ping", (s) =>
            {
                return true;
            }, 1);
 		   
-pingResponder.start(1);		   
+pingResponder.start();		   
 
 public void callPingResponders()
 {
 	foreach (Farmer farmer in Game1.otherFarmers.Values)
 	{
 		long t = Game1.currentGameTime.TotalGameTime.Milliseconds;
-		var ping = PyNet.sendRequestToFarmer<bool>("PytK.Ping", t, farmer);
+		Task<bool> ping = PyNet.sendRequestToFarmer<bool>("PytK.Ping", t, farmer);
 		ping.Wait();
 		long r = Game1.currentGameTime.TotalGameTime.Milliseconds;
 		if (ping.Result)
@@ -143,6 +143,35 @@ public void callPingResponders()
 	});
 }
 
+PyResponder<int,int> staminaResponder = new PyResponder<int, int>("PytK.StaminaRequest", (stamina) =>
+            {
+                if (stamina == -1)
+                    return (int)Game1.player.Stamina;
+                else
+                {
+                    Game1.player.Stamina = stamina;
+                    return stamina;
+                }
+
+            }, 8));
+			
+staminaResponder.start();
+
+public int getStamina(Famer farmer)
+{
+	Task<int> getStamina = PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", -1, farmer);
+	getStamina.Wait();
+	int stamina = getStamina.Result;
+	Monitor.Log(farmer.Name + ": " + stamina, LogLevel.Info);
+	return stamina;
+}
+
+public void setStamina(Farmer farmer, int stamina)
+{
+	Task<int> setStamina = PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", stamina, farmer);
+	setStamina.Wait();
+	Monitor.Log(farmer.Name + ": " + setStamina.Result, LogLevel.Info);
+}
 ```
 
 ## Frameworks
