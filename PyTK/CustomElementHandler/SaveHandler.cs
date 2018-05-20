@@ -326,9 +326,14 @@ namespace PyTK.CustomElementHandler
             }
         }
 
-        private static string getTypeName(object o)
+        internal static string getTypeName(object o)
         {
-            string[] aqn = o.GetType().AssemblyQualifiedName.Split(',');
+            return (getAssemblyTypeName(o.GetType()));
+        }
+
+        internal static string getAssemblyTypeName(Type t)
+        {
+            string[] aqn = t.AssemblyQualifiedName.Split(',');
             return aqn[0] + ", " + aqn[1];
         }
 

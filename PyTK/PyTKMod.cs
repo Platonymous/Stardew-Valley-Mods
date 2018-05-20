@@ -37,6 +37,7 @@ namespace PyTK
         internal static IMonitor _monitor;
         internal static bool _activeSpriteBatchFix = true;
         internal static string sdvContentFolder => PyUtils.getContentFolder();
+        internal static List<IPyResponder> responders;
 
         public override void Entry(IModHelper helper)
         {
@@ -50,19 +51,54 @@ namespace PyTK
             FormatManager.Instance.RegisterMapFormat(new NewTiledTmxFormat());
 
             SaveHandler.BeforeRebuilding += (a, b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
+            initializeResponders();
+            startResponder();
             registerConsoleCommands();
             CustomTVMod.load();
             PyLua.init();
             SaveHandler.setUpEventHandlers();
-
-            
         }
 
         private void harmonyFix()
         {
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.PyTK");
-            OvSpritebatch.DrawFix1.init("SObject",PyUtils.getTypeSDV("Object"), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
+            OvSpritebatch.DrawFix1.init("SObject", PyUtils.getTypeSDV("Object"), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
             instance.PatchAll(Assembly.GetExecutingAssembly());
+        }
+
+        private void startResponder()
+        {
+            responders.ForEach(r => r.start());
+        }
+
+        private void stopResponder()
+        {
+            responders.ForEach(r => r.stop());
+        }
+
+        private void initializeResponders()
+        {
+            responders = new List<IPyResponder>();
+            responders.Add(new PyResponder<int, int>("PytK.StaminaRequest", (s) =>
+            {
+                if (Game1.player == null)
+                    return -1;
+
+                if (s == -1)
+                    return (int)Game1.player.Stamina;
+                else
+                {
+                    Game1.player.Stamina = s;
+                    return s;
+                }
+
+            }, 8));
+
+            responders.Add(new PyResponder<bool, long>("PytK.Ping", (s) =>
+            {
+                return true;
+
+            }, 1));
         }
 
         private void registerConsoleCommands()
@@ -84,7 +120,7 @@ namespace PyTK
                     List<string> parts = new List<string>(p);
                     parts.Remove(p[0]);
                     string message = String.Join(" ", p);
-                    PyUtils.sendMPString(address, message);
+                    PyNet.sendMessage(address, message);
                     Monitor.Log("OK", LogLevel.Info);
                 }
 
@@ -96,24 +132,82 @@ namespace PyTK
                     Monitor.Log("Missing address", LogLevel.Alert);
                 else
                 {
-                    List<MPStringMessage> messages = PyUtils.getNewMPStringMessages(p[0]);
-                    foreach (MPStringMessage msg in messages)
+                    List<MPMessage> messages = PyNet.getNewMessages(p[0]).ToList();
+                    foreach (MPMessage msg in messages)
                         Monitor.Log($"From {msg.sender.Name} : {msg.message}", LogLevel.Info);
 
                     Monitor.Log("OK", LogLevel.Info);
                 }
 
             }).register();
+
+            new ConsoleCommand("getstamina", "lists the current stamina values of all players", (s, p) =>
+            {
+                Monitor.Log(Game1.player.Name + ": " + Game1.player.Stamina, LogLevel.Info);
+                foreach (Farmer farmer in Game1.otherFarmers.Values)
+                {
+                    var getStamina = PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", -1, farmer);
+                    getStamina.Wait();
+                    Monitor.Log(farmer.Name + ": " + getStamina.Result, LogLevel.Info);
+                }
+            }).register();
+
+            new ConsoleCommand("setstamina", "changes the stamina of all or a specific player. use: setstamina [playername or all] [stamina]", (s, p) =>
+            {
+                if (p.Length < 2)
+                    Monitor.Log("Missing parameter", LogLevel.Alert);
+
+                Monitor.Log(Game1.player.Name + ": " + Game1.player.Stamina, LogLevel.Info);
+                Farmer farmer = null;
+                try
+                {
+                    farmer = Game1.otherFarmers.Find(k => k.Value.Name.Equals(p[0])).Value;
+                }
+                catch
+                {
+                    
+                }
+
+                if(farmer == null)
+                {
+                    Monitor.Log("Couldn't find Farmer", LogLevel.Alert);
+                    return;
+                }
+
+                int i = -1;
+                int.TryParse(p[1], out i);
+
+                var setStamina = PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", i, farmer);
+                setStamina.Wait();
+                Monitor.Log(farmer.Name + ": " + setStamina.Result, LogLevel.Info);
+            }).register();
+
+
+            new ConsoleCommand("ping", "pings all other players", (s, p) =>
+            {
+                foreach (Farmer farmer in Game1.otherFarmers.Values)
+                {
+                    long t = Game1.currentGameTime.TotalGameTime.Milliseconds;
+                    var ping = PyNet.sendRequestToFarmer<bool>("PytK.Ping", t, farmer);
+                    ping.Wait();
+
+                    long r = Game1.currentGameTime.TotalGameTime.Milliseconds;
+                    if (ping.Result)
+                        Monitor.Log(farmer.Name + ": " + (r - t) + "ms", LogLevel.Info);
+                    else
+                        Monitor.Log(farmer.Name + ": No Answer", LogLevel.Error);
+                }
+            }).register();
         }
 
         private void messageTest()
         {
-            PyUtils.sendMPString("Platonymous.PyTK.Test", "TestMessage");
+            PyNet.sendMessage("Platonymous.PyTK.Test", "TestMessage");
             TimeEvents.TimeOfDayChanged += (s, e) => 
             {
-                foreach(MPStringMessage msg in PyUtils.getNewMPStringMessages("Platonymous.PyTK.Test"))
+                foreach(MPMessage msg in PyNet.getNewMessages("Platonymous.PyTK.Test"))
                 {
-                    string message = msg.message;
+                    string message = (string) msg.message;
                     string sender = msg.sender.Name;
                     //Do Something;
                 } 
