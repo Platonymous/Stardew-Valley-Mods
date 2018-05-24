@@ -1,7 +1,7 @@
 {
   "Name": "Portraiture",
   "Author": "Platonymous",
-  "Version": "1.5.4",
+  "Version": "1.5.5",
   "Description": "Helper Mod for Portraits.",
   "UniqueID": "Platonymous.Portraiture",
   "EntryDll": "Portraiture.dll",
