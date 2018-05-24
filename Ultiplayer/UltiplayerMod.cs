@@ -19,6 +19,11 @@ using Microsoft.Xna.Framework.Input;
 using StardewValley.Menus;
 using StardewValley.Locations;
 using StardewValley.Buildings;
+using PyTK;
+using xTile.Tiles;
+using PyTK.Extensions;
+using System.Linq;
+using PyTK.Types;
 
 namespace Ultiplayer
 {
@@ -108,7 +113,6 @@ namespace Ultiplayer
             if (!ultiplayer)
                 return;
 
-            mon.Log("SyncFarmhands");
             foreach (Farmer f in Game1.otherFarmers.Values)
                 if (farmers.Find(fh => (id == 0 || f.UniqueMultiplayerID == id) && fh.Value.UniqueMultiplayerID == f.UniqueMultiplayerID) is NetRef<Farmer> nfh)
                 {
@@ -118,6 +122,8 @@ namespace Ultiplayer
                     SaveGame.farmerSerializer.Serialize(fs, f);
                 }
         }
+
+        
 
         #endregion
 
@@ -152,9 +158,6 @@ namespace Ultiplayer
         {
             if (!ultiplayer)
                 return true;
-
-            mon.Log(message.MessageType + ":" + message.GetHashCode());
-            mon.Log((message.MessageType == 0).ToString());
             
             if (message.MessageType != 0)
                 return true;
@@ -196,7 +199,7 @@ namespace Ultiplayer
 
             internal static bool Prefix(Farmer __instance)
             {
-                List<INetSerializable>  list = help.Reflection.GetField<List<INetSerializable>>(__instance.NetFields, "fields").GetValue();
+                List<INetSerializable>  list = help.Reflection.GetField<List<INetSerializable>>((object) __instance.NetFields, "fields").GetValue();
                 return false;
 
             }
@@ -332,8 +335,6 @@ namespace Ultiplayer
 
         internal static bool sendAvailableFarmhands(string userID, Action<OutgoingMessage> sendMessage)
         {
-            mon.Log("sendAvailableFarmhands:" + userID);
-
             Multiplayer multiplayer = (Multiplayer)typeof(Game1).GetField("multiplayer", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
             List<NetRef<Farmer>> netRefList = new List<NetRef<Farmer>>();
 
@@ -355,7 +356,6 @@ namespace Ultiplayer
 
             if (netRefList.Count < 1)
             {
-                mon.Log("Creating New");
                 NetRef<Farmer> newF = getNewFarmHand();
                 farmers.Add(newF);
                 netRefList.Add(newF);
