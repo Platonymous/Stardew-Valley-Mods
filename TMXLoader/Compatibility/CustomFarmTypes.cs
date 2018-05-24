@@ -225,18 +225,19 @@ namespace TMXLoader.Compatibility
 
         internal static void fixGreenhouseWarp()
         {
-            Farm farm = Game1.getFarm();
-            if (farm.map.Properties.ContainsKey("Greenhouse"))
+            if (Game1.getFarm() is Farm f && f.map is Map m && m.Properties.ContainsKey("Greenhouse"))
             {
-                string[] position = farm.map.Properties["Greenhouse"].ToString().Split(',');
+                string[] position = m.Properties["Greenhouse"].ToString().Split(',');
                 Point greenHousePosition = new Point(int.Parse(position[0]), int.Parse(position[1]));
 
-                GameLocation greenhouse = Game1.getLocationFromName("Greenhouse");
-                Warp warp = new List<Warp>(greenhouse.warps).Find(w => w.TargetName == "Farm" && w.TargetX == 28 && w.TargetY == 16);
-                if (warp != null)
+                if (Game1.getLocationFromName("Greenhouse") is GameLocation greenhouse)
                 {
-                    warp.TargetX = greenHousePosition.X;
-                    warp.TargetY = greenHousePosition.Y + 1;
+                    Warp warp = new List<Warp>(greenhouse.warps).Find(w => w.TargetName == "Farm" && w.TargetX == 28 && w.TargetY == 16);
+                    if (warp is Warp)
+                    {
+                        warp.TargetX = greenHousePosition.X;
+                        warp.TargetY = greenHousePosition.Y + 1;
+                    }
                 }
 
             }

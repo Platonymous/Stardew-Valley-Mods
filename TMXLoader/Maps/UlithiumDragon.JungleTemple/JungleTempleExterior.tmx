@@ -12,7 +12,7 @@
   <property name="Warp" value="14 35 Woods 7 2 15 35 Woods 8 2 16 8 JungleTempleInterior 8 15 15 8 JungleTempleInterior 8 15 14 8 JungleTempleInterior 7 15 13 8 JungleTempleInterior 7 15"/>
  </properties>
  <tileset firstgid="1" name="Jungle Temple Custom Tilesheet" tilewidth="16" tileheight="16" tilecount="1200" columns="20">
-  <image source="spring_JungleTempleTileSheet.png" width="320" height="960"/>
+  <image source="z_spring_JungleTempleTileSheet.png" width="320" height="960"/>
   <tile id="240">
    <properties>
     <property name="Spawnable" value="T"/>
@@ -803,7 +803,7 @@
   <image source="paths" width="64" height="128"/>
  </tileset>
  <tileset firstgid="1233" name="untitled tile sheet" tilewidth="16" tileheight="16" tilecount="2150" columns="25">
-  <image source="spring_JungleTempleoutdoorsTileSheet.png" width="400" height="1376"/>
+  <image source="z_spring_JungleTempleoutdoorsTileSheet.png" width="400" height="1376"/>
   <tile id="150">
    <properties>
     <property name="Spawnable" value="T"/>

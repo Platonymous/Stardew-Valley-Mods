@@ -7,11 +7,11 @@
   <property name="Outdoors" value="F"/>
   <property name="Warp" value="9 12 JungleTempleInterior 7 7 10 12 JungleTempleInterior 8 7 1 7 JungleTempleLeftRoom01 17 8 1 8 JungleTempleLeftRoom01 17 9 18 7 JungleTempleRightRoom01 0 8 18 8 JungleTempleRightRoom01 0 9"/>
  </properties>
- <tileset firstgid="1" name="cave" tilewidth="16" tileheight="16" tilecount="672" columns="24">
-  <image source="cave" width="384" height="448"/>
+ <tileset firstgid="1" name="z_cave" tilewidth="16" tileheight="16" tilecount="672" columns="24">
+  <image source="z_cave" width="384" height="448"/>
  </tileset>
  <tileset firstgid="673" name="Jungle Temple Custom Tilesheet" tilewidth="16" tileheight="16" tilecount="1200" columns="20">
-  <image source="spring_JungleTempleTileSheet.png" width="320" height="960"/>
+  <image source="z_spring_JungleTempleTileSheet.png" width="320" height="960"/>
  </tileset>
  <tileset firstgid="1873" name="Paths" tilewidth="16" tileheight="16" tilecount="32" columns="4">
   <image source="paths" width="64" height="128"/>

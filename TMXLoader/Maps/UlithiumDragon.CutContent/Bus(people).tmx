@@ -4,8 +4,8 @@
   <property name="Music" value="SettlingIn"/>
   <property name="Warp" value="2 7 BusStop 12 9"/>
  </properties>
- <tileset firstgid="1" name="busPeople" tilewidth="16" tileheight="16" tilecount="462" columns="22">
-  <image source="busPeople" width="352" height="336"/>
+ <tileset firstgid="1" name="zBusPeople" tilewidth="16" tileheight="16" tilecount="462" columns="22">
+  <image source="zBusPeople" width="352" height="336"/>
   <tile id="86">
    <animation>
     <frame tileid="86" duration="250"/>

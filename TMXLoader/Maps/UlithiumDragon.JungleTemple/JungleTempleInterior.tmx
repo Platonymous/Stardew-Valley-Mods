@@ -8,23 +8,23 @@
   <property name="Outdoors" value="F"/>
   <property name="Warp" value="7 16 JungleTempleExterior 14 11 8 16 JungleTempleExterior 15 11 7 4 JungleTempleJunction01 9 11 8 4 JungleTempleJunction01 10 11"/>
  </properties>
- <tileset firstgid="1" name="cave" tilewidth="16" tileheight="16" tilecount="672" columns="24">
-  <image source="cave" width="384" height="448"/>
+ <tileset firstgid="1" name="z_cave" tilewidth="16" tileheight="16" tilecount="672" columns="24">
+  <image source="z_cave" width="384" height="448"/>
  </tileset>
  <tileset firstgid="673" name="Jungle Temple Custom Tilesheet" tilewidth="16" tileheight="16" tilecount="1200" columns="20">
-  <image source="spring_JungleTempleTileSheet.png" width="320" height="960"/>
+  <image source="z_spring_JungleTempleTileSheet.png" width="320" height="960"/>
  </tileset>
  <tileset firstgid="1873" name="Paths" tilewidth="16" tileheight="16" tilecount="32" columns="4">
   <image source="paths" width="64" height="128"/>
  </tileset>
  <tileset firstgid="1905" name="SewerTiles" tilewidth="16" tileheight="16" tilecount="88" columns="8">
-  <image source="SewerTiles" width="128" height="176"/>
+  <image source="z_SewerTiles" width="128" height="176"/>
  </tileset>
  <tileset firstgid="1993" name="untitled tile sheet" tilewidth="16" tileheight="16" tilecount="2150" columns="25">
-  <image source="spring_JungleTempleoutdoorsTileSheet.png" width="400" height="1376"/>
+  <image source="z_spring_JungleTempleoutdoorsTileSheet.png" width="400" height="1376"/>
  </tileset>
  <tileset firstgid="4143" name="WizardHouseTiles" tilewidth="16" tileheight="16" tilecount="60" columns="4">
-  <image source="WizardHouseTiles" width="64" height="240"/>
+  <image source="z_WizardHouseTiles" width="64" height="240"/>
  </tileset>
  <layer name="Back" width="16" height="16">
   <data encoding="csv">

@@ -49,7 +49,7 @@ namespace TMXLoader
             if (a.Length > 2)
                 if (a[2] == "this")
                 {
-                    string id = location.name + "." + layer + "." + tile.Y + tile.Y;
+                    string id = location.Name + "." + layer + "." + tile.Y + tile.Y;
                     if (!PyLua.hasScript(id))
                     {
                         if (layer == "Map")
@@ -113,7 +113,7 @@ namespace TMXLoader
         {
             string[] strings = action.Split(' ');
 
-            if (Game1.player.ActiveObject is Item i && i.parentSheetIndex == int.Parse(strings[2]) && i.Stack >= int.Parse(strings[1]))
+            if (Game1.player.ActiveObject is Item i && i.ParentSheetIndex == int.Parse(strings[2]) && i.Stack >= int.Parse(strings[1]))
             {
                 int amount = int.Parse(strings[1]);
                 Game1.playSound("newArtifact");

@@ -42,15 +42,33 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Examples\UlithiumDragon.CutContent\Bus%28people%29.tmx" />
-    <None Include="Examples\UlithiumDragon.CutContent\CityBus.json" />
-    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTemple.json" />
-    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleExterior.tmx" />
-    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleInterior.tmx" />
-    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleJunction01.tmx" />
-    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleLeftRoom01.tmx" />
-    <None Include="Examples\UlithiumDragon.JungleTemple\JungleTempleRightRoom01.tmx" />
-    <None Include="Examples\UlithiumDragon.JungleTemple\Woods.tmx" />
+    <None Include="Maps\UlithiumDragon.CutContent\Bus%28people%29.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\UlithiumDragon.CutContent\CityBus.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTemple.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleExterior.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleInterior.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleJunction01.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleLeftRoom01.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleRightRoom01.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\UlithiumDragon.JungleTemple\Woods.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -67,20 +85,48 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Examples\UlithiumDragon.CutContent\busPeople.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\cave.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\fall_JungleTempleoutdoorsTileSheet.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\fall_JungleTempleTileSheet.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\paths.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\SewerTiles.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\spring_JungleTempleoutdoorsTileSheet.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\spring_JungleTempleTileSheet.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\spring_outdoorsTileSheet.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\summer_JungleTempleoutdoorsTileSheet.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\summer_JungleTempleTileSheet.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\winter_JungleTempleoutdoorsTileSheet.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\winter_JungleTempleTileSheet.png" />
-    <Content Include="Examples\UlithiumDragon.JungleTemple\WizardHouseTiles.png" />
+    <Content Include="Maps\UlithiumDragon.CutContent\zBusPeople.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_cave.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_fall_JungleTempleoutdoorsTileSheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_fall_JungleTempleTileSheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\paths.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_SewerTiles.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_spring_JungleTempleoutdoorsTileSheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_spring_JungleTempleTileSheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\spring_outdoorsTileSheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_summer_JungleTempleoutdoorsTileSheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_summer_JungleTempleTileSheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_winter_JungleTempleoutdoorsTileSheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_winter_JungleTempleTileSheet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\UlithiumDragon.JungleTemple\z_WizardHouseTiles.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
