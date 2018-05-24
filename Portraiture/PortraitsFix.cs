@@ -56,7 +56,7 @@ namespace Portraiture
             int num4 = y + __instance.height / 2 - 148 - 36;
             b.Draw(Game1.mouseCursors, new Vector2((float)(num1 - 8), (float)y), new Rectangle?(new Rectangle(583, 411, 115, 97)), Color.White, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
 
-            if (!characterDialogue.speaker.Portrait.Bounds.Contains(rectangle))
+            if (!texture.Bounds.Contains(rectangle))
                 rectangle = TextureLoader.getSoureRectangle(texture, 0);
 
             int num5 = shouldPortraitShake(characterDialogue, __instance) ? Game1.random.Next(-1, 2) : 0;
