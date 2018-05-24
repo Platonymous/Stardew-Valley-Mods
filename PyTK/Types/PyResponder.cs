@@ -5,18 +5,21 @@ using System.Xml.Serialization;
 using Newtonsoft.Json;
 using StardewValley;
 using StardewModdingAPI.Events;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace PyTK.Types
 {
     public interface IPyResponder
     {
+        string address { get; set; }
         void start();
         void stop();
     }
 
     public class PyResponder<TOut, TIn> : IPyResponder
     {
-        public string address;
+        public string address { get; set; }
         public int interval;
         public XmlSerializer xmlSerializer;
         public Func<TIn, TOut> requestHandler;
@@ -31,9 +34,8 @@ namespace PyTK.Types
             this.interval = interval;
             this.requestHandler = requestHandler;
             this.address = address;
+            this.xmlSerializer = xmlSerializer;
 
-            if (xmlSerializer == null)
-                xmlSerializer= new XmlSerializer(typeof(TOut));
         }
 
         public void start()
@@ -53,8 +55,11 @@ namespace PyTK.Types
             if (tick != interval)
                 return;
 
-            foreach (MPMessage request in receive())
-                respond(request);
+            List<MPMessage> messages = receive().ToList();
+
+            if (messages.Count > 0)
+                foreach (MPMessage request in messages)
+                    Task.Run(() => {respond(request);});
 
             tick = 0;
         }
@@ -71,6 +76,9 @@ namespace PyTK.Types
             if (type == (int)SerializationType.PLAIN)
                 return (TIn)data;
 
+            if (type == SerializationType.XML && xmlSerializer == null)
+                xmlSerializer = new XmlSerializer(typeof(TIn));
+
             return (type == SerializationType.XML ? (TIn)xmlSerializer.Deserialize(new StringReader(data.ToString())) : JsonConvert.DeserializeObject<TIn>(data.ToString()));
         }
 
@@ -83,6 +91,9 @@ namespace PyTK.Types
 
                 if (serializationType == SerializationType.XML)
                 {
+                    if (xmlSerializer == null)
+                        xmlSerializer = new XmlSerializer(typeof(TOut));
+
                     StringWriter writer = new StringWriter();
                     xmlSerializer.Serialize(writer, data);
                     objectData = writer.ToString();

@@ -2,7 +2,7 @@
 
 namespace PyTK.Tiled
 {
-    internal class TiledLayerData : XmlObject, IXmlFormatable
+    public class TiledLayerData : XmlObject, IXmlFormatable
     {
         public string EncodingType { get; set; }
         public string Data { get; set; }

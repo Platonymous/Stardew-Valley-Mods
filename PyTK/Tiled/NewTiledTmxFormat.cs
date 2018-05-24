@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using xTile;
 using xTile.Dimensions;
@@ -89,9 +90,20 @@ namespace PyTK.Tiled
             return new CompatibilityReport(compatibilityNoteList);
         }
 
+        public Map Load(XmlReader xmlReader)
+        {
+            TiledMap = new TiledMap(XElement.Load(xmlReader));
+            return Load(TiledMap);
+        }
+
         public Map Load(Stream stream)
         {
             TiledMap = new TiledMap(XElement.Load(stream));
+            return Load(TiledMap);
+        }
+
+        public Map Load(TiledMap TiledMap)
+        {
             Map map = new Map();
             if (TiledMap.Orientation != "orthogonal")
                 throw new Exception("Only orthogonal Tiled maps are supported.");
@@ -113,7 +125,17 @@ namespace PyTK.Tiled
             return map;
         }
 
+        public string AsString(Map map)
+        {
+            return Store(map).ToString();
+        }
+
         public void Store(Map map, Stream stream)
+        {
+            Store(map).Save(stream);
+        }
+
+        public XElement Store(Map map)
         {
             TiledMap tiledMap1 = new TiledMap();
             tiledMap1.Version = "1.0";
@@ -142,8 +164,10 @@ namespace PyTK.Tiled
             StoreTileSets(map, tiledMap2);
             StoreLayers(map, tiledMap2);
             StoreObjects(map, tiledMap2);
-            tiledMap2.ToXml().Save(stream);
+            return tiledMap2.ToXml();
         }
+
+        
 
         public void LoadTileSets(Map map)
         {

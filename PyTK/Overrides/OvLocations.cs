@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
+using System.IO;
 using System.Reflection;
 
 namespace PyTK.Overrides
@@ -80,6 +81,39 @@ namespace PyTK.Overrides
                     return false;
                 else
                     return true;
+            }
+        }
+
+        [HarmonyPatch]
+        internal class LocationRequestFix1
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("Game1"), "getLocationRequest");
+            }
+
+            internal static void Prefix(string locationName, bool isStructure = false)
+            {
+                if (locationName == null || isStructure)
+                    return;
+
+                GameLocation location = Game1.getLocationFromName(locationName, isStructure);
+  
+                if (location == null)
+                {
+                    string locationMap = Path.Combine("Maps", locationName);
+
+                    if (locationName.Contains(":"))
+                    {
+                        locationMap = Path.Combine("Maps", locationName.Split(':')[0]);
+                        locationName = locationMap + "_" + locationName.Split(':')[1];
+                    }
+
+                    if (locationName.Contains("Farm"))
+                        Game1.locations.Add(new Farm(locationMap, locationName));
+                    else
+                        Game1.locations.Add(new GameLocation(locationMap, locationName));
+                }
             }
         }
 

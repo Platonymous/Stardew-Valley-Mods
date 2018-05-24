@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetZip, Version=1.11.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.11.0\lib\net20\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="MoonSharp.Interpreter, Version=2.0.0.0, Culture=neutral, PublicKeyToken=921e73ce94aa17f8, processorArchitecture=MSIL">
       <HintPath>..\packages\MoonSharp.2.0.0.0\lib\net40-client\MoonSharp.Interpreter.dll</HintPath>
     </Reference>
@@ -47,6 +50,12 @@
     <Compile Include="ConsoleCommands\CCLua.cs" />
     <Compile Include="ConsoleCommands\CcSaveHandler.cs" />
     <Compile Include="ConsoleCommands\CcTime.cs" />
+    <Compile Include="ContentSync\ContentRequest.cs" />
+    <Compile Include="ContentSync\ContentResponse.cs" />
+    <Compile Include="ContentSync\ContentSyncHandler.cs" />
+    <Compile Include="ContentSync\ContentType.cs" />
+    <Compile Include="ContentSync\SerializationColor.cs" />
+    <Compile Include="ContentSync\SerializationTexture2D.cs" />
     <Compile Include="CustomElementHandler\CraftingData.cs" />
     <Compile Include="CustomElementHandler\CustomObjectData.cs" />
     <Compile Include="CustomElementHandler\IDrawFromCustomObjectData.cs" />

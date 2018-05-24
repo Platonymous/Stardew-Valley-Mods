@@ -2,7 +2,7 @@
 
 namespace PyTK.Tiled
 {
-    internal class TiledProperty : XmlObject, IXmlFormatable
+    public class TiledProperty : XmlObject, IXmlFormatable
     {
         public string Name { get; set; }
         public string Value { get; set; }

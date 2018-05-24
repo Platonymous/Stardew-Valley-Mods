@@ -14,8 +14,7 @@ namespace PyTK.Types
         public PyMessenger(string address, XmlSerializer xmlSerializer = null)
         {
             this.address = address;
-            if (xmlSerializer == null)
-                xmlSerializer = new XmlSerializer(typeof(T));
+            this.xmlSerializer = xmlSerializer;
         }
 
         public void sendToFarmer(long farmer, SerializationType serializationType = SerializationType.PLAIN, params T[] dataSet)
@@ -30,6 +29,9 @@ namespace PyTK.Types
 
             if (serializationType == SerializationType.XML)
             {
+                if (xmlSerializer == null)
+                    xmlSerializer = new XmlSerializer(typeof(T));
+
                 StringWriter writer = new StringWriter();
                 xmlSerializer.Serialize(writer, data);
                 objectData = writer.ToString();
@@ -55,6 +57,9 @@ namespace PyTK.Types
         {
             if (type == (int)SerializationType.PLAIN)
                 return (T) data;
+
+            if (type == SerializationType.XML && xmlSerializer == null)
+                xmlSerializer = new XmlSerializer(typeof(T));
 
             return (type == SerializationType.XML ? (T)xmlSerializer.Deserialize(new StringReader(data.ToString())) : JsonConvert.DeserializeObject<T>(data.ToString()));
         }

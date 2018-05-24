@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace PyTK.Tiled
 {
-    internal class TiledMap : XmlObject, IXmlFormatable
+    public class TiledMap : XmlObject, IXmlFormatable
     {
         public string Version { get; set; } = "1.0";
         public string Orientation { get; set; } = "orthogonal";

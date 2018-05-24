@@ -57,6 +57,7 @@ namespace PyTK
             CustomTVMod.load();
             PyLua.init();
             SaveHandler.setUpEventHandlers();
+            ContentSync.ContentSyncHandler.initialize();
         }
 
         private void harmonyFix()
@@ -197,6 +198,16 @@ namespace PyTK
                         Monitor.Log(farmer.Name + ": No Answer", LogLevel.Error);
                 }
             }).register();
+
+            new ConsoleCommand("syncmap", "Syncs map of a specified location to all clients. Exp.: syncmap Farm, syncmap BusStop, syncmao Town", (s, p) =>
+            {
+                if (p.Length < 1)
+                    Monitor.Log("No Location specified. ");
+
+                PyNet.syncLocationMapToAll(p[0]);
+            }).register();
+
+            
         }
 
         private void messageTest()
