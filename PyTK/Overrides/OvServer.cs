@@ -2,6 +2,7 @@
 using PyTK.CustomElementHandler;
 using StardewValley;
 using StardewValley.Network;
+using System.Linq;
 using System.Reflection;
 
 namespace PyTK.Overrides
@@ -18,13 +19,11 @@ namespace PyTK.Overrides
 
             internal static void Prefix()
             {
-                PyTKMod._monitor.Log("Players:" + Game1.numberOfPlayers());
-                SaveHandler.Replace();
+                    SaveHandler.Replace();
             }
 
             internal static void Postfix()
             {
-                if (Game1.IsClient || Game1.numberOfPlayers() < 2)
                     SaveHandler.Rebuild();
             }
         }
@@ -39,13 +38,11 @@ namespace PyTK.Overrides
 
             internal static void Prefix()
             {
-                if (Game1.IsServer)
                     SaveHandler.Replace();
             }
 
             internal static void Postfix()
             {
-                if (Game1.IsClient || Game1.numberOfPlayers() < 2)
                     SaveHandler.Rebuild();
             }
         }

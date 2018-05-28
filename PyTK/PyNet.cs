@@ -258,24 +258,32 @@ namespace PyTK
                 }
         }
 
-        internal static string CompressBytes(byte[] buffer)
+        public static string CompressBytes(byte[] buffer)
         {
             return Convert.ToBase64String(Ionic.Zlib.GZipStream.CompressBuffer(buffer));
         }
 
-        internal static byte[] DecompressBytes(string data)
+        public static byte[] DecompressBytes(string data)
         {
             return Ionic.Zlib.GZipStream.UncompressBuffer(Convert.FromBase64String(data));
         }
 
-        internal static string CompressString(string str)
+        public static string CompressString(string str)
         {
             return Convert.ToBase64String(Ionic.Zlib.GZipStream.CompressString(str));
         }
 
-        internal static string DecompressString(string str)
+        public static string DecompressString(string str)
         {
             return Ionic.Zlib.GZipStream.UncompressString(Convert.FromBase64String(str));
+        }
+
+        public void warpFarmer(Farmer farmer, string location, int x, int y, bool isStructure = false, int facingAfterWarp = -1)
+        {
+            Task.Run(async () =>
+           {
+               await sendRequestToFarmer<bool>("PyTK.WarpFarmer", new WarpRequest(farmer, location, x, y, isStructure, facingAfterWarp), farmer, (b) => Monitor.Log("Warping " + farmer.Name + " " + (b ? "was successful" : "failed"), b ? LogLevel.Info : LogLevel.Error), SerializationType.JSON);
+           });
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Netcode;
 using PyTK.Extensions;
+using PyTK.Types;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -13,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 
 namespace PyTK.CustomElementHandler
@@ -23,6 +25,7 @@ namespace PyTK.CustomElementHandler
         public static event EventHandler BeforeRebuilding;
         public static event EventHandler BeforeRemoving;
         public static event EventHandler FinishedRemoving;
+        internal static IPyResponder TypeChecker;
         public static bool inSync = false;
 
         internal static IModHelper Helper { get; } = PyTKMod._helper;
@@ -38,6 +41,7 @@ namespace PyTK.CustomElementHandler
         public static char valueSeperator = '=';
         public static string oldPrefix = "CEHe";
         public static string newPrefix = "PyTK";
+        internal static string typeCheckerName = "PyTK.TypeChecker";
 
         private static List<Func<string, string>> preProcessors = new List<Func<string, string>>();
         private static List<Func<object, object>> objectPreProcessors = new List<Func<object, object>>();
@@ -57,6 +61,44 @@ namespace PyTK.CustomElementHandler
             objectPreProcessors.AddOrReplace(pp);
         }
 
+        internal static void rebuildIfAvailable()
+        {
+            Task.Run(() =>
+            {
+
+                OnBeforeRebuilding(EventArgs.Empty);
+                ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+                ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+                foreach (Farmer farmer in Game1.otherFarmers.Values)
+                    ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+                OnFinishedRebuilding(EventArgs.Empty);
+
+            });
+        }
+
+        internal static bool canBeRebuildInMultiplayer(object obj)
+        {
+            if (!(getDataString(obj).StartsWith(newPrefix) || getDataString(obj).StartsWith(oldPrefix)))
+                return false;
+
+            string dataString = getDataString(obj);
+            preProcessors.useAll(p => dataString = p.Invoke(dataString));
+
+            dataString = dataString.Replace(" " + valueSeperator.ToString() + " ", valueSeperator.ToString());
+            string[] data = splitElemets(dataString);
+
+            bool result = true;
+
+            foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive())) {
+                Task<bool> fResult = PyNet.sendRequestToFarmer<bool>(typeCheckerName, data[2], farmer);
+                fResult.Wait();
+                result = result && fResult.Result;
+
+            }
+
+            return result;
+        }
+
         internal static void setUpEventHandlers()
         {
             ceh = Helper.ModRegistry.IsLoaded("Platonymous.CustomElementHandler");
@@ -67,6 +109,12 @@ namespace PyTK.CustomElementHandler
             SaveEvents.BeforeSave += (s, e) => Replace();
             SaveEvents.AfterSave += (s, e) => Rebuild();
             SaveEvents.AfterLoad += (s, e) => Rebuild();
+            TypeChecker = new PyResponder<bool, string>(typeCheckerName, (s) =>
+              {
+                  return Type.GetType(s) != null;
+              },16);
+            TypeChecker.start();
+
         }
 
         internal static void Replace()
@@ -77,17 +125,27 @@ namespace PyTK.CustomElementHandler
             OnBeforeRemoving(EventArgs.Empty);
             ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
             ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
+            foreach (Farmer farmer in Game1.otherFarmers.Values)
+                ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
             OnFinishedRemoving(EventArgs.Empty);
         }
 
         internal static void Rebuild()
         {
-            if (Game1.IsMultiplayer && Game1.numberOfPlayers() > 1 && Game1.IsServer)
+            if (Game1.IsMultiplayer && Game1.IsClient)
                 return;
+
+            if (Game1.IsMultiplayer && Game1.IsServer)
+            {
+                rebuildIfAvailable();
+                return;
+            }
 
             OnBeforeRebuilding(EventArgs.Empty);
             ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
             ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
+            foreach (Farmer farmer in Game1.otherFarmers.Values)
+                ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
             OnFinishedRebuilding(EventArgs.Empty);
         }
      
@@ -233,7 +291,7 @@ namespace PyTK.CustomElementHandler
             return replacement;
         }
 
-        private static string getDataString(object o)
+        internal static string getDataString(object o)
         {
             if (o is SObject obj)
                 return obj.name;
@@ -356,14 +414,14 @@ namespace PyTK.CustomElementHandler
             return name;
         }
 
-        private static object getReplacement(ISaveElement ise)
+        public static object getReplacement(ISaveElement ise)
         {
             object o = ise.getReplacement();
             setDataString(o, getReplacementName(ise));
             return o;
         }
 
-        private static object getReplacement(object element)
+        public static object getReplacement(object element)
         {
             object replacement = element;
 

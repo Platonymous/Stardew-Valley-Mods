@@ -126,6 +126,7 @@
     <Compile Include="Types\TileAction.cs" />
     <Compile Include="Types\TileLocationSelector.cs" />
     <Compile Include="Types\TVChannel.cs" />
+    <Compile Include="Types\WarpRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Examples.md" />

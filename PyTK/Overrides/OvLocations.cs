@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Locations;
 using System.IO;
 using System.Reflection;
 
@@ -97,10 +98,19 @@ namespace PyTK.Overrides
                 if (locationName == null || isStructure)
                     return;
 
-                GameLocation location = Game1.getLocationFromName(locationName, isStructure);
-  
+                GameLocation location = null;
+                try
+                {
+                    location = Game1.getLocationFromName(locationName, isStructure);
+                }
+                catch
+                {
+
+                }
+
                 if (location == null)
                 {
+
                     string locationMap = Path.Combine("Maps", locationName);
 
                     if (locationName.Contains(":"))
@@ -109,7 +119,9 @@ namespace PyTK.Overrides
                         locationName = locationMap + "_" + locationName.Split(':')[1];
                     }
 
-                    if (locationName.Contains("Farm"))
+                    if (locationName.Contains("FarmHouse"))
+                        Game1.locations.Add(new FarmHouse(locationMap, locationName));
+                    else if (locationName.Contains("Farm"))
                         Game1.locations.Add(new Farm(locationMap, locationName));
                     else
                         Game1.locations.Add(new GameLocation(locationMap, locationName));

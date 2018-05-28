@@ -100,6 +100,19 @@ namespace PyTK
                 return true;
 
             }, 1));
+
+            responders.Add(new PyResponder<bool, WarpRequest>("PyTK.WarpFarmer", (w) =>
+             {
+                 try
+                 {
+                     Game1.warpFarmer(Game1.getLocationRequest(w.locationName, w.isStructure), w.x, w.y, w.facing < 0 ? Game1.player.FacingDirection : w.facing);
+                     return true;
+                 }
+                 catch
+                 {
+                     return false;
+                 }
+             },16,SerializationType.PLAIN,SerializationType.JSON));
         }
 
         private void registerConsoleCommands()
