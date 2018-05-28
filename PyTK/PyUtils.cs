@@ -19,7 +19,6 @@ namespace PyTK
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
-        internal static Dictionary<string, List<MPStringMessage>> messages = new Dictionary<string, List<MPStringMessage>>();
 
         public static bool CheckEventConditions(string conditions)
         {
@@ -150,67 +149,24 @@ namespace PyTK
             string[] files = Directory.GetFiles(folder, "*", SearchOption.AllDirectories);
             foreach (string file in files)
             {
-                if(!file.Contains(".") && !file.Contains("old") && !file.Contains("SaveGame"))
+                if (!file.Contains(".") && !file.Contains("old") && !file.Contains("SaveGame"))
                 {
-                        XmlReaderSettings settings = new XmlReaderSettings();
+                    XmlReaderSettings settings = new XmlReaderSettings();
 
-                        XmlReader reader = XmlReader.Create(Path.Combine(Helper.DirectoryPath, file), settings);
+                    XmlReader reader = XmlReader.Create(Path.Combine(Helper.DirectoryPath, file), settings);
                     FileInfo info = new FileInfo(file);
                     try
                     {
-                        while (reader.Read());
-                        Monitor.Log( info.Directory.Name + "/" + info.Name + " (OK)");
+                        while (reader.Read()) ;
+                        Monitor.Log(info.Directory.Name + "/" + info.Name + " (OK)");
                     }
                     catch (Exception e)
                     {
-                        Monitor.Log("Error in " + info.Directory.Name + "/" + info.Name + ": " + e.Message,LogLevel.Error);
+                        Monitor.Log("Error in " + info.Directory.Name + "/" + info.Name + ": " + e.Message, LogLevel.Error);
                     }
                 }
-            }           
+            }
         }
 
-        public static void sendMPString(string address, string message)
-        {
-            sendMPString(new MPStringMessage(address, Game1.player, message));
-        }
-
-        public static void sendMPString(MPStringMessage msg)
-        {
-            if (Game1.IsServer)
-                foreach (long key in Game1.otherFarmers.Keys)
-                {
-                    if (key != msg.sender.UniqueMultiplayerID)
-                        Game1.server.sendMessage(key, 99, msg.sender, msg.address, (Int16) 0, msg.message);
-                }
-            else
-                Game1.client.sendMessage(new OutgoingMessage(99, msg.sender, msg.address, (Int16) 0, msg.message));
-        }
-
-        public static void receiveMPString(IncomingMessage inc)
-        {
-            string address = inc.Reader.ReadString();
-            inc.Reader.ReadInt16();
-            string message = inc.Reader.ReadString();
-
-            if (!messages.ContainsKey(address))
-                messages.Add(address, new List<MPStringMessage>());
-
-            messages[address].Add(new MPStringMessage(address,inc.SourceFarmer,message));
-        }
-
-        public static List<MPStringMessage> getMPStringMessages(string address)
-        {
-            if (!messages.ContainsKey(address))
-                messages.Add(address, new List<MPStringMessage>());
-
-            return messages[address];
-        }
-
-        public static List<MPStringMessage> getNewMPStringMessages(string address)
-        {
-            List<MPStringMessage> msgs = new List<MPStringMessage>(getMPStringMessages(address));
-            messages[address].Clear();
-            return msgs;
-        }
     }
 }

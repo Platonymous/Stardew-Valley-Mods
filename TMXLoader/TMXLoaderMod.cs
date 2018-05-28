@@ -23,9 +23,11 @@ namespace TMXLoader
         internal static string contentFolder = "Maps";
         internal static IMonitor monitor;
         internal static IModHelper helper;
+        internal static List<Map> maplayers;
 
         public override void Entry(IModHelper helper)
         {
+            maplayers = new List<Map>();
             TMXLoaderMod.helper = Helper;
             monitor = Monitor;
             Monitor.Log("Environment:" + PyUtils.getContentFolder());
@@ -39,6 +41,7 @@ namespace TMXLoader
             PyLua.addGlobal("TMX", new TMXActions());
             fixCompatibilities();
             harmonyFix();
+            PlayerEvents.Warped += (s, e) => { if (e.NewLocation is GameLocation l && l.map is Map m) { addMoreMapLayers(m); } };
         }
 
         private void fixCompatibilities()
@@ -107,7 +110,7 @@ namespace TMXLoader
                     Map map = TMXContent.Load(filePath, Helper);
                     addMoreMapLayers(map);
                     Map original = edit.retainWarps ? Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent) : map;
-                    editWarps(map, edit.addWarps, edit.removeWarps, original);
+                    editWarps(map, edit.addWarps, edit.removeWarps, original);                   
                     map.injectAs("Maps/" + edit.name);
                 }
 
@@ -137,13 +140,16 @@ namespace TMXLoader
             }
         }
 
-        
-
         private void addMoreMapLayers(Map map)
         {
+            if (maplayers.Contains(map))
+                return;
+
             foreach (Layer layer in map.Layers)
                 if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
                         maplayer.AfterDraw += (s, e) => layer.Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, Game1.pixelZoom);
+
+            maplayers.Add(map);
         }
 
         private void editWarps(Map map, string[] addWarps, string[] removeWarps, Map original = null)
@@ -176,7 +182,6 @@ namespace TMXLoader
         {
             Monitor.Log("Converting..", LogLevel.Trace);
             string inPath = Path.Combine(Helper.DirectoryPath, "Converter", "IN");
-            
 
             string[] directories = Directory.GetDirectories(inPath, "*.*",SearchOption.TopDirectoryOnly);
 

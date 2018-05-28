@@ -20,7 +20,7 @@ namespace PyTK.Extensions
                     if (ingredients.Count <= 0)
                         return;
                     else if (ingredients.ContainsKey(i))
-                        if (items[list].Find(p => p.parentSheetIndex == i) is Item j)
+                        if (items[list].Find(p => p.ParentSheetIndex == i) is Item j)
                         {
                             j.Stack -= ingredients[i];
                             ingredients[i] = (j.Stack >= 0) ? 0 : Math.Abs(j.Stack);
@@ -41,7 +41,7 @@ namespace PyTK.Extensions
                     if (ingredients.Count <= 0)
                         return true;
                     else if (ingredients.ContainsKey(i))
-                        if (items[list].Find(p => p.parentSheetIndex == i) is Item j)
+                        if (items[list].Find(p => p.ParentSheetIndex == i) is Item j)
                         {
                             ingredients[i] = (j.Stack - ingredients[i] >= 0) ? 0 : Math.Abs(j.Stack - ingredients[i]);
                             if (ingredients[i] == 0)

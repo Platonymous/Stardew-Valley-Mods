@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace PyTK.Tiled
 {
-    internal class TiledLayer : XmlObject, IXmlFormatable
+    public class TiledLayer : XmlObject, IXmlFormatable
     {
         public string Name { get; set; }
         public int Width { get; set; }

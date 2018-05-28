@@ -11,10 +11,6 @@ using StardewValley;
 using StardewValley.Network;
 using StardewValley.Quests;
 using StardewModdingAPI.Events;
-using StardewValley.Tools;
-using xTile.Dimensions;
-using xTile;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley.Menus;
 using StardewValley.Locations;
@@ -31,6 +27,8 @@ namespace Ultiplayer
         internal static List<NetRef<Farmer>> farmers;
         internal static string farmhandDirectory;
         internal static bool ultiplayer;
+        internal const int maxDistance = 810000;
+        internal const int overflow = 6;
         #endregion
 
         #region init
@@ -106,7 +104,6 @@ namespace Ultiplayer
             if (!ultiplayer)
                 return;
 
-            mon.Log("SyncFarmhands");
             foreach (Farmer f in Game1.otherFarmers.Values)
                 if (farmers.Find(fh => (id == 0 || f.UniqueMultiplayerID == id) && fh.Value.UniqueMultiplayerID == f.UniqueMultiplayerID) is NetRef<Farmer> nfh)
                 {
@@ -116,6 +113,8 @@ namespace Ultiplayer
                     SaveGame.farmerSerializer.Serialize(fs, f);
                 }
         }
+
+        
 
         #endregion
 
@@ -142,7 +141,7 @@ namespace Ultiplayer
         {
             float distX = Math.Abs(p1.X - p2.X);
             float distY = Math.Abs(p1.Y - p2.Y);
-            double dist = Math.Sqrt((distX * distX) + (distY * distY));
+            double dist = (distX * distX) + (distY * distY);
             return dist;
         }
 
@@ -150,12 +149,12 @@ namespace Ultiplayer
         {
             if (!ultiplayer)
                 return true;
-
-            if (int.Parse(message.MessageType.ToString()) != 0)
+            
+            if (message.MessageType != 0)
                 return true;
 
                 if (!peers.ContainsKey(peerId))
-                peers.Add(peerId, 5);
+                peers.Add(peerId, overflow);
 
 
             Farmer compare = Game1.player;
@@ -164,19 +163,19 @@ namespace Ultiplayer
                     compare = message.SourceFarmer;
 
 
-            if (Game1.otherFarmers[peerId] == compare || (int.Parse(message.MessageType.ToString()) == 0 && (Game1.otherFarmers[peerId].currentLocation != compare.currentLocation || getDistance(new Vector2(compare.position.X, compare.position.Y), new Vector2(Game1.otherFarmers[peerId].position.X, Game1.otherFarmers[peerId].position.Y)) > 900)))
+            if (Game1.otherFarmers[peerId] == compare || (int.Parse(message.MessageType.ToString()) == 0 && (Game1.otherFarmers[peerId].currentLocation != compare.currentLocation || getDistance(new Vector2(compare.position.X, compare.position.Y), new Vector2(Game1.otherFarmers[peerId].position.X, Game1.otherFarmers[peerId].position.Y)) > maxDistance)))
             {
-                if (peers[peerId] <= 0)
-                    return false;
-                else
-                {
-                    peers[peerId]--;
+                peers[peerId]--;
+                
+                if (peers[peerId] > 0)
                     return true;
-                }
+                else
+                    return false;
+                
             }
             else
             {
-                peers[peerId] = 5;
+                peers[peerId] = overflow;
                 return true;
             } 
         }
@@ -191,7 +190,7 @@ namespace Ultiplayer
 
             internal static bool Prefix(Farmer __instance)
             {
-                List<INetSerializable>  list = help.Reflection.GetField<List<INetSerializable>>(__instance.NetFields, "fields").GetValue();
+                List<INetSerializable>  list = help.Reflection.GetField<List<INetSerializable>>((object) __instance.NetFields, "fields").GetValue();
                 return false;
 
             }
@@ -327,8 +326,6 @@ namespace Ultiplayer
 
         internal static bool sendAvailableFarmhands(string userID, Action<OutgoingMessage> sendMessage)
         {
-            mon.Log("sendAvailableFarmhands:" + userID);
-
             Multiplayer multiplayer = (Multiplayer)typeof(Game1).GetField("multiplayer", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
             List<NetRef<Farmer>> netRefList = new List<NetRef<Farmer>>();
 
@@ -350,7 +347,6 @@ namespace Ultiplayer
 
             if (netRefList.Count < 1)
             {
-                mon.Log("Creating New");
                 NetRef<Farmer> newF = getNewFarmHand();
                 farmers.Add(newF);
                 netRefList.Add(newF);

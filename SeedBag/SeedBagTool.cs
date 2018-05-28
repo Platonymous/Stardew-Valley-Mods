@@ -94,6 +94,7 @@ namespace SeedBag
         {
         }
 
+        public override string DisplayName { get => "Seed Bag"; set => base.DisplayName = "Seed Bag"; }
 
         private void build()
         {

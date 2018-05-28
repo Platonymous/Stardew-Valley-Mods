@@ -28,9 +28,9 @@ namespace PyTK.Overrides
 
         internal static bool Prefix(int updateType, int itemIndex, Chest chest = null)
         {
-            Item item = (updateType == 0) ? Game1.player.items[itemIndex] : (updateType == 1 || chest == null) ? chest.items[itemIndex] : null;
+            Item item = (updateType == 0) ? Game1.player.Items[itemIndex] : (updateType == 1 || chest == null) ? chest.items[itemIndex] : null;
 
-            if(item == null || item.parentSheetIndex < 0 || item is ISaveElement)
+            if(item == null || item.ParentSheetIndex < 0 || item is ISaveElement)
                 return false;
 
             return true;

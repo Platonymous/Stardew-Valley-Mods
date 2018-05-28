@@ -1,7 +1,7 @@
 {
   "Name": "Seed Bag",
   "Author": "Platonymous",
-  "Version": "1.2.2",
+  "Version": "1.2.3",
   "Description": "Adds a Seed Bag to the Game",
   "UniqueID": "Platonymous.SeedBag",
   "EntryDll": "SeedBag.dll",

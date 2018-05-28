@@ -11,6 +11,8 @@
     <AssemblyName>PyTK</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,8 +32,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetZip, Version=1.11.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.11.0\lib\net20\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="MoonSharp.Interpreter, Version=2.0.0.0, Culture=neutral, PublicKeyToken=921e73ce94aa17f8, processorArchitecture=MSIL">
       <HintPath>..\packages\MoonSharp.2.0.0.0\lib\net40-client\MoonSharp.Interpreter.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -41,6 +50,12 @@
     <Compile Include="ConsoleCommands\CCLua.cs" />
     <Compile Include="ConsoleCommands\CcSaveHandler.cs" />
     <Compile Include="ConsoleCommands\CcTime.cs" />
+    <Compile Include="ContentSync\ContentRequest.cs" />
+    <Compile Include="ContentSync\ContentResponse.cs" />
+    <Compile Include="ContentSync\ContentSyncHandler.cs" />
+    <Compile Include="ContentSync\ContentType.cs" />
+    <Compile Include="ContentSync\SerializationColor.cs" />
+    <Compile Include="ContentSync\SerializationTexture2D.cs" />
     <Compile Include="CustomElementHandler\CraftingData.cs" />
     <Compile Include="CustomElementHandler\CustomObjectData.cs" />
     <Compile Include="CustomElementHandler\IDrawFromCustomObjectData.cs" />
@@ -63,6 +78,7 @@
     <Compile Include="Overrides\OvSpritebatch.cs" />
     <Compile Include="Overrides\OvTV.cs" />
     <Compile Include="Overrides\OvSleep.cs" />
+    <Compile Include="PyNet.cs" />
     <Compile Include="Tiled\EnumHelper.cs" />
     <Compile Include="Tiled\IXmlFormatable.cs" />
     <Compile Include="Tiled\NewTiledTmxFormat.cs" />
@@ -99,14 +115,18 @@
     <Compile Include="Types\ICustomContentAPI.cs" />
     <Compile Include="Types\InventoryItem.cs" />
     <Compile Include="Types\Mail.cs" />
-    <Compile Include="Types\MPStringMessage.cs" />
+    <Compile Include="Types\MPMessage.cs" />
+    <Compile Include="Types\PyResponder.cs" />
+    <Compile Include="Types\PyMessenger.cs" />
     <Compile Include="Types\Range.cs" />
+    <Compile Include="Types\SerializationType.cs" />
     <Compile Include="Types\STime.cs" />
     <Compile Include="Types\TerrainSelector.cs" />
     <Compile Include="Types\ItemSelector.cs" />
     <Compile Include="Types\TileAction.cs" />
     <Compile Include="Types\TileLocationSelector.cs" />
     <Compile Include="Types\TVChannel.cs" />
+    <Compile Include="Types\WarpRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Examples.md" />
@@ -120,14 +140,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
+    <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
+  <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
+    <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
   </Target>
 </Project>

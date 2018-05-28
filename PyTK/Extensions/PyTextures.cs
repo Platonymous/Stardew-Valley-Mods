@@ -77,7 +77,6 @@ namespace PyTK.Extensions
                 int x2 = area.X;
                 int y2 = area.Y;
 
-                int i = 0;
                 for (int x = x2; x < w + x2; x++)
                     for (int y = y2; y < h + y2; y++)
                         data2[(y - y2) * w + (x - x2)] = data[y * t.Width + x];

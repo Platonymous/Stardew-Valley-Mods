@@ -101,6 +101,79 @@ STime inTwoHours = STime.CURRENT + 120;
 bool timeReached = STime.CURRENT > targetTime;
 ```
 
+## Multiplayer
+##### Messaging
+```sh
+using PyTK;
+using PyTK.Types;
+
+//send Messages
+PyNet.sendMessage("MyMod.MyAddress","mydata");
+
+//receive Messages
+List<MPMessage> messages = PyNet.getNewMessages("MyMod.MyAddress").ToList();
+		   
+//use Messenger
+PyMessenger<MyClass> messenger = new PyMessenger<MyClass>("MyMod.MyMessengerAddress");
+MyClass envelope = new MyClass(params);
+messenger.send(envelope, SerializationType.JSON);
+List<MyClass> messages = messenger.receive().ToList();
+
+// Responder
+PyResponder<bool,long> pingResponder = new PyResponder<bool, long>("PytK.Ping", (s) =>
+           {
+               return true;
+           }, 1);
+		   
+pingResponder.start();		   
+
+public void callPingResponders()
+{
+	foreach (Farmer farmer in Game1.otherFarmers.Values)
+	{
+		long t = Game1.currentGameTime.TotalGameTime.Milliseconds;
+		Task<bool> ping = PyNet.sendRequestToFarmer<bool>("PytK.Ping", t, farmer);
+		ping.Wait();
+		long r = Game1.currentGameTime.TotalGameTime.Milliseconds;
+		if (ping.Result)
+			Monitor.Log(farmer.Name + ": " + (r - t) + "ms", LogLevel.Info);
+		else
+			Monitor.Log(farmer.Name + ": No Answer", LogLevel.Error);
+		}
+	}
+}
+
+PyResponder<int,int> staminaResponder = new PyResponder<int, int>("PytK.StaminaRequest", (stamina) =>
+            {
+                if (stamina == -1)
+                    return (int)Game1.player.Stamina;
+                else
+                {
+                    Game1.player.Stamina = stamina;
+                    return stamina;
+                }
+
+            }, 8);
+			
+staminaResponder.start();
+
+public int getStamina(Famer farmer)
+{
+	Task<int> getStamina = PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", -1, farmer);
+	getStamina.Wait();
+	int stamina = getStamina.Result;
+	Monitor.Log(farmer.Name + ": " + stamina, LogLevel.Info);
+	return stamina;
+}
+
+public void setStamina(Farmer farmer, int stamina)
+{
+	Task<int> setStamina = PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", stamina, farmer);
+	setStamina.Wait();
+	Monitor.Log(farmer.Name + ": " + setStamina.Result, LogLevel.Info);
+}
+```
+
 ## Frameworks
 ##### Custom TV
 ```sh

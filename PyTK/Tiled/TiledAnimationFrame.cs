@@ -2,7 +2,7 @@
 
 namespace PyTK.Tiled
 {
-    internal class TiledAnimationFrame : XmlObject, IXmlFormatable
+    public class TiledAnimationFrame : XmlObject, IXmlFormatable
     {
         public int TileId { get; set; }
         public int Duration { get; set; }

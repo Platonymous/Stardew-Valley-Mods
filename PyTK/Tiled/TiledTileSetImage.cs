@@ -2,7 +2,7 @@
 
 namespace PyTK.Tiled
 {
-    internal class TiledTileSetImage : XmlObject, IXmlFormatable
+    public class TiledTileSetImage : XmlObject, IXmlFormatable
     {
         public string Source { get; set; }
         public int Width { get; set; }

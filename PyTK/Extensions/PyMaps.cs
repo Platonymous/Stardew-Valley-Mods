@@ -14,6 +14,8 @@ using PyTK.Types;
 using xTile.Dimensions;
 using System;
 using xTile.ObjectModel;
+using PyTK.Extensions;
+using PyTK.Tiled;
 
 namespace PyTK.Extensions
 {

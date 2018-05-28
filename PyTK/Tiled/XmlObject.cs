@@ -2,7 +2,7 @@
 
 namespace PyTK.Tiled
 {
-    internal class XmlObject
+    public class XmlObject
     {
         public XElement XElement { get; }
 
