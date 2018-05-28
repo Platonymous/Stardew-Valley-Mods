@@ -151,17 +151,19 @@ namespace Arcade2048
             Game1.graphics.GraphicsDevice.SetRenderTarget(target);
 
             b.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-            bool alternate = false;
+            Dictionary<Point, bool> rectangles = new Dictionary<Point, bool>();
+
             for (int x = 0; x < backgroundW; x++)
-            {
-                for (int y = 0; y < backgroundH; y++)
-                {
-                    drawRectangle(b, new Rectangle((int)(x * backgroundTileSize + backgoundPosition.X * backgroundSteps), (int)(y * backgroundTileSize + backgoundPosition.Y * backgroundSteps), backgroundTileSize, backgroundTileSize), alternate ? backGroundColor2 : backGroundColor);
-                    alternate = !alternate;
+                for (int y = 0; y < backgroundH; y++) {
+                    Point prev = new Point(x - 1, y);
+                    Point current = new Point(x, y);
+                    Point above = new Point(x, y - 1);
+                    rectangles.Add(current, rectangles.ContainsKey(above) ? !rectangles[above] : rectangles.ContainsKey(prev) ? !rectangles[prev] : true);
                 }
-                if (backgroundW % 2 != 0)
-                    alternate = !alternate;
-            }
+
+            foreach(KeyValuePair<Point,bool> r in rectangles)
+                drawRectangle(b, new Rectangle((int)(r.Key.X * backgroundTileSize + backgoundPosition.X * backgroundSteps), (int)(r.Key.Y * backgroundTileSize + backgoundPosition.Y * backgroundSteps), backgroundTileSize, backgroundTileSize), r.Value ? backGroundColor2 : backGroundColor);
+
             b.End();
             Game1.game1.GraphicsDevice.SetRenderTarget(null);
             Game1.game1.GraphicsDevice.Clear(Color.Black);
