@@ -65,12 +65,13 @@ namespace PyTK.CustomElementHandler
         {
             Task.Run(() =>
             {
-
                 OnBeforeRebuilding(EventArgs.Empty);
-                ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+
                 ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+                ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
                 foreach (Farmer farmer in Game1.otherFarmers.Values)
                     ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+
                 OnFinishedRebuilding(EventArgs.Empty);
 
             });
@@ -89,11 +90,10 @@ namespace PyTK.CustomElementHandler
 
             bool result = true;
 
-            foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive())) {
+            foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive() && f != Game1.player)) {
                 Task<bool> fResult = PyNet.sendRequestToFarmer<bool>(typeCheckerName, data[2], farmer);
                 fResult.Wait();
                 result = result && fResult.Result;
-
             }
 
             return result;
@@ -109,6 +109,8 @@ namespace PyTK.CustomElementHandler
             SaveEvents.BeforeSave += (s, e) => Replace();
             SaveEvents.AfterSave += (s, e) => Rebuild();
             SaveEvents.AfterLoad += (s, e) => Rebuild();
+            Events.PyTimeEvents.BeforeSleepEvents += (s, e) => { if (Game1.IsClient) { Replace(); } };
+
             TypeChecker = new PyResponder<bool, string>(typeCheckerName, (s) =>
               {
                   return Type.GetType(s) != null;
@@ -119,9 +121,6 @@ namespace PyTK.CustomElementHandler
 
         internal static void Replace()
         {
-            if (Game1.IsMultiplayer && Game1.IsClient)
-                return;
-
             OnBeforeRemoving(EventArgs.Empty);
             ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
             ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
@@ -132,10 +131,7 @@ namespace PyTK.CustomElementHandler
 
         internal static void Rebuild()
         {
-            if (Game1.IsMultiplayer && Game1.IsClient)
-                return;
-
-            if (Game1.IsMultiplayer && Game1.IsServer)
+            if (Game1.IsMultiplayer)
             {
                 rebuildIfAvailable();
                 return;
@@ -239,7 +235,8 @@ namespace PyTK.CustomElementHandler
             ICollection col = value as ICollection;
             OverlaidDictionary<Vector2, SObject> ovd = value as OverlaidDictionary<Vector2, SObject>;
             NetObjectList<Item> noli = value as NetObjectList<Item>;
-            NetCollection<Building> ncb = value as NetCollection<Building>;
+            IList<Building> buildings = value as IList<Building>;
+
 
             if (dict != null)
                 foreach (object item in dict.Values)
@@ -247,8 +244,8 @@ namespace PyTK.CustomElementHandler
             else if (list != null)
                 foreach (object item in list)
                     FindAllInstances(item, propNames, exploredObjects, found, list);
-            else if(col != null)
-                foreach(object item in col)
+            else if (col != null)
+                foreach (object item in col)
                     FindAllInstances(item, propNames, exploredObjects, found, col);
             else if (ovd != null)
                 foreach (object item in ovd.Values)
@@ -256,9 +253,9 @@ namespace PyTK.CustomElementHandler
             else if (noli != null)
                 foreach (object item in noli)
                     FindAllInstances(item, propNames, exploredObjects, found, noli);
-            else if (ncb != null)
-                foreach (object item in ncb)
-                    FindAllInstances(item, propNames, exploredObjects, found, ncb);
+            else if(buildings != null)
+                foreach (object item in buildings)
+                    FindAllInstances(item, propNames, exploredObjects, found, buildings);
             else
             {
                 if (found.ContainsKey(parent))
@@ -272,14 +269,14 @@ namespace PyTK.CustomElementHandler
 
                 foreach (FieldInfo property in properties)
                 {
-                    if (!propNames.Contains(property.Name))
+                   if (!propNames.Contains(property.Name))
                         continue;
 
                     object propertyValue = property.GetValue(value);
-                    FindAllInstances(propertyValue, propNames, exploredObjects, found, new KeyValuePair<FieldInfo, object>(property, value));
+                    if (propertyValue != null && propertyValue.GetType() is Type t && t.IsClass)
+                        FindAllInstances(propertyValue, propNames, exploredObjects, found, new KeyValuePair<FieldInfo, object>(property, value));
                 }
             }
-
         }
 
         private static object checkReplacement(object replacement)
@@ -469,7 +466,7 @@ namespace PyTK.CustomElementHandler
 
         private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent)
         {
-            return FindAllInstances(obj, parent, new List<string>() { "value", "Value", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
+            return FindAllInstances(obj, parent, new List<string>() {"netObjects","overlayObjects", "farmhand","owner", "elements", "parent", "array", "value", "Value", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
         }
 
         private static void ReplaceAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate, Func<TIn, object> replacer, bool reverse = false)
@@ -478,12 +475,15 @@ namespace PyTK.CustomElementHandler
 
             if (reverse)
                 objs.Reverse();
-                
+
             foreach (object key in objs)
             {
                 foreach (object obj in found[key])
+                {
+
                     if (obj is TIn item && predicate(item))
                     {
+
                         if (key is IDictionary<Vector2, SObject> dict)
                         {
                             foreach (Vector2 k in dict.Keys.Reverse())
@@ -553,7 +553,7 @@ namespace PyTK.CustomElementHandler
                         else if (key is IList list)
                         {
                             object[] lobj = new object[list.Count];
-                            list.CopyTo(lobj,0);
+                            list.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
                             list[index] = replacer(item);
                         }
@@ -562,7 +562,7 @@ namespace PyTK.CustomElementHandler
                             Item[] lobj = new Item[noli.Count];
                             noli.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
-                            noli[index] = (Item) replacer(item);
+                            noli[index] = (Item)replacer(item);
                         }
                         else if (key is Array arr)
                         {
@@ -571,12 +571,13 @@ namespace PyTK.CustomElementHandler
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
                             arr.SetValue(replacer(item), index);
                         }
-      
+
                         else if (key is KeyValuePair<FieldInfo, object> kpv)
                         {
                             kpv.Key.SetValue(kpv.Value, replacer(item));
                         }
                     }
+                }
             }
         }
 
@@ -588,6 +589,7 @@ namespace PyTK.CustomElementHandler
                 foreach (object obj in found[key])
                     if (obj is TIn item && predicate(item))
                     {
+
                         if (key is Dictionary<Vector2, SObject> dict)
                         {
                             foreach (Vector2 k in dict.Keys)
@@ -634,6 +636,7 @@ namespace PyTK.CustomElementHandler
                         {
                             kpv.Key.SetValue(kpv.Value, null);
                         }
+
                     }
             }
         }

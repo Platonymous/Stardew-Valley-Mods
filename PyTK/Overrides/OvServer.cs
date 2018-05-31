@@ -67,6 +67,25 @@ namespace PyTK.Overrides
         }
 
         [HarmonyPatch]
+        internal class ServerFix4
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("Network.GameServer"), "sendAvailableFarmhands");
+            }
+
+            internal static void Prefix()
+            {
+                SaveHandler.Replace();
+            }
+
+            internal static void Postfix()
+            {
+                SaveHandler.Rebuild();
+            }
+        }
+
+        [HarmonyPatch]
         internal class ClientFix1
         {
             internal static MethodInfo TargetMethod()
