@@ -237,6 +237,7 @@ namespace PyTK.CustomElementHandler
             NetObjectList<Item> noli = value as NetObjectList<Item>;
             IList<Building> buildings = value as IList<Building>;
 
+
             if (dict != null)
                 foreach (object item in dict.Values)
                     FindAllInstances(item, propNames, exploredObjects, found, dict);
