@@ -239,6 +239,7 @@ namespace PyTK.CustomElementHandler
             ICollection col = value as ICollection;
             OverlaidDictionary<Vector2, SObject> ovd = value as OverlaidDictionary<Vector2, SObject>;
             NetObjectList<Item> noli = value as NetObjectList<Item>;
+            NetCollection<Building> ncb = value as NetCollection<Building>;
 
             if (dict != null)
                 foreach (object item in dict.Values)
@@ -255,6 +256,9 @@ namespace PyTK.CustomElementHandler
             else if (noli != null)
                 foreach (object item in noli)
                     FindAllInstances(item, propNames, exploredObjects, found, noli);
+            else if (ncb != null)
+                foreach (object item in ncb)
+                    FindAllInstances(item, propNames, exploredObjects, found, ncb);
             else
             {
                 if (found.ContainsKey(parent))
