@@ -13,11 +13,7 @@ using Newtonsoft.Json;
 using PyTK.ContentSync;
 using xTile.Tiles;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.Extensions;
 using xTile;
-using System.Text;
-using System.IO.Compression;
-using Ionic;
 
 namespace PyTK
 {
@@ -97,7 +93,7 @@ namespace PyTK
 
         public static void sendRequestToAllFarmers<T>(string address, object request, Action<T> callback, SerializationType serializationType = SerializationType.PLAIN, int timeout = 10000, XmlSerializer xmlSerializer = null)
         {
-            foreach (Farmer farmer in Game1.otherFarmers.Values)
+            foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive() &&  f != Game1.player))
                 Task.Run(() => sendRequestToFarmer(address, request, farmer, callback, serializationType, timeout, xmlSerializer));
         }
 
@@ -128,7 +124,7 @@ namespace PyTK
             {
                 while (true)
                 {
-                    List<T> msgs = new List<T>(messenger.receive(fromFarmer));
+                    List<T> msgs = new List<T>(messenger.receive());
                     if (msgs.Count() > 0)
                     {
                         messages.Remove(returnAddress);
@@ -142,7 +138,6 @@ namespace PyTK
                     Thread.Sleep(1);
                 }
             });
-
             callback?.Invoke((T)result);
             return (T)result;
         }
