@@ -18,7 +18,7 @@ namespace FarmHub
         public int MaxPlayers { get; set; }
         public int CurrentPlayers { get; set; }
         public int LastUpdate { get; set; }
-        public string Passwort { get; set; }
+        public string Password { get; set; }
         public string Id { get; set; }
         public string[] RequiredMods { get; set; }
         private string Guid { get; set; }
@@ -50,7 +50,7 @@ namespace FarmHub
             Monitor = monitor;
             InviteCode = server.getInviteCode(); ;
             Name = Game1.player.farmName.Value;
-            Passwort = FarmHubMod.passwort.toMD5Hash();
+            Password = FarmHubMod.password.toMD5Hash();
             Guid = FarmHubMod.guid;
             TimeEvents.TimeOfDayChanged += Update;
             SaveEvents.AfterReturnToTitle += DelistServer;
