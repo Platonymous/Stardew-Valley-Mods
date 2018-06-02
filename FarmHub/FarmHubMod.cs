@@ -1,5 +1,5 @@
-﻿using Firebase.Database;
-using Firebase.Database.Query;
+﻿using FarmHub.Firebase.Database;
+using FarmHub.Firebase.Database.Query;
 using PyTK.Extensions;
 using PyTK.Types;
 using StardewModdingAPI;

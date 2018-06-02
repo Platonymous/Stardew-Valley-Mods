@@ -1,7 +1,7 @@
 {
   "Name": "FarmHub",
   "Author": "Platonymous",
-  "Version": "0.7.2",
+  "Version": "0.8.0",
   "Description": "Active Server List for SDV",
   "UniqueID": "Platonymous.FarmHub",
   "EntryDll": "FarmHub.dll",

@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,39 +32,121 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LiteDB, Version=4.1.3.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteDB.4.1.3\lib\net40\LiteDB.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Core.3.1.1\lib\net45\System.Reactive.Core.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Interfaces.3.1.1\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Linq.3.1.1\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.PlatformServices.3.1.1\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Windows.Threading.3.1.1\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions">
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FarmHubMod.cs" />
     <Compile Include="FarmHubServer.cs" />
     <Compile Include="FHConfig.cs" />
+    <Compile Include="FirebaseNet45\ExceptionEventArgs.cs" />
+    <Compile Include="FirebaseNet45\Extensions\ObservableExtensions.cs" />
+    <Compile Include="FirebaseNet45\Extensions\TaskExtensions.cs" />
+    <Compile Include="FirebaseNet45\FirebaseClient.cs" />
+    <Compile Include="FirebaseNet45\FirebaseException.cs" />
+    <Compile Include="FirebaseNet45\FirebaseKeyGenerator.cs" />
+    <Compile Include="FirebaseNet45\FirebaseObject.cs" />
+    <Compile Include="FirebaseNet45\FirebaseOptions.cs" />
+    <Compile Include="FirebaseNet45\Http\HttpClientExtensions.cs" />
+    <Compile Include="FirebaseNet45\Http\PostResult.cs" />
+    <Compile Include="FirebaseNet45\ObservableExtensions.cs" />
+    <Compile Include="FirebaseNet45\Offline\ConcurrentOfflineDatabase.cs" />
+    <Compile Include="FirebaseNet45\Offline\DatabaseExtensions.cs" />
+    <Compile Include="FirebaseNet45\Offline\InitialPullStrategy.cs" />
+    <Compile Include="FirebaseNet45\Offline\Internals\MemberAccessVisitor.cs" />
+    <Compile Include="FirebaseNet45\Offline\ISetHandler.cs" />
+    <Compile Include="FirebaseNet45\Offline\OfflineCacheAdapter.cs" />
+    <Compile Include="FirebaseNet45\Offline\OfflineDatabase.cs" />
+    <Compile Include="FirebaseNet45\Offline\OfflineEntry.cs" />
+    <Compile Include="FirebaseNet45\Offline\RealtimeDatabase.cs" />
+    <Compile Include="FirebaseNet45\Offline\SetHandler.cs" />
+    <Compile Include="FirebaseNet45\Offline\StreamingOptions.cs" />
+    <Compile Include="FirebaseNet45\Offline\SyncOptions.cs" />
+    <Compile Include="FirebaseNet45\Query\AuthQuery.cs" />
+    <Compile Include="FirebaseNet45\Query\ChildQuery.cs" />
+    <Compile Include="FirebaseNet45\Query\FilterQuery.cs" />
+    <Compile Include="FirebaseNet45\Query\FirebaseQuery.cs" />
+    <Compile Include="FirebaseNet45\Query\IFirebaseQuery.cs" />
+    <Compile Include="FirebaseNet45\Query\OrderQuery.cs" />
+    <Compile Include="FirebaseNet45\Query\ParameterQuery.cs" />
+    <Compile Include="FirebaseNet45\Query\QueryExtensions.cs" />
+    <Compile Include="FirebaseNet45\Query\QueryFactoryExtensions.cs" />
+    <Compile Include="FirebaseNet45\Query\SilentQuery.cs" />
+    <Compile Include="FirebaseNet45\Streaming\FirebaseCache.cs" />
+    <Compile Include="FirebaseNet45\Streaming\FirebaseEvent.cs" />
+    <Compile Include="FirebaseNet45\Streaming\FirebaseEventSource.cs" />
+    <Compile Include="FirebaseNet45\Streaming\FirebaseEventType.cs" />
+    <Compile Include="FirebaseNet45\Streaming\FirebaseServerEventType.cs" />
+    <Compile Include="FirebaseNet45\Streaming\FirebaseSubscription.cs" />
+    <Compile Include="FirebaseNet45\Streaming\NonBlockingStreamReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json" />
     <None Include="packages.config" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\firebase-database-dotnet-master\src\FirebaseNet45\FirebaseNet45.csproj">
-      <Project>{c71f88dd-bb11-4e29-9e84-9ef86036dda4}</Project>
-      <Name>FirebaseNet45</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PyTK\PyTK.csproj">
       <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
       <Name>PyTK</Name>
@@ -76,5 +160,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
   </Target>
 </Project>
