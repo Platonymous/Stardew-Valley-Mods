@@ -1,0 +1,15 @@
+{
+  "Name": "FarmHub",
+  "Author": "Platonymous",
+  "Version": "0.7.1",
+  "Description": "Active Server List for SDV",
+  "UniqueID": "Platonymous.FarmHub",
+  "EntryDll": "FarmHub.dll",
+  "MinimumApiVersion": "2.6-beta",
+  "UpdateKeys": [ "Nexus:2309" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ]
+}
