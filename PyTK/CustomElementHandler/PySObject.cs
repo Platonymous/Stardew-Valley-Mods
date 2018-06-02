@@ -23,7 +23,6 @@ namespace PyTK.CustomElementHandler
 
         }
 
-
         public PySObject(CustomObjectData data)
             : base(data.sdvId,1)
         {
@@ -46,7 +45,7 @@ namespace PyTK.CustomElementHandler
 
         public virtual Dictionary<string, string> getAdditionalSaveData()
         {
-            return new Dictionary<string, string>() { { "id", data.id }, { "tileLocation", tileLocation.X + "," + tileLocation.Y }, { "name", name }, { "quality", quality.ToString() }, { "price", price.ToString() }, { "stack", stack.ToString() } };
+            return new Dictionary<string, string>() { { "id", data.id }, { "tileLocation", TileLocation.X + "," + TileLocation.Y }, { "name", Name }, { "quality", Quality.ToString() }, { "price", Price.ToString() }, { "stack", Stack.ToString() } };
         }
 
         public virtual object getReplacement()

@@ -1,5 +1,4 @@
-﻿using PyTK.Types;
-using StardewValley;
+﻿using StardewValley;
 using StardewModdingAPI;
 using System;
 using System.Collections.Generic;
@@ -10,8 +9,6 @@ using StardewValley.Buildings;
 using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.Extensions;
-using StardewValley.Network;
 
 namespace PyTK
 {
