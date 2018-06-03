@@ -23,7 +23,7 @@ namespace CustomFarmingRedux
 
         public override Item getOne()
         {
-            return new WaterItem(data) { tileLocation = Vector2.Zero, name = name, price = price, quality = quality };
+            return new WaterItem(data) { TileLocation = Vector2.Zero, name = name, Price = price, Quality = quality };
         }
 
         public override ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)

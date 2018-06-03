@@ -29,7 +29,7 @@ namespace CustomFarmingRedux
         internal Texture2D texture;
         private Rectangle tilesize = new Rectangle(0, 0, 16, 16);
         internal Rectangle sourceRectangle;
-        private SObject input { get => heldObject; set => heldObject = value; }
+        private SObject input { get => heldObject.Value; set => heldObject.Value = value; }
 
         public CustomObject()
         {
@@ -53,14 +53,14 @@ namespace CustomFarmingRedux
                 namesplit[blueprint.insertpos] += " " + input.name;
                 cname = String.Join(" ", namesplit);
             }
-            price =(blueprint.prefix || blueprint.suffix || blueprint.insert) ? price + input.price : price;
+            price.Value =(blueprint.prefix || blueprint.suffix || blueprint.insert) ? price + input.Price : price;
             this.name = cname;
             displayName = cname;
             this.blueprint = blueprint;
-            parentSheetIndex = blueprint.index;
+            parentSheetIndex.Value = blueprint.index;
             this.input = input;
-            stack = blueprint.stack;
-            quality = (blueprint.quality == -1) ? input.quality : blueprint.quality;
+            stack.Value = blueprint.stack;
+            quality.Value = (blueprint.quality == -1) ? input.Quality : blueprint.quality;
             texture = blueprint.getTexture();
             sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex, 16, 16);
             if (blueprint.colored)
@@ -87,12 +87,12 @@ namespace CustomFarmingRedux
                 {
                     string[] strArray1 = str.Split('/');
                     name = strArray1[0];
-                    price = Convert.ToInt32(strArray1[1]);
-                    edibility = Convert.ToInt32(strArray1[2]);
+                    price.Value = Convert.ToInt32(strArray1[1]);
+                    edibility.Value = Convert.ToInt32(strArray1[2]);
                     string[] strArray2 = strArray1[3].Split(' ');
-                    type = strArray2[0];
+                    type.Value = strArray2[0];
                     if (strArray2.Length > 1)
-                        category = Convert.ToInt32(strArray2[1]);
+                        category.Value = Convert.ToInt32(strArray2[1]);
                 }
             }
             catch
@@ -108,13 +108,12 @@ namespace CustomFarmingRedux
             texture.GetData(data);
             int w = 16;
             int h = 16;
-            Rectangle sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, input.parentSheetIndex, w, h);
+            Rectangle sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, input.ParentSheetIndex, w, h);
             Color[] data2 = new Color[w * h];
 
             int x2 = sourceRectangle.X;
             int y2 = sourceRectangle.Y;
 
-            int i = 0;
             for (int x = x2; x < w + x2; x++)
                 for (int y = y2; y < h + y2; y++)
                     data2[(y - y2) * w + (x - x2)] = data[y * texture.Width + x];
@@ -166,7 +165,7 @@ namespace CustomFarmingRedux
             return Game1.parseText(blueprint.description, Game1.smallFont, Game1.tileSize * 4 + Game1.tileSize / 4);
         }
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
 
             spriteBatch.Draw(Game1.shadowTexture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize * 3 / 4)), new Rectangle?(Game1.shadowTexture.Bounds), Color.White * 0.5f, 0.0f, new Vector2(Game1.shadowTexture.Bounds.Center.X, Game1.shadowTexture.Bounds.Center.Y), 3f, SpriteEffects.None, layerDepth - 0.0001f);
@@ -207,11 +206,11 @@ namespace CustomFarmingRedux
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
-            SObject lastInput = (SObject) (replacement as Chest).items.Find(i => i is SObject);
+            SObject lastInput = (SObject) (replacement as Chest).items.ToList().Find(i => i is SObject);
             CustomMachineBlueprint mBlueprint = machines.Find(cmb => additionalSaveData["mid"] == cmb.fullid);
             RecipeBlueprint blueprint = mBlueprint.production.Find(p => p.id.ToString() == additionalSaveData["id"]);
             build(additionalSaveData["name"], lastInput, blueprint);
-            stack = int.Parse(additionalSaveData["stack"]);
+            stack.Value = int.Parse(additionalSaveData["stack"]);
         }
     }
 }

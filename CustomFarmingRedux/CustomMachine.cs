@@ -88,11 +88,11 @@ namespace CustomFarmingRedux
             this.blueprint = blueprint;
             texture = blueprint.getTexture();
             id = blueprint.fullid;
-            parentSheetIndex = data.sdvId;
-            bigCraftable = true;
-            type = "Crafting";
+            ParentSheetIndex = data.sdvId;
+            bigCraftable.Value = true;
+            type.Value = "Crafting";
             tilesize = new Rectangle(0, 0, blueprint.tilewidth, blueprint.tileheight);
-            boundingBox = new Rectangle(0, 0, blueprint.tilewidth * 4, blueprint.tileheight * 4);
+            boundingBox.Value = new Rectangle(0, 0, blueprint.tilewidth * 4, blueprint.tileheight * 4);
             skipFrame = 60 / Math.Max(1, blueprint.fps);
             animationFrames = blueprint.frames;
             tileindex = blueprint.tileindex;
@@ -120,11 +120,11 @@ namespace CustomFarmingRedux
         private SObject maxed(SObject obj)
         {
             SObject o = (SObject) obj.getOne();
-            o.stack = int.MaxValue;
+            o.Stack = int.MaxValue;
             return o;
         }
 
-        private RecipeBlueprint findRecipe(List<List<Item>> items)
+        private RecipeBlueprint findRecipe(List<IList<Item>> items)
         {
             RecipeBlueprint result = null;
             if (blueprint.production != null)
@@ -145,15 +145,15 @@ namespace CustomFarmingRedux
 
         private RecipeBlueprint findRecipe(List<Item> items)
         {
-            return findRecipe(new List<List<Item>>() { items });
+            return findRecipe(new List<IList<Item>>() { items });
         }
 
         private RecipeBlueprint findRecipe(Item item)
         {
-            return findRecipe(new List<List<Item>>() { new List<Item>() { item } });
+            return findRecipe(new List<IList<Item>>() { new List<Item>() { item } });
         }
 
-        private bool hasStarterMaterials(List<List<Item>> items)
+        private bool hasStarterMaterials(List<IList<Item>> items)
         {
             if (starterRecipe == null)
                 return true;
@@ -166,23 +166,23 @@ namespace CustomFarmingRedux
 
         private bool hasStarterMaterials(List<Item> items)
         {
-            return hasStarterMaterials(new List<List<Item>>() { items });
+            return hasStarterMaterials(new List<IList<Item>>() { items });
         }
 
-        private List<List<Item>> getItemLists(SFarmer player = null)
+        private List<IList<Item>> getItemLists(SFarmer player = null)
         {
-            List<List<Item>> items = new List<List<Item>>();
+            List<IList<Item>> items = new List<IList<Item>>();
 
             if (player != null)
-                items.Add(player.items);
+                items.Add(player.Items);
 
             if (config.automation)
             {
                 if (location is GameLocation)
                     if (tileLocation == Vector2.Zero)
                         if (!location.objects.ContainsKey(tileLocation) || location.objects[tileLocation] != this)
-                            if (location.objects.ContainsValue(this))
-                                tileLocation = location.objects.Find(k => k.Value == this).Key;
+                            if (new List<SObject>(location.objects.Values).Contains(this))
+                                tileLocation.Value = new List<Vector2>(location.objects.Keys).Find(k => location.objects[k] == this);
 
                 List<Vector2> tiles = Utility.getAdjacentTileLocations(tileLocation);
                 if (location is GameLocation)
@@ -199,7 +199,7 @@ namespace CustomFarmingRedux
             List<Vector2> tiles = Utility.getAdjacentTileLocations(tileLocation);
             if (location is GameLocation)
                 foreach (Vector2 tile in tiles)
-                    if (location.objects.ContainsKey(tile) && location.objects[tile] is Chest c && c.playerChest == true && c.items.Count < 24)
+                    if (location.objects.ContainsKey(tile) && location.objects[tile] is Chest c && c.playerChest.Value == true && c.items.Count < 24)
                     {
                         c.addItem(o);
                         clear();
@@ -213,10 +213,10 @@ namespace CustomFarmingRedux
             if (blueprint.production == null || activeRecipe == null)
                 return;
 
-            minutesUntilReady = -1;
+            minutesUntilReady.Value = -1;
             completionTime = null;
-            heldObject = createProduce();
-            readyForHarvest = true;
+            heldObject.Value = createProduce();
+            readyForHarvest.Value = true;
 
             if(config.automation)
                 if (deliverToNearChest(heldObject))
@@ -225,7 +225,7 @@ namespace CustomFarmingRedux
 
         private void startAutomation()
         {
-            List<List<Item>> items = getItemLists(null);
+            List<IList<Item>> items = getItemLists(null);
             RecipeBlueprint recipe = findRecipe(items);
             bool hasRecipe = recipe != null;
             bool hasStarter = hasStarterMaterials(items);
@@ -233,20 +233,20 @@ namespace CustomFarmingRedux
             {
                 foreach (List<Item> list in items)
                     foreach (Item item in list)
-                        if (recipe.materials.Find(m => m.index == item.parentSheetIndex || m.index == item.category) != null) {
+                        if (recipe.materials.Find(m => m.index == item.ParentSheetIndex || m.index == item.Category) != null) {
                             startProduction((SObject)item, recipe, items);
                             return;
                         }
             }
         }
 
-        private void startProduction(SObject obj, RecipeBlueprint recipe, List<List<Item>> items)
+        private void startProduction(SObject obj, RecipeBlueprint recipe, List<IList<Item>> items)
         {
             activeRecipe = recipe;
             if (completionTime == null)
                 completionTime = STime.CURRENT + recipe.time;
 
-            minutesUntilReady = (completionTime - STime.CURRENT).timestamp;
+            minutesUntilReady.Value = (completionTime - STime.CURRENT).timestamp;
 
             if (starterRecipe != null)
                 starterRecipe.consumeIngredients(items);
@@ -256,16 +256,16 @@ namespace CustomFarmingRedux
 
             if (obj != null)
             {
-                heldObject = (SObject)obj.getOne();
-                heldObject.stack = obj.stack;
+                heldObject.Value = (SObject)obj.getOne();
+                heldObject.Value.Stack = obj.Stack;
             }
         }
         private SObject createProduce()
         {
-            if (!(heldObject is Chest))
-                return activeRecipe.createObject(heldObject);
+            if (!(heldObject.Value is Chest))
+                return activeRecipe.createObject(heldObject.Value);
             else
-                return (SObject)SaveHandler.rebuildElement(heldObject.name, heldObject);
+                return (SObject)SaveHandler.rebuildElement(heldObject.Value.name, heldObject);
         }
 
         public override bool minutesElapsed(int minutes, GameLocation environment)
@@ -273,12 +273,12 @@ namespace CustomFarmingRedux
             return false;
         }
 
-        public override void updateWhenCurrentLocation(GameTime time)
+        public override void updateWhenCurrentLocation(GameTime time, GameLocation environment)
         {
             if(tileLocation == Vector2.Zero)
                 if (!Game1.currentLocation.objects.ContainsKey(tileLocation) || Game1.currentLocation.objects[tileLocation] != this)
-                    if(Game1.currentLocation.objects.ContainsValue(this))
-                        tileLocation = Game1.currentLocation.objects.Find(k => k.Value == this).Key;
+                    if(new List<SObject>(Game1.currentLocation.objects.Values).Contains(this))
+                        tileLocation.Value = new List<Vector2>(Game1.currentLocation.objects.Keys).Find(k => Game1.currentLocation.objects[k] == this);
 
             if (!wasBuild || blueprint.asdisplay)
             {
@@ -292,10 +292,10 @@ namespace CustomFarmingRedux
             if (!(isWorking && completionTime != null))
                 startAutoProduction();
 
-           base.updateWhenCurrentLocation(time);
+           base.updateWhenCurrentLocation(time, environment);
 
             if (completionTime != null)
-                minutesUntilReady = Math.Max((completionTime - STime.CURRENT).timestamp,0);
+                minutesUntilReady.Value = Math.Max((completionTime - STime.CURRENT).timestamp,0);
         }
 
         public override string DisplayName { get => name; set => base.DisplayName = value; }
@@ -329,20 +329,20 @@ namespace CustomFarmingRedux
             Rectangle destinationRectangle = new Rectangle((int)(local.X - vector2.X / 2.0) + (shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)(local.Y - vector2.Y / 2.0) + (shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)((tilesize.Width * 4) + (double)vector2.X), (int)((tilesize.Height * 4) + vector2.Y / 2.0));
             spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)(Math.Max(0.0f, ((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + x * 9.99999974737875E-06));
 
-            if (readyForHarvest && heldObject != null)
+            if (readyForHarvest && heldObject.Value != null)
             {
-                Texture2D tilesheet = (heldObject is CustomObject co) ? co.texture : Game1.objectSpriteSheet;
-                Rectangle csourceRectangle = (heldObject is CustomObject cobj) ? cobj.sourceRectangle : Game1.getSourceRectForStandardTileSheet(tilesheet, heldObject.parentSheetIndex, 16, 16);
-                Color color = (heldObject is CustomObject cco) ? cco.color : (heldObject is ColoredObject cvo) ? cvo.color : Color.White;
+                Texture2D tilesheet = (heldObject.Value is CustomObject co) ? co.texture : Game1.objectSpriteSheet;
+                Rectangle csourceRectangle = (heldObject.Value is CustomObject cobj) ? cobj.sourceRectangle : Game1.getSourceRectForStandardTileSheet(tilesheet, heldObject.Value.ParentSheetIndex, 16, 16);
+                Color color = (heldObject.Value is CustomObject cco) ? cco.color : (heldObject.Value is ColoredObject cvo) ? cvo.color.Value : Color.White;
                 float num = (float)(4.0 * Math.Round(Math.Sin(DateTime.Now.TimeOfDay.TotalMilliseconds / 250.0), 2));
                 spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize - 8), (y * Game1.tileSize - Game1.tileSize * 3 / 2 - 16) + num)), new Rectangle(141, 465, 20, 24), Color.White * 0.75f, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, (float)(((y + 1) * Game1.tileSize) / 10000.0 + 9.99999997475243E-07 + tileLocation.X / 10000.0 + (parentSheetIndex == 105 ? 0.00150000001303852 : 0.0)));
                 spriteBatch.Draw(tilesheet, Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize + Game1.tileSize / 2), (y * Game1.tileSize - Game1.tileSize - Game1.tileSize / 8) + num)), csourceRectangle, color * 0.75f, 0.0f, new Vector2(8f, 8f), Game1.pixelZoom, SpriteEffects.None, (float)(((y + 1) * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + tileLocation.X / 10000.0 + 0.0));
             }
 
-            if (blueprint.showitem && heldObject != null)
+            if (blueprint.showitem && heldObject.Value != null)
             {
                 Rectangle displayDestinationRectangle = new Rectangle((int)(local.X - vector2.X / 2.0) + blueprint.itempos[0] + (shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)(local.Y - vector2.Y / 2.0) + blueprint.itempos[1] + (shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0), (int)(blueprint.itemzoom * ((int)(Game1.tileSize + vector2.X))), (int)(blueprint.itemzoom * ((int)((Game1.tileSize) + vector2.Y / 2.0))));
-                spriteBatch.Draw(heldObject is CustomObject co ?  co.texture : Game1.objectSpriteSheet, displayDestinationRectangle, heldObject is CustomObject cor ? cor.sourceRectangle : Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, heldObject.parentSheetIndex, 16, 16), Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)(Math.Max(0.0f, ((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + (x + 1) * 9.99999974737875E-06));
+                spriteBatch.Draw(heldObject.Value is CustomObject co ?  co.texture : Game1.objectSpriteSheet, displayDestinationRectangle, heldObject.Value is CustomObject cor ? cor.sourceRectangle : Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, heldObject.Value.ParentSheetIndex, 16, 16), Color.White * alpha, 0.0f, Vector2.Zero, SpriteEffects.None, (float)(Math.Max(0.0f, ((y + 1) * Game1.tileSize - Game1.pixelZoom * 6) / 10000f) + (x + 1) * 9.99999974737875E-06));
             }
 
             if (blueprint.category == "Mailbox" && Game1.mailbox.Count > 0 && frame == 0 && animationFrames == 0)
@@ -358,7 +358,7 @@ namespace CustomFarmingRedux
                 draw(spriteBatch, xNonTile, yNonTile, alpha);
         }
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
             tileindex = 0;
             spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), sourceRectangle, Color.White * transparency, 0.0f, new Vector2(tilesize.Width / 2, tilesize.Width), Game1.pixelZoom * (scaleSize < 0.2 ? scaleSize : scaleSize / 2.00f), SpriteEffects.None, layerDepth);
@@ -380,7 +380,7 @@ namespace CustomFarmingRedux
             data.Add("id", id);
 
             if (location != null)
-                data.Add("location", location.name);
+                data.Add("location", location.Name);
 
             if (activeRecipe != null && !blueprint.asdisplay)
                 data.Add("recipe", activeRecipe.id.ToString());
@@ -396,12 +396,12 @@ namespace CustomFarmingRedux
         public object getReplacement()
         {
             Chest replacement = new Chest(true);
-            if (heldObject != null)
+            if (heldObject.Value != null)
                 replacement.items.Add(heldObject);
 
             activeMachines.Remove(this);
 
-            replacement.tileLocation = tileLocation;
+            replacement.TileLocation = tileLocation;
 
             return replacement;
         }
@@ -433,13 +433,13 @@ namespace CustomFarmingRedux
                 completionTime = STime.CURRENT;
 
             Chest c = (Chest)replacement;
-            tileLocation = c.tileLocation;
+            tileLocation.Value = c.TileLocation;
 
             if(additionalSaveData.ContainsKey("tileLocation"))
-                tileLocation = additionalSaveData["tileLocation"].Split(',').toList(s => int.Parse(s)).toVector<Vector2>();
+                tileLocation.Value = additionalSaveData["tileLocation"].Split(',').toList(s => int.Parse(s)).toVector<Vector2>();
             if (c.items.Count > 0 && c.items[0] is SObject o)
-                heldObject = o;
-            updateWhenCurrentLocation(Game1.currentGameTime);
+                heldObject.Value = o;
+            updateWhenCurrentLocation(Game1.currentGameTime, new List<GameLocation>(Game1.locations).Find(g => new List<SObject>(g.Objects.Values).Contains(this)));
             startAutoProduction();
             wasBuild = true;
         }
@@ -474,18 +474,18 @@ namespace CustomFarmingRedux
 
                 shakeTimer = 100;
 
-                if (specialVariable == 0)
+                if (SpecialVariable == 0)
                     Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\StringsFromCSFiles:Object.cs.12926"));
-                else if (specialVariable != 1)
-                    Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\StringsFromCSFiles:Object.cs.12929", specialVariable));
+                else if (SpecialVariable != 1)
+                    Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\StringsFromCSFiles:Object.cs.12929", SpecialVariable));
                 else
                     Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\StringsFromCSFiles:Object.cs.12927"));
 
                 return false;
             }
 
-            if (heldObject == null)
-                return (who.ActiveObject is SObject o && findRecipe(maxed(o)) != null && hasStarterMaterials(who.items));
+            if (heldObject.Value == null)
+                return (who.ActiveObject is SObject o && findRecipe(maxed(o)) != null && hasStarterMaterials(new List<IList<Item>>() { who.Items }));
 
             if (!readyForHarvest)
                 return false;
@@ -505,7 +505,7 @@ namespace CustomFarmingRedux
             }
 
             if (!toInventory)
-                Game1.createItemDebris(heldObject, tileLocation * Game1.tileSize, -1, null);
+                Game1.createItemDebris(heldObject, tileLocation.Value * Game1.tileSize, -1, null);
 
             clear();
 
@@ -527,8 +527,8 @@ namespace CustomFarmingRedux
 
         private void clear()
         {
-            heldObject = null;
-            readyForHarvest = false;
+            heldObject.Value = null;
+            readyForHarvest.Value = false;
             activeRecipe = null;
             completionTime = null;
         }
@@ -544,26 +544,26 @@ namespace CustomFarmingRedux
         private string getCatName(int cat)
         {
             SObject s = new SObject(Vector2.Zero, 399);
-            s.category = cat;
+            s.Category = cat;
             return s.getCategoryName();
         }
 
-        public override bool performObjectDropInAction(SObject dropIn, bool probe, SFarmer who)
+        public override bool performObjectDropInAction(Item dropInItem, bool probe, SFarmer who)
         {
-            if (heldObject != null)
+            if (heldObject.Value != null)
                 return false;
 
-            if (heldObject == null)
+            if (heldObject.Value == null)
                 clear();
 
-            if (blueprint.asdisplay && dropIn is SObject d)
+            if (blueprint.asdisplay && dropInItem is SObject d)
             {
-                heldObject = (SObject) d.getOne();
+                heldObject.Value = (SObject) d.getOne();
                 return false;
             }
 
-            List<List<Item>> items = getItemLists(who);
-            RecipeBlueprint recipe = findRecipeFor(maxed(dropIn));
+            List<IList<Item>> items = getItemLists(who);
+            RecipeBlueprint recipe = findRecipeFor(maxed((SObject)dropInItem));
             bool hasRecipe = recipe != null;
             bool hasStarter = hasStarterMaterials(items);
             bool hasIngredients = hasRecipe && recipe.hasIngredients(items);
@@ -572,7 +572,7 @@ namespace CustomFarmingRedux
             if (probe)
             {
                 if (canProduce)
-                    heldObject = dropIn;
+                    heldObject.Value = (SObject) dropInItem;
 
                 return canProduce;
             }
@@ -580,7 +580,7 @@ namespace CustomFarmingRedux
 
             if (canProduce)
             {
-                startProduction(dropIn, findRecipeFor(maxed(dropIn)), items);
+                startProduction((SObject)dropInItem, findRecipeFor(maxed((SObject)dropInItem)), items);
                 Game1.playSound("Ship");
                 return false;
             }
@@ -600,10 +600,9 @@ namespace CustomFarmingRedux
 
             return false;
         }
-
-        public override bool performToolAction(Tool t)
+        public override bool performToolAction(Tool t, GameLocation location)
         {
-            if (heldObject != null && !blueprint.asdisplay)
+            if (heldObject.Value != null && !blueprint.asdisplay)
             {
                 if (readyForHarvest)
                 {
@@ -622,9 +621,9 @@ namespace CustomFarmingRedux
             if (t == null || !t.isHeavyHitter() || t is MeleeWeapon || !(t is Pickaxe))
                 return false;
 
-            if (blueprint.asdisplay && heldObject != null)
+            if (blueprint.asdisplay && heldObject.Value != null)
             {
-                heldObject = null;
+                heldObject.Value = null;
                 return false;
             }
 
@@ -634,9 +633,9 @@ namespace CustomFarmingRedux
             Game1.playSound("hammer");
 
             if (!Game1.currentLocation.objects.ContainsKey(tileLocation) || Game1.currentLocation.objects[tileLocation] != this)
-                tileLocation = Game1.currentLocation.objects.Find(k => k.Value == this).Key;
+                tileLocation.Value = new List<Vector2>(Game1.currentLocation.objects.Keys).Find(k => Game1.currentLocation.objects[k] == this);
 
-            Game1.createItemDebris(getOne(), tileLocation * Game1.tileSize, -1, null);
+            Game1.createItemDebris(getOne(), tileLocation.Value * Game1.tileSize, -1, null);
             Game1.currentLocation.objects.Remove(tileLocation);
 
             return false;

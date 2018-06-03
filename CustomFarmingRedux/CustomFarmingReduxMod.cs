@@ -39,8 +39,15 @@ namespace CustomFarmingRedux
             loadPacks();
 
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            SaveEvents.AfterLoad += (s, e) => Game1.player.craftingRecipes.AddOrReplace(craftingrecipes);
-            harmonyFix();
+            SaveEvents.AfterLoad += (s, e) =>
+            {
+                foreach (var c in craftingrecipes)
+                    if (Game1.player.craftingRecipes.ContainsKey(c.Key))
+                        Game1.player.craftingRecipes[c.Key] = c.Value;
+                    else
+                        Game1.player.craftingRecipes.Add(c.Key, c.Value);
+            };
+                harmonyFix();
             SaveHandler.addPreprocessor(legacyFix);
             SaveHandler.addReplacementPreprocessor(fixLegacyObject);
             helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
@@ -50,18 +57,11 @@ namespace CustomFarmingRedux
                 new CustomObjectData("Platonymous.Water", "Water/1/2/Cooking -7/Water/Plain drinking water./drink/0 0 0 0 0 0 0 0 0 0 0/0", Game1.objectSpriteSheet.getTile(247).setSaturation(0), Color.Aqua, type: typeof(WaterItem));
                 ButtonClick.ActionButton.onClick((pos) => clickedOnWateringCan(pos), (p) => convertWater());
             }
-
-            if (_config.gold)
-            {
-                new CustomObjectData("Platonymous.G", "G/1/-300/Basic/G/The common currency of Pelican Town.", Game1.mouseCursors.getArea(new Rectangle(280, 410, 16, 16)), Color.White, type: typeof(GoldItem));
-                ButtonClick.ActionButton.onClick((pos) => Game1.onScreenMenus.Exists(m => m is DayTimeMoneyBox && m.isWithinBounds(pos.X, pos.Y - 180) && m.isWithinBounds(pos.X, pos.Y) && m.isWithinBounds(pos.X, pos.Y + 50)), (p) => convertMoney());
-            }
-
         }
 
         private bool clickedOnWateringCan(Point pos)
         {
-            if (Game1.activeClickableMenu is GameMenu g && g.currentTab == 0 && Game1.player.items.Exists(i => i is WateringCan))
+            if (Game1.activeClickableMenu is GameMenu g && g.currentTab == 0 && Game1.player.Items.ToList().Exists(i => i is WateringCan))
             {
                 List<IClickableMenu> pages = _helper.Reflection.GetField<List<IClickableMenu>>(g, "pages").GetValue();
                 if (pages.Find(p => p is InventoryPage) is InventoryPage ip && ip.inventory.inventory.Exists(c => ip.inventory.actualInventory[int.Parse(c.name)] is WateringCan && c.containsPoint(pos.X, pos.Y)))
@@ -72,7 +72,7 @@ namespace CustomFarmingRedux
 
         private void convertWater()
         {
-            Item item = Game1.player.items.Find(i => i is WateringCan);
+            Item item = Game1.player.Items.ToList().Find(i => i is WateringCan);
 
             if(item is WateringCan wc)
             {
@@ -82,9 +82,9 @@ namespace CustomFarmingRedux
           
                 if (heldItem is WaterItem s && wc.WaterLeft < wc.waterCanMax)
                 {
-                    int w = Math.Min(s.stack, wc.waterCanMax - wc.WaterLeft);
-                    s.stack -= w;
-                    if(s.stack <= 0)
+                    int w = Math.Min(s.Stack, wc.waterCanMax - wc.WaterLeft);
+                    s.Stack -= w;
+                    if(s.Stack <= 0)
                         _helper.Reflection.GetField<Item>(pages.Find(p => p is InventoryPage), "heldItem").SetValue(null);
                     
                     wc.WaterLeft += w;
@@ -99,31 +99,6 @@ namespace CustomFarmingRedux
                     Game1.playSound("glug");
                 }
             }
-        }
-
-        private void convertMoney()
-        {
-            if (Game1.player.ActiveObject != null)
-            {
-                if (Game1.player.ActiveObject is GoldItem s)
-                {
-                    Game1.player.money += s.stack;
-                    Game1.player.removeItemFromInventory(s);
-                    Game1.player.ActiveObject = null;
-                    Game1.playSound("sell");
-                }
-                return;
-            }
-
-            int a = Math.Min(999, Game1.player.money);
-            int g = Game1.objectInformation.getIndexByName("G");
-
-            if (a <= 0)
-                return;
-
-            Game1.player.money -= a;
-            Game1.player.addItemByMenuIfNecessary(new SObject(CustomObjectData.getIndexForId("Platonymous.G"), a));
-            Game1.playSound("purchase");
         }
 
         public override object GetApi()
@@ -215,16 +190,16 @@ namespace CustomFarmingRedux
             {
                 if (c.name.Contains("simpleMachine"))
                 {
-                    c.items = new List<Item>();
+                    c.items.Clear();
                     return c;
                 }
 
                 if (c.name.Contains("customNamedObject"))
                 {
                     SObject item = (SObject) c.items[0];
-                    SObject obj = new SObject(Vector2.Zero, item.parentSheetIndex, item.stack);
+                    SObject obj = new SObject(Vector2.Zero, item.ParentSheetIndex, item.Stack);
                     obj.name = item.name;
-                    obj.quality = item.quality;
+                    obj.Quality = item.Quality;
                     return obj;
                 }
             }
