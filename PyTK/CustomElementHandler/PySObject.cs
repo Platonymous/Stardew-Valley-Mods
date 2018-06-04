@@ -5,18 +5,18 @@ using StardewValley.Objects;
 using Microsoft.Xna.Framework;
 using PyTK.Extensions;
 using StardewModdingAPI;
-using Netcode;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace PyTK.CustomElementHandler
 {
-    public class PySObject : SObject, ICustomObject, IDrawFromCustomObjectData
+    public class PySObject : SObject, ICustomObject, IDrawFromCustomObjectData, ISyncableElement
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
         public SObject sObject;
         public CustomObjectData data { get; set; }
+        public PySync syncObject { get; set; }
 
         public PySObject()
         {
@@ -45,7 +45,8 @@ namespace PyTK.CustomElementHandler
 
         public virtual Dictionary<string, string> getAdditionalSaveData()
         {
-            return new Dictionary<string, string>() { { "id", data.id }, { "tileLocation", TileLocation.X + "," + TileLocation.Y }, { "name", Name }, { "quality", Quality.ToString() }, { "price", Price.ToString() }, { "stack", Stack.ToString() } };
+            checkData();
+            return new Dictionary<string, string>() { { "id", data != null ? data.id : "na" }, { "tileLocation", TileLocation != null ? TileLocation.X + "," + TileLocation.Y : "0,0" }, { "name", Name != null ? Name : "Error"}, { "quality", Quality.ToString() != null ? Quality.ToString() : "0" }, { "price", Price.ToString() != null ? Price.ToString() : "0"}, { "stack", Stack.ToString() != null ? Stack.ToString() : "1" } };
         }
 
         public virtual object getReplacement()
@@ -111,6 +112,16 @@ namespace PyTK.CustomElementHandler
                 return new PySObject(data, additionalSaveData["tileLocation"].Split(',').toList(i => i.toInt()).toVector<Vector2>());
             else
                 return new PySObject(CustomObjectData.collection[additionalSaveData["id"]]);
+        }
+
+        public Dictionary<string, string> getSyncData()
+        {
+            return null;
+        }
+
+        public void sync(Dictionary<string, string> syncData)
+        {
+            
         }
     }
 }

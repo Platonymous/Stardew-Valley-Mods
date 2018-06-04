@@ -9,6 +9,7 @@ using StardewValley.Buildings;
 using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections;
 
 namespace PyTK
 {
@@ -138,6 +139,13 @@ namespace PyTK
         public static Texture2D getWhitePixel()
         {
             return getRectangle(1, 1, Color.White);
+        }
+
+        public static byte[] BitArrayToByteArray(BitArray bits)
+        {
+            byte[] ret = new byte[(bits.Length - 1) / 8 + 1];
+            bits.CopyTo(ret, 0);
+            return ret;
         }
 
         internal static void checkAllSaves()

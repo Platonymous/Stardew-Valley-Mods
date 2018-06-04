@@ -60,6 +60,7 @@
     <Compile Include="CustomElementHandler\CustomObjectData.cs" />
     <Compile Include="CustomElementHandler\IDrawFromCustomObjectData.cs" />
     <Compile Include="CustomElementHandler\ICustomObject.cs" />
+    <Compile Include="CustomElementHandler\ISyncableElement.cs" />
     <Compile Include="CustomElementHandler\NetReplacable.cs" />
     <Compile Include="CustomElementHandler\PySObject.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Overrides\OvTV.cs" />
     <Compile Include="Overrides\OvSleep.cs" />
     <Compile Include="PyNet.cs" />
+    <Compile Include="CustomElementHandler\PySync.cs" />
     <Compile Include="Tiled\EnumHelper.cs" />
     <Compile Include="Tiled\IXmlFormatable.cs" />
     <Compile Include="Tiled\NewTiledTmxFormat.cs" />

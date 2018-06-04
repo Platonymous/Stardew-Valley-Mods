@@ -77,6 +77,8 @@ namespace PyTK.CustomElementHandler
             });
         }
 
+        internal static List<string> typeCheckCache = new List<string>();
+
         internal static bool canBeRebuildInMultiplayer(object obj)
         {
             if (!(getDataString(obj).StartsWith(newPrefix) || getDataString(obj).StartsWith(oldPrefix)))
@@ -90,11 +92,18 @@ namespace PyTK.CustomElementHandler
 
             bool result = true;
 
-            foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive() && f != Game1.player)) {
+            if (typeCheckCache.Contains(data[2]))
+                return true;
+
+            foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive() && f != Game1.player))
+            {
                 Task<bool> fResult = PyNet.sendRequestToFarmer<bool>(typeCheckerName, data[2], farmer);
                 fResult.Wait();
                 result = result && fResult.Result;
             }
+
+            if (result)
+                typeCheckCache.Add(data[2]);
 
             return result;
         }
@@ -117,6 +126,16 @@ namespace PyTK.CustomElementHandler
               },16);
             TypeChecker.start();
 
+        }
+
+        public static void RebuildAll(object obj, object parent)
+        {
+            ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
+        }
+
+        public static void ReplaceAll(object obj, object parent)
+        {
+            ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => hasSaveType(o), o => getReplacement(o), true);
         }
 
         internal static void Replace()

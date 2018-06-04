@@ -253,6 +253,21 @@ namespace PyTK
                 }
         }
 
+        public static byte[] DecompressBytes(byte[] data)
+        {
+            return Ionic.Zlib.GZipStream.UncompressBuffer(data);
+        }
+
+        public static byte[] CompressStringToBytes(string str)
+        {
+            return Ionic.Zlib.GZipStream.CompressString(str);
+        }
+
+        public static string DecompressString(byte[] str)
+        {
+            return Ionic.Zlib.GZipStream.UncompressString(str);
+        }
+
         public static string CompressBytes(byte[] buffer)
         {
             return Convert.ToBase64String(Ionic.Zlib.GZipStream.CompressBuffer(buffer));

@@ -1,9 +1,8 @@
 ﻿using Harmony;
 using PyTK.CustomElementHandler;
-using StardewValley;
 using StardewValley.Network;
-using System.Linq;
 using System.Reflection;
+using StardewModdingAPI.Events;
 
 namespace PyTK.Overrides
 {
@@ -19,14 +18,23 @@ namespace PyTK.Overrides
 
             internal static void Prefix()
             {
-                    SaveHandler.Replace();
+                SaveHandler.Replace();
             }
 
             internal static void Postfix()
             {
-                    SaveHandler.Rebuild();
+                SaveHandler.Rebuild();
+                TimeEvents.TimeOfDayChanged += DelayedRebuild;
+            }
+
+            private static void DelayedRebuild(object sender, EventArgsIntChanged e)
+            {
+                SaveHandler.Rebuild();
+                TimeEvents.TimeOfDayChanged -= DelayedRebuild;
             }
         }
+
+
 
         [HarmonyPatch]
         internal class ServerFix2
@@ -76,6 +84,7 @@ namespace PyTK.Overrides
 
             internal static void Prefix()
             {
+                SaveHandler.typeCheckCache.Clear();
                 SaveHandler.Replace();
             }
 
