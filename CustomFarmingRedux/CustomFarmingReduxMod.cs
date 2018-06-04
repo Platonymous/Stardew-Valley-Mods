@@ -139,7 +139,7 @@ namespace CustomFarmingRedux
                     if (i is Chest chest && machines.Exists(m => m.fullid == chest.name || m.legacy == chest.name))
                     {
                         Item cf = new CustomMachine(machines.Find(m => m.fullid == chest.name || m.legacy == chest.name));
-                        items.Add(cf, new int[] { chest.preservedParentSheetIndex, int.MaxValue });
+                        items.Add(cf, new int[] { chest.preservedParentSheetIndex.Value, int.MaxValue });
                         additions.Add(cf);
                         remove.Add(i);
                     }

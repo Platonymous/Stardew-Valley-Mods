@@ -240,7 +240,7 @@ namespace CustomFarmingRedux
             else if (!custom)
                 return setNameAndQuality(new SObject(Vector2.Zero, index, stack), input);
             else
-                return new CustomObject(name, input, this);
+                return new CustomObject(index, stack, name, input, this);
         }
 
         private SObject setNameAndQuality(SObject s, SObject input)

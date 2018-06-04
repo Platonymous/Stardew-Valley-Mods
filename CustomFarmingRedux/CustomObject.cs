@@ -10,12 +10,13 @@ using StardewModdingAPI;
 using PyTK.Extensions;
 using PyTK.CustomElementHandler;
 using StardewValley.Objects;
-using System.IO;
 
 namespace CustomFarmingRedux
 {
-    public class CustomObject : SObject, ISaveElement
+    public class CustomObject : SObject, ISyncableElement, ICustomObject
     {
+        public PySync syncObject { get; set; }
+
         internal IModHelper Helper = CustomFarmingReduxMod._helper;
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
         internal string folder = CustomFarmingReduxMod.folder;
@@ -33,7 +34,16 @@ namespace CustomFarmingRedux
 
         public CustomObject()
         {
+            syncObject = new PySync(this);
+            syncObject.init();
+        }
 
+        public CustomObject(int index, int stack, string name, SObject input, RecipeBlueprint blueprint)
+            :base(Vector2.Zero, index, stack)
+        {
+            syncObject = new PySync(this);
+            syncObject.init();
+            build(name, input, blueprint);
         }
 
         public CustomObject(string name, SObject input, RecipeBlueprint blueprint)
@@ -43,15 +53,29 @@ namespace CustomFarmingRedux
 
         private void build(string name, SObject input, RecipeBlueprint blueprint)
         {
-            loadBaseObjectInformation(blueprint.index);
-            _name = name;
-            cname = (blueprint.prefix) ? input.name + " " + name : name;
-            cname = (blueprint.suffix) ? cname + " " + input.name : cname;
-            if (blueprint.insert)
+            if (syncObject == null)
             {
-                string[] namesplit = cname.Split(' ');
-                namesplit[blueprint.insertpos] += " " + input.name;
-                cname = String.Join(" ", namesplit);
+                syncObject = new PySync(this);
+                syncObject.init();
+            }
+
+            _name = name;
+            cname = name;
+            try
+            {
+                cname = (blueprint.prefix) ? input.name + " " + name : name;
+                cname = (blueprint.suffix) ? cname + " " + input.name : cname;
+
+                if (blueprint.insert)
+                {
+                    string[] namesplit = cname.Split(' ');
+                    namesplit[blueprint.insertpos] += " " + input.name;
+                    cname = String.Join(" ", namesplit);
+                }
+            }
+            catch
+            {
+
             }
             price.Value =(blueprint.prefix || blueprint.suffix || blueprint.insert) ? price + input.Price : price;
             this.name = cname;
@@ -153,7 +177,7 @@ namespace CustomFarmingRedux
 
         public override Item getOne()
         {
-            return new CustomObject(_name, input, blueprint);
+            return new CustomObject(ParentSheetIndex, Stack, _name, input, blueprint);
         }
 
         public override string DisplayName { get => cname; set => base.DisplayName = value; }
@@ -169,7 +193,7 @@ namespace CustomFarmingRedux
         {
 
             spriteBatch.Draw(Game1.shadowTexture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize * 3 / 4)), new Rectangle?(Game1.shadowTexture.Bounds), Color.White * 0.5f, 0.0f, new Vector2(Game1.shadowTexture.Bounds.Center.X, Game1.shadowTexture.Bounds.Center.Y), 3f, SpriteEffects.None, layerDepth - 0.0001f);
-            spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), new Rectangle?(sourceRectangle), color * transparency, 0.0f, new Vector2(tilesize.Width / 2, tilesize.Height / 2), Game1.pixelZoom * (scaleSize < 0.2 ? scaleSize : scaleSize), SpriteEffects.None, layerDepth);
+            spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), new Rectangle?(sourceRectangle), this.color * transparency, 0.0f, new Vector2(tilesize.Width / 2, tilesize.Height / 2), Game1.pixelZoom * (scaleSize < 0.2 ? scaleSize : scaleSize), SpriteEffects.None, layerDepth);
 
             if (drawStackNumber && maximumStackSize() > 1 && (scaleSize > 0.3 && Stack != int.MaxValue) && Stack > 1)
                 Utility.drawTinyDigits(stack, spriteBatch, location + new Vector2((Game1.tileSize - Utility.getWidthOfTinyDigitString(stack, 3f * scaleSize)) + 3f * scaleSize, (float)(Game1.tileSize - 18.0 * scaleSize + 2.0)), 3f * scaleSize, 1f, Color.White);
@@ -203,14 +227,49 @@ namespace CustomFarmingRedux
             data.Add("stack", stack.ToString());
             return data;
         }
-
+        
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
-            SObject lastInput = (SObject) (replacement as Chest).items.ToList().Find(i => i is SObject);
+            SObject lastInput = (SObject)replacement;
+
+            if (replacement is Chest c)
+                lastInput = (SObject) c.items.ToList().First();
+
+            CustomMachineBlueprint mBlueprint = machines.Find(cmb => additionalSaveData["mid"] == cmb.fullid);
+            RecipeBlueprint blueprint = mBlueprint.production.Find(p => p.id.ToString() == additionalSaveData["id"]);
+            try
+            {
+                build(additionalSaveData["name"], lastInput, blueprint);
+            }
+            catch
+            {
+
+            }
+            stack.Value = int.Parse(additionalSaveData["stack"]);
+        }
+
+        public Dictionary<string, string> getSyncData()
+        {
+            return getAdditionalSaveData();
+        }
+
+        public void sync(Dictionary<string, string> syncData)
+        {
+            rebuild(syncData, heldObject);
+        }
+
+        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        {
+            SObject lastInput = (SObject)replacement;
+
+            if (replacement is Chest c)
+                lastInput = (SObject)c.items.ToList().First();
+
             CustomMachineBlueprint mBlueprint = machines.Find(cmb => additionalSaveData["mid"] == cmb.fullid);
             RecipeBlueprint blueprint = mBlueprint.production.Find(p => p.id.ToString() == additionalSaveData["id"]);
             build(additionalSaveData["name"], lastInput, blueprint);
             stack.Value = int.Parse(additionalSaveData["stack"]);
+            return new CustomObject(blueprint.index, int.Parse(additionalSaveData["stack"]), additionalSaveData["name"], lastInput, blueprint);
         }
     }
 }

@@ -14,8 +14,11 @@ using StardewValley.Tools;
 
 namespace CustomFarmingRedux
 {
-    public class CustomMachine : SObject, ICustomObject
+    public class CustomMachine : SObject, ICustomObject, ISyncableElement
     {
+
+        public PySync syncObject { get; set; }
+
         internal IModHelper Helper = CustomFarmingReduxMod._helper;
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
         internal Config config = CustomFarmingReduxMod._config;
@@ -61,7 +64,8 @@ namespace CustomFarmingRedux
 
         public CustomMachine()
         {
-
+            syncObject = new PySync(this);
+            syncObject.init();
         }
 
         public CustomMachine(CustomObjectData data)
@@ -79,7 +83,13 @@ namespace CustomFarmingRedux
 
         private void build(CustomMachineBlueprint blueprint)
         {
-            if(data == null)
+            if (syncObject == null)
+            {
+                syncObject = new PySync(this);
+                syncObject.init();
+            }
+
+            if (data == null)
                 data = CustomObjectData.collection.ContainsKey(blueprint.fullid) ? CustomObjectData.collection[blueprint.fullid] : new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, typeof(CustomMachine), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.name, blueprint.crafting));
 
             name = blueprint.name;
@@ -221,6 +231,7 @@ namespace CustomFarmingRedux
             if(config.automation)
                 if (deliverToNearChest(heldObject))
                     startAutomation();
+            syncObject.MarkDirty();
         }
 
         private void startAutomation()
@@ -259,13 +270,15 @@ namespace CustomFarmingRedux
                 heldObject.Value = (SObject)obj.getOne();
                 heldObject.Value.Stack = obj.Stack;
             }
+
+            syncObject.MarkDirty();
         }
         private SObject createProduce()
         {
             if (!(heldObject.Value is Chest))
                 return activeRecipe.createObject(heldObject.Value);
             else
-                return (SObject)SaveHandler.rebuildElement(heldObject.Value.name, heldObject);
+                return (SObject)SaveHandler.rebuildElement(heldObject.Value.name, heldObject.Value);
         }
 
         public override bool minutesElapsed(int minutes, GameLocation environment)
@@ -307,7 +320,7 @@ namespace CustomFarmingRedux
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
-            if (blueprint.category == "Mailbox" && Game1.mailbox.Count == 0)
+            if (blueprint.category == "Mailbox" && Game1.mailbox is IList<string> mb && mb.Count == 0)
                 active = false;
             else
                 active = true;
@@ -413,6 +426,8 @@ namespace CustomFarmingRedux
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
+            var machine = machines.Find(cmb => additionalSaveData["id"] == cmb.fullid);
+
             if (additionalSaveData.ContainsKey("completionTime"))
                 completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
 
@@ -439,7 +454,11 @@ namespace CustomFarmingRedux
                 tileLocation.Value = additionalSaveData["tileLocation"].Split(',').toList(s => int.Parse(s)).toVector<Vector2>();
             if (c.items.Count > 0 && c.items[0] is SObject o)
                 heldObject.Value = o;
-            updateWhenCurrentLocation(Game1.currentGameTime, new List<GameLocation>(Game1.locations).Find(g => new List<SObject>(g.Objects.Values).Contains(this)));
+
+            if (location == null)
+                location = new List<GameLocation>(Game1.locations).Find(g => new List<SObject>(g.Objects.Values).Contains(this));
+
+            updateWhenCurrentLocation(Game1.currentGameTime, location);
             startAutoProduction();
             wasBuild = true;
         }
@@ -498,7 +517,7 @@ namespace CustomFarmingRedux
 
         public bool deliverProduce(SFarmer who, bool toInventory = true)
         {
-            if (toInventory && who.IsMainPlayer && !who.addItemToInventoryBool(heldObject, false))
+            if (toInventory && !who.addItemToInventoryBool(heldObject, false))
             {
                 Game1.showRedMessage("Inventory Full");
                 return false;
@@ -550,6 +569,9 @@ namespace CustomFarmingRedux
 
         public override bool performObjectDropInAction(Item dropInItem, bool probe, SFarmer who)
         {
+            if (!(dropInItem is SObject))
+                return false;
+
             if (heldObject.Value != null)
                 return false;
 
@@ -600,23 +622,21 @@ namespace CustomFarmingRedux
 
             return false;
         }
+
         public override bool performToolAction(Tool t, GameLocation location)
         {
+            Farmer farmer = t.getLastFarmerToUse();
+
             if (heldObject.Value != null && !blueprint.asdisplay)
             {
                 if (readyForHarvest)
                 {
-                    deliverProduce(Game1.player, false);
+                    deliverProduce(farmer, false);
                     return false;
-                }
-                else if (t is Pickaxe)
-                {
-                    deliverProduce(Game1.player, false);
                 }
                 else
                     return false;
             }
-
 
             if (t == null || !t.isHeavyHitter() || t is MeleeWeapon || !(t is Pickaxe))
                 return false;
@@ -644,6 +664,26 @@ namespace CustomFarmingRedux
         public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
         {
             return new CustomMachine();
+        }
+
+        public Dictionary<string, string> getSyncData()
+        {
+            var data = new Dictionary<string, string>() { {"completionTime", completionTime != null ? completionTime.timestamp.ToString() : "-1" } };
+
+            if (activeRecipe != null && !blueprint.asdisplay)
+                data.Add("recipe", activeRecipe.id.ToString());
+
+            return data;
+        }
+
+        public void sync(Dictionary<string, string> syncData)
+        {
+            if (syncData.ContainsKey("completionTime"))
+                if (int.Parse(syncData["completionTime"]) is int i && i != -1)
+                    completionTime = new STime(i);
+
+            if (syncData.ContainsKey("recipe"))
+                activeRecipe = blueprint.production.Find(r => r.id == syncData["recipe"]);
         }
     }
 }

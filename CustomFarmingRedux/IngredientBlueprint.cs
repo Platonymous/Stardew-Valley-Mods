@@ -1,5 +1,6 @@
 ﻿using StardewValley;
 using PyTK.Extensions;
+using Newtonsoft.Json;
 
 namespace CustomFarmingRedux
 {
@@ -23,6 +24,11 @@ namespace CustomFarmingRedux
             {
                 _index = value;
             }
+        }
+
+        public IngredientBlueprint()
+        {
+
         }
         
         public IngredientBlueprint clone()
