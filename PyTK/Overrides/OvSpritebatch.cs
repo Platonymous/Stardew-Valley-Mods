@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using StardewValley;
+using PyTK.Types;
 
 namespace PyTK.Overrides
 {
@@ -18,7 +19,6 @@ namespace PyTK.Overrides
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
         internal static bool replaceNext = false;
-        internal static Item nextItem;
         internal static CustomObjectData nextData;
         internal static Dictionary<object, CustomObjectData> dataChache = new Dictionary<object, CustomObjectData>();
 
@@ -33,12 +33,26 @@ namespace PyTK.Overrides
                     return AccessTools.Method(typeof(FakeSpriteBatch), "DrawInternal");
             }
 
+            static bool skip = false;
+
             internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth, ref bool autoFlush)
             {
-                if (!replaceNext )
+                if (!skip && texture is ScaledTexture2D s && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
+                {
+                    var newDestination = new Vector4(destinationRectangle.X, destinationRectangle.Y, destinationRectangle.Z / s.Scale, destinationRectangle.W / s.Scale);
+                    var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
+
+                    skip = true;
+                    MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
+                    drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, newSR, color, rotation, origin, effect, depth, autoFlush });
+                    skip = false;
+                    return false;
+                }
+
+                if (!replaceNext)
                     return true;
 
-                if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle && texture == nextData.sdvTexture)
+                if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle)
                 {
                     replaceNext = false;
 
@@ -67,12 +81,25 @@ namespace PyTK.Overrides
                     return AccessTools.Method(typeof(FakeSpriteBatch), "InternalDraw");
             }
 
+            static bool skip = false;
+
             internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
             {
+                if (!skip && texture is ScaledTexture2D s && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
+                {
+                    var newDestination = new Vector4(destination.X, destination.Y, destination.Z / s.Scale, destination.W / s.Scale);
+                    var newSR = new Rectangle?(new Rectangle((int) (r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
+                    skip = true;
+                    MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics"), "InternalDraw");
+                    drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, scaleDestination, newSR, color, rotation, origin, effects, depth });
+                    skip = false;
+                    return false;
+                }
+                
                 if (!replaceNext)
                     return true;
-                
-                if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle && texture == nextData.sdvTexture)
+
+                if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle)
                 {
                     replaceNext = false;
 
@@ -124,7 +151,6 @@ namespace PyTK.Overrides
                 if (c != null)
                 {
                     replaceNext = true;
-                    nextItem = __instance;
                     nextData = c;
                 }
                 else
@@ -135,22 +161,38 @@ namespace PyTK.Overrides
             {
                     replaceNext = false;
             }
+        }
 
-            public static void init(string name, Type type, List<string> toPatch)
+        internal class DrawFix2
+        {
+            public static void prefix(ref TemporaryAnimatedSprite __instance, string ___textureName)
             {
-                HarmonyInstance harmony = HarmonyInstance.Create("Platonymous.PyTK.Draw." + name);
-                List<MethodInfo> replacer = typeof(DrawFix1).GetMethods(BindingFlags.Static | BindingFlags.Public).ToList();
-                MethodInfo prefix = typeof(DrawFix1).GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().Find(m => m.Name == "prefix");
-                MethodInfo postfix = typeof(DrawFix1).GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().Find(m => m.Name == "postfix");
-                List<MethodInfo> originals = type.GetMethods().ToList();
+                CustomObjectData c = null;
 
-                foreach(MethodInfo method in originals)
-                    if(toPatch.Contains(method.Name))
-                        harmony.Patch(method, new HarmonyMethod(prefix), new HarmonyMethod(postfix));                        
+                if (dataChache.ContainsKey(__instance))
+                    c = dataChache[__instance];
+                else if (___textureName == "Maps\\springobjects")
+                {
+                    TemporaryAnimatedSprite obj = __instance;
+                    c = __instance is IDrawFromCustomObjectData draw ? draw.data : CustomObjectData.collection.Find(o => o.Value.sdvSourceRectangle == obj.sourceRect && o.Value.bigCraftable == false).Value;
+                    dataChache.AddOrReplace(__instance, c);
+                }
+                else
+                    dataChache.AddOrReplace(__instance, c);
+
+                if (c != null)
+                {
+                    replaceNext = true;
+                    nextData = c;
+                }
+                else
+                    replaceNext = false;
             }
 
-            
-
+            public static void postfix(ref SObject __instance)
+            {
+                replaceNext = false;
+            }
         }
 
     }
