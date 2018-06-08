@@ -10,13 +10,13 @@ using StardewModdingAPI;
 using PyTK.Extensions;
 using PyTK.CustomElementHandler;
 using StardewValley.Objects;
+using PyTK;
 
 namespace CustomFarmingRedux
 {
     public class CustomObject : SObject, ISyncableElement, ICustomObject
     {
         public PySync syncObject { get; set; }
-
         internal IModHelper Helper = CustomFarmingReduxMod._helper;
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
         internal string folder = CustomFarmingReduxMod.folder;
@@ -51,16 +51,34 @@ namespace CustomFarmingRedux
             build(name, input, blueprint);
         }
 
-        private void build(string name, SObject input, RecipeBlueprint blueprint)
+        private void calculatePrice()
         {
-            if (syncObject == null)
+            int compPrice = (int)(PyUtils.calc(blueprint.price, new KeyValuePair<string, object>("input", input.Price), new KeyValuePair<string, object>("original", Price)));
+            price.Value = compPrice;
+        }
+
+        private void build(string name, SObject input, RecipeBlueprint blueprint, bool forSync = false)
+        {
+            this.blueprint = blueprint;
+            texture = blueprint.getTexture();
+            if (blueprint.colored)
             {
-                syncObject = new PySync(this);
-                syncObject.init();
+                if (blueprint.color != null)
+                    color = new Color(blueprint.color[0], blueprint.color[1], blueprint.color[2], blueprint.color[3]);
+                else
+                    color = getColor(input);
             }
+            else
+                color = Color.White;
+
+            this.input = input;
 
             _name = name;
             cname = name;
+
+            if (forSync)
+                return;
+
             try
             {
                 cname = (blueprint.prefix) ? input.name + " " + name : name;
@@ -77,28 +95,24 @@ namespace CustomFarmingRedux
             {
 
             }
-            price.Value =(blueprint.prefix || blueprint.suffix || blueprint.insert) ? price + input.Price : price;
+
             this.name = cname;
             displayName = cname;
-            this.blueprint = blueprint;
+
             parentSheetIndex.Value = blueprint.index;
-            this.input = input;
+
             stack.Value = blueprint.stack;
             quality.Value = (blueprint.quality == -1) ? input.Quality : blueprint.quality;
-            texture = blueprint.getTexture();
+
             sourceRectangle = Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex, 16, 16);
-            if (blueprint.colored)
+
+            calculatePrice();
+
+            if (syncObject == null)
             {
-                if (blueprint.color != null)
-                    color = new Color(blueprint.color[0], blueprint.color[1], blueprint.color[2], blueprint.color[3]);
-                else
-                    color = getColor(input);
+                syncObject = new PySync(this);
+                syncObject.init();
             }
-            else
-            {
-                color = Color.White;
-            }
-            
         }
 
         public void loadBaseObjectInformation(int parentSheetIndex)
@@ -227,8 +241,13 @@ namespace CustomFarmingRedux
             data.Add("stack", stack.ToString());
             return data;
         }
-        
+
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
+        {
+            rebuild(additionalSaveData, replacement, false);
+        }
+
+        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement, bool forSync)
         {
             SObject lastInput = (SObject)replacement;
 
@@ -239,7 +258,7 @@ namespace CustomFarmingRedux
             RecipeBlueprint blueprint = mBlueprint.production.Find(p => p.id.ToString() == additionalSaveData["id"]);
             try
             {
-                build(additionalSaveData["name"], lastInput, blueprint);
+                build(additionalSaveData["name"], lastInput, blueprint, forSync);
             }
             catch
             {
@@ -255,7 +274,7 @@ namespace CustomFarmingRedux
 
         public void sync(Dictionary<string, string> syncData)
         {
-            rebuild(syncData, heldObject);
+            rebuild(syncData, heldObject, true);
         }
 
         public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)

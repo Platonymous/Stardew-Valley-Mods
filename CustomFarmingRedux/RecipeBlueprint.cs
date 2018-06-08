@@ -24,6 +24,7 @@ namespace CustomFarmingRedux
         public int[] exclude;
         public int[] include;
         public string id => name + "." + index + "." + quality + "." + stack;
+        public string price = "original";
         public string name
         {
             get
@@ -57,9 +58,7 @@ namespace CustomFarmingRedux
             get
             {
                 if (_category == "")
-                {
                     _category = Game1.objectInformation[index].Split('/')[3].Split(' ')[0];
-                }
 
                 return _category;
             }
@@ -74,8 +73,7 @@ namespace CustomFarmingRedux
             {
                 if (_index <= 0 && item != "")
                     _index = Game1.objectInformation.getIndexByName(item);
-                else
-                    if(_index <= 0 && name != "")
+                else if (_index <= 0 && name != "")
                     _index = Game1.objectInformation.getIndexByName(name);
 
                 return _index;
@@ -236,11 +234,11 @@ namespace CustomFarmingRedux
         public SObject createObject(SObject input)
         {
             if (!custom && colored)
-                return setNameAndQuality(new ColoredObject(index, stack, getColor(input)), input);
+                return setNameAndQuality(new ColoredObject(index == -999 ? input.ParentSheetIndex : index, stack, getColor(input)), input);
             else if (!custom)
-                return setNameAndQuality(new SObject(Vector2.Zero, index, stack), input);
+                return setNameAndQuality(new SObject(Vector2.Zero, index == -999 ? input.ParentSheetIndex : index, stack), input);
             else
-                return new CustomObject(index, stack, name, input, this);
+                return new CustomObject(index == -999 ? input.ParentSheetIndex : index, stack, name, input, this);
         }
 
         private SObject setNameAndQuality(SObject s, SObject input)

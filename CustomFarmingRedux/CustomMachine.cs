@@ -379,7 +379,7 @@ namespace CustomFarmingRedux
 
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, SFarmer f)
         {
-
+            spriteBatch.Draw(texture, objectPosition, sourceRectangle, Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (f.getStandingY() + 2) / 10000f));
         }
 
         public override Item getOne()

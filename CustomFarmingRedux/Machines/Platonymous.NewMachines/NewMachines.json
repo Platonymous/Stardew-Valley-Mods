@@ -1,7 +1,7 @@
 {
    "name": "New Machines Redux",
    "author": "Platonymous",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "machines":
    [
 	   {
@@ -209,21 +209,21 @@
 		   },
 		   "production":
 			[
-				{
-					"name": "Soap",
-					"description": "All natural soap",
-					"texture": "newproduce.png",
-					"tileindex": 11,
-					"index": 224,
-					"time": 600,
-					"prefix": true,
-					"materials":
-					[
-						{
-							"index": -80
-						}
-					]
-				}
+        {
+          "name": "Soap",
+          "description": "All natural soap",
+          "texture": "newproduce.png",
+          "tileindex": 11,
+          "price": "original + (input * 2)",
+          "index": 224,
+          "time": 600,
+          "prefix": true,
+          "materials": [
+            {
+              "index": -80
+            }
+          ]
+        }
 			]
 	   },
 	   {
@@ -239,71 +239,71 @@
 		   "frames": 1,
 		   "production":
 			[
-				{
-					"name": "Yogurt from",
-					"description": "Plain unflavored yogurt",
-					"texture": "newproduce.png",
-					"tileindex": 7,
-					"index": 349,
-					"time": 600,
-					"suffix": true,
-					"materials":
-					[
-						{
-							"index": 184,
-							"stack": 2
-						}
-					]
-				},
-				{
-					"name": "Yogurt from ",
-					"description": "Plain unflavored yogurt",
-					"texture": "newproduce.png",
-					"tileindex": 7,
-					"index": 349,
-					"time": 600,
-					"suffix": true,
-					"quality": 4,
-					"materials":
-					[
-						{
-							"index": 186,
-							"stack": 1
-						}
-					]
-				},
-				{
-					"name": "Yogurt from ",
-					"description": "Plain unflavored yogurt",
-					"texture": "newproduce.png",
-					"tileindex": 7,
-					"index": 349,
-					"time": 600,
-					"suffix": true,
-					"materials":
-					[
-						{
-							"index": 436,
-							"stack": 2
-						}
-					]
-				},
-				{
-					"name": "Yogurt from ",
-					"description": "Plain unflavored yogurt",
-					"texture": "newproduce.png",
-					"tileindex": 7,
-					"index": 349,
-					"time": 600,
-					"suffix": true,
-					"quality": 4,
-					"materials":
-					[
-						{
-							"index": 438
-						}
-					]
-				}
+        {
+          "name": "Yogurt from",
+          "description": "Plain unflavored yogurt",
+          "texture": "newproduce.png",
+          "price": "original + input",
+          "tileindex": 7,
+          "index": 349,
+          "time": 600,
+          "suffix": true,
+          "materials": [
+            {
+              "index": 184,
+              "stack": 2
+            }
+          ]
+        },
+        {
+          "name": "Yogurt from ",
+          "description": "Plain unflavored yogurt",
+          "texture": "newproduce.png",
+          "tileindex": 7,
+          "index": 349,
+          "time": 600,
+          "price": "original + input",
+          "suffix": true,
+          "quality": 4,
+          "materials": [
+            {
+              "index": 186,
+              "stack": 1
+            }
+          ]
+        },
+        {
+          "name": "Yogurt from ",
+          "description": "Plain unflavored yogurt",
+          "texture": "newproduce.png",
+          "tileindex": 7,
+          "index": 349,
+          "time": 600,
+          "price": "original + input",
+          "suffix": true,
+          "materials": [
+            {
+              "index": 436,
+              "stack": 2
+            }
+          ]
+        },
+        {
+          "name": "Yogurt from ",
+          "description": "Plain unflavored yogurt",
+          "texture": "newproduce.png",
+          "tileindex": 7,
+          "index": 349,
+          "time": 600,
+          "price": "original + input",
+          "suffix": true,
+          "quality": 4,
+          "materials": [
+            {
+              "index": 438
+            }
+          ]
+        }
 			]
 	   },
 	   {
@@ -317,117 +317,117 @@
 		   "tileindex": 0,
 		   "production":
 			[
-				{
-					"name": "Aceto Balsamico di Pelicano",
-					"texture": "newproduce.png",
-					"tileindex": 4,
-					"index": 419,
-					"quality": 4,
-					"time": 600,
-					"materials":
-					[
-						{
-							"index": 398,
-							"quality": 4
-						}
-					]
-				},
-				{
-					"name": "Vinegar",
-					"tileindex": 0,
-					"index": 419,
-					"time": 600,
-					"prefix": true,
-					"materials":
-					[
-						{
-							"index": 348,
-							"quality": -4
-						}
-					]
-				},
-				{
-					"name": "Condimento Balsamico",
-					"texture": "newproduce.png",
-					"tileindex": 4,
-					"index": 419,
-					"quality": 2,
-					"time": 600,
-					"materials":
-					[
-						{
-							"index": 398
-						}
-					]
-				},
-				{
-					"name": "Apple Cider Vinegar",
-					"texture": "newproduce.png",
-					"tileindex": 1,
-					"index": 419,
-					"quality": 1,
-					"time": 600,
-					"materials":
-					[
-						{
-							"index": 613
-						}
-					]
-				},
-				{
-					"name": "Rice Vinegar",
-					"texture": "newproduce.png",
-					"tileindex": 1,
-					"index": 419,
-					"time": 600,
-					"materials":
-					[
-						{
-							"index": 423
-						}
-					]
-				},
-				{
-					"name": "White Vinegar",
-					"texture": "newproduce.png",
-					"tileindex": 2,
-					"index": 419,
-					"time": 600,
-					"materials":
-					[
-						{
-							"index": 262
-						}
-					]
-				},
-				{
-					"name": "Coconut Vinegar",
-					"texture": "newproduce.png",
-					"tileindex": 2,
-					"index": 419,
-					"quality": 1,
-					"time": 600,
-					"materials":
-					[
-						{
-							"index": 88
-						}
-					]
-				},
-				{
-					"name": "Malt Vinegar",
-					"texture": "newproduce.png",
-					"tileindex": 3,
-					"index": 419,
-					"quality": 1,
-					"time": 600,
-					"materials":
-					[
-						{
-							"index": 303
-						}
-					]
-				},
+        {
+          "name": "Aceto Balsamico di Pelicano",
+          "texture": "newproduce.png",
+          "tileindex": 4,
+          "price": "original + (input * 2)",
+          "index": 419,
+          "quality": 4,
+          "time": 600,
+          "materials": [
+            {
+              "index": 398,
+              "quality": 4
+            }
+          ]
+        },
+        {
+          "name": "Vinegar",
+          "tileindex": 0,
+          "index": 419,
+          "time": 600,
+          "price": "original + (input * 2)",
+          "prefix": true,
+          "materials": [
+            {
+              "index": 348,
+              "quality": -4
+            }
+          ]
+        },
+        {
+          "name": "Condimento Balsamico",
+          "texture": "newproduce.png",
+          "tileindex": 4,
+          "index": 419,
+          "price": "original + (input * 2)",
+          "quality": 2,
+          "time": 600,
+          "materials": [
+            {
+              "index": 398
+            }
+          ]
+        },
+        {
+          "name": "Apple Cider Vinegar",
+          "texture": "newproduce.png",
+          "tileindex": 1,
+          "index": 419,
+          "quality": 1,
+          "price": "original + (input * 2)",
+          "time": 600,
+          "materials": [
+            {
+              "index": 613
+            }
+          ]
+        },
+        {
+          "name": "Rice Vinegar",
+          "texture": "newproduce.png",
+          "tileindex": 1,
+          "index": 419,
+          "price": "original + (input * 2)",
+          "time": 600,
+          "materials": [
+            {
+              "index": 423
+            }
+          ]
+        },
+        {
+          "name": "White Vinegar",
+          "texture": "newproduce.png",
+          "tileindex": 2,
+          "index": 419,
+          "price": "original + (input * 2)",
+          "time": 600,
+          "materials": [
+            {
+              "index": 262
+            }
+          ]
+        },
+        {
+          "name": "Coconut Vinegar",
+          "texture": "newproduce.png",
+          "tileindex": 2,
+          "index": 419,
+          "quality": 1,
+          "price": "original + (input * 2)",
+          "time": 600,
+          "materials": [
+            {
+              "index": 88
+            }
+          ]
+        },
+        {
+          "name": "Malt Vinegar",
+          "texture": "newproduce.png",
+          "tileindex": 3,
+          "index": 419,
+          "quality": 1,
+          "price": "original + (input * 2)",
+          "time": 600,
+          "materials": [
+            {
+              "index": 303
+            }
+          ]
+        },
 				{
 					"name": "Beer Vinegar",
 					"texture": "newproduce.png",
