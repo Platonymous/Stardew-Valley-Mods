@@ -10,6 +10,9 @@ using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections;
+using NCalc;
+using Harmony;
+using System.Reflection;
 
 namespace PyTK
 {
@@ -171,6 +174,34 @@ namespace PyTK
                     }
                 }
             }
+        }
+
+        public static float calc(string expression, params KeyValuePair<string,object>[] paramters)
+        {
+            Expression e = new Expression(expression);
+
+            foreach (KeyValuePair<string, object> p in paramters)
+                e.Parameters.Add(p.Key, p.Value);
+
+            return float.Parse(e.Evaluate().ToString());
+        }
+
+        public static void initOverride(IModHelper helper, Type type, Type patch, List<string> toPatch)
+        {
+            initOverride(helper.ModRegistry.ModID, type, patch, toPatch);
+        }
+
+
+        public static void initOverride(string harmonyId, Type type, Type patch, List<string> toPatch)
+        {
+            HarmonyInstance harmony = HarmonyInstance.Create("Platonymous.PyTK.PyUtils." + harmonyId);
+            MethodInfo prefix = patch.GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().Find(m => m.Name.ToLower() == "prefix");
+            MethodInfo postfix = patch.GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().Find(m => m.Name.ToLower() == "postfix");
+            List<MethodInfo> originals = type.GetMethods().ToList();
+
+            foreach (MethodInfo method in originals)
+                if (toPatch.Contains(method.Name))
+                    harmony.Patch(method, prefix == null ? null : new HarmonyMethod(prefix), postfix == null ? null : new HarmonyMethod(postfix));
         }
 
     }

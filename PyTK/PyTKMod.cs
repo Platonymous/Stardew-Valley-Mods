@@ -22,6 +22,7 @@ using xTile.Format;
 using System.Linq;
 using PyTK.Tiled;
 using PyTK.Lua;
+using static PyTK.Overrides.OvSpritebatch;
 
 namespace PyTK
 {
@@ -63,7 +64,8 @@ namespace PyTK
         private void harmonyFix()
         {
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.PyTK");
-            OvSpritebatch.DrawFix1.init("SObject", PyUtils.getTypeSDV("Object"), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
+            PyUtils.initOverride("SObject", PyUtils.getTypeSDV("Object"),typeof(DrawFix1), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
+            PyUtils.initOverride("TemporaryAnimatedSprite", PyUtils.getTypeSDV("TemporaryAnimatedSprite"),typeof(DrawFix2), new List<string>() { "draw" });
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 
