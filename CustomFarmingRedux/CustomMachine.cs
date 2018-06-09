@@ -344,12 +344,26 @@ namespace CustomFarmingRedux
 
             if (readyForHarvest && heldObject.Value != null)
             {
-                Texture2D tilesheet = (heldObject.Value is CustomObject co) ? co.texture : Game1.objectSpriteSheet;
-                Rectangle csourceRectangle = (heldObject.Value is CustomObject cobj) ? cobj.sourceRectangle : Game1.getSourceRectForStandardTileSheet(tilesheet, heldObject.Value.ParentSheetIndex, 16, 16);
+                Texture2D tilesheet = null;
+                Rectangle csourceRectangle = new Rectangle();
+                bool cbig = false;
+                if(heldObject.Value.bigCraftable.Value && CustomObjectData.collection.Exists(c => c.Value.sdvId == heldObject.Value.ParentSheetIndex) && CustomObjectData.collection.Find(c => c.Value.sdvId == heldObject.Value.ParentSheetIndex) is KeyValuePair<string, CustomObjectData> cod)
+                {
+                    cbig = true;
+                    tilesheet = cod.Value.texture;
+                    csourceRectangle = cod.Value.sourceRectangle;
+                }
+
+                if (!cbig)
+                {
+                    tilesheet = (heldObject.Value is CustomObject co) ? co.texture : !heldObject.Value.bigCraftable.Value ? Game1.objectSpriteSheet : Game1.bigCraftableSpriteSheet;
+                    csourceRectangle = (heldObject.Value is CustomObject cobj) ? cobj.sourceRectangle : Game1.getSourceRectForStandardTileSheet(tilesheet, heldObject.Value.ParentSheetIndex, 16, heldObject.Value.bigCraftable.Value ? 32 : 16);
+                }
+
                 Color color = (heldObject.Value is CustomObject cco) ? cco.color : (heldObject.Value is ColoredObject cvo) ? cvo.color.Value : Color.White;
                 float num = (float)(4.0 * Math.Round(Math.Sin(DateTime.Now.TimeOfDay.TotalMilliseconds / 250.0), 2));
                 spriteBatch.Draw(Game1.mouseCursors, Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize - 8), (y * Game1.tileSize - Game1.tileSize * 3 / 2 - 16) + num)), new Rectangle(141, 465, 20, 24), Color.White * 0.75f, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, (float)(((y + 1) * Game1.tileSize) / 10000.0 + 9.99999997475243E-07 + tileLocation.X / 10000.0 + (parentSheetIndex == 105 ? 0.00150000001303852 : 0.0)));
-                spriteBatch.Draw(tilesheet, Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize + Game1.tileSize / 2), (y * Game1.tileSize - Game1.tileSize - Game1.tileSize / 8) + num)), csourceRectangle, color * 0.75f, 0.0f, new Vector2(8f, 8f), Game1.pixelZoom, SpriteEffects.None, (float)(((y + 1) * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + tileLocation.X / 10000.0 + 0.0));
+                spriteBatch.Draw(tilesheet, Game1.GlobalToLocal(Game1.viewport, new Vector2((x * Game1.tileSize + Game1.tileSize / 2), (y * Game1.tileSize - Game1.tileSize - Game1.tileSize / 8 - (heldObject.Value.bigCraftable.Value ? 64 : 0)) + num)), csourceRectangle, color * 0.75f, 0.0f, new Vector2(8f, 8f), Game1.pixelZoom, SpriteEffects.None, (float)(((y + 1) * Game1.tileSize) / 10000.0 + 9.99999974737875E-06 + tileLocation.X / 10000.0 + 0.0));
             }
 
             if (blueprint.showitem && heldObject.Value != null)
