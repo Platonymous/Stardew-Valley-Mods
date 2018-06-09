@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("PyTK")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Modding Toolkit for Stardew Valley")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Platonymous")]
 [assembly: AssemblyProduct("PyTK")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
