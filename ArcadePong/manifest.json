@@ -1,7 +1,7 @@
 {
   "Name": "Arcade Pong",
   "Author": "Platonymous",
-  "Version": "1.0.2",
+  "Version": "1.0.3",
   "Description": "Takes Cat's Pong and puts it where it belongs.",
   "UniqueID": "Platonymous.ArcadePong",
   "EntryDll": "ArcadePong.dll",

@@ -78,7 +78,7 @@ namespace ArcadePong
         {
             ArcadePongMod.pong = __instance;
     
-            e = new EventArgsInput(SButton.A, e.Cursor, false, false, new HashSet<SButton>());
+            e = new EventArgsInput(SButton.A, e.Cursor, new HashSet<SButton>());
         }
     }
 
