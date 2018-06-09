@@ -1,0 +1,7 @@
+{
+  "name": "Gameboy Pocket",
+  "author": "Platonymous",
+  "version": "1.1.0",
+  "palette": "gameboyPaletteFromImage.png",
+  "saturation": 0,
+}

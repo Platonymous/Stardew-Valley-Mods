@@ -8,7 +8,6 @@ using PyTK.Types;
 using StardewValley;
 using StardewValley.Menus;
 using StardewModdingAPI.Events;
-using Harmony;
 using System.Reflection;
 using PyTK.CustomElementHandler;
 using StardewValley.Objects;
@@ -16,6 +15,7 @@ using SObject = StardewValley.Object;
 using Microsoft.Xna.Framework;
 using System;
 using StardewValley.Tools;
+using Microsoft.Xna.Framework.Input;
 
 namespace CustomFarmingRedux
 {
@@ -37,7 +37,6 @@ namespace CustomFarmingRedux
             _config = Helper.ReadConfig<Config>();
 
             loadPacks();
-
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
             SaveEvents.AfterLoad += (s, e) =>
             {
@@ -47,7 +46,8 @@ namespace CustomFarmingRedux
                     else
                         Game1.player.craftingRecipes.Add(c.Key, c.Value);
             };
-                harmonyFix();
+
+            harmonyFix();
             SaveHandler.addPreprocessor(legacyFix);
             SaveHandler.addReplacementPreprocessor(fixLegacyObject);
             helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
@@ -209,8 +209,8 @@ namespace CustomFarmingRedux
 
         private void harmonyFix()
         {
-            var instance = HarmonyInstance.Create("Platonymous.CustomFarmingRedux");
-            instance.PatchAll(Assembly.GetExecutingAssembly());
+            typeof(SObjectBAI).PatchType(typeof(SObject), Helper);
+            typeof(SObjectBAI).PatchType(typeof(ColoredObject), Helper);
         }
 
         private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)

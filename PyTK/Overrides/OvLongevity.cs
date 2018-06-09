@@ -15,7 +15,7 @@ namespace PyTK.Overrides
         }
     }
 
-    [HarmonyPatch()]
+    [HarmonyPatch]
     internal class LongevityFix
     {
         internal static MethodInfo TargetMethod()

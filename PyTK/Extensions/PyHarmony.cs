@@ -9,6 +9,9 @@ namespace PyTK.Extensions
 {
     public static class PyHarmony
     {
+        internal static IModHelper Helper { get; } = PyTKMod._helper;
+        internal static IMonitor Monitor { get; } = PyTKMod._monitor;
+
         private static Dictionary<string, HarmonyInstance> harmonyInstances = new Dictionary<string, HarmonyInstance>();
 
         public static void PatchBase(this Type type, IModHelper helper)
@@ -33,8 +36,7 @@ namespace PyTK.Extensions
 
             HarmonyInstance harmony = harmonyInstances[harmonyId];
 
-            List<MethodInfo> originals = typeToPatch.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).ToList();
-
+            List<MethodInfo> originals = typeToPatch.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m != m.GetBaseDefinition()).ToList();
             foreach (MethodInfo method in originals)
             {
                 MethodInfo[] preMethods = type.GetMethods(BindingFlags.Public | BindingFlags.Static).Where(m => m.Name == "Prefix_" + method.Name).ToArray();

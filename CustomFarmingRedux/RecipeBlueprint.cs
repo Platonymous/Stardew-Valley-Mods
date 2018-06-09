@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using StardewValley.Objects;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using PyTK;
 
 namespace CustomFarmingRedux
 {
@@ -252,6 +253,12 @@ namespace CustomFarmingRedux
                 namesplit[insertpos] += " " + input.name;
                 s.name = String.Join(" ", namesplit);
             }
+
+            int compPrice = (int)(PyUtils.calc(price, new KeyValuePair<string, object>("input", input.Price), new KeyValuePair<string, object>("original", s.Price)));
+            s.Price = compPrice;
+
+            if(prefix || suffix || insert)
+                s.preservedParentSheetIndex.Value = -1 * input.ParentSheetIndex;
             return s;
         }
 
