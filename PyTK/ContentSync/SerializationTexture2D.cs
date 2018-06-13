@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PyTK.Types;
 using StardewValley;
 using System.IO;
 
@@ -11,6 +12,12 @@ namespace PyTK.ContentSync
         public int Width { get; set; }
         public int Height { get; set; }
 
+        public bool IsScaled { get; set; }
+        public float Scale { get; set; }
+        public string ScaledData { get; set; }
+        public int ScaledWidth { get; set; }
+        public int ScaledHeight { get; set; }
+
         public SerializationTexture2D()
         {
 
@@ -20,11 +27,23 @@ namespace PyTK.ContentSync
         {
             Width = texture.Width;
             Height = texture.Height;
+
+            IsScaled = false;
+
+            if (texture is ScaledTexture2D st)
+            {
+                IsScaled = true;
+                Scale = st.Scale;
+                ScaledWidth = st.STexture.Width;
+                ScaledHeight = st.STexture.Height;
+            }
+
             serialize(texture);
         }
 
         public Texture2D getTexture()
         {
+
             byte[] buffer = PyNet.DecompressBytes(Data);
             MemoryStream stream = new MemoryStream(buffer);
             BinaryReader reader = new BinaryReader(stream);
@@ -39,8 +58,34 @@ namespace PyTK.ContentSync
                 colors[i] = new Color(r, g, b, a);
             }
 
-            Texture2D texture = new Texture2D(Game1.graphics.GraphicsDevice, Width, Height);
+
+            Texture2D texture = null;
+
+            if (IsScaled)
+            {
+                byte[] sbuffer = PyNet.DecompressBytes(ScaledData);
+                MemoryStream sstream = new MemoryStream(sbuffer);
+                BinaryReader sreader = new BinaryReader(sstream);
+                Color[] scolors = new Color[ScaledWidth * ScaledHeight];
+
+                for (int i = 0; i < scolors.Length; i++)
+                {
+                    var sr = sreader.ReadByte();
+                    var sg = sreader.ReadByte();
+                    var sb = sreader.ReadByte();
+                    var sa = sreader.ReadByte();
+                    scolors[i] = new Color(sr, sg, sb, sa);
+                }
+
+                Texture2D stexture = new Texture2D(Game1.graphics.GraphicsDevice, ScaledWidth, ScaledHeight);
+                stexture.SetData(scolors);
+
+                texture = new ScaledTexture2D(Game1.graphics.GraphicsDevice, Width, Height, stexture, Scale);
+            }else
+                texture = new Texture2D(Game1.graphics.GraphicsDevice, Width, Height);
+
             texture.SetData(colors);
+
             return texture;
         }
 
@@ -62,6 +107,26 @@ namespace PyTK.ContentSync
             }
 
             Data = PyNet.CompressBytes(stream.ToArray());
+
+            if (texture is ScaledTexture2D stexture)
+            {
+                Color[] sdata = new Color[ScaledWidth * ScaledHeight];
+                byte[] sbuffer = new byte[sdata.Length * 4];
+                stexture.STexture.GetData(sdata);
+
+                MemoryStream sstream = new MemoryStream();
+                BinaryWriter swriter = new BinaryWriter(sstream);
+
+                for (int i = 0; i < sdata.Length; i++)
+                {
+                    swriter.Write(sdata[i].R);
+                    swriter.Write(sdata[i].G);
+                    swriter.Write(sdata[i].B);
+                    swriter.Write(sdata[i].A);
+                }
+
+                ScaledData = PyNet.CompressBytes(sstream.ToArray());
+            }
         }
     }
 }

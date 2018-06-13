@@ -219,7 +219,7 @@ namespace PyTK.ContentSync
                 return (T)(object)null;
         }
 
-        private static T deserialize<T>(ContentResponse response)
+        public static T deserialize<T>(ContentResponse response)
         {
             if (response.type == (int)ContentType.DictInt)
             {
@@ -288,7 +288,7 @@ namespace PyTK.ContentSync
            });
         }       
 
-        private static string serialize(object contents, ContentType type)
+        public static string serialize(object contents, ContentType type)
         {
             if(type == ContentType.DictInt)
             {

@@ -18,7 +18,7 @@ namespace PyTK.Lua
 
         public static bool log(string text)
         {
-            Monitor.Log(text, LogLevel.Trace);
+            Monitor.Log(text, LogLevel.Info);
             return true;
         }
 

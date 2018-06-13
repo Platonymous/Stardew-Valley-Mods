@@ -39,8 +39,8 @@ namespace PyTK.Overrides
             {
                 if (!skip && texture is ScaledTexture2D s && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
                 {
-                    var newDestination = new Vector4(destinationRectangle.X, destinationRectangle.Y, destinationRectangle.Z / s.Scale, destinationRectangle.W / s.Scale);
-                    var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
+                    var newDestination = new Vector4(destinationRectangle.X + s.DestinationPositionAdjustment.X, destinationRectangle.Y + s.DestinationPositionAdjustment.Y, destinationRectangle.Z / s.Scale, destinationRectangle.W / s.Scale);
+                    var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale) + (int) s.SourcePositionAdjustment.X, (int)(r.Y * s.Scale) + (int) s.SourcePositionAdjustment.Y, (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
 
                     skip = true;
                     MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
@@ -87,8 +87,8 @@ namespace PyTK.Overrides
             {
                 if (!skip && texture is ScaledTexture2D s && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
                 {
-                    var newDestination = new Vector4(destination.X, destination.Y, destination.Z / s.Scale, destination.W / s.Scale);
-                    var newSR = new Rectangle?(new Rectangle((int) (r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
+                    var newDestination = new Vector4(destination.X + s.DestinationPositionAdjustment.X, destination.Y + s.DestinationPositionAdjustment.Y, destination.Z / s.Scale, destination.W / s.Scale);
+                    var newSR = new Rectangle?(new Rectangle((int) (r.X * s.Scale) + (int) s.SourcePositionAdjustment.X, (int)(r.Y * s.Scale) + (int)s.SourcePositionAdjustment.Y, (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
                     skip = true;
                     MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics"), "InternalDraw");
                     drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, scaleDestination, newSR, color, rotation, origin, effects, depth });

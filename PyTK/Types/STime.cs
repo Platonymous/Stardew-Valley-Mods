@@ -149,6 +149,11 @@ namespace PyTK.Types
             return timestamp.CompareTo(other.timestamp);
         }
 
+        public override string ToString()
+        {
+            return $"STime[Year:{year} Season:{season} Day:{day} Hour:{hour} Minute:{minute}";
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is STime s)

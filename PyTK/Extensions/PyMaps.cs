@@ -222,5 +222,15 @@ namespace PyTK.Extensions
         {
             m.GetLayer("Buildings").PickTile(new Location((int)position.X * Game1.tileSize, (int)position.Y * Game1.tileSize), Game1.viewport.Size).Properties.AddOrReplace("Action", trigger + " " + args);
         }
+
+        public static void addTouchAction(this Map m, Vector2 position, TileAction action, string args)
+        {
+            m.GetLayer("Back").PickTile(new Location((int)position.X * Game1.tileSize, (int)position.Y * Game1.tileSize), Game1.viewport.Size).Properties.AddOrReplace("TouchAction", action.trigger + " " + args);
+        }
+
+        public static void addTouchAction(this Map m, Vector2 position, string trigger, string args)
+        {
+            m.GetLayer("Back").PickTile(new Location((int)position.X * Game1.tileSize, (int)position.Y * Game1.tileSize), Game1.viewport.Size).Properties.AddOrReplace("TouchAction", trigger + " " + args);
+        }
     }
 }

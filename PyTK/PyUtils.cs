@@ -13,6 +13,7 @@ using System.Collections;
 using NCalc;
 using Harmony;
 using System.Reflection;
+using PyTK.Lua;
 
 namespace PyTK
 {
@@ -64,6 +65,8 @@ namespace PyTK
 
             if (conditions.StartsWith("PC "))
                 result = checkPlayerConditions(conditions.Replace("PC ", ""));
+            else if (conditions.StartsWith("LC "))
+                result = checkLuaConditions(conditions.Replace("LC ", ""));
             else
                 result = Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) != -1;
 
@@ -73,6 +76,14 @@ namespace PyTK
         public static bool checkPlayerConditions(string conditions)
         {
             return Helper.Reflection.GetField<bool>(Game1.player, conditions).GetValue();
+        }
+
+        public static bool checkLuaConditions(string conditions)
+        {
+            var script = PyLua.getNewScript();
+            script.Globals["result"] = false;
+            script.DoString("result = (" + conditions + ")");
+            return (bool) script.Globals["result"];
         }
 
         public static List<GameLocation> getAllLocationsAndBuidlings()

@@ -4,6 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <ProjectGuid>{A8E6272F-A6A1-4BFE-BA8F-021F63596987}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -122,6 +123,8 @@
     <Compile Include="Types\InventoryItem.cs" />
     <Compile Include="Types\Mail.cs" />
     <Compile Include="Types\MPMessage.cs" />
+    <Compile Include="Types\PyNetMap.cs" />
+    <Compile Include="Types\PyNetTexture.cs" />
     <Compile Include="Types\PyResponder.cs" />
     <Compile Include="Types\PyMessenger.cs" />
     <Compile Include="Types\Range.cs" />

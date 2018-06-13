@@ -73,7 +73,6 @@ namespace PyTK.Extensions
 
                 if (postMethod != null || preMethod != null)
                     harmony.Patch(method, preMethod == null ? null : new HarmonyMethod(preMethod), postMethod == null ? null : new HarmonyMethod(postMethod));
-
             }
         }
     }
