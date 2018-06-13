@@ -1,0 +1,15 @@
+﻿{
+  "Name": "FanShirts",
+  "Author": "Platonymous",
+  "Version": "0.9.0",
+  "Description": "A collection of World Cup jerseys",
+  "UniqueID": "Platonymous.FanShirts",
+  "EntryDll": "FanShirts.dll",
+  "MinimumApiVersion": "2.6-beta",
+  "UpdateKeys": [ "Nexus:" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ]
+}
