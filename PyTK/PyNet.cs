@@ -14,6 +14,7 @@ using PyTK.ContentSync;
 using xTile.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using xTile;
+using Netcode;
 
 namespace PyTK
 {
@@ -91,7 +92,7 @@ namespace PyTK
             }
         }
 
-        public static void sendRequestToAllFarmers<T>(string address, object request, Action<T> callback, SerializationType serializationType = SerializationType.PLAIN, int timeout = 10000, XmlSerializer xmlSerializer = null)
+        public static void sendRequestToAllFarmers<T>(string address, object request, Action<T> callback, SerializationType serializationType = SerializationType.PLAIN, int timeout = 1000, XmlSerializer xmlSerializer = null)
         {
             foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive() &&  f != Game1.player))
                 Task.Run(() => sendRequestToFarmer(address, request, farmer, callback, serializationType, timeout, xmlSerializer));
@@ -288,7 +289,7 @@ namespace PyTK
             return Ionic.Zlib.GZipStream.UncompressString(Convert.FromBase64String(str));
         }
 
-        public void warpFarmer(Farmer farmer, string location, int x, int y, bool isStructure = false, int facingAfterWarp = -1)
+        public void WarpFarmer(Farmer farmer, string location, int x, int y, bool isStructure = false, int facingAfterWarp = -1)
         {
             Task.Run(async () =>
            {

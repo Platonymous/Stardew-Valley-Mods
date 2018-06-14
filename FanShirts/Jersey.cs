@@ -1,10 +1,16 @@
-﻿namespace FanShirts
+﻿using Microsoft.Xna.Framework.Graphics;
+using PyTK.Types;
+
+namespace FanShirts
 {
     public class Jersey
     {
-        public string Id { get; set; } = "Platonymous.Germany";
-        public string Texture { get; set; } = "jersey_germany.png";
-        public int BaseShirt { get; set; } = 1;
+        public string id { get; set; }
+        public string fullid { get; set; }
+        public string texture { get; set; }
+        public float scale { get; set; }
+        public int baseid { get; set; }
+        internal Texture2D texture2d;
 
         public Jersey()
         {

@@ -44,34 +44,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="FanPack.cs" />
     <Compile Include="Jersey.cs" />
     <Compile Include="Overrides\OvFarmerRenderer.cs" />
     <Compile Include="FanShirtsMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Jerseys\Argentina.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Jerseys\Portugal.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Jerseys\Spain.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Jerseys\England.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Jerseys\Brazil.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Jerseys\Germany.json">
+    <None Include="FanPacks\Platonymous.WorldCup2018\Platonymous.WorldCup2018.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <Compile Include="SavedJersey.cs" />
+    <Compile Include="ShirtSync.cs" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
@@ -88,24 +76,26 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="Jerseys\jersey_germany.png">
+    <Folder Include="Jerseys\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_germany.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Jerseys\jersey_argentina.png">
+    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_argentina.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Jerseys\jersey_brazil.png">
+    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_brazil.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Jerseys\jersey_england.png">
+    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_england.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Jerseys\jersey_portugal.png">
+    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_portugal.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Jerseys\jersey_spain.png">
+    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_spain.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -43,7 +43,6 @@ namespace PyTK.ContentSync
 
         public Texture2D getTexture()
         {
-
             byte[] buffer = PyNet.DecompressBytes(Data);
             MemoryStream stream = new MemoryStream(buffer);
             BinaryReader reader = new BinaryReader(stream);
@@ -57,7 +56,6 @@ namespace PyTK.ContentSync
                 var a = reader.ReadByte();
                 colors[i] = new Color(r, g, b, a);
             }
-
 
             Texture2D texture = null;
 

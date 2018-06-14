@@ -107,7 +107,12 @@ namespace PyTK
 
         public static void loadContentPacks<TModel>(out List<TModel> packs, string folder, SearchOption option = SearchOption.AllDirectories, IMonitor monitor = null, string filesearch = "*.json") where TModel : class
         {
-            packs = new List<TModel>();
+            packs = loadContentPacks<TModel>(folder,option,monitor,filesearch);
+        }
+
+        public static List<TModel> loadContentPacks<TModel>(string folder, SearchOption option = SearchOption.AllDirectories, IMonitor monitor = null, string filesearch = "*.json") where TModel : class
+        {
+            List<TModel>  packs = new List<TModel>();
             string[] files = Directory.GetFiles(folder, filesearch, option);
             foreach (string file in files)
             {
@@ -126,6 +131,8 @@ namespace PyTK
                     }
                 }
             }
+
+            return packs;
         }
 
         public static Type getTypeSDV(string type)
