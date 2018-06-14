@@ -14,6 +14,7 @@ using StardewValley.Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace FanShirts
@@ -21,78 +22,139 @@ namespace FanShirts
     public class FanShirtsMod : Mod
     {
         internal static Config config;
-        internal static NetStringDictionary<Texture2D, PyNetTexture> playerJerseys = new NetStringDictionary<Texture2D, PyNetTexture>();
-        internal static NetStringDictionary<int, NetInt> playerBaseJerseys = new NetStringDictionary<int, NetInt>();
+
+        internal static Dictionary<long, ScaledTexture2D> playerJerseys = new Dictionary<long, ScaledTexture2D>();
+        internal static Dictionary<long, int> playerBaseJerseys = new Dictionary<long, int>();
+        internal static List<FanPack> packs = new List<FanPack>();
         internal static List<Jersey> jerseys = new List<Jersey>();
         internal static Texture2D vanillaShirts;
         internal static bool worldIsReady => Context.IsWorldReady;
-        internal static Vector2 syncDummyPlace = new Vector2(-20, -14);
+        internal static string ShirtSyncerName = "Platonymous.FanShirts.Sync";
+        internal static string ShirtReloaderName = "Platonymous.FanShirts.Reload";
+        internal static IPyResponder ShirtSyncer;
+        internal static IPyResponder ShirtReloader;
 
         internal static IMonitor _monitor;
 
         public override void Entry(IModHelper helper)
         {
+            vanillaShirts = Helper.Content.Load<Texture2D>(@"Characters/Farmer/shirts", ContentSource.GameContent);
+            ShirtSyncer = new PyResponder<bool, ShirtSync>(ShirtSyncerName, (s) =>
+              {
+                  try
+                  {
+                      if (playerJerseys.ContainsKey(s.FarmerId))
+                          playerJerseys.Remove(s.FarmerId);
+
+                      if (playerBaseJerseys.ContainsKey(s.FarmerId))
+                          playerBaseJerseys.Remove(s.FarmerId);
+
+                      playerJerseys.Add(s.FarmerId, (ScaledTexture2D) s.Texture.getTexture());
+                      playerBaseJerseys.Add(s.FarmerId, s.BaseShirt);
+                  }
+                  catch (Exception e)
+                  {
+                      Monitor.Log(e.Message + e.StackTrace, LogLevel.Alert);
+                  }
+                  return true;
+              }, 60, SerializationType.PLAIN, SerializationType.JSON);
+
+            ShirtReloader = new PyResponder<long, long>(ShirtReloaderName, (s) =>
+            {
+                loadJersey();
+                return Game1.player.UniqueMultiplayerID;
+            }, 60);
+
+            ShirtSyncer.start();
+            ShirtReloader.start();
+
             _monitor = Monitor;
             config = helper.ReadConfig<Config>();
 
             HarmonyInstance harmony = HarmonyInstance.Create("Platonymous.FanShirts");
-            if(config.SyncInMultiplayer)
-                harmony.Patch(typeof(Farm).GetMethod("initNetFields", BindingFlags.Instance | BindingFlags.NonPublic), null, new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("NetFieldFix")));
             harmony.Patch(typeof(FarmerRenderer).GetMethod("drawHairAndAccesories"), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Prefix_drawHairAndAccesories")), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Postfix_drawHairAndAccesories")));
 
-            vanillaShirts = Helper.Content.Load<Texture2D>(@"Characters/Farmer/shirts", ContentSource.GameContent);
+            
+            packs = PyUtils.loadContentPacks<FanPack>(Path.Combine(helper.DirectoryPath, "FanPacks"), SearchOption.AllDirectories, Monitor);
+            foreach (FanPack fp in packs)
+                fp.jerseys.ForEach((j) =>
+                {
+                    j.fullid = fp.id + "." + j.id;
+                    string path = @"FanPacks/" + fp.folderName + "/" + j.texture;
+                    j.texture2d = ScaledTexture2D.FromTexture(vanillaShirts,Helper.Content.Load<Texture2D>(path),j.scale);
+                    jerseys.Add(j);
+                });
 
-
-            Monitor.Log($"Started {helper.ModRegistry.ModID} from folder: {helper.DirectoryPath}");
-
-            PyUtils.loadContentPacks(out jerseys, Path.Combine(helper.DirectoryPath, "Jerseys"), SearchOption.TopDirectoryOnly, Monitor);
-            Keys.J.onPressed(() =>
+           config.SwitchKey.onPressed(() =>
             {
                 if (!Context.IsWorldReady)
                     return;
 
-                int index = jerseys.FindIndex(j => j.Id == config.JerseyID);
+                int index = jerseys.FindIndex(j => j.fullid == config.JerseyID);
                 int next = index + 1 >= jerseys.Count ? 0 : index + 1;
-                config.JerseyID = jerseys[next].Id;
+
+                config.JerseyID = jerseys[next].fullid;
+
+                if (config.SavedJerseys.Find(j => j.Id == Game1.player.UniqueMultiplayerID) is SavedJersey sj)
+                    sj.JerseyID = config.JerseyID;
+                else
+                    config.SavedJerseys.Add(new SavedJersey(Game1.player.UniqueMultiplayerID, config.JerseyID));
+
                 helper.WriteConfig(config);
+
                 loadJersey();
             });
-            SaveEvents.AfterLoad += (s,e) => loadJersey();
+
+            SaveEvents.AfterLoad += (s, e) =>
+            {
+                loadJersey();
+                PyNet.sendRequestToAllFarmers<long>(ShirtReloaderName, Game1.player.UniqueMultiplayerID, null);
+            };
+
+            foreach(SavedJersey sj in config.SavedJerseys)
+                loadJersey(sj.Id, false);
         }
 
-        private void loadJersey()
+        private void loadJersey(long mid = -1, bool sendAround = true)
         {
-            Jersey jersey = jerseys.Find(j => j.Id == config.JerseyID);
+            if (mid == -1)
+                mid = Game1.player.UniqueMultiplayerID;
+
+            string jerseyId = config.JerseyID;
+
+            if (config.SavedJerseys.Find(sj => sj.Id == mid) is SavedJersey sav)
+            {
+                jerseyId = sav.JerseyID;
+
+                if (mid == Game1.player.UniqueMultiplayerID)
+                    config.JerseyID = jerseyId;
+            }
+            else
+            {
+                config.SavedJerseys.Add(new SavedJersey(mid, jerseyId));
+                Helper.WriteConfig(config);
+            }
+
+            Jersey jersey = jerseys.Find(j => j.fullid == jerseyId);
 
             if (jersey == null)
             {
-                Monitor.Log("Couldn't find jersey id", LogLevel.Error);
+                Monitor.Log("Couldn't find jersey:" + jerseyId, LogLevel.Error);
                 return;
             }
 
-            Texture2D tex = FarmerRenderer.shirtsTexture;
-            Texture2D tex4x = Helper.Content.Load<Texture2D>(@"Jerseys/" + jersey.Texture);
-            ScaledTexture2D stex = ScaledTexture2D.FromTexture(tex, tex4x, 4);
+            if (playerJerseys.ContainsKey(mid))
+                playerJerseys.Remove(mid);
 
-            if (playerJerseys.ContainsKey(Game1.player.UniqueMultiplayerID.ToString()))
-                playerJerseys.Remove(Game1.player.UniqueMultiplayerID.ToString());
+            if (playerBaseJerseys.ContainsKey(mid))
+                playerBaseJerseys.Remove(mid);
 
-            if (playerBaseJerseys.ContainsKey(Game1.player.UniqueMultiplayerID.ToString()))
-                playerBaseJerseys.Remove(Game1.player.UniqueMultiplayerID.ToString());
+            playerBaseJerseys.Add(mid, jersey.baseid);
+            playerJerseys.Add(mid, (ScaledTexture2D) jersey.texture2d);
 
-            playerBaseJerseys.Add(Game1.player.UniqueMultiplayerID.ToString(), new NetInt(jersey.BaseShirt));
-            playerJerseys.Add(Game1.player.UniqueMultiplayerID.ToString(), new PyNetTexture(stex));
-            playerBaseJerseys.MarkDirty();
-            playerJerseys.MarkDirty();
-        }
+            if(sendAround)
+                PyNet.sendRequestToAllFarmers<bool>(ShirtSyncerName, new ShirtSync(jersey.texture2d, jersey.baseid, mid), null, SerializationType.JSON, 1000);
 
-        private void setJersey(Farmer farmer, int id, ScaledTexture2D stex)
-        {   
-            farmer.changeShirt(id);
-            Rectangle sr = Game1.getSourceRectForStandardTileSheet(vanillaShirts, id, 8, 32);
-            stex.DestinationPositionAdjustment = new Vector2(0, -96);
-            stex.SourcePositionAdjustment = new Vector2(-(sr.X * 4), -(sr.Y * 4));
-            FarmerRenderer.shirtsTexture = stex;
         }
     }
 }
