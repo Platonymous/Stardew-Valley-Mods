@@ -76,9 +76,7 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Jerseys\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_germany.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -93,6 +91,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_portugal.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_russia.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_saudi-arabia.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_spain.png">
