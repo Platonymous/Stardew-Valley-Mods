@@ -1,13 +1,13 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 
-namespace FanShirts
+namespace CustomShirts
 {
     class Config
     {
-        public string JerseyID { get; set; } = "Platonymous.WorldCup2018.Germany";
+        public string ShirtId { get; set; } = "none";
         public Keys SwitchKey { get; set; } = Keys.J;
-        public List<SavedJersey> SavedJerseys { get; set; } = new List<SavedJersey>();
+        public List<SavedShirt> SavedShirts { get; set; } = new List<SavedShirt>();
 
         public Config()
         {

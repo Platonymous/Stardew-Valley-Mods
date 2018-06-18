@@ -4,12 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
+    <ModFolderName>[CS]WordCup2018</ModFolderName>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{05E3B1D0-1902-46CC-9F61-5B6015663106}</ProjectGuid>
+    <ProjectGuid>{2D69E926-F8A4-422D-9659-D7734E0A9413}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FanShirts</RootNamespace>
-    <AssemblyName>FanShirts</AssemblyName>
+    <RootNamespace>CS_Platonymous_WorldCup2018</RootNamespace>
+    <AssemblyName>CS_Platonymous_WorldCup2018</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -43,63 +44,43 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config.cs" />
-    <Compile Include="FanPack.cs" />
-    <Compile Include="Jersey.cs" />
-    <Compile Include="Overrides\OvFarmerRenderer.cs" />
-    <Compile Include="FanShirtsMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FanPacks\Platonymous.WorldCup2018\Platonymous.WorldCup2018.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-    <Compile Include="SavedJersey.cs" />
-    <Compile Include="ShirtSync.cs" />
+    <None Include="content.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
-      <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
-      <Name>Harmony</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
-      <Name>PyTK</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_germany.png">
+    <Content Include="assets\jersey_argentina.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_argentina.png">
+    <Content Include="assets\jersey_brazil.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_brazil.png">
+    <Content Include="assets\jersey_england.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_england.png">
+    <Content Include="assets\jersey_germany.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_portugal.png">
+    <Content Include="assets\jersey_portugal.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_russia.png">
+    <Content Include="assets\jersey_russia.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_saudi-arabia.png">
+    <Content Include="assets\jersey_saudi-arabia.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="FanPacks\Platonymous.WorldCup2018\jersey_spain.png">
+    <Content Include="assets\jersey_spain.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
