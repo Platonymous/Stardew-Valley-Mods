@@ -168,6 +168,8 @@ namespace PyTK.Extensions
             if (name.StartsWith("contains:"))
                 return (dictionary.Where(d => d.Value.Split('/')[0].Contains(name.Split(':')[1])).FirstOrDefault()).Key;
 
+            Monitor.Log(name + "=>" +(dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Key + ":" + (dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Value);
+
             return (dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Key;
         }
     }

@@ -22,9 +22,9 @@ namespace PyTK
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
-        public static bool CheckEventConditions(string conditions)
+        public static bool CheckEventConditions(string conditions, object caller = null)
         {
-            return checkEventConditions(conditions);
+            return checkEventConditions(conditions, caller);
         }
 
         public PyUtils()
@@ -49,7 +49,7 @@ namespace PyTK
             return null;
         }
 
-        public static bool checkEventConditions(string conditions)
+        public static bool checkEventConditions(string conditions, object caller = null)
         {
             if (conditions == null || conditions == "")
                 return true;
@@ -66,7 +66,7 @@ namespace PyTK
             if (conditions.StartsWith("PC "))
                 result = checkPlayerConditions(conditions.Replace("PC ", ""));
             else if (conditions.StartsWith("LC "))
-                result = checkLuaConditions(conditions.Replace("LC ", ""));
+                result = checkLuaConditions(conditions.Replace("LC ", ""), caller);
             else
                 result = Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) != -1;
 
@@ -78,10 +78,12 @@ namespace PyTK
             return Helper.Reflection.GetField<bool>(Game1.player, conditions).GetValue();
         }
 
-        public static bool checkLuaConditions(string conditions)
+        public static bool checkLuaConditions(string conditions, object caller = null)
         {
             var script = PyLua.getNewScript();
             script.Globals["result"] = false;
+            if(caller != null)
+                script.Globals["caller"] = caller;
             script.DoString("result = (" + conditions + ")");
             return (bool) script.Globals["result"];
         }

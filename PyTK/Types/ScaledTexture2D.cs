@@ -10,6 +10,7 @@ namespace PyTK.Types
         public Texture2D STexture { get; set; }
         public Vector2 DestinationPositionAdjustment { get; set; } = Vector2.Zero;
         public Vector2 SourcePositionAdjustment { get; set; } = Vector2.Zero;
+        public Rectangle? ForcedSourceRectangle { get; set; } = null;
 
         public ScaledTexture2D(GraphicsDevice graphicsDevice, int width, int height)
             : base(graphicsDevice, width, height)

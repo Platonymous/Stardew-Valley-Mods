@@ -16,10 +16,9 @@ namespace PyTK.Lua
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
-        public static bool log(string text)
+        public static void log(string text)
         {
             Monitor.Log(text, LogLevel.Info);
-            return true;
         }
 
         public static bool setGameValue(string field, object value, int delay = 0, object root = null)
@@ -45,6 +44,19 @@ namespace PyTK.Lua
                 fieldInfo.SetValue(fieldInfo.IsStatic ? null : currentBranch, value);
 
             return true;
+        }
+
+        public static double getDistance(Vector2 p1, Vector2 p2)
+        {
+            float distX = Math.Abs(p1.X - p2.X);
+            float distY = Math.Abs(p1.Y - p2.Y);
+            double dist = (distX * distX) + (distY * distY);
+            return dist;
+        }
+        
+        public static double getTileDistance(Vector2 p1, Vector2 p2)
+        {
+            return Math.Sqrt(getDistance(p1, p2));
         }
 
         public static string getObjectType(object o)

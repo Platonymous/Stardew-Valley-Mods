@@ -42,6 +42,9 @@ namespace PyTK.Overrides
                     var newDestination = new Vector4(destinationRectangle.X + s.DestinationPositionAdjustment.X, destinationRectangle.Y + s.DestinationPositionAdjustment.Y, destinationRectangle.Z / s.Scale, destinationRectangle.W / s.Scale);
                     var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale) + (int) s.SourcePositionAdjustment.X, (int)(r.Y * s.Scale) + (int) s.SourcePositionAdjustment.Y, (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
 
+                    if (s.ForcedSourceRectangle.HasValue)
+                        newSR = s.ForcedSourceRectangle.Value;
+
                     skip = true;
                     MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
                     drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, newSR, color, rotation, origin, effect, depth, autoFlush });
@@ -89,6 +92,10 @@ namespace PyTK.Overrides
                 {
                     var newDestination = new Vector4(destination.X + s.DestinationPositionAdjustment.X, destination.Y + s.DestinationPositionAdjustment.Y, destination.Z / s.Scale, destination.W / s.Scale);
                     var newSR = new Rectangle?(new Rectangle((int) (r.X * s.Scale) + (int) s.SourcePositionAdjustment.X, (int)(r.Y * s.Scale) + (int)s.SourcePositionAdjustment.Y, (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
+
+                    if (s.ForcedSourceRectangle.HasValue)
+                        newSR = s.ForcedSourceRectangle.Value;
+
                     skip = true;
                     MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics"), "InternalDraw");
                     drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, scaleDestination, newSR, color, rotation, origin, effects, depth });
