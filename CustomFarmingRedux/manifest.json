@@ -1,8 +1,8 @@
 {
   "Name": "Custom Farming Redux",
   "Author": "Platonymous",
-  "Version": "2.7.2",
-  "Description": "Helper Mod for Custom Machine creation.",
+  "Version": "2.8.5",
+  "Description": "Mod for Custom Machine creation.",
   "UniqueID": "Platonymous.CustomFarming",
   "EntryDll": "CustomFarmingRedux.dll",
   "MinimumApiVersion": "2.6-beta",

@@ -16,6 +16,8 @@ using Microsoft.Xna.Framework;
 using System;
 using StardewValley.Tools;
 using Microsoft.Xna.Framework.Input;
+using PyTK.Lua;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace CustomFarmingRedux
 {
@@ -57,6 +59,8 @@ namespace CustomFarmingRedux
                 new CustomObjectData("Platonymous.Water", "Water/1/2/Cooking -7/Water/Plain drinking water./drink/0 0 0 0 0 0 0 0 0 0 0/0", Game1.objectSpriteSheet.getTile(247).setSaturation(0), Color.Aqua, type: typeof(WaterItem));
                 ButtonClick.ActionButton.onClick((pos) => clickedOnWateringCan(pos), (p) => convertWater());
             }
+
+            PyLua.registerType(typeof(CustomMachine),registerAssembly:true);
         }
 
         private bool clickedOnWateringCan(Point pos)
@@ -64,7 +68,7 @@ namespace CustomFarmingRedux
             if (Game1.activeClickableMenu is GameMenu g && g.currentTab == 0 && Game1.player.Items.ToList().Exists(i => i is WateringCan))
             {
                 List<IClickableMenu> pages = _helper.Reflection.GetField<List<IClickableMenu>>(g, "pages").GetValue();
-                if (pages.Find(p => p is InventoryPage) is InventoryPage ip && ip.inventory.inventory.Exists(c => ip.inventory.actualInventory[int.Parse(c.name)] is WateringCan && c.containsPoint(pos.X, pos.Y)))
+                if (pages.Find(p => p is InventoryPage) is InventoryPage ip && ip.inventory.inventory.Exists(c => int.Parse(c.name) is int i && i > 0 && i < ip.inventory.actualInventory.Count &&  ip.inventory.actualInventory[i] is WateringCan && c.containsPoint(pos.X, pos.Y)))
                     return true;
             }
             return false;

@@ -191,7 +191,7 @@ namespace CustomFarmingRedux
 
         public override Item getOne()
         {
-            return new CustomObject(ParentSheetIndex, Stack, _name, input, blueprint);
+            return new CustomObject(ParentSheetIndex, 1, _name, input, blueprint);
         }
 
         public override string DisplayName { get => cname; set => base.DisplayName = value; }

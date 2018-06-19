@@ -11,6 +11,7 @@ using SFarmer = StardewValley.Farmer;
 using PyTK.Extensions;
 using PyTK.Types;
 using StardewValley.Tools;
+using PyTK;
 
 namespace CustomFarmingRedux
 {
@@ -34,7 +35,8 @@ namespace CustomFarmingRedux
         private bool wasBuild = false;
         private bool isWorking { get => active && !readyForHarvest && ((completionTime != null && activeRecipe != null) || blueprint.production == null); }
         private string id;
-        private STime completionTime = null;
+        private string conditions = null;
+        private STime completionTime;
         private int tileindex;
         private Rectangle tilesize = new Rectangle(0, 0, 16, 32);
         private int _frame = 0;
@@ -43,8 +45,9 @@ namespace CustomFarmingRedux
         private int counter = 0;
         private RecipeBlueprint activeRecipe;
         private RecipeBlueprint starterRecipe;
-        private GameLocation location;
+        public GameLocation location;
         private CustomObjectData data;
+        private bool meetsConditions = true;
         private int frame {
             get
             {
@@ -98,6 +101,7 @@ namespace CustomFarmingRedux
             this.blueprint = blueprint;
             texture = blueprint.getTexture();
             id = blueprint.fullid;
+            conditions = blueprint.workconditions;
             ParentSheetIndex = data.sdvId;
             bigCraftable.Value = true;
             type.Value = "Crafting";
@@ -145,7 +149,7 @@ namespace CustomFarmingRedux
             return result;
         }
 
-        private RecipeBlueprint findRecipeFor(Item item)
+        internal RecipeBlueprint findRecipeFor(Item item)
         {
             if (blueprint.production == null)
                 return null;
@@ -257,8 +261,18 @@ namespace CustomFarmingRedux
             if (completionTime == null)
                 completionTime = STime.CURRENT + recipe.time;
 
-            minutesUntilReady.Value = (completionTime - STime.CURRENT).timestamp;
+            meetsConditions = PyUtils.CheckEventConditions(conditions, this);
 
+            if (!meetsConditions)
+            {
+                completionTime = STime.CURRENT + STime.DAY;
+                completionTime.hour = 6;
+                completionTime.minute = 0;
+                completionTime += recipe.time;
+            }
+
+            minutesUntilReady.Value = (completionTime - STime.CURRENT).timestamp;
+            
             if (starterRecipe != null)
                 starterRecipe.consumeIngredients(items);
 
@@ -327,10 +341,13 @@ namespace CustomFarmingRedux
 
             if (animationFrames != 0)
             {
-                counter++;
-                counter = counter > skipFrame ? 0 : counter;
-                frame = counter == 0 ? frame + 1 : frame;
-                frame = frame >= animationFrames + 1 ? 1 : frame;
+                if (!blueprint.conditionalanimation || meetsConditions)
+                {
+                    counter++;
+                    counter = counter > skipFrame ? 0 : counter;
+                    frame = counter == 0 ? frame + 1 : frame;
+                    frame = frame >= animationFrames + 1 ? 1 : frame;
+                }
             }
             else if (animationFrames == 1)
                 frame = 1;
@@ -460,6 +477,17 @@ namespace CustomFarmingRedux
                 completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
             else
                 completionTime = STime.CURRENT;
+
+            meetsConditions = PyUtils.CheckEventConditions(conditions, this);
+
+            if (completionTime != null && completionTime > STime.CURRENT && !meetsConditions)
+            {
+                int minutesToCompletion = (completionTime - STime.CURRENT).timestamp;
+                completionTime = STime.CURRENT + STime.DAY;
+                completionTime.hour = 6;
+                completionTime.minute = 0;
+                completionTime += minutesToCompletion < 0 ? 0 : minutesToCompletion;
+            }
 
             Chest c = (Chest)replacement;
             tileLocation.Value = c.TileLocation;
@@ -641,14 +669,9 @@ namespace CustomFarmingRedux
         {
             Farmer farmer = t.getLastFarmerToUse();
 
-            if (heldObject.Value != null && !blueprint.asdisplay)
+            if (heldObject.Value != null && !blueprint.asdisplay && readyForHarvest)
             {
-                if (readyForHarvest)
-                {
                     deliverProduce(farmer, false);
-                    return false;
-                }
-                else
                     return false;
             }
 

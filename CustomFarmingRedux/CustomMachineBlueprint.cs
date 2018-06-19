@@ -49,6 +49,9 @@ namespace CustomFarmingRedux
         public string condition { get; set; }
         public string crafting { get; set; }
         public Texture2D texture2d { get; set; }
+        public string workconditions { get; set; } = "";
+        public bool conditionalanimation { get; set; } = false;
+
 
         public Texture2D getTexture(IModHelper helper = null)
         {

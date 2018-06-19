@@ -7,17 +7,19 @@
       "id": 0,
       "name": "Alien Idol",
       "legacy": "Platonymous.More.AlienIdol.json",
-      "description": "Produces Rare Seeds out of cosmic energy",
+      "description": "Produces Rare Seeds out of cosmic energy if placed outdoors",
       "category": "Crafting",
       "texture": "MoreMachines.png",
       "tileindex": 0,
       "pulsate": false,
       "frames": 4,
+      "workconditions": "LC caller.location.IsOutdoors",
+      "conditionalanimation": true,
       "crafting": "336 20 768 20",
       "production": [
         {
-          "index": 347,
-          "time": 1200
+          "item": "Rare Seed",
+          "time": 20
         }
       ]
     },

@@ -11,6 +11,7 @@ namespace CustomFarmingRedux
         public int exactquality { get; set; } = -1;
         public int stack { get; set; } = 1;
         public string name { get; set; } = "";
+        public string item { get => name; set => name = value; } 
         public int index
         {
             get

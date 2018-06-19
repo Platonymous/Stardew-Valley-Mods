@@ -16,7 +16,7 @@ namespace CustomFarmingRedux
     {
         internal IModHelper Helper = CustomFarmingReduxMod._helper;
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
-
+        internal Random rnd = new Random();
         public string _name = "";
         public string _description = "";
         public string _category = "";
@@ -75,14 +75,30 @@ namespace CustomFarmingRedux
                 if (bigcraftable)
                 {
                     if (_index <= 0 && item != "")
+                    {
+                        if (item.StartsWith("random:"))
+                        {
+                            string[] items = item.Split(':')[1].Split(',');
+                            return Game1.bigCraftablesInformation.getIndexByName(items[rnd.Next(0,items.Length)]);
+                        }
+                        else
                         _index = Game1.bigCraftablesInformation.getIndexByName(item);
+                    }
                     else if (_index <= 0 && name != "")
                         _index = Game1.bigCraftablesInformation.getIndexByName(name);
                 }
                 else
                 {
                     if (_index <= 0 && item != "")
-                        _index = Game1.objectInformation.getIndexByName(item);
+                    {
+                        if (item.StartsWith("random:"))
+                        {
+                            string[] items = item.Split(':')[1].Split(',');
+                            return Game1.objectInformation.getIndexByName(items[rnd.Next(0, items.Length)]);
+                        }
+                        else
+                            _index = Game1.objectInformation.getIndexByName(item);
+                    }
                     else if (_index <= 0 && name != "")
                         _index = Game1.objectInformation.getIndexByName(name);
                 }
@@ -271,7 +287,7 @@ namespace CustomFarmingRedux
                 s.name = String.Join(" ", namesplit);
             }
 
-            int compPrice = (int)(PyUtils.calc(price, new KeyValuePair<string, object>("input", input.Price), new KeyValuePair<string, object>("original", s.Price)));
+            int compPrice = (int)(PyUtils.calc(price, new KeyValuePair<string, object>("input", input == null ? 0 : input.Price), new KeyValuePair<string, object>("original", s.Price)));
             s.Price = compPrice;
 
             if(prefix || suffix || insert)
