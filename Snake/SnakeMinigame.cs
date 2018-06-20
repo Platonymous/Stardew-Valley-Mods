@@ -55,6 +55,7 @@ namespace Snake
         public string LastMusic { get; set; }
         public Texture2D Background { get; set; }
         public Color BackgroundColor { get; set; }
+        public int Highscore { get; set; }
 
         #endregion
 
@@ -62,6 +63,7 @@ namespace Snake
 
         public void Initialize(IModHelper helper)
         {
+            Highscore = 0;
             Random = new Random();
             BoardTexture = helper.Content.Load<Texture2D>(@"Assets/board.png");
             BoardDebug = helper.Content.Load<Texture2D>(@"Assets/board_debug.png");
@@ -291,6 +293,11 @@ namespace Snake
         public void unload()
         {
 
+        }
+
+        public bool doMainGameUpdates()
+        {
+            return false;
         }
 
         #endregion

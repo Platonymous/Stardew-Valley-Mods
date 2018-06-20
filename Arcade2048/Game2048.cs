@@ -410,6 +410,11 @@ namespace Arcade2048
 
         }
 
+        public bool doMainGameUpdates()
+        {
+            return false;
+        }
+
         #endregion
     }
 }

@@ -92,5 +92,10 @@ namespace ArcadePong
         {
             
         }
+
+        public bool doMainGameUpdates()
+        {
+            return false;
+        }
     }
 }
