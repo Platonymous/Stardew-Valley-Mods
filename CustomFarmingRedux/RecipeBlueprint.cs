@@ -277,7 +277,7 @@ namespace CustomFarmingRedux
 
         private SObject setNameAndQuality(SObject s, SObject input)
         {
-            s.Quality = quality;
+            s.Quality = quality == -1 ? input.Quality : quality;
             s.name = (prefix) ? input.name + " " + name : name;
             s.name = (suffix) ? s.name + " " + input.name : s.name;
             if (insert)
