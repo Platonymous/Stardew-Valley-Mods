@@ -13,6 +13,7 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace CustomShirts
 {
@@ -22,6 +23,7 @@ namespace CustomShirts
 
         internal static Dictionary<long, Texture2D> playerShirts = new Dictionary<long, Texture2D>();
         internal static Dictionary<long, int> playerBaseShirts = new Dictionary<long, int>();
+        internal static Dictionary<long, Color[]> playerBaseColors = new Dictionary<long, Color[]>();
         internal static List<ShirtPack> packs = new List<ShirtPack>();
         internal static List<Shirt> shirts = new List<Shirt>();
         internal static Texture2D vanillaShirts;
@@ -50,8 +52,24 @@ namespace CustomShirts
                       if (playerBaseShirts.ContainsKey(s.FarmerId))
                           playerBaseShirts.Remove(s.FarmerId);
 
-                      playerShirts.Add(s.FarmerId, (ScaledTexture2D)s.Texture.getTexture());
-                      playerBaseShirts.Add(s.FarmerId, s.BaseShirt);
+                      if (playerBaseColors.ContainsKey(s.FarmerId))
+                          playerBaseColors.Remove(s.FarmerId);
+
+                      try
+                      {
+                          playerShirts.Add(s.FarmerId, (ScaledTexture2D)s.Texture.getTexture());
+                          playerBaseShirts.Add(s.FarmerId, s.BaseShirt);
+
+                          if (s.BaseColors is int[][] colors && colors.Length == 3)
+                          {
+                              Color[] baseColors = new Color[3] { new Color(colors[0][0], colors[0][1], colors[0][2]), new Color(colors[1][0], colors[1][1], colors[1][2]), new Color(colors[2][0], colors[2][1], colors[2][2]) };
+                              playerBaseColors.Add(s.FarmerId, baseColors);
+                          }
+                      }
+                      catch
+                      {
+
+                      }
                   }
                   catch (Exception e)
                   {
@@ -62,7 +80,7 @@ namespace CustomShirts
 
             ShirtReloader = new PyResponder<long, long>(ShirtReloaderName, (s) =>
             {
-                loadJersey();
+                loadShirt();
                 return Game1.player.UniqueMultiplayerID;
             }, 60);
 
@@ -75,7 +93,7 @@ namespace CustomShirts
             HarmonyInstance harmony = HarmonyInstance.Create("Platonymous.CustomShirts");
             harmony.Patch(typeof(FarmerRenderer).GetMethod("drawHairAndAccesories"), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Prefix_drawHairAndAccesories")), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Postfix_drawHairAndAccesories")));
             harmony.Patch(typeof(Farmer).GetMethod("changeShirt"), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Prefix_changeShirt")), null);
-
+            harmony.Patch(typeof(FarmerRenderer).GetMethod("doChangeShirt", BindingFlags.NonPublic | BindingFlags.Instance), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Prefix_doChangeShirt")), null);
             loadContentPacks();
 
             if(config.SwitchKey != Keys.Escape)
@@ -85,26 +103,32 @@ namespace CustomShirts
             {
                 if (recolor)
                 {
-                    OvFarmerRenderer.recolorShirt();
+                    OvFarmerRenderer.recolorShirt(Game1.player.UniqueMultiplayerID);
                     recolor = false;
                 }
             };
 
             SaveEvents.AfterLoad += (s, e) =>
             {
-                setJersey();
-                loadJersey();
+                setShirt();
+                PyUtils.setDelayedAction(500, () =>
+                 {
+                     OvFarmerRenderer.Prefix_doChangeShirt(Game1.player.FarmerRenderer, Game1.player.shirt.Value);
+                     OvFarmerRenderer.recolorShirt(Game1.player.UniqueMultiplayerID);
+                     foreach (Farmer f in Game1.otherFarmers.Values)
+                         OvFarmerRenderer.Prefix_doChangeShirt(f.FarmerRenderer, f.shirt.Value);
+                 });
                 PyNet.sendRequestToAllFarmers<long>(ShirtReloaderName, Game1.player.UniqueMultiplayerID, null);
             };
 
             MenuEvents.MenuClosed += (s, e) =>
             {
                 if (e.PriorMenu is CharacterCustomization || e.PriorMenu.GetType().Name.ToLower().Contains("character"))
-                    setJersey(true);
+                    setShirt(true);
             };
 
             foreach (SavedShirt sj in config.SavedShirts)
-                loadJersey(sj.Id, false);
+                loadShirt(sj.Id, false);
         }
 
         private void loadContentPacks()
@@ -113,17 +137,28 @@ namespace CustomShirts
             {
                 ShirtPack shirtPack = pack.ReadJsonFile<ShirtPack>("content.json");
 
+                int c = 0;
                 foreach (Shirt shirt in shirtPack.shirts)
                 {
+                    c++;
+
+                    if (shirt.id == "none")
+                        shirt.id = "shirt" + c;
+
+                    Texture2D texture = pack.LoadAsset<Texture2D>(shirt.texture);
+
+                    if (texture.Width > (8 * shirt.scale))
+                        texture = texture.getTile(shirt.tileindex, (int)(8 * shirt.scale), (int) (32 * shirt.scale));
+
                     shirt.fullid = pack.Manifest.UniqueID + "." + shirt.id;
-                    shirt.texture2d = ScaledTexture2D.FromTexture(vanillaShirts, pack.LoadAsset<Texture2D>(shirt.texture), shirt.scale);
+                    shirt.texture2d = ScaledTexture2D.FromTexture(vanillaShirts, texture, shirt.scale);
                     shirts.Add(shirt);
                 }
             }
         }
 
 
-        private void setJersey(bool fromDresser = false)
+        private void setShirt(bool fromDresser = false)
         {
             Shirt shirt = new Shirt();
 
@@ -145,11 +180,13 @@ namespace CustomShirts
             if (shirt.fullid != "none")
             {
                 Game1.player.changeShirt(shirt.baseid - 1);
-                loadJersey();
+                loadShirt();
             }
+            else
+                PyNet.sendRequestToAllFarmers<bool>(ShirtSyncerName, new ShirtSync(PyUtils.getRectangle(1, 1, Color.White), -9999, Game1.player.UniqueMultiplayerID), null, SerializationType.JSON, 1000);
         }
 
-        private void loadJersey(long mid = -1, bool sendAround = true)
+        public void loadShirt(long mid = -1, bool sendAround = true)
         {
             if (mid == -1)
                 mid = Game1.player.UniqueMultiplayerID;
