@@ -1,10 +1,15 @@
 {
   "Name": "Portraiture",
   "Author": "Platonymous",
-  "Version": "1.5.5",
+  "Version": "1.6.1",
   "Description": "Helper Mod for Portraits.",
   "UniqueID": "Platonymous.Portraiture",
   "EntryDll": "Portraiture.dll",
   "MinimumApiVersion": "2.6-beta",
-  "UpdateKeys": [ "Nexus:999" ]
+  "UpdateKeys": [ "Nexus:999" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ]
 }

@@ -5,6 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CDDBC248-8B88-4B29-9AB6-49D9AE9F60E1}</ProjectGuid>
+    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Portraiture</RootNamespace>
@@ -52,7 +53,12 @@
     <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
       <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
       <Name>Harmony</Name>
-      <Private>True</Private>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\PyTK\PyTK.csproj">
+      <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
+      <Name>PyTK</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

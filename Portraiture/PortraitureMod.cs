@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-
 using StardewValley;
 using StardewValley.Menus;
 using System;
@@ -18,7 +17,6 @@ namespace Portraiture
         public static IModHelper helper;
         private static Mod instance;
         internal static PConfig config;
-        internal static Texture2D activeTexure;
         
         public override void Entry(IModHelper help)
         {
@@ -77,9 +75,6 @@ namespace Portraiture
             string activeFolderText = TextureLoader.getFolderName();
 
             activeFolderText = activeFolderText.Replace('_', ' ');
-
-            if (activeTexure is Texture2D texture && texture.Width > 128)
-                activeFolderText = "= " + activeFolderText;
 
             int textlength = (int)Game1.smallFont.MeasureString(activeFolderText).X;
             int textheight = (int)Game1.smallFont.MeasureString(activeFolderText).Y;

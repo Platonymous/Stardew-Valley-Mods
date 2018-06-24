@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewValley.Menus;
+using PyTK.Types;
 
 namespace Portraiture
 {
@@ -14,7 +15,7 @@ namespace Portraiture
         private static string contentFolder;
         internal static int activeFolder;
         private static List<string> folders;
-        static Dictionary<string, Texture2D> pTextures;
+        static Dictionary<string, ScaledTexture2D> pTextures;
 
         public static void loadTextures()
         {
@@ -22,7 +23,7 @@ namespace Portraiture
             contentFolder = Path.Combine(PortraitureMod.helper.DirectoryPath, "Portraits");
             folders = new List<string>();
             folders.Add("Vanilla");
-            pTextures = new Dictionary<string, Texture2D>();
+            pTextures = new Dictionary<string, ScaledTexture2D>();
             loadAllPortraits();
 
             string loadConfig = PortraitureMod.config.active;
@@ -44,7 +45,7 @@ namespace Portraiture
             return Game1.getSourceRectForStandardTileSheet(texture, index, textureSize, textureSize);
         }
 
-        public static Texture2D getPortrait(string name)
+        public static ScaledTexture2D getPortrait(string name)
         {
             activeFolder = Math.Max(activeFolder, 0);
 
@@ -71,11 +72,22 @@ namespace Portraiture
 
                     if (extention == "xnb")
                         fileName = name;
-
-                    if (!pTextures.ContainsKey(folderName + ">" + name))
-                        pTextures.Add(folderName + ">" + name, PortraitureMod.helper.Content.Load<Texture2D>($"Portraits/{folderName}/{fileName}"));
+                    Texture2D texture = PortraitureMod.helper.Content.Load<Texture2D>($"Portraits/{folderName}/{fileName}");
+                    int tileWith = Math.Max(texture.Width / 2, 64);
+                    float scale = tileWith / 64;
+                    ScaledTexture2D scaled;
+                    try
+                    {
+                        scaled = ScaledTexture2D.FromTexture(Game1.getCharacterFromName(name).Portrait, texture, scale);
+                    }
+                    catch
+                    {
+                        scaled = ScaledTexture2D.FromTexture(Game1.getCharacterFromName("Pierre").Portrait, texture, scale);
+                    }
+                        if (!pTextures.ContainsKey(folderName + ">" + name))
+                        pTextures.Add(folderName + ">" + name, scaled);
                     else
-                        pTextures[folderName + ">" + name] = PortraitureMod.helper.Content.Load<Texture2D>($"Portraits/{folderName}/{fileName}");
+                        pTextures[folderName + ">" + name] = scaled;
                 }
             }
         }
