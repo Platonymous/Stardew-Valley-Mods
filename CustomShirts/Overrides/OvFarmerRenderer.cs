@@ -186,8 +186,13 @@ namespace CustomShirts.Overrides
                 {
                     int id = CustomShirtsMod.playerBaseShirts[mid] - 1;
                     if (id < 0)
-                        id = Game1.otherFarmers[mid].shirt.Value;
+                    {
+                        if (Game1.otherFarmers.ContainsKey(mid))
+                            id = Game1.otherFarmers[mid].shirt.Value;
+                        else
+                            id = 19;
 
+                    }
                     Color[] data = new Color[CustomShirtsMod.vanillaShirts.Bounds.Width * CustomShirtsMod.vanillaShirts.Bounds.Height];
                     CustomShirtsMod.vanillaShirts.GetData<Color>(data);
                     int index = id * 8 / CustomShirtsMod.vanillaShirts.Bounds.Width * 32 * 128 + id * 8 % CustomShirtsMod.vanillaShirts.Bounds.Width + CustomShirtsMod.vanillaShirts.Width * 4;

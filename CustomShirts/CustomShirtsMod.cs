@@ -156,48 +156,50 @@ namespace CustomShirts
 
         private void loadContentPacks()
         {
-            foreach(StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
+            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
             {
                 ShirtPack shirtPack = pack.ReadJsonFile<ShirtPack>("content.json");
 
                 int c = 0;
-                foreach (Shirt shirt in shirtPack.shirts)
-                {
-                    c++;
+                if (shirtPack.shirts != null && shirtPack.shirts.Count > 0)
+                    foreach (Shirt shirt in shirtPack.shirts)
+                    {
+                        c++;
 
-                    if (shirt.id == "none")
-                        shirt.id = "shirt" + c;
+                        if (shirt.id == "none")
+                            shirt.id = "shirt" + c;
 
-                    Texture2D texture = pack.LoadAsset<Texture2D>(shirt.texture);
+                        Texture2D texture = pack.LoadAsset<Texture2D>(shirt.texture);
 
-                    if (texture.Width > (8 * shirt.scale))
-                        texture = texture.getTile(shirt.tileindex, (int)(8 * shirt.scale), (int) (32 * shirt.scale));
+                        if (texture.Width > (8 * shirt.scale))
+                            texture = texture.getTile(shirt.tileindex, (int)(8 * shirt.scale), (int)(32 * shirt.scale));
 
-                    shirt.fullid = pack.Manifest.UniqueID + "." + shirt.id;
-                    shirt.texture2d = ScaledTexture2D.FromTexture(vanillaShirts, texture, shirt.scale);
-                    shirts.Add(shirt);
-                }
+                        shirt.fullid = pack.Manifest.UniqueID + "." + shirt.id;
+                        shirt.texture2d = ScaledTexture2D.FromTexture(vanillaShirts, texture, shirt.scale);
+                        shirts.Add(shirt);
+                    }
 
                 c = 0;
-                foreach (HatBlueprint hat in shirtPack.hats)
-                {
-                    c++;
+                if (shirtPack.hats != null && shirtPack.hats.Count > 0)
+                    foreach (HatBlueprint hat in shirtPack.hats)
+                    {
+                        c++;
 
-                    if (hat.id == "none")
-                        hat.id = "hat" + c;
+                        if (hat.id == "none")
+                            hat.id = "hat" + c;
 
-                    Texture2D texture = pack.LoadAsset<Texture2D>(hat.texture);
+                        Texture2D texture = pack.LoadAsset<Texture2D>(hat.texture);
 
-                    if (texture.Width > (20 * hat.scale))
-                        texture = texture.getTile(hat.tileindex, (int)(20 * hat.scale), (int)(80 * hat.scale));
+                        if (texture.Width > (20 * hat.scale))
+                            texture = texture.getTile(hat.tileindex, (int)(20 * hat.scale), (int)(80 * hat.scale));
 
-                    hat.fullid = pack.Manifest.UniqueID + "." + hat.id;
-                    hat.texture2d = ScaledTexture2D.FromTexture(vanillaHats, texture, hat.scale);;
-                    hats.Add(hat);
+                        hat.fullid = pack.Manifest.UniqueID + "." + hat.id;
+                        hat.texture2d = ScaledTexture2D.FromTexture(vanillaHats, texture, hat.scale); ;
+                        hats.Add(hat);
 
-                    InventoryItem hatItem = new InventoryItem(new CustomHat(hat), hat.price, 1);
-                    hatItem.addToHatShop();
-                }
+                        InventoryItem hatItem = new InventoryItem(new CustomHat(hat), hat.price, 1);
+                        hatItem.addToHatShop();
+                    }
             }
         }
 

@@ -56,14 +56,17 @@ namespace CustomShirts
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
             if (texture is ScaledTexture2D st)
+            {
                 st.ForcedSourceRectangle = new Rectangle(0, 0, (int)(20 * st.Scale), (int)(20 * st.Scale));
-
-            spriteBatch.Draw(texture, location + new Vector2(10f, 10f), new Rectangle?(new Rectangle(blueprint.baseid * 20 % FarmerRenderer.hatsTexture.Width, blueprint.baseid * 20 / FarmerRenderer.hatsTexture.Width * 20 * 4, 20, 20)), color * transparency, 0.0f, new Vector2(3f, 3f), 3f * scaleSize, SpriteEffects.None, layerDepth);
-        }
+                spriteBatch.Draw(texture, location + new Vector2(10f, 10f), new Rectangle?(new Rectangle(blueprint.baseid * 20 % FarmerRenderer.hatsTexture.Width, blueprint.baseid * 20 / FarmerRenderer.hatsTexture.Width * 20 * 4, 20, 20)), color * transparency, 0.0f, new Vector2(3f, 3f), 3f * scaleSize, SpriteEffects.None, layerDepth);
+            }
+            else
+                base.drawInMenu(spriteBatch, location, scaleSize, transparency, layerDepth, drawStackNumber, color, drawShadow);
+            }
 
         public static bool Prefix_drawInMenu(Hat __instance, SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
-            if (__instance is CustomHat hat)
+            if (__instance is CustomHat hat && hat.texture is ScaledTexture2D)
             {
                 hat.drawInMenu(spriteBatch, location, scaleSize, transparency, layerDepth, drawStackNumber, color, drawShadow);
                 return false;
@@ -131,8 +134,10 @@ namespace CustomShirts
             string id = additionalSaveData["blueprint"];
             int baseid = 0;
 
-            if(additionalSaveData.ContainsKey("which"))
+            if (additionalSaveData.ContainsKey("which"))
                 baseid = int.Parse(additionalSaveData["which"]);
+            else if (replacement is Hat ht)
+                baseid = ht.which.Value;
 
             if (CustomShirtsMod.hats.Find(h => h.fullid == id) is HatBlueprint hb)
                 return new CustomHat(hb);
