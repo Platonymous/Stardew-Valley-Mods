@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Linq;
 using StardewValley;
 using PyTK.Types;
+using StardewValley.Menus;
 
 namespace PyTK.Overrides
 {
@@ -18,9 +19,20 @@ namespace PyTK.Overrides
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
-        internal static bool replaceNext = false;
-        internal static CustomObjectData nextData;
         internal static Dictionary<object, CustomObjectData> dataChache = new Dictionary<object, CustomObjectData>();
+        internal static MethodInfo drawMethodMono = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
+        internal static MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics"), "InternalDraw");
+        internal static Dictionary<Rectangle, CustomObjectData> recCache = new Dictionary<Rectangle, CustomObjectData>();
+
+        internal static CustomObjectData getDataFromSourceRectangle(Rectangle source)
+        {
+            if (recCache.ContainsKey(source))
+                return recCache[source];
+
+            CustomObjectData data = CustomObjectData.collection.Find(o => o.Value.sdvSourceRectangle == source) is KeyValuePair<string, CustomObjectData> d ? d.Value : null;
+            recCache.Add(source, data);
+            return data;
+        }
 
         [HarmonyPatch]
         internal class SpriteBatchFixMono
@@ -37,36 +49,37 @@ namespace PyTK.Overrides
 
             internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth, ref bool autoFlush)
             {
+                if (skip)
+                    return true;
+
                 if (!skip && texture is ScaledTexture2D s && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
                 {
-                    var newDestination = new Vector4(destinationRectangle.X + s.DestinationPositionAdjustment.X, destinationRectangle.Y + s.DestinationPositionAdjustment.Y, destinationRectangle.Z / s.Scale, destinationRectangle.W / s.Scale);
-                    var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale) + (int) s.SourcePositionAdjustment.X, (int)(r.Y * s.Scale) + (int) s.SourcePositionAdjustment.Y, (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
+                    var newDestination = new Vector4(destinationRectangle.X, destinationRectangle.Y, destinationRectangle.Z / s.Scale, destinationRectangle.W / s.Scale);
+                    var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
+                    var newOrigin = new Vector2(origin.X * s.Scale, origin.Y * s.Scale);
 
                     if (s.ForcedSourceRectangle.HasValue)
                         newSR = s.ForcedSourceRectangle.Value;
 
                     skip = true;
-                    MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
-                    drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, newSR, color, rotation, origin, effect, depth, autoFlush });
+                    drawMethodMono.Invoke(__instance, new object[] { s.STexture, newDestination, newSR, color, rotation, newOrigin, effect, depth, autoFlush });
                     skip = false;
                     return false;
                 }
 
-                if (!replaceNext)
-                    return true;
-
-                if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle)
+                if (!(Game1.activeClickableMenu is TitleMenu) && texture.Tag is String && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle sr)
                 {
-                    replaceNext = false;
+                    CustomObjectData data = getDataFromSourceRectangle(sr);
 
-                    if (nextData.texture == null)
+                    if(data != null)
+                    {
+                        skip = true;
+                        drawMethodMono.Invoke(__instance, new object[] { data.texture, destinationRectangle, data.sourceRectangle, data.color != Color.White ? data.color : color, rotation, origin, effect, depth, autoFlush });
+                        skip = false;
                         return false;
-
-                    MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
-                    drawMethod.Invoke(__instance, new object[] { nextData.texture, destinationRectangle, nextData.sourceRectangle, nextData.color != Color.White ? nextData.color : color, rotation, origin, effect, depth, autoFlush });
-                    return false;
+                    }
                 }
-
+               
                 return true;
             }
 
@@ -88,36 +101,37 @@ namespace PyTK.Overrides
 
             internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
             {
+                if (skip)
+                    return true;
+                
                 if (!skip && texture is ScaledTexture2D s && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
                 {
-                    var newDestination = new Vector4(destination.X + s.DestinationPositionAdjustment.X, destination.Y + s.DestinationPositionAdjustment.Y, destination.Z / s.Scale, destination.W / s.Scale);
-                    var newSR = new Rectangle?(new Rectangle((int) (r.X * s.Scale) + (int) s.SourcePositionAdjustment.X, (int)(r.Y * s.Scale) + (int)s.SourcePositionAdjustment.Y, (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
+                    var newDestination = new Vector4(destination.X, destination.Y, destination.Z / s.Scale, destination.W / s.Scale);
+                    var newSR = new Rectangle?(new Rectangle((int) (r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
+                    var newOrigin = new Vector2(origin.X * s.Scale, origin.Y * s.Scale);
 
                     if (s.ForcedSourceRectangle.HasValue)
                         newSR = s.ForcedSourceRectangle.Value;
 
                     skip = true;
-                    MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics"), "InternalDraw");
-                    drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, scaleDestination, newSR, color, rotation, origin, effects, depth });
+                    drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, scaleDestination, newSR, color, rotation, newOrigin, effects, depth });
                     skip = false;
                     return false;
                 }
                 
-                if (!replaceNext)
-                    return true;
-
-                if (sourceRectangle.HasValue && sourceRectangle == nextData.sdvSourceRectangle)
+                if (!(Game1.activeClickableMenu is TitleMenu) && texture.Tag is String && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle sr)
                 {
-                    replaceNext = false;
+                    CustomObjectData data = getDataFromSourceRectangle(sr);
 
-                    if (nextData.texture == null)
+                    if (data != null)
+                    {
+                        skip = true;
+                        drawMethod.Invoke(__instance, new object[] { data.texture, destination, scaleDestination, data.sourceRectangle, data.color != Color.White ? data.color : color, rotation, origin, effects, depth });
+                        skip = false;
                         return false;
-
-                    MethodInfo drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics"), "InternalDraw");
-                    drawMethod.Invoke(__instance, new object[] { nextData.texture, destination, scaleDestination, nextData.sourceRectangle, nextData.color != Color.White ? nextData.color : color, rotation, origin, effects, depth });
-                    return false;
+                    }
                 }
-
+              
                 return true;
             }
 
@@ -135,70 +149,6 @@ namespace PyTK.Overrides
             internal void InternalDraw(Texture2D texture, ref Vector4 destination, bool scaleDestination, ref Rectangle? sourceRectangle, Color color, float rotation, ref Vector2 origin, SpriteEffects effects, float depth)
             {
                 return;
-            }
-        }
-        
-        internal class DrawFix1
-        {
-            public static void prefix(ref SObject __instance)
-            {
-                CustomObjectData c = null;
-
-                if (dataChache.ContainsKey(__instance))
-                    c = dataChache[__instance];
-                else if (!SaveHandler.hasSaveType(__instance) || __instance is IDrawFromCustomObjectData)
-                {
-                    SObject obj = __instance;
-                    c = __instance is IDrawFromCustomObjectData draw ? draw.data : CustomObjectData.collection.Find(o => o.Value.sdvId == obj.ParentSheetIndex && o.Value.bigCraftable == obj.bigCraftable.Value).Value;
-                    dataChache.AddOrReplace(__instance, c);
-                }
-                else
-                    dataChache.AddOrReplace(__instance, c);
-
-                if (c != null)
-                {
-                    replaceNext = true;
-                    nextData = c;
-                }
-                else
-                    replaceNext = false;
-            }
-
-            public static void postfix(ref SObject __instance)
-            {
-                    replaceNext = false;
-            }
-        }
-
-        internal class DrawFix2
-        {
-            public static void prefix(ref TemporaryAnimatedSprite __instance, string ___textureName)
-            {
-                CustomObjectData c = null;
-
-                if (dataChache.ContainsKey(__instance))
-                    c = dataChache[__instance];
-                else if (___textureName == "Maps\\springobjects")
-                {
-                    TemporaryAnimatedSprite obj = __instance;
-                    c = __instance is IDrawFromCustomObjectData draw ? draw.data : CustomObjectData.collection.Find(o => o.Value.sdvSourceRectangle == obj.sourceRect && o.Value.bigCraftable == false).Value;
-                    dataChache.AddOrReplace(__instance, c);
-                }
-                else
-                    dataChache.AddOrReplace(__instance, c);
-
-                if (c != null)
-                {
-                    replaceNext = true;
-                    nextData = c;
-                }
-                else
-                    replaceNext = false;
-            }
-
-            public static void postfix(ref SObject __instance)
-            {
-                replaceNext = false;
             }
         }
 

@@ -5,14 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
-using Netcode;
 using Newtonsoft.Json;
 using PyTK.ContentSync;
+using Netcode;
 
 namespace PyTK.Types
 {
+    /*
     public class PyNetTexture : NetField<Texture2D, PyNetTexture>
     {
+        
         public PyNetTexture()
         {
         }
@@ -25,10 +27,9 @@ namespace PyTK.Types
         {
             string str = (string)null;
 
-           
-                if (reader.ReadBoolean())
-                    str = reader.ReadString();
-            
+            if (reader.ReadBoolean())
+                str = reader.ReadString();
+
             if (!version.IsPriorityOver(this.ChangeVersion))
                 return;
 
@@ -37,7 +38,7 @@ namespace PyTK.Types
                 CleanSet(null, false);
                 return;
             }
-            
+
             Texture2D tex = JsonConvert.DeserializeObject<SerializationTexture2D>(PyNet.DecompressString(str)).getTexture();
             CleanSet(tex, false);
         }
@@ -49,5 +50,7 @@ namespace PyTK.Types
                 return;
             writer.Write(PyNet.CompressString(JsonConvert.SerializeObject(new SerializationTexture2D(value))));
         }
+        
     }
+    */
 }

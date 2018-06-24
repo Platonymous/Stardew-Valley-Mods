@@ -9,6 +9,7 @@ using SObject = StardewValley.Object;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PyTK.Overrides;
 
 namespace PyTK.CustomElementHandler
 {
@@ -111,6 +112,9 @@ namespace PyTK.CustomElementHandler
             sdvId = getNewSDVId();
 
             collection.AddOrReplace(id, this);
+
+            if (OvSpritebatch.recCache.ContainsKey(sdvSourceRectangle))
+                OvSpritebatch.recCache.Remove(sdvSourceRectangle);
 
             if(inventoryCheck == null)
                 inventoryCheck = new ItemSelector<Item>(i => collection.Exists(c => c.Value.sdvId == i.ParentSheetIndex && (!(i is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable))).whenAddedToInventory(l => l.useAll(x => Game1.player.Items[new List<Item>(Game1.player.Items).FindIndex(o => o == x)] = collection.Find(c => c.Value.sdvId == x.ParentSheetIndex && (!(x is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable)).Value.getObject(x)));

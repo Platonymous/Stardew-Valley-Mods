@@ -44,7 +44,7 @@ namespace PyTK
         {
             _helper = helper;
             _monitor = Monitor;
-
+           
             //testing();
             //messageTest()
 
@@ -59,13 +59,14 @@ namespace PyTK
             PyLua.init();
             SaveHandler.setUpEventHandlers();
             ContentSync.ContentSyncHandler.initialize();
+            PlayerEvents.Warped += (s, e) => e.NewLocation?.Map.enableMoreMapLayers();
         }
 
         private void harmonyFix()
         {
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.PyTK");
-            PyUtils.initOverride("SObject", PyUtils.getTypeSDV("Object"),typeof(DrawFix1), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
-            PyUtils.initOverride("TemporaryAnimatedSprite", PyUtils.getTypeSDV("TemporaryAnimatedSprite"),typeof(DrawFix2), new List<string>() { "draw" });
+           // PyUtils.initOverride("SObject", PyUtils.getTypeSDV("Object"),typeof(DrawFix1), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
+           // PyUtils.initOverride("TemporaryAnimatedSprite", PyUtils.getTypeSDV("TemporaryAnimatedSprite"),typeof(DrawFix2), new List<string>() { "draw" });
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 

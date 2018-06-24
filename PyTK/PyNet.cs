@@ -100,47 +100,47 @@ namespace PyTK
 
         public static async Task<T> sendRequestToFarmer<T>(string address, object request, Farmer farmer, Action<T> callback = null, SerializationType serializationType = SerializationType.PLAIN, int timeout = 500, XmlSerializer xmlSerializer = null)
         {
-            long fromFarmer = farmer.UniqueMultiplayerID;
+                long fromFarmer = farmer.UniqueMultiplayerID;
 
-            if (xmlSerializer == null)
-                xmlSerializer = new XmlSerializer(typeof(T));
+                if (xmlSerializer == null)
+                    xmlSerializer = new XmlSerializer(typeof(T));
 
-            object objectData = request;
+                object objectData = request;
 
-            if (serializationType == SerializationType.XML)
-            {
-                StringWriter writer = new StringWriter();
-                xmlSerializer.Serialize(writer, request);
-                objectData = writer.ToString();
-            }
-            else if (serializationType == SerializationType.JSON)
-                objectData = JsonConvert.SerializeObject(request);
-
-            Int16 id = (Int16)random.Next(Int16.MinValue, Int16.MaxValue);
-            string returnAddress = address + "." + id;
-            PyMessenger<T> messenger = new PyMessenger<T>(returnAddress);
-            sendMessage(new MPMessage(address, Game1.player, objectData, id, fromFarmer));
-
-            object result = await Task.Run(() =>
-            {
-                while (true)
+                if (serializationType == SerializationType.XML)
                 {
-                    List<T> msgs = new List<T>(messenger.receive());
-                    if (msgs.Count() > 0)
-                    {
-                        messages.Remove(returnAddress);
-                        return msgs[0];
-                    }
-
-                    timeout--;
-
-                    if (timeout < 0)
-                        return default(T);
-                    Thread.Sleep(1);
+                    StringWriter writer = new StringWriter();
+                    xmlSerializer.Serialize(writer, request);
+                    objectData = writer.ToString();
                 }
-            });
-            callback?.Invoke((T)result);
-            return (T)result;
+                else if (serializationType == SerializationType.JSON)
+                    objectData = JsonConvert.SerializeObject(request);
+
+                Int16 id = (Int16)random.Next(Int16.MinValue, Int16.MaxValue);
+                string returnAddress = address + "." + id;
+                PyMessenger<T> messenger = new PyMessenger<T>(returnAddress);
+                sendMessage(new MPMessage(address, Game1.player, objectData, id, fromFarmer));
+
+                object result = await Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        List<T> msgs = new List<T>(messenger.receive());
+                        if (msgs.Count() > 0)
+                        {
+                            messages.Remove(returnAddress);
+                            return msgs[0];
+                        }
+
+                        timeout--;
+
+                        if (timeout < 0)
+                            return default(T);
+                        Thread.Sleep(1);
+                    }
+                });
+                callback?.Invoke((T)result);
+                return (T)result;
         }
 
 
@@ -189,7 +189,7 @@ namespace PyTK
 
             foreach (TileSheet t in map.TileSheets)
                 {
-                    if (t.ImageSource.StartsWith("z"))
+                    if (t.Id.StartsWith("z"))
                     {
                         Texture2D texture = null;
 

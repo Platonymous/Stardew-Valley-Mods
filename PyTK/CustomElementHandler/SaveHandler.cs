@@ -46,7 +46,7 @@ namespace PyTK.CustomElementHandler
         private static List<Func<string, string>> preProcessors = new List<Func<string, string>>();
         private static List<Func<object, object>> objectPreProcessors = new List<Func<object, object>>();
 
-        internal static bool hasSaveType(object o)
+        public static bool hasSaveType(object o)
         {
             return (o is ISaveElement || ceh && o.GetType().GetInterfaces().Contains(cehType));
         }
@@ -119,13 +119,47 @@ namespace PyTK.CustomElementHandler
             SaveEvents.AfterSave += (s, e) => Rebuild();
             SaveEvents.AfterLoad += (s, e) => Rebuild();
             Events.PyTimeEvents.BeforeSleepEvents += (s, e) => { if (Game1.IsClient) { Replace(); } };
-
+            TimeEvents.AfterDayStarted += (s, e) => {
+                    Game1.objectSpriteSheet.Tag = "cod_objects";
+                    Game1.bigCraftableSpriteSheet.Tag = "cod_bigobject";
+            };
             TypeChecker = new PyResponder<bool, string>(typeCheckerName, (s) =>
               {
                   return Type.GetType(s) != null;
               },16);
             TypeChecker.start();
+        }
 
+        private static bool isRebuildable(object o)
+        {
+            return getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix);
+        }
+
+        public static Dictionary<string,string> getAdditionalSaveData(object obj)
+        {
+            if (obj is ISaveElement ise)
+                return ise.getAdditionalSaveData();
+
+            if(isRebuildable(obj))
+            {
+                string dataString = getDataString(obj).Replace(" " + valueSeperator.ToString() + " ", valueSeperator.ToString());
+                string[] data = splitElemets(dataString);
+
+                Dictionary<string, string> additionalSaveData = new Dictionary<string, string>();
+
+                if (data.Length > 3)
+                    for (int i = 3; i < data.Length; i++)
+                    {
+                        if (!data[i].Contains(valueSeperator))
+                            continue;
+                        string[] entry = data[i].Split(valueSeperator);
+                        additionalSaveData.Add(entry[0], entry[1]);
+                    }
+
+                return additionalSaveData;
+            }
+
+            return null;
         }
 
         public static void RebuildAll(object obj, object parent)

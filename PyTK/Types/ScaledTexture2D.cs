@@ -8,8 +8,6 @@ namespace PyTK.Types
     {
         public float Scale{ get; set; }
         public Texture2D STexture { get; set; }
-        public Vector2 DestinationPositionAdjustment { get; set; } = Vector2.Zero;
-        public Vector2 SourcePositionAdjustment { get; set; } = Vector2.Zero;
         public Rectangle? ForcedSourceRectangle { get; set; } = null;
 
         public ScaledTexture2D(GraphicsDevice graphicsDevice, int width, int height)
@@ -32,20 +30,19 @@ namespace PyTK.Types
             STexture = tex;
         }
 
-        public ScaledTexture2D(GraphicsDevice graphicsDevice, int width, int height, Texture2D scaledTexture, float scale)
+        public ScaledTexture2D(GraphicsDevice graphicsDevice, int width, int height, Texture2D scaledTexture, float scale, Rectangle? forcedSourceRectangle = null)
             :base(graphicsDevice, width,height)
         {
             Scale = scale;
             STexture = scaledTexture;
+            ForcedSourceRectangle = forcedSourceRectangle;
         }
 
-        public static ScaledTexture2D FromTexture(Texture2D orgTexture, Texture2D scaledTexture, float scale)
+        public static ScaledTexture2D FromTexture(Texture2D orgTexture, Texture2D scaledTexture, float scale, Rectangle? forcedSourceRectangle = null)
         {
             Color[] data = new Color[orgTexture.Width * orgTexture.Height];
             orgTexture.GetData(data);
-            ScaledTexture2D result = new ScaledTexture2D(orgTexture.GraphicsDevice, orgTexture.Width,orgTexture.Height,scaledTexture,scale);
-            result.STexture = scaledTexture;
-            result.Scale = scale;
+            ScaledTexture2D result = new ScaledTexture2D(orgTexture.GraphicsDevice, orgTexture.Width,orgTexture.Height,scaledTexture,scale,forcedSourceRectangle);
             result.SetData(data);
             return result;
         }

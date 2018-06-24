@@ -17,6 +17,7 @@ namespace PyTK.ContentSync
         public string ScaledData { get; set; }
         public int ScaledWidth { get; set; }
         public int ScaledHeight { get; set; }
+        public int[] ForcedSourceRectangle { get; set; }
 
         public SerializationTexture2D()
         {
@@ -36,6 +37,10 @@ namespace PyTK.ContentSync
                 Scale = st.Scale;
                 ScaledWidth = st.STexture.Width;
                 ScaledHeight = st.STexture.Height;
+                if (st.ForcedSourceRectangle.HasValue)
+                    ForcedSourceRectangle = new int[4] { st.ForcedSourceRectangle.Value.X, st.ForcedSourceRectangle.Value.Y, st.ForcedSourceRectangle.Value.Width, st.ForcedSourceRectangle.Value.Height };
+                else
+                    ForcedSourceRectangle = new int[4] { -1, -1, -1, -1 };
             }
 
             serialize(texture);
@@ -78,7 +83,7 @@ namespace PyTK.ContentSync
                 Texture2D stexture = new Texture2D(Game1.graphics.GraphicsDevice, ScaledWidth, ScaledHeight);
                 stexture.SetData(scolors);
 
-                texture = new ScaledTexture2D(Game1.graphics.GraphicsDevice, Width, Height, stexture, Scale);
+                texture = new ScaledTexture2D(Game1.graphics.GraphicsDevice, Width, Height, stexture, Scale, (ForcedSourceRectangle.Length > 0 && ForcedSourceRectangle[0] != -1) ? new Rectangle?(new Rectangle(ForcedSourceRectangle[0], ForcedSourceRectangle[1], ForcedSourceRectangle[2], ForcedSourceRectangle[3])) : null);
             }else
                 texture = new Texture2D(Game1.graphics.GraphicsDevice, Width, Height);
 

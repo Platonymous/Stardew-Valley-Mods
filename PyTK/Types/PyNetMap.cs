@@ -6,6 +6,7 @@ using System.Xml;
 
 namespace PyTK.Types
 {
+    /*
     public class PyNetMap : NetField<Map,PyNetMap>
     {
         private NewTiledTmxFormat format = new NewTiledTmxFormat();
@@ -47,4 +48,5 @@ namespace PyTK.Types
             writer.Write(PyNet.CompressString(format.AsString(value)));
         }
     }
+    */
 }

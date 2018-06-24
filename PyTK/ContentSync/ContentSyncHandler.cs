@@ -147,57 +147,86 @@ namespace PyTK.ContentSync
             if (instruction.type == (int) ContentType.DictInt)
             {
                 SerializableDictionary<int, string> asset = deserialize<SerializableDictionary<int, string>>(instruction);
-                asset.inject(instruction.assetName);
+                SerializableDictionary<int, string> content = null;
+                try
+                {
+                    content = Helper.Content.Load<SerializableDictionary<int, string>>(instruction.assetName, ContentSource.GameContent);
+                }
+                catch
+                {
+
+                }
+
+                if (content == null)
+                    asset.inject(instruction.assetName);
+                else
+                    asset.injectInto(instruction.assetName);
             }
 
             if (instruction.type == (int)ContentType.DictString)
             {
                 SerializableDictionary<string, string> asset = deserialize<SerializableDictionary<string, string>>(instruction);
-                asset.inject(instruction.assetName);
+
+                SerializableDictionary<string, string> content = null;
+                try
+                {
+                    content = Helper.Content.Load<SerializableDictionary<string, string>>(instruction.assetName, ContentSource.GameContent);
+                }
+                catch
+                {
+
+                }
+
+                if (content == null)
+                    asset.inject(instruction.assetName);
+                else
+                    asset.injectInto(instruction.assetName);
+
             }
 
             if (instruction.type == (int)ContentType.Texture)
             {
                 Texture2D asset = deserialize<Texture2D>(instruction);
-                asset.inject(instruction.assetName);
+                Texture2D content = null;
+                try
+                {
+                    content = Helper.Content.Load<Texture2D>(instruction.assetName, ContentSource.GameContent);
+                }
+                catch
+                {
+
+                }
+
+                if (content == null)
+                    asset.inject(instruction.assetName);
+                else
+                    asset.injectAs(instruction.assetName);
             }
 
             if (instruction.type == (int)ContentType.Map)
             {
                 Map asset = deserialize<Map>(instruction);
-                asset.inject(instruction.assetName);
+                Map content = null;
+                try
+                {
+                    content = Helper.Content.Load<Map>(instruction.assetName, ContentSource.GameContent);
+                }
+                catch
+                {
+
+                }
+
+                if(content == null)
+                    asset.inject(instruction.assetName);
+                else
+                    asset.injectAs(instruction.assetName);
             }
         }
 
         private static void incjectToGameContent(ContentResponse instruction, string[] assetNames)
         {
-            if (instruction.type == (int)ContentType.DictInt)
-            {
-                SerializableDictionary<int, string> asset = deserialize<SerializableDictionary<int, string>>(instruction);
-                foreach(string assetName in assetNames)
-                    asset.inject(assetName);
-            }
-
-            if (instruction.type == (int)ContentType.DictString)
-            {
-                SerializableDictionary<string, string> asset = deserialize<SerializableDictionary<string, string>>(instruction);
-                foreach (string assetName in assetNames)
-                    asset.inject(assetName);
-            }
-
-            if (instruction.type == (int)ContentType.Texture)
-            {
-                Texture2D asset = deserialize<Texture2D>(instruction);
-                foreach (string assetName in assetNames)
-                    asset.inject(assetName);
-            }
-
-            if (instruction.type == (int)ContentType.Map)
-            {
-                Map asset = deserialize<Map>(instruction);
-                foreach (string assetName in assetNames)
-                    asset.inject(assetName);
-            }
+            foreach (string asset in assetNames)
+                incjectToGameContent(instruction);
         }
 
         public static void addContent<T>(string assetName, T contentAsset)
