@@ -1,16 +1,24 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
+using PyTK;
+using PyTK.ContentSync;
+using PyTK.CustomElementHandler;
 using PyTK.Types;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Objects;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace CustomShirts.Overrides
 {
     internal class OvFarmerRenderer
     {
         public static bool addedFields = false;
+        public static List<string> requestedHatSyncs = new List<string>();
 
         internal static bool menuIsCC()
         {
@@ -19,7 +27,63 @@ namespace CustomShirts.Overrides
 
         public static void Prefix_drawHairAndAccesories(FarmerRenderer __instance, Farmer who, int facingDirection, Vector2 position, Vector2 origin, float scale, int currentFrame, float rotation, Color overrideColor)
         {
-            
+            if (Game1.activeClickableMenu is TitleMenu && who.hat.Value is Hat h && !(h is CustomHat) && SaveHandler.getAdditionalSaveData(h) is Dictionary<string, string> savdata)
+                if (savdata.ContainsKey("blueprint") && savdata["blueprint"] is string bid && CustomShirtsMod.hats.Find(bp => bp.fullid == bid) is HatBlueprint hbp)
+                    who.hat.Value = new CustomHat(hbp);
+
+            if (who.hat.Value is CustomHat c)
+            {
+                if (c.texture == null && CustomShirtsMod.syncedHats.ContainsKey(c.hatId + "." + who.UniqueMultiplayerID))
+                    c.texture = CustomShirtsMod.syncedHats[c.hatId + "." + who.UniqueMultiplayerID];
+
+                if (c.texture == null && !requestedHatSyncs.Contains(c.hatId + "." + who.UniqueMultiplayerID))
+                {
+                    requestedHatSyncs.Add(c.hatId + "." + who.UniqueMultiplayerID);
+                    try
+                    {
+                    Task.Run(async () =>
+                    {
+                       await PyNet.sendRequestToFarmer<HatSync>(CustomShirtsMod.HatSyncerRequestName, c.hatId, who, (hs) =>
+                       {
+                           requestedHatSyncs.Remove(c.hatId + "." + who.UniqueMultiplayerID);
+
+                           if (hs == null || hs.Texture == null)
+                               return;
+
+                           if (CustomShirtsMod.syncedHats.ContainsKey(hs.SyncId))
+                               CustomShirtsMod.syncedHats.Remove(hs.SyncId);
+
+                           CustomShirtsMod.syncedHats.Add(hs.SyncId, hs.Texture.getTexture());
+                       }, SerializationType.PLAIN, 1000);
+                   });
+                    }
+                    catch (Exception e)
+                    {
+                        CustomShirtsMod._monitor.Log(e.Message + ":" + e.StackTrace);
+                    }
+                }
+
+                if (c.texture != null)
+                {
+                    int direction = who.FacingDirection;
+                    FarmerRenderer.hatsTexture = c.texture;
+                    if (direction == 0)
+                        direction = 3;
+                    else if (direction == 2)
+                        direction = 0;
+                    else if (direction == 3)
+                        direction = 2;
+
+                    if (Game1.activeClickableMenu is TitleMenu || Game1.activeClickableMenu is GameMenu)
+                        direction = 0;
+
+                    if (c.texture is ScaledTexture2D sct)
+                        sct.ForcedSourceRectangle = new Rectangle(0, (int)(direction * 20 * sct.Scale), (int)(20 * sct.Scale), (int)(20 * sct.Scale));
+                }
+            }
+            else
+                FarmerRenderer.hatsTexture = CustomShirtsMod.vanillaHats;
+
             bool savedShirt = CustomShirtsMod.playerShirts.ContainsKey(who.UniqueMultiplayerID) && CustomShirtsMod.playerBaseShirts.ContainsKey(who.UniqueMultiplayerID) && CustomShirtsMod.playerBaseShirts[who.UniqueMultiplayerID] != -9999;
 
             if (savedShirt && (Game1.activeClickableMenu is CharacterCustomization || menuIsCC()))
@@ -39,10 +103,8 @@ namespace CustomShirts.Overrides
             {
                 try
                 {
-                    if (!savedShirt)
-                    {
+                    if (!savedShirt && who == Game1.player)
                         FarmerRenderer.shirtsTexture = CustomShirtsMod.shirts[(who.shirt.Value * -1) - 1].texture2d;
-                    }
                     else
                     {
                         if (CustomShirtsMod.playerShirts[who.UniqueMultiplayerID] == null)
@@ -54,16 +116,7 @@ namespace CustomShirts.Overrides
             }
             
             if (FarmerRenderer.shirtsTexture is ScaledTexture2D st)
-            {
-                if (st.Scale > 1)
-                    st.DestinationPositionAdjustment = new Vector2(0, -(80 + st.Scale / 2 * 8));
-                else
-                    st.DestinationPositionAdjustment = Vector2.Zero;
                 st.ForcedSourceRectangle = new Rectangle?(new Rectangle(0, (int)((facingDirection == 0 ? 24 : facingDirection == 1 ? 8 : facingDirection == 3 ? 16 : 0) * st.Scale), (int)(8 * st.Scale), (int)(8 * st.Scale)));
-            }
-
-            if (FarmerRenderer.shirtsTexture is ScaledTexture2D stex && (Game1.activeClickableMenu is GameMenu || Game1.activeClickableMenu is TitleMenu || Game1.activeClickableMenu is CharacterCustomization || menuIsCC()))
-                stex.DestinationPositionAdjustment = Vector2.Zero;
         }
 
         public static bool Prefix_kiskae()
@@ -73,7 +126,7 @@ namespace CustomShirts.Overrides
 
         public static bool Prefix_doChangeShirt(FarmerRenderer __instance, int whichShirt)
         {
-            if(whichShirt < 0)
+            if(whichShirt < 0 && ((whichShirt * -1) - 1) > 0 && ((whichShirt * -1) - 1) < CustomShirtsMod.shirts.Count)
             {
                 int id = CustomShirtsMod.shirts[(whichShirt * -1) - 1].baseid - 1;
                 CustomShirtsMod._helper.Reflection.GetMethod(__instance, "doChangeShirt").Invoke(new object[] { null, null, id });
@@ -132,10 +185,13 @@ namespace CustomShirts.Overrides
                 if (!CustomShirtsMod.playerBaseColors.ContainsKey(mid))
                 {
                     int id = CustomShirtsMod.playerBaseShirts[mid] - 1;
+                    if (id < 0)
+                        id = Game1.otherFarmers[mid].shirt.Value;
+
                     Color[] data = new Color[CustomShirtsMod.vanillaShirts.Bounds.Width * CustomShirtsMod.vanillaShirts.Bounds.Height];
                     CustomShirtsMod.vanillaShirts.GetData<Color>(data);
                     int index = id * 8 / CustomShirtsMod.vanillaShirts.Bounds.Width * 32 * 128 + id * 8 % CustomShirtsMod.vanillaShirts.Bounds.Width + CustomShirtsMod.vanillaShirts.Width * 4;
-
+                    CustomShirtsMod._monitor.Log("index:" + index);
                     color1 = data[index];
                     color2 = data[index - CustomShirtsMod.vanillaShirts.Width];
                     color3 = data[index - CustomShirtsMod.vanillaShirts.Width * 2];

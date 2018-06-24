@@ -10,6 +10,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,14 +25,19 @@ namespace CustomShirts
         internal static Dictionary<long, Texture2D> playerShirts = new Dictionary<long, Texture2D>();
         internal static Dictionary<long, int> playerBaseShirts = new Dictionary<long, int>();
         internal static Dictionary<long, Color[]> playerBaseColors = new Dictionary<long, Color[]>();
+        internal static Dictionary<string, Texture2D> syncedHats = new Dictionary<string, Texture2D>();
         internal static List<ShirtPack> packs = new List<ShirtPack>();
         internal static List<Shirt> shirts = new List<Shirt>();
+        internal static List<HatBlueprint> hats = new List<HatBlueprint>();
         internal static Texture2D vanillaShirts;
+        internal static Texture2D vanillaHats;
         internal static bool worldIsReady => Context.IsWorldReady;
         internal static string ShirtSyncerName = "Platonymous.CustomShirts.Sync";
         internal static string ShirtReloaderName = "Platonymous.CustomShirts.Reload";
+        internal static string HatSyncerRequestName = "Platonymous.CustomShirts.HatsSyncRequest";
         internal static IPyResponder ShirtSyncer;
         internal static IPyResponder ShirtReloader;
+        internal static IPyResponder HatSyncerRequest;
 
         internal static IMonitor _monitor;
         internal static IModHelper _helper;
@@ -42,6 +48,7 @@ namespace CustomShirts
         {
             _helper = helper;
             vanillaShirts = Helper.Content.Load<Texture2D>(@"Characters/Farmer/shirts", ContentSource.GameContent);
+            vanillaHats = Helper.Content.Load<Texture2D>(@"Characters/Farmer/hats", ContentSource.GameContent);
             ShirtSyncer = new PyResponder<bool, ShirtSync>(ShirtSyncerName, (s) =>
               {
                   try
@@ -66,9 +73,9 @@ namespace CustomShirts
                               playerBaseColors.Add(s.FarmerId, baseColors);
                           }
                       }
-                      catch
+                      catch(Exception e)
                       {
-
+                          Monitor.Log(e.Message + ":" + e.StackTrace);
                       }
                   }
                   catch (Exception e)
@@ -84,8 +91,21 @@ namespace CustomShirts
                 return Game1.player.UniqueMultiplayerID;
             }, 60);
 
+            HatSyncerRequest = new PyResponder<HatSync, string>(HatSyncerRequestName, (s) =>
+            {
+                if (hats.Find(h => h.fullid == s) is HatBlueprint hb)
+                {
+                    CustomHat c = new CustomHat(hb);
+                    return new HatSync(c.texture, Game1.player.UniqueMultiplayerID, s);
+                }
+
+                return new HatSync();
+
+            }, 60, SerializationType.JSON, SerializationType.PLAIN);
+
             ShirtSyncer.start();
             ShirtReloader.start();
+            HatSyncerRequest.start();
 
             _monitor = Monitor;
             config = helper.ReadConfig<Config>();
@@ -94,6 +114,9 @@ namespace CustomShirts
             harmony.Patch(typeof(FarmerRenderer).GetMethod("drawHairAndAccesories"), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Prefix_drawHairAndAccesories")), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Postfix_drawHairAndAccesories")));
             harmony.Patch(typeof(Farmer).GetMethod("changeShirt"), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Prefix_changeShirt")), null);
             harmony.Patch(typeof(FarmerRenderer).GetMethod("doChangeShirt", BindingFlags.NonPublic | BindingFlags.Instance), new HarmonyMethod(typeof(Overrides.OvFarmerRenderer).GetMethod("Prefix_doChangeShirt")), null);
+            harmony.Patch(typeof(Hat).GetMethod("draw", BindingFlags.Public | BindingFlags.Instance), new HarmonyMethod(typeof(CustomHat).GetMethod("Prefix_draw")), null);
+            harmony.Patch(typeof(Hat).GetMethod("drawInMenu",new Type[] { typeof(SpriteBatch) , typeof(Vector2) , typeof(float) , typeof(float) , typeof(float) , typeof(bool) , typeof(Color) , typeof(bool)  }), new HarmonyMethod(typeof(CustomHat).GetMethod("Prefix_drawInMenu")), null);
+
             loadContentPacks();
 
             if(config.SwitchKey != Keys.Escape)
@@ -153,6 +176,27 @@ namespace CustomShirts
                     shirt.fullid = pack.Manifest.UniqueID + "." + shirt.id;
                     shirt.texture2d = ScaledTexture2D.FromTexture(vanillaShirts, texture, shirt.scale);
                     shirts.Add(shirt);
+                }
+
+                c = 0;
+                foreach (HatBlueprint hat in shirtPack.hats)
+                {
+                    c++;
+
+                    if (hat.id == "none")
+                        hat.id = "hat" + c;
+
+                    Texture2D texture = pack.LoadAsset<Texture2D>(hat.texture);
+
+                    if (texture.Width > (20 * hat.scale))
+                        texture = texture.getTile(hat.tileindex, (int)(20 * hat.scale), (int)(80 * hat.scale));
+
+                    hat.fullid = pack.Manifest.UniqueID + "." + hat.id;
+                    hat.texture2d = ScaledTexture2D.FromTexture(vanillaHats, texture, hat.scale);;
+                    hats.Add(hat);
+
+                    InventoryItem hatItem = new InventoryItem(new CustomHat(hat), hat.price, 1);
+                    hatItem.addToHatShop();
                 }
             }
         }
@@ -224,10 +268,12 @@ namespace CustomShirts
                 PyNet.sendRequestToAllFarmers<bool>(ShirtSyncerName, new ShirtSync(PyUtils.getRectangle(1, 1, Color.White), -9999, mid), null, SerializationType.JSON, 1000);
 
             if (sendAround)
+            {
                 if (shirtId == "none")
                     PyNet.sendRequestToAllFarmers<bool>(ShirtSyncerName, new ShirtSync(PyUtils.getRectangle(1, 1, Color.White), -9999, mid), null, SerializationType.JSON, 1000);
                 else
                     PyNet.sendRequestToAllFarmers<bool>(ShirtSyncerName, new ShirtSync(jersey.texture2d, jersey.baseid, mid), null, SerializationType.JSON, 1000);
+            }
         }
     }
 }

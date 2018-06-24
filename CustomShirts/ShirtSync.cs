@@ -4,7 +4,7 @@ using PyTK.ContentSync;
 
 namespace CustomShirts
 {
-    internal class ShirtSync
+    public class ShirtSync
     {
         public SerializationTexture2D Texture { get; set; }
         public int BaseShirt { get; set; }

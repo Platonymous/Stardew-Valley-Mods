@@ -48,5 +48,15 @@
       "baseid": 9,
       "scale": 4
     }
+  ],
+  "hats": [
+    {
+      "id": "ACap",
+      "texture": "assets/acap.png",
+      "scale": 8,
+      "baseid": 20,
+      "name": "A. Cap",
+      "description": "A baseball cap"
+    }
   ]
 }

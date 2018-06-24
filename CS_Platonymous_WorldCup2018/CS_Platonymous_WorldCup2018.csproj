@@ -59,6 +59,9 @@
     <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180428\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\acap.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="assets\jersey_argentina.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
