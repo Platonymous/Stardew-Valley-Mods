@@ -31,7 +31,7 @@ namespace HarpOfYobaRedux
             Game1.player.FarmerSprite.setCurrentAnimation(animation.ToArray());
             Game1.player.FarmerSprite.loopThisAnimation = true;
             Game1.player.FarmerSprite.PauseForSingleAnimation = true;
-            Game1.player.FarmerSprite.indexInCurrentAnimation = 1;
+            Game1.player.FarmerSprite.currentAnimationIndex = 1;
         }
 
         public void stop()

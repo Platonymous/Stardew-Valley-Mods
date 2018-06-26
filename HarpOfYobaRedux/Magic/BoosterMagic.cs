@@ -19,7 +19,7 @@ namespace HarpOfYobaRedux
 
             if (!playedToday)
             {
-                Game1.player.stamina = Game1.player.maxStamina;
+                Game1.player.stamina = Game1.player.maxStamina.Value;
                 Game1.player.health = Game1.player.maxHealth;
                 buff.millisecondsDuration = 35000 + Game1.random.Next(30000);
             }

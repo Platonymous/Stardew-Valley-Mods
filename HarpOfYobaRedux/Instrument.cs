@@ -42,14 +42,6 @@ namespace HarpOfYobaRedux
             }
         }
 
-        public override string Name
-        {
-            get
-            {
-                return getDisplayName();
-            }
-        }
-
         public override bool canBeDropped()
         {
             return false;
@@ -71,7 +63,7 @@ namespace HarpOfYobaRedux
                 allInstruments = new Dictionary<string, Instrument>();
 
             this.animation = animation;
-            this.name = name;
+            this.Name = name;
             displayName = name;
             this.description = description;
             this.texture = texture;
@@ -92,17 +84,17 @@ namespace HarpOfYobaRedux
 
         private void build(string id)
         {
-            name = allInstruments[id].name;
+            Name = allInstruments[id].Name;
             description = allInstruments[id].description;
             texture = allInstruments[id].texture;
             animation = allInstruments[id].animation;
             readyToPlay = true;
             cooldownTime = 60;
-            numAttachmentSlots = 1;
-            attachments = new SObject[numAttachmentSlots];
+            numAttachmentSlots.Value = 1;
+            attachments.SetCount(numAttachmentSlots);
             owned = true;
             allInstruments[id].owned = true;
-            instantUse = true;
+            InstantUse = true;
             instrumentID = id;
 
             if (allAdditionalSaveData == null)
@@ -162,8 +154,12 @@ namespace HarpOfYobaRedux
         public object getReplacement()
         {
             FishingRod replacement = new FishingRod(1);
-            replacement.upgradeLevel = -1;
-            replacement.attachments = attachments;
+            replacement.UpgradeLevel = -1;
+            if (attachments.Count > 0)
+            {
+                replacement.attachments.SetCount(1);
+                replacement.attachments[0] = attachments[0];
+            }
             return replacement;
         }
 
@@ -171,15 +167,14 @@ namespace HarpOfYobaRedux
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
             build(additionalSaveData["id"]);
-            attachments = (replacement as Tool).attachments;
+            if (replacement is Tool t && t.attachments.Count > 0)
+                attachments[0] = t.attachments[0];
             allInstruments[instrumentID].owned = true;
 
             foreach (string key in additionalSaveData.Keys)
                 if (key != "id" && !allAdditionalSaveData.ContainsKey(key))
                     allAdditionalSaveData.Add(key, additionalSaveData[key]);
         }
-
-        public override string DisplayName { get => name; set => name = value; }
 
         public override string getDescription()
         {
@@ -191,11 +186,6 @@ namespace HarpOfYobaRedux
             SpriteFont smallFont = Game1.smallFont;
             int width = Game1.tileSize * 4 + Game1.tileSize / 4;
             return Game1.parseText(text, smallFont, width);
-        }
-
-        private string getDisplayName()
-        {
-            return name;
         }
 
         public override void DoFunction(GameLocation location, int x, int y, int power, StardewValley.Farmer who)
@@ -270,7 +260,7 @@ namespace HarpOfYobaRedux
             return false;
         }
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
             float alpha = 1.0f;
             int minutesTillReady = 0;
@@ -316,12 +306,12 @@ namespace HarpOfYobaRedux
 
         protected override string loadDisplayName()
         {
-            return name;
+            return Name;
         }
 
         protected override string loadDescription()
         {
-            return getDescription();
+            return description;
         }
     }
 }

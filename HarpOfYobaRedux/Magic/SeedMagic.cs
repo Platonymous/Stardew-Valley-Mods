@@ -37,7 +37,7 @@ namespace HarpOfYobaRedux
                             if (Game1.IsWinter)
                                 seeds = 498;
 
-                            hd.plant(seeds,(int)tile.X, (int)tile.Y,Game1.player);
+                            hd.plant(seeds,(int)tile.X, (int)tile.Y,Game1.player, false, Game1.currentLocation);
 
                             if(hd.crop != null)
                             {

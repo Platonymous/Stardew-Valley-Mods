@@ -140,12 +140,12 @@ namespace HarpOfYobaRedux
             Game1.changeMusicTrack(music);
         }
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
             Rectangle sourceRectangle = new Rectangle(0, 0, 16, 16);
             spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), new Rectangle?(sourceRectangle), Color.White * transparency, 0.0f, new Vector2(8, 8), Game1.pixelZoom * scaleSize * 0.8f, SpriteEffects.None, layerDepth);
             Rectangle sourceRectangleNote = new Rectangle(16, 0, 16, 16);
-            spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), new Rectangle?(sourceRectangleNote), color * transparency, 0.0f, new Vector2(8, 8), Game1.pixelZoom * scaleSize * 0.8f, SpriteEffects.None, layerDepth);
+            spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), new Rectangle?(sourceRectangleNote), this.color * transparency, 0.0f, new Vector2(8, 8), Game1.pixelZoom * scaleSize * 0.8f, SpriteEffects.None, layerDepth);
         }
 
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, StardewValley.Farmer f)

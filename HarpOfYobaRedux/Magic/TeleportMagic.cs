@@ -21,7 +21,7 @@ namespace HarpOfYobaRedux
         private void teleport()
         {
             Game1.changeMusicTrack("none");
-            Game1.warpFarmer(targetLocation.name, (int)targetPosition.X, (int)targetPosition.Y, false);
+            Game1.warpFarmer(targetLocation.Name, (int)targetPosition.X, (int)targetPosition.Y, false);
             Game1.fadeToBlackAlpha = 0.99f;
             Game1.screenGlow = false;
             Game1.player.temporarilyInvincible = false;
@@ -66,7 +66,7 @@ namespace HarpOfYobaRedux
                 lastPosition = new Vector2(53,24);
             }
 
-            targetLocation = Game1.getLocationFromName(lastLocation.name);
+            targetLocation = Game1.getLocationFromName(lastLocation.Name);
             targetPosition = new Vector2(lastPosition.X, lastPosition.Y);
             lastLocation = Game1.currentLocation;
             lastPosition = new Vector2(Game1.player.getTileX(), Game1.player.getTileY());

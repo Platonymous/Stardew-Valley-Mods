@@ -5,6 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1D875951-1F85-4D1B-A73C-7384EFA5BE5F}</ProjectGuid>
+    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HarpOfYobaRedux</RootNamespace>
@@ -63,6 +64,9 @@
     <Compile Include="Magic\TreeMagic.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\luamagic.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>

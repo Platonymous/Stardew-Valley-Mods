@@ -18,19 +18,19 @@ namespace HarpOfYobaRedux
         {
             Letter nextLetter = checkForLetter();
             if (nextLetter != null && !Game1.mailbox.Contains(nextLetter.id))
-                Game1.mailbox.Enqueue(nextLetter.id);
+                Game1.mailbox.Add(nextLetter.id);
         }
 
         public static void checkForProgress(GameLocation location, SheetMusic sheet)
         {
 
-            if (sheet.sheetMusicID == "birthday" && (sheet.magic as BirthdayMagic).lastBirthday != null && (sheet.magic as BirthdayMagic).lastBirthday.name == "Wizard")
+            if (sheet.sheetMusicID == "birthday" && (sheet.magic as BirthdayMagic).lastBirthday != null && (sheet.magic as BirthdayMagic).lastBirthday.Name == "Wizard")
                 if (Instrument.allAdditionalSaveData.ContainsKey("wizard"))
                     Instrument.allAdditionalSaveData["wizard"] = "true";
                 else
                     Instrument.allAdditionalSaveData.Add("wizard", "true");
 
-            if (location is Beach && Game1.isRaining && (location as Beach).bridgeFixed && Game1.player.getTileX() > 70 && Game1.player.getTileY() < 15)
+            if (location is Beach && Game1.isRaining && (location as Beach).bridgeFixed.Value && Game1.player.getTileX() > 70 && Game1.player.getTileY() < 15)
             {
                 if (Instrument.allAdditionalSaveData.ContainsKey("mariner"))
                 {
@@ -99,6 +99,9 @@ namespace HarpOfYobaRedux
 
             if (Game1.player.eventsSeen.Contains(18) && !SheetMusic.hasSheet("time"))
                 return DataLoader.getLetter("hoy_time");
+
+            if (SheetMusic.hasSheet("thunder") && SheetMusic.hasSheet("animals") && !SheetMusic.hasSheet("lua"))
+                return DataLoader.getLetter("hoy_lua");
 
             return null;
         }

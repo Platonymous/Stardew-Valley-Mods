@@ -24,7 +24,7 @@ namespace HarpOfYobaRedux
             for (int i = 0; i < Game1.currentLocation.characters.Count(); i++)
             {
                 Character c = Game1.currentLocation.characters[i];
-                if (c is Monster && !(c is Duggy) && !(c is Fireball))
+                if (c is Monster && !(c is Duggy))
                     glMonster.Add(i);
             }
 
@@ -51,7 +51,7 @@ namespace HarpOfYobaRedux
                         monster = (Monster)Activator.CreateInstance(t, new object[] { monster.position });
                 }
                 else if (Game1.currentLocation is SlimeHutch && pickMonster is GreenSlime)
-                    monster = (Monster)Activator.CreateInstance(t, new object[] { monster.position, (pickMonster as GreenSlime).color });
+                    monster = (Monster)Activator.CreateInstance(t, new object[] { monster.position, (pickMonster as GreenSlime).color.Value });
 
                 Game1.currentLocation.characters[glMonster[j]] = monster;
             }
