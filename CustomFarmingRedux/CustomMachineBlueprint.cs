@@ -50,6 +50,7 @@ namespace CustomFarmingRedux
         public string crafting { get; set; }
         public Texture2D texture2d { get; set; }
         public string workconditions { get; set; } = "";
+        public bool conditionaldropin { get; set; } = false;
         public bool conditionalanimation { get; set; } = false;
 
 

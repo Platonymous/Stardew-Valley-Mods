@@ -52,7 +52,7 @@ namespace PyTK.Overrides
                 if (skip)
                     return true;
 
-                if (!skip && texture is ScaledTexture2D s && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
+                if (!skip && texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
                 {
                     var newDestination = new Vector4(destinationRectangle.X, destinationRectangle.Y, destinationRectangle.Z / s.Scale, destinationRectangle.W / s.Scale);
                     var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
@@ -104,7 +104,7 @@ namespace PyTK.Overrides
                 if (skip)
                     return true;
                 
-                if (!skip && texture is ScaledTexture2D s && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
+                if (!skip && texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
                 {
                     var newDestination = new Vector4(destination.X, destination.Y, destination.Z / s.Scale, destination.W / s.Scale);
                     var newSR = new Rectangle?(new Rectangle((int) (r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));

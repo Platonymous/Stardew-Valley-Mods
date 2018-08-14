@@ -1,0 +1,1448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="35" tilewidth="16" tileheight="16" nextobjectid="3">
+ <properties>
+  <property name="AmbientLight" value="120 65 120"/>
+  <property name="Fall_Objects" value="281 .5 404 .6 420 .2"/>
+  <property name="Holly" value="283 .9"/>
+  <property name="Light" value="11 13 6 18 13 6 9 21 6 20 21 6 11 28 6 18 28 6"/>
+  <property name="Music" value="EarthMine"/>
+  <property name="Outdoors" value="T"/>
+  <property name="Spring_Objects" value="257 .5 404 .25"/>
+  <property name="Summer_Objects" value="258 .9 420 .25"/>
+  <property name="Warp" value="14 35 Woods 7 2 15 35 Woods 8 2 16 8 JungleTempleInterior 8 15 15 8 JungleTempleInterior 8 15 14 8 JungleTempleInterior 7 15 13 8 JungleTempleInterior 7 15"/>
+ </properties>
+ <tileset firstgid="1" name="z Jungle Temple Custom Tilesheet" tilewidth="16" tileheight="16" tilecount="1200" columns="20">
+  <image source="spring_JungleTempleTileSheet.png" width="320" height="960"/>
+  <tile id="240">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="241">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="242">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="243">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="244">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="245">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="260">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="261">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="262">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="263">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="264">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="265">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="280">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="281">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="282">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="283">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="284">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="285">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="300">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="301">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="302">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="303">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="304">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="305">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="306">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="307">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="320">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="321">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="322">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="323">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="324">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="325">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="326">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="327">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="340">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="341">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="342">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="343">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="344">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="345">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="346">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="347">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="360">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="361">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="362">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="363">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="364">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="365">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="366">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="367">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="380">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="381">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="382">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="383">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="384">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="385">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="386">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="387">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="388">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="400">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="401">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="402">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="403">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="404">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="405">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="406">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="407">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="408">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="420">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="421">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="422">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="423">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="424">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="425">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="426">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="427">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="428">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="440">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="441">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="442">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="443">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="444">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="445">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="446">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="447">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="448">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="460">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="461">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="462">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="463">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="464">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="465">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="466">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="467">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="468">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="480">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="481">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="482">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="483">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="484">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="485">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="486">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="487">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="488">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="491">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="492">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="493">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="494">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="500">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="501">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="502">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="503">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="504">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="505">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="506">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="507">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="508">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="520">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="521">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="522">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="523">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="524">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="525">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="526">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="527">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="528">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="533">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="534">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="540">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="541">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="542">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="543">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="544">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="545">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="546">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="547">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="548">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="560">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="561">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="562">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="563">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="564">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="565">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="566">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="567">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="568">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="580">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="581">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="582">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="583">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="584">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="585">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="586">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="587">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="588">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="593">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="594">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="1201" name="Paths" tilewidth="16" tileheight="16" tilecount="32" columns="4">
+  <image source="paths" width="64" height="128"/>
+ </tileset>
+ <tileset firstgid="1233" name="untitled tile sheet" tilewidth="16" tileheight="16" tilecount="2150" columns="25">
+  <image source="spring_JungleTempleoutdoorsTileSheet.png" width="400" height="1376"/>
+  <tile id="150">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="151">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="152">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="156">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="175">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="176">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="177">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="178">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="179">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="180">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="181">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="182">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="200">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="201">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="202">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="203">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="204">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="205">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="206">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="207">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="225">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="226">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="227">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="228">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="229">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="230">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="231">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="250">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="251">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="252">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="253">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="254">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="255">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="256">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="261">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="275">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="276">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="277">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="278">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="279">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="281">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="286">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="300">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="301">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="302">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="303">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="304">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="305">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="306">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="311">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="325">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="326">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="327">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="328">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="329">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="331">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="332">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="350">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="351">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="352">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="353">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="354">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="355">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="356">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="357">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="375">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="376">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="377">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="378">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="379">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="380">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="381">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="382">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="400">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="401">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="403">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="404">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="405">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="406">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="407">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="1092">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="1093">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="1094">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="1095">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="1096">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="1119">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="1120">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+  <tile id="1121">
+   <properties>
+    <property name="Spawnable" value="T"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Back" width="30" height="35">
+  <data encoding="csv">
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1750,1751,1750,1751,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1726,1725,1726,1726,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,557,538,514,513,539,560,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1751,553,553,553,553,1751,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1750,1751,1750,1751,231,1751,1750,553,553,553,553,1749,1750,232,1750,1751,1750,1751,1613,1613,1613,1613,1613,1613,
+1635,1635,1635,1635,1635,1635,1635,1635,1635,1635,1635,1584,553,574,552,552,575,553,1584,1635,1635,1635,1635,1635,1635,1635,1635,1635,1635,1635,
+1635,1635,1635,1635,1635,1750,1751,1750,1751,1751,1750,1751,1752,594,534,535,595,1749,1750,1751,1750,1751,1750,1751,1635,1635,1635,1635,1635,1635,
+1635,1635,1635,1635,1635,1635,1635,1635,1635,1635,1635,1751,495,362,406,401,465,494,1584,1635,1635,1635,1635,1635,1635,1635,1635,1635,1635,1635,
+1613,1613,1613,1751,1751,1584,1584,1584,492,1584,1632,495,382,403,386,441,424,385,494,1776,1584,492,1584,1584,1584,1751,1750,1613,1613,1613,
+1613,1613,1613,1751,1584,1584,1584,424,1584,406,385,445,445,1584,422,386,1584,385,442,385,404,1584,421,1584,1584,1584,1750,1613,1613,1613,
+1613,1613,1613,1579,1584,1511,1509,1510,1510,1511,1509,421,1584,1562,1584,1584,384,1584,426,1511,1609,1509,1510,1511,1636,1584,1582,1613,1613,1613,
+1613,1613,1613,495,1564,563,1633,1635,1635,1635,1383,1544,366,1584,403,1584,385,1533,1564,1633,1635,485,1635,589,569,1636,469,1613,1613,1613,
+1613,1613,1613,1614,1585,1635,1635,523,1635,1635,1635,1583,1584,386,1537,1584,365,1584,1585,1635,1383,1635,1635,547,548,1494,1612,1613,1613,1613,
+1613,1613,1613,1584,1610,1635,223,1635,1635,1635,1635,1584,1533,1584,443,1584,1562,1584,1584,1635,1633,1635,1635,1635,1635,1519,1612,1613,1613,1613,
+1613,1613,1613,1564,1635,1633,1635,1635,1634,1635,1635,1544,381,1538,1584,1533,1538,446,1564,1635,1635,561,521,1634,1635,1519,1612,1613,1613,1613,
+1613,1613,1613,1585,1635,486,1635,1635,1635,1635,1635,1583,1584,441,442,443,2181,1584,1585,1635,1635,1635,1635,1635,544,1636,1612,1613,1613,1613,
+1613,1613,1613,1585,1635,1635,1383,1635,561,1635,1383,1583,2205,423,386,2231,2180,2207,1585,1634,1635,1635,1383,1635,1635,1494,1612,1613,1613,1613,
+1613,1613,1613,1514,1635,1635,1635,1635,1635,1635,1635,1584,403,1533,422,423,1584,404,1584,561,1635,1635,1635,582,1635,1519,1537,1613,1613,1613,
+1613,1613,1613,1539,1635,1633,1635,1635,1635,1635,485,1544,421,1584,421,443,1584,423,1564,1635,1383,1635,1633,1635,1635,1519,1612,1613,1613,1613,
+1613,1613,1613,1564,1635,1635,1635,1634,1635,1635,1635,1583,385,1584,1562,425,1533,442,1585,1635,1635,545,1635,1635,1635,1544,1612,1613,1613,1613,
+1613,1613,1613,1585,1383,1635,501,1635,549,1635,1558,1584,1584,1584,404,426,1584,1584,1584,1560,1635,1635,1635,1634,1635,1494,1533,1613,1613,1613,
+1613,1613,1613,1514,487,509,1635,1383,1635,1635,1561,441,385,462,441,422,446,442,446,1611,1635,1383,1635,1634,223,423,1612,1613,1613,1613,
+1613,1613,1613,1539,547,548,1635,1635,1558,1561,361,404,425,1562,2181,406,386,425,423,361,1611,1560,564,1635,1635,1544,1612,1613,1613,1613,
+1613,1613,1613,1614,1560,1633,503,1558,1561,381,383,2182,2182,425,2182,1562,443,442,2182,441,386,1611,1560,544,541,178,1612,1613,1613,1613,
+1613,1613,1613,1614,1611,1559,1534,1533,1562,2180,2180,421,2182,385,2231,2180,2207,404,421,421,2182,1562,1584,1536,1559,1561,1612,1613,1613,1613,
+1613,1613,1613,1614,1584,1584,1538,1538,446,424,406,426,423,366,362,2231,386,403,426,406,442,386,1538,1562,366,1584,1612,1613,1613,1613,
+1613,1613,1613,1615,1588,1588,1588,1588,1588,1588,1588,1588,1588,1615,1537,1587,1565,1588,1588,1588,1588,1588,1588,1588,1588,1588,1565,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1615,429,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,304,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,
+1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,283,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613,1613
+</data>
+ </layer>
+ <layer name="Buildings" width="30" height="35">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2303,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2229,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,2199,0,17,18,19,20,0,2179,2253,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,1751,35,36,35,36,1750,0,0,2179,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,2199,1751,169,177,178,179,180,170,1750,0,0,0,2179,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,2199,1750,1751,1751,557,0,0,0,0,560,1751,1751,2227,0,0,2179,0,0,0,0,0,0,
+0,0,0,0,0,0,2199,0,184,187,224,1750,577,0,0,0,0,580,1750,223,190,0,369,0,0,2179,0,0,0,0,
+1750,1751,1750,1751,1750,1751,1750,1751,1750,1751,1750,1751,597,0,0,0,0,600,1751,1750,1750,1751,1750,1751,1750,1751,2179,1750,1751,1750,
+1651,1651,1650,1750,2199,1750,187,369,231,1751,1750,1751,592,0,0,0,0,593,1750,1751,1750,232,369,190,1750,1751,2227,1650,1651,1651,
+1750,1750,1751,1750,1750,1751,1750,1750,1751,1750,1651,1751,531,0,0,0,0,530,1748,1651,1751,1750,1751,1750,1751,1750,1750,1751,1750,1750,
+1778,1775,1776,369,369,1579,1752,1776,70,1778,257,258,90,0,0,0,0,91,259,260,1775,71,1776,1749,1750,369,369,1776,1778,1778,
+0,2377,2378,391,1579,1629,1777,0,90,0,213,214,95,0,0,0,0,96,215,216,0,91,0,1774,1632,1582,390,2377,2378,0,
+0,2377,2378,371,1604,41,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,496,370,2377,2378,0,
+0,2377,2378,371,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,469,2377,2378,0,
+0,2377,2378,165,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2377,2378,0,
+0,2377,2378,0,0,226,161,225,0,0,0,151,0,0,0,0,0,0,152,0,0,206,168,165,0,0,0,2377,2378,0,
+0,2377,2378,0,0,0,201,0,0,41,0,0,0,0,0,0,0,0,0,0,42,0,0,0,0,0,0,2377,2378,0,
+0,2377,2378,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,163,2377,2378,0,
+0,2377,2378,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2377,2378,0,
+0,2377,2378,0,0,0,0,0,0,293,0,55,0,105,0,0,162,0,56,0,294,0,0,0,0,0,0,2377,2378,0,
+0,2377,2378,165,0,183,43,0,0,0,0,0,0,181,0,0,182,0,0,0,0,0,0,0,0,0,0,2377,2378,0,
+0,2377,2378,0,0,0,0,0,188,0,0,0,10,201,0,0,202,0,0,0,0,0,0,162,0,0,230,2377,2378,0,
+0,2377,2378,0,0,0,0,207,0,313,0,163,85,165,0,0,183,85,185,0,314,0,0,209,369,189,369,2377,2378,0,
+0,2377,2378,0,0,20,0,0,0,0,0,95,0,0,0,0,0,0,96,0,0,0,0,272,17,18,232,2377,2378,0,
+0,2377,2378,0,0,0,0,0,0,0,0,0,90,0,0,0,0,91,0,0,0,0,0,202,277,25,183,2377,2378,0,
+0,2377,2378,165,0,0,0,0,0,0,309,310,0,0,0,0,0,0,311,312,0,0,0,0,177,169,28,2377,2378,0,
+0,2377,2378,0,0,0,0,0,0,0,233,234,0,0,0,0,0,0,235,236,0,0,0,0,0,168,190,2377,2378,0,
+0,2377,2378,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,209,224,2377,2378,0,
+0,2377,2378,0,0,0,0,0,0,0,0,0,45,0,0,0,0,46,0,0,0,0,0,0,0,0,0,2377,2378,0,
+0,2377,2378,2377,2378,2377,2378,2377,2378,2377,2378,2377,2378,571,0,0,570,2377,2378,2377,2378,2377,2378,2377,2378,2377,2378,2377,2378,0,
+0,0,0,0,0,0,0,0,0,0,0,2377,2378,571,0,0,570,2377,2378,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,2377,2378,571,0,0,570,2377,2378,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="Front" width="30" height="35">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,2173,2178,2204,2178,2204,2178,2277,2253,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,2204,2277,2277,2277,2277,2277,2277,2276,2303,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,2198,2199,2201,2200,2201,2200,2200,2202,2277,2276,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,2204,2204,2277,2277,0,37,38,39,40,0,2274,2202,2276,2298,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,2179,2277,2277,2277,187,10,184,184,924,184,11,228,2228,2202,2274,2276,2204,0,0,0,0,0,0,
+0,0,0,0,0,2229,2204,2277,2277,2277,187,231,208,0,0,0,0,209,232,190,2274,2202,2202,2276,2229,0,0,0,0,0,
+0,0,0,0,2223,2248,2277,2277,2226,184,376,208,50,0,3015,3015,0,71,209,375,184,184,2274,2202,2202,2276,2204,0,0,0,
+0,0,0,2173,2277,2277,2277,2200,187,231,70,0,70,598,0,0,599,51,0,31,232,190,0,2228,2202,2202,2276,0,0,0,
+0,0,0,2277,2277,369,369,212,395,208,50,0,50,0,0,0,0,71,0,71,209,396,211,369,369,2202,2274,0,0,0,
+0,0,0,2277,2200,187,231,208,30,0,70,0,50,0,0,0,0,51,1772,51,0,31,209,232,190,0,2202,0,0,0,
+0,0,0,187,212,415,1775,0,0,0,287,258,35,0,0,0,0,36,0,288,0,0,0,1775,416,211,190,0,0,0,
+0,0,0,271,208,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,209,272,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,203,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,204,0,0,0,
+0,0,0,0,0,0,0,0,0,50,0,191,0,0,0,0,0,0,192,0,24,0,23,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,70,0,0,0,0,0,0,0,0,0,0,71,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,1,0,0,149,0,0,0,0,150,0,0,2,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,21,0,0,127,0,0,0,0,128,0,0,31,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,50,0,171,127,0,0,0,0,128,172,0,71,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,23,0,0,0,0,0,127,0,0,0,0,128,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,127,0,0,0,0,128,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,187,0,23,0,0,0,0,0,0,0,11,0,0,24,0,0,0,190,229,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,131,30,0,0,0,0,31,132,0,0,0,0,411,270,369,510,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,70,0,0,0,0,71,0,0,0,0,0,182,271,209,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,17,18,0,0,0,0,0,0,19,20,0,0,0,0,0,164,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,77,78,0,0,0,0,0,0,79,80,0,0,0,0,0,163,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,6,0,0,0,0,0,0,0,162,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,0,26,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="Paths" width="30" height="35">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,1209,0,0,0,0,0,0,1209,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,1209,1209,1209,1209,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,1209,0,1209,0,0,0,0,1209,0,1209,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,1209,0,0,0,0,1209,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,1209,0,0,0,1209,0,0,1209,0,1209,0,0,0,1209,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,1209,0,0,1220,0,0,1218,0,0,1209,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,1209,0,0,0,0,0,0,0,0,0,0,1219,0,0,0,0,0,0,0,1209,0,0,0,0,0,
+0,0,0,0,0,0,0,1217,0,1218,1209,1209,1209,1221,0,1219,1216,1209,1209,1209,1217,0,1218,0,0,0,0,0,0,0,
+0,0,0,0,0,1209,0,1219,1223,1215,1223,0,1223,0,1209,1214,1217,1223,0,1223,1219,0,1214,1223,1209,0,0,0,0,0,
+0,0,0,0,1223,1221,0,1226,0,0,1214,0,1209,1223,1219,1223,0,1209,0,1214,0,0,1218,0,1222,0,1209,0,0,0,
+0,0,0,1209,0,0,0,0,0,0,0,0,0,1215,0,0,0,1208,0,1227,0,0,0,0,0,0,1219,0,0,0,
+0,0,0,1215,1223,1209,0,0,0,1209,1223,1209,0,1208,1209,1223,1214,0,1209,0,1209,0,0,0,1223,1209,1216,0,0,0,
+0,0,0,0,0,1223,0,1223,0,0,1223,1223,0,0,1223,1223,1223,0,0,0,0,0,1209,0,0,1223,1217,0,0,0,
+0,0,0,1219,0,0,1223,0,1223,0,1223,1223,0,0,0,0,0,0,1223,1223,0,1223,1216,1223,0,0,0,0,0,0,
+0,0,0,1209,0,1209,1208,1223,1223,0,0,0,0,0,0,0,0,0,0,0,0,0,1225,1219,1208,0,1209,0,0,0,
+0,0,0,1215,0,1215,0,0,1215,1209,1219,1209,0,0,1209,1209,0,0,1209,0,1209,0,0,1218,1215,0,1219,0,0,0,
+0,0,0,0,1209,0,0,1217,0,1227,0,0,0,0,0,0,0,0,0,0,1223,1214,1209,1227,0,1209,1214,0,0,0,
+0,0,0,0,0,1223,1223,1209,0,0,0,0,0,0,1215,0,0,0,1217,1216,0,0,0,0,0,0,1209,0,0,0,
+0,0,0,1223,0,1214,0,0,0,1209,1223,0,0,0,0,1208,0,0,0,1223,1209,0,1223,0,0,0,1214,0,0,0,
+0,0,0,0,0,1209,0,0,0,1217,1223,1209,0,0,1209,0,0,0,1209,0,0,1223,1223,0,1209,0,1218,0,0,0,
+0,0,0,1217,0,0,1218,1223,0,0,0,0,0,1214,0,0,0,0,0,0,1209,0,0,0,0,0,0,0,0,0,
+0,0,0,0,1209,0,1223,0,0,0,0,0,0,0,0,1215,0,0,0,0,0,0,1209,0,0,1209,0,0,0,0,
+0,0,0,1223,0,0,0,1209,1214,0,1209,1209,0,0,1209,1209,0,0,1209,1209,0,1214,1222,0,0,0,0,0,0,0,
+0,0,0,1215,0,1222,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1215,1209,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,1209,0,0,0,1223,1214,1215,1223,0,0,0,1209,0,0,0,1221,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,1223,1209,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1223,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,1223,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="AlwaysFront" width="30" height="35">
+  <data encoding="csv">
+2179,2179,2179,2179,2179,2173,2179,2179,2179,2179,2179,2303,2179,2204,2179,2179,2179,2179,2179,2179,2229,2179,2179,2179,2204,2179,2179,2179,2179,2179,
+2179,2229,2179,2179,2204,2179,2179,2179,2229,2179,2179,2179,2179,2179,2179,2179,2179,2204,2179,2179,2179,2179,2173,2179,2179,2179,2179,2179,2229,2179,
+2179,2179,2179,2179,2179,2179,2179,2179,2179,2179,2173,2179,2229,2179,2179,2303,2179,2179,2179,2229,2179,2178,2179,2179,2179,2178,2179,2179,2179,2179,
+2298,2179,2179,2179,2179,2173,2179,2179,2179,2173,2179,2251,2275,2276,2275,2276,2275,2276,2250,2179,2179,2179,2179,2229,2179,2179,2179,2204,2179,2179,
+2179,2173,2179,2229,2179,2179,2179,2204,2179,2179,2179,2277,2199,2199,2199,2199,2199,2199,2249,2250,2179,2178,2179,2179,2179,2179,2179,2179,2173,2179,
+2179,2179,2179,2179,2179,2229,2179,2179,2179,2173,2277,2274,2277,2224,2200,2201,2227,2274,2202,2249,2179,2179,2179,2204,2179,2173,2179,2179,2179,2179,
+2179,2179,2179,2204,2179,2179,2179,2179,2251,2277,2199,2199,2199,2225,0,0,2226,2202,2274,2199,2249,2250,2179,2179,2179,2179,2179,2229,2179,2179,
+2229,2179,2179,2179,2179,2298,2173,2277,2199,2199,2274,2199,2225,55,56,55,56,2226,2202,2274,2274,2199,2249,2250,2179,2179,2179,2179,2179,2179,
+2179,2179,2173,2179,2173,2251,2277,2199,2202,2199,2199,2225,30,558,515,516,559,31,2226,2202,2199,2274,2274,2249,2250,2179,2303,2179,2179,2178,
+2179,2179,2179,2204,2277,2249,2202,2199,2199,2200,2225,0,12,578,0,0,579,12,0,2226,2200,2202,2199,2274,2199,2249,2250,2179,2179,2179,
+2204,2179,2229,2277,2199,2199,2199,2199,2225,0,208,0,52,0,0,0,0,52,0,209,0,2226,2202,2274,2274,2274,2249,2178,2179,2229,
+2179,2179,2223,2199,2202,2199,2200,2225,0,0,0,0,32,0,0,0,0,32,0,0,0,0,2226,2200,2202,2274,2199,2253,2204,2179,
+2179,2229,2223,2199,2199,2225,0,0,0,0,17,18,0,0,0,0,0,0,19,20,0,0,0,0,2226,2202,2274,2253,2179,2179,
+2173,2179,2248,2199,2225,0,208,0,0,0,289,290,0,0,0,0,0,0,291,292,0,0,0,209,0,2226,2202,2228,2179,2173,
+2179,2179,2223,2224,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2227,2228,2204,2179,
+2179,2204,2223,2224,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2227,2228,2179,2173,
+2179,2179,2248,2249,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2252,2253,2179,2179,
+2173,2179,2223,2224,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2227,2228,2173,2179,
+2179,2179,2248,2249,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2252,2253,2179,2229,
+2204,2179,2223,2224,0,0,0,0,0,1,267,268,149,8,48,48,28,150,8,48,2,0,0,0,0,0,2227,2228,2179,2179,
+2179,2229,2223,2224,0,0,0,0,0,0,0,0,127,0,0,0,0,128,0,0,0,0,0,0,0,0,2252,2253,2179,2204,
+2173,2179,2248,2249,0,0,0,0,0,0,0,0,127,0,0,0,0,128,0,0,0,0,0,0,0,0,2227,2228,2179,2179,
+2179,2179,2248,2249,0,0,0,0,0,0,0,0,127,0,0,0,0,128,0,0,0,0,0,0,0,0,2252,2253,2173,2179,
+2179,2173,2223,2224,0,0,0,0,0,0,0,0,127,0,0,0,0,128,0,0,0,0,0,0,0,0,2252,2253,2179,2179,
+2229,2179,2248,2249,0,0,0,0,0,0,0,0,10,0,0,0,0,11,0,0,0,0,0,0,0,0,2227,2228,2229,2179,
+2179,2179,2223,2224,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,182,17,511,2252,2253,2179,2179,
+2179,2298,2223,2224,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,14,2252,2253,2179,2173,
+2179,2179,2248,2249,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,278,2227,2228,2179,2179,
+2173,2179,2223,2274,2250,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2251,2277,2253,2179,2179,
+2179,2179,2298,2273,2274,2250,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2251,2277,2228,2253,2204,2179,
+2179,2204,2298,2298,2273,2274,2275,2276,2276,2275,2276,2277,2274,2250,0,0,2251,2277,2274,2275,2276,2275,2276,2275,2277,2228,2301,2303,2179,2179,
+2173,2179,2179,2298,2300,2301,2300,2299,2302,2300,2301,2302,2273,2224,0,0,2252,2253,2204,2299,2302,2300,2301,2300,2301,2300,2303,2303,2179,2229,
+2179,2179,2204,2179,2179,2229,2179,2173,2179,2179,2204,2179,2248,2249,0,0,2227,2178,2179,2179,2179,2179,2179,2229,2179,2173,2179,2179,2179,2179,
+2179,2204,2179,2173,2179,2179,2179,2229,2179,2298,2179,2298,2223,2224,0,0,2227,2228,2179,2204,2179,2179,2179,2179,2298,2179,2179,2298,2179,2179,
+2229,2179,2179,2179,2179,2298,2179,2179,2179,2179,2204,2179,2223,2224,0,0,2252,2253,2298,2179,2179,2298,2179,2179,2179,2179,2229,2179,2179,2173
+</data>
+ </layer>
+ <objectgroup name="Back"/>
+ <objectgroup name="Buildings"/>
+ <objectgroup name="Front"/>
+ <objectgroup name="Paths"/>
+ <objectgroup name="AlwaysFront"/>
+</map>

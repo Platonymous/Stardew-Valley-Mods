@@ -1,0 +1,51 @@
+﻿{
+  "addMaps": [
+    {
+      "name": "CityBus",
+      "file": "assets/buspeople/Bus(people).tmx",
+      "addWarps": [
+        "2 7 BusStop 12 9"
+      ]
+    },
+    {
+      "name": "JungleTempleExterior",
+      "file": "assets/jungletemple/JungleTempleExterior.tmx"
+    },
+    {
+      "name": "JungleTempleInterior",
+      "file": "assets/jungletemple/JungleTempleInterior.tmx"
+    },
+    {
+      "name": "JungleTempleJunction01",
+      "file": "assets/jungletemple/JungleTempleJunction01.tmx"
+    },
+    {
+      "name": "JungleTempleLeftRoom01",
+      "file": "assets/jungletemple/JungleTempleLeftRoom01.tmx"
+    },
+    {
+      "name": "JungleTempleRightRoom01",
+      "file": "assets/jungletemple/JungleTempleRightRoom01.tmx"
+    }
+  ],
+  "mergeMaps": [
+    {
+      "name": "Woods",
+      "file": "assets/jungletemple/Woods.tmx",
+      "sourceArea": [ 0, 0, 12, 12 ],
+      "position": [ 0, 0 ],
+      "addWarps": [
+        "7 -1 JungleTempleExterior 14 34",
+        "8 -1 JungleTempleExterior 15 34"
+      ]
+    }
+  ],
+  "onlyWarps": [
+    {
+      "name": "BusStop",
+      "addWarps": [
+        "12 8 CityBus 2 6"
+      ]
+    }
+  ]
+}

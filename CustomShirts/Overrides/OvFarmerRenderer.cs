@@ -196,7 +196,6 @@ namespace CustomShirts.Overrides
                     Color[] data = new Color[CustomShirtsMod.vanillaShirts.Bounds.Width * CustomShirtsMod.vanillaShirts.Bounds.Height];
                     CustomShirtsMod.vanillaShirts.GetData<Color>(data);
                     int index = id * 8 / CustomShirtsMod.vanillaShirts.Bounds.Width * 32 * 128 + id * 8 % CustomShirtsMod.vanillaShirts.Bounds.Width + CustomShirtsMod.vanillaShirts.Width * 4;
-                    CustomShirtsMod._monitor.Log("index:" + index);
                     color1 = data[index];
                     color2 = data[index - CustomShirtsMod.vanillaShirts.Width];
                     color3 = data[index - CustomShirtsMod.vanillaShirts.Width * 2];

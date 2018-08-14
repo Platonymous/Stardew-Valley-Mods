@@ -26,6 +26,7 @@ namespace CustomFarmingRedux
         public int[] include;
         public string id => name + "." + index + "." + quality + "." + stack;
         public string price = "original";
+        private int dropInQuality = -1;
         public string name
         {
             get
@@ -72,6 +73,9 @@ namespace CustomFarmingRedux
         {
             get
             {
+                if (_index == -999)
+                    return _index;
+
                 if (bigcraftable)
                 {
                     if (_index <= 0 && item != "")
@@ -143,26 +147,34 @@ namespace CustomFarmingRedux
         public CustomMachineBlueprint mBlueprint;
         public Texture2D texture2d;
 
-        public void consumeIngredients( List<IList<Item>> items, SObject dropin = null)
+        public void consumeIngredients(List<IList<Item>> items, SObject dropin = null)
         {
             if (materials == null)
                 return;
+
+            if (dropin != null && quality == -1)
+                dropInQuality = dropin.Quality;
+
             List<IngredientBlueprint> ingredients = materials.toList(p => p.clone());
+        
             foreach (IngredientBlueprint i in materials)
+            {
                 for (int list = 0; list < items.Count; list++)
                     if (ingredients.Exists(e => e.index == i.index))
                         if (items[list].ToList().Find(p => fitsIngredient(p, i) && (dropin == null || p.ParentSheetIndex == dropin.ParentSheetIndex)) is Item j)
                         {
                             j.Stack -= i.stack;
-                            int ii = ingredients.FindIndex(p=> p.index == i.index);
+                            int ii = ingredients.FindIndex(p => p.index == i.index);
+
                             ingredients[ii].stack = (j.Stack > 0) ? 0 : Math.Abs(j.Stack);
                             if (ingredients[ii].stack == 0)
                                 ingredients.Remove(ingredients[ii]);
                             if (j.Stack <= 0)
                                 items[list].Remove(j);
                         }
+            }
 
-            if(ingredients.Count > 0)
+            if (ingredients.Count > 0)
                 foreach (IngredientBlueprint i in materials)
                     for (int list = 0; list < items.Count; list++)
                         if (ingredients.Exists(e => e.index == i.index))
@@ -170,12 +182,15 @@ namespace CustomFarmingRedux
                             {
                                 j.Stack -= i.stack;
                                 int ii = ingredients.FindIndex(p => p.index == i.index);
+
                                 ingredients[ii].stack = (j.Stack > 0) ? 0 : Math.Abs(j.Stack);
                                 if (ingredients[ii].stack == 0)
                                     ingredients.Remove(ingredients[ii]);
                                 if (j.Stack <= 0)
                                     items[list].Remove(j);
                             }
+
+            dropInQuality = -1;
         }
 
         public Texture2D getTexture(IModHelper helper = null)
@@ -197,7 +212,10 @@ namespace CustomFarmingRedux
 
         internal bool fitsIngredient(Item p, IngredientBlueprint i)
         {
-            if (p is SObject obj && i.index == -999)
+            if (quality == -1 && dropInQuality > 0 && p is SObject sbj && sbj.Quality != dropInQuality)
+                return false;
+
+            if (p is SObject obj && i.index == -999 && (i.exactquality == -1 || obj.Quality == i.exactquality) && obj.Quality >= i.quality && (i.quality >= 0 || obj.Quality < (i.quality * -1)))
                 return true;
 
             return p is SObject o && (exclude == null || !exclude.Contains(o.ParentSheetIndex)) && (o.ParentSheetIndex == i.index || o.Category == i.index || (include != null && (include.Contains(o.ParentSheetIndex) || include.Contains(o.Category)))) && (i.exactquality == -1 || o.Quality == i.exactquality) && o.Quality >= i.quality && (i.quality >= 0 || o.Quality < (i.quality * -1));
@@ -217,10 +235,13 @@ namespace CustomFarmingRedux
             return false;
         }
 
-        public bool hasIngredients(List<IList<Item>> items)
+        public bool hasIngredients(List<IList<Item>> items, Item dropInItem = null)
         {
             if (materials == null)
                 return true;
+
+            if (dropInItem is SObject dropin && quality == -1)
+                dropInQuality = dropin.Quality;
 
             List<IngredientBlueprint> ingredients = materials.toList(p => p.clone());
 
@@ -236,6 +257,9 @@ namespace CustomFarmingRedux
                                 ingredients.Remove(ingredients[ii]);
                         }
                     }
+
+            dropInQuality = -1;
+
             if (ingredients.Count <= 0)
                 return true;
             else
@@ -277,6 +301,7 @@ namespace CustomFarmingRedux
 
         private SObject setNameAndQuality(SObject s, SObject input)
         {
+            string oName = s.name;
             s.Quality = quality == -1 ? input.Quality : quality;
             s.name = (prefix) ? input.name + " " + name : name;
             s.name = (suffix) ? s.name + " " + input.name : s.name;
@@ -286,6 +311,9 @@ namespace CustomFarmingRedux
                 namesplit[insertpos] += " " + input.name;
                 s.name = String.Join(" ", namesplit);
             }
+
+            if (s.name == null || s.name == "" || s.name == " ")
+                s.name = oName;
 
             int compPrice = (int)(PyUtils.calc(price, new KeyValuePair<string, object>("input", input == null ? 0 : input.Price), new KeyValuePair<string, object>("original", s.Price)));
             s.Price = compPrice;

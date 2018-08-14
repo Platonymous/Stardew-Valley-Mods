@@ -35,6 +35,8 @@ namespace FarmHub
             config = Helper.ReadConfig<FHConfig>();
             TimeEvents.AfterDayStarted += StartFarmHubServer;
 
+           // new ConsoleCommand("menu", "Lists the available servers", (s, p) => Game1.activeClickableMenu = new FarmHubMenu(Game1.game1,Helper)).register();
+
             new ConsoleCommand("farmhub", "Lists the available servers", (s, p) => populateList(writeListToConsole)).register();
             new ConsoleCommand("join", "Join a server by name. Name and password have to use _ instead of spaces. Usage: join [name] [password if required]", (s, p) => populateList((l) => findServer(l,p) )).register();
         }

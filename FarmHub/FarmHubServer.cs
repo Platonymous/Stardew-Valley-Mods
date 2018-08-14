@@ -39,10 +39,8 @@ namespace FarmHub
             if (CurrentPlayers >= MaxPlayers)
                 Dispose();
             else
-            {
-                Monitor.Log("Updating FarmHubServer");
                 Task.Run(() => farms.Child(Id).PutAsync(this));
-            }
+            
         }
 
         public FarmHubServer(IGameServer server, IMonitor monitor)

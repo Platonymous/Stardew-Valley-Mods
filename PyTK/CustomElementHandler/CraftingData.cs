@@ -20,6 +20,7 @@ namespace PyTK.CustomElementHandler
                 _index = value;
                 if (_index != -1)
                 {
+                    
                     CraftingRecipe.craftingRecipes.AddOrReplace(name, data);
 
                     if (!Game1.player.craftingRecipes.ContainsKey(name) && delivery == "null")

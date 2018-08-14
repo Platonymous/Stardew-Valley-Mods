@@ -201,6 +201,12 @@ namespace CustomShirts
                         hatItem.addToHatShop();
                     }
             }
+
+            TimeEvents.AfterDayStarted += (s, e) =>
+            {
+                vanillaShirts = Helper.Content.Load<Texture2D>(@"Characters/Farmer/shirts", ContentSource.GameContent);
+                vanillaHats = Helper.Content.Load<Texture2D>(@"Characters/Farmer/hats", ContentSource.GameContent);
+            };
         }
 
 

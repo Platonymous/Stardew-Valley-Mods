@@ -1,0 +1,10 @@
+﻿{
+  "Name": "MuliplayerTweaks",
+  "Author": "Platonymous",
+  "Version": "0.3.0-prerelease",
+  "Description": "Tweaks Multiplayer",
+  "UniqueID": "Platonymous.MuliplayerTweaks",
+  "EntryDll": "MuliplayerTweaks.dll",
+  "MinimumApiVersion": "2.6-beta",
+  "UpdateKeys": [ "Nexus:" ]
+}

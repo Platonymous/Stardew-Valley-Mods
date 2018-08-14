@@ -1,0 +1,7 @@
+﻿{
+  "template.start": "Started {{mod}} from folder: {{folder}}",
+  "template.redpill.name": "Red Pill",
+  "template.redpill.description": "Take the red pill",
+  "template.bluepill.name": "Blue Pill",
+  "template.bluepill.description": "Take the blue pill"
+}

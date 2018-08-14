@@ -366,7 +366,7 @@ namespace CustomFarmingRedux
                 next.machines.Add(legacyMachine);
                 packs.Add(next);
             }
-            
+
             foreach (CustomFarmingPack pack in packs)
                 foreach (CustomMachineBlueprint blueprint in pack.machines)
                 {
@@ -387,8 +387,8 @@ namespace CustomFarmingRedux
 
                     CustomObjectData data = new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, typeof(CustomMachine), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.fullid, blueprint.crafting));
 
-                    if (blueprint.forsale && (blueprint.condition == null || PyUtils.CheckEventConditions(blueprint.condition)))
-                        new InventoryItem(new CustomMachine(blueprint), blueprint.price).addToNPCShop(blueprint.shop);
+                    if (blueprint.forsale)
+                        new InventoryItem(new CustomMachine(blueprint), blueprint.price).addToNPCShop(blueprint.shop, blueprint.condition);
                 }
             
             Monitor.Log(packs.Count + " Content Packs with " + machines.Count + " machines found.", LogLevel.Trace);

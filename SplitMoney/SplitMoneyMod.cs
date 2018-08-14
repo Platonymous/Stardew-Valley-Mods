@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework;
 using System;
 using SObject = StardewValley.Object;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace SplitMoney
 {
@@ -63,6 +64,40 @@ namespace SplitMoney
         #endregion
 
         #region overrides
+
+        [HarmonyPatch]
+        internal class FriendShipFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return PyUtils.getTypeSDV("SaveGame").GetMethod("loadDataToFarmer", BindingFlags.Public | BindingFlags.Static);
+            }
+
+            internal static void Prefix(Farmer target, ref int __state)
+            {
+                if (target.friendships != null && target.friendships.ContainsKey("money"))
+                {
+                    __state = target.friendships["money"][0];
+                    target.friendships.Remove("money");
+                }
+                else
+                {
+                    __state = -1;
+                }
+            }
+
+            internal static void Postfix(Farmer target, ref int __state)
+            {
+                if (__state != -1)
+                {
+                    if (target.friendships == null)
+                        target.friendships = new SerializableDictionary<string, int[]>();
+
+                    target.friendships.Add("money", new int[] { __state });
+                }
+            }
+        }
+
         [HarmonyPatch]
         internal class MoneyGetter
         {

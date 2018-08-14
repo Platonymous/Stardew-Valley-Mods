@@ -5,6 +5,7 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Visualize
 {
@@ -19,6 +20,7 @@ namespace Visualize
         public static Dictionary<Color[], Color[]> lineCache = new Dictionary<Color[], Color[]>();
         public static Color[] lastData;
         public static Color[] lastNewData;
+        public static bool running = false;
         public static Dictionary<Texture2D, List<Color>> paletteCache = new Dictionary<Texture2D, List<Color>>();
         internal static int[] whitecolor = new int[] { 255, 255, 255, 255 };
         internal static bool active = false;
@@ -57,11 +59,10 @@ namespace Visualize
 
             drawMethod.Invoke(__instance, new object[] { changeColor(texture, useProfile.saturation, useProfile.palette), destination, scaleDestination, sourceRectangle, newColor, rotation, origin, effects, depth });
 
-            
             return false;
         }
 
-        private Color multiply(Color color1, Color color2)
+        public Color multiply(Color color1, Color color2)
         {
             Color result = new Color();
 
@@ -73,48 +74,58 @@ namespace Visualize
             return result;
         }
 
-
         private Texture2D changeColor(Texture2D texture, float saturation, string palletteFile)
         {
             if (textureCache.ContainsKey(texture))
-                return textureCache[texture];
+                    return textureCache[texture];
 
-            Texture2D newTexture = new Texture2D(texture.GraphicsDevice, texture.Width, texture.Height);
+            if (!running)
+            {
+                running = true;
+                Task.Run(() =>
+               {
+                   Texture2D newTexture = new Texture2D(texture.GraphicsDevice, texture.Width, texture.Height);
 
-            Color[] colorData;
+                   Color[] colorData;
 
-            colorData = new Color[texture.Width * texture.Height];
-            int width = texture.Width;
-            int height = texture.Height;
-            texture.GetData<Color>(colorData);
-            int length = colorData.Length;
-            Color[] lastColorData = (Color[])colorData.Clone();
-            Dictionary<Color, Color> newShortColorCache = new Dictionary<Color, Color>();
-            int split = Game1.tileSize;
+                   colorData = new Color[texture.Width * texture.Height];
+                   int width = texture.Width;
+                   int height = texture.Height;
+                   texture.GetData<Color>(colorData);
+                   int length = colorData.Length;
+                   Color[] lastColorData = (Color[])colorData.Clone();
+                   Dictionary<Color, Color> newShortColorCache = new Dictionary<Color, Color>();
 
-            for (int x = 0; x < texture.Width; x++)
-                for (int y = 0; y < texture.Height; y++)
-                {
-                    Color color = colorData[x * texture.Height + y];
-                    if (shortColorCache.ContainsKey(color))
-                        colorData[x * texture.Height + y] = shortColorCache[color];
-                    else
-                    {
-                        Color newColor = changeColor(color, saturation, palletteFile);
-                        shortColorCache.Add(color, newColor);
-                        colorData[x * texture.Height + y] = newColor;
-                    }
-                }
+                   for (int x = 0; x < texture.Width; x++)
+                       for (int y = 0; y < texture.Height; y++)
+                       {
+                           Color color = colorData[x * texture.Height + y];
+                           if (shortColorCache.ContainsKey(color))
+                               colorData[x * texture.Height + y] = shortColorCache[color];
+                           else
+                           {
+                               Color newColor = changeColor(color, saturation, palletteFile);
+                               shortColorCache.Add(color, newColor);
+                               colorData[x * texture.Height + y] = newColor;
+                           }
+                       }
 
-            shortColorCache = newShortColorCache;
-            newTexture.SetData<Color>(colorData);
+                   shortColorCache = newShortColorCache;
+                   newTexture.SetData<Color>(colorData);
 
-            lastData = lastColorData;
-            lastNewData = colorData;
+                   lastData = lastColorData;
+                   lastNewData = colorData;
 
-            textureCache.Add(texture, newTexture);
+                   if (textureCache.ContainsKey(texture))
+                       textureCache[texture] = newTexture;
+                   else
+                       textureCache.Add(texture, newTexture);
 
-            return newTexture;
+                   running = false;
+               });
+            }
+
+            return texture;
         }
 
         private Color changeColor(Color color, float saturation, string palletteFile)
@@ -125,7 +136,7 @@ namespace Visualize
             if (colorCache.ContainsKey(color))
                 return colorCache[color];
 
-            saturation *= VisualizeMod._config.saturation / 100;      
+            saturation *= VisualizeMod._config.saturation / 100;
 
             Color newColor = new Color(color.R, color.G, color.B, color.A);
 
@@ -136,8 +147,8 @@ namespace Visualize
             float l = 0.2125f * newR + 0.7154f * newG + 0.0721f * newB;
 
             float s = 1f - (saturation / 100);
-            
-            if(s != 0)
+
+            if (s != 0)
             {
                 newR = newR + s * (l - newR);
                 newG = newG + s * (l - newG);
@@ -152,8 +163,10 @@ namespace Visualize
                 newColor = FindNearestColor(VisualizeMod.palette.ToArray(), newColor);
 
             newColor.A = color.A;
-
-            colorCache.Add(color, newColor);
+            if (colorCache.ContainsKey(color))
+                colorCache[color] = newColor;
+            else
+                colorCache.Add(color, newColor);
 
             return newColor;
         }

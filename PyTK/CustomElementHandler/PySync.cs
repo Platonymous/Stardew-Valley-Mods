@@ -20,7 +20,7 @@ namespace PyTK.CustomElementHandler
 
         public void init()
         {
-            Element.NetFields.AddField(Element.syncObject);
+            (Element as Item).NetFields.AddField(Element.syncObject);
         }
 
         ISyncableElement Element { get; set; }

@@ -8,6 +8,6 @@ namespace PyTK.CustomElementHandler
         Dictionary<string, string> getSyncData();
         void sync(Dictionary<string, string> syncData);
         PySync syncObject { get; set; }
-        NetFields NetFields { get; }
+       // NetFields NetFields { get; }
     }
 }

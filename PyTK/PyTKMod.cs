@@ -126,6 +126,14 @@ namespace PyTK
             CcTime.skip().register();
             CcLua.runScript().register();
 
+            new ConsoleCommand("allready", "confirms all players for the current readydialogue", (s, p) =>
+            {
+                if (!(Game1.activeClickableMenu is ReadyCheckDialog))
+                    Monitor.Log("No open ready check.", LogLevel.Alert);
+                else
+                    OvReadyCheck.allready = true;
+            }).register();
+
             new ConsoleCommand("send", "sends a message to all players: send [address] [message]", (s, p) =>
             {
                 if (p.Length < 2)

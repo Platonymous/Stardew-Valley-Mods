@@ -120,7 +120,8 @@ namespace PyTK.CustomElementHandler
             SaveEvents.AfterLoad += (s, e) => Rebuild();
             Events.PyTimeEvents.BeforeSleepEvents += (s, e) => { if (Game1.IsClient) { Replace(); } };
             TimeEvents.AfterDayStarted += (s, e) => {
-                    Game1.objectSpriteSheet.Tag = "cod_objects";
+                Rebuild();
+                Game1.objectSpriteSheet.Tag = "cod_objects";
                     Game1.bigCraftableSpriteSheet.Tag = "cod_bigobject";
             };
             TypeChecker = new PyResponder<bool, string>(typeCheckerName, (s) =>
@@ -288,7 +289,8 @@ namespace PyTK.CustomElementHandler
             ICollection col = value as ICollection;
             OverlaidDictionary<Vector2, SObject> ovd = value as OverlaidDictionary<Vector2, SObject>;
             NetObjectList<Item> noli = value as NetObjectList<Item>;
-            IList<Building> buildings = value as IList<Building>;
+            NetCollection<Building> netBuildings = value as NetCollection<Building>;
+            NetArray<SObject, NetRef<SObject>> netObjectArray = value as NetArray<SObject, NetRef<SObject>>;
 
 
             if (dict != null)
@@ -306,9 +308,12 @@ namespace PyTK.CustomElementHandler
             else if (noli != null)
                 foreach (object item in noli)
                     FindAllInstances(item, propNames, exploredObjects, found, noli);
-            else if(buildings != null)
-                foreach (object item in buildings)
-                    FindAllInstances(item, propNames, exploredObjects, found, buildings);
+            else if (netBuildings != null)
+                foreach (object item in netBuildings)
+                    FindAllInstances(item, propNames, exploredObjects, found, netBuildings);
+            else if (netObjectArray != null)
+                foreach (SObject item in netObjectArray.Where(no => no != null))
+                    FindAllInstances(item, propNames, exploredObjects, found, netObjectArray);
             else
             {
                 if (found.ContainsKey(parent))
@@ -318,16 +323,16 @@ namespace PyTK.CustomElementHandler
 
                 Type type = value.GetType();
 
-                FieldInfo[] properties = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.GetProperty);
+                FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.GetProperty);
 
-                foreach (FieldInfo property in properties)
+                foreach (FieldInfo field in fields)
                 {
-                   if (!propNames.Contains(property.Name))
+                    if (!propNames.Contains(field.Name))
                         continue;
 
-                    object propertyValue = property.GetValue(value);
+                    object propertyValue = field.GetValue(value);
                     if (propertyValue != null && propertyValue.GetType() is Type t && t.IsClass)
-                        FindAllInstances(propertyValue, propNames, exploredObjects, found, new KeyValuePair<FieldInfo, object>(property, value));
+                        FindAllInstances(propertyValue, propNames, exploredObjects, found, new KeyValuePair<FieldInfo, object>(field, value));
                 }
             }
         }
@@ -343,35 +348,6 @@ namespace PyTK.CustomElementHandler
                 return rchest;
             }
             return replacement;
-        }
-
-        internal static string getDataString(object o)
-        {
-            if (o is SObject obj)
-                return obj.name;
-            if (o is Tool t)
-                return t.Name;
-            if (o is Furniture f)
-                return f.name;
-            if (o is Hat h)
-                return h.Name;
-            if (o is Boots b)
-                return b.Name;
-            if (o is Ring r)
-                return r.Name;
-            if (o is Building bl)
-                return bl.nameOfIndoors;
-            if (o is GameLocation gl)
-                return (gl.lastQuestionKey != null) ? gl.lastQuestionKey : "not available";
-            if (o is FarmAnimal a)
-                return a.Name;
-            if (o is NPC n)
-                return n.Name;
-            if (o is FruitTree ft)
-                return ft.fruitSeason.Value;
-
-            return "not available";
-
         }
 
         public static string[] splitElemets(string dataString)
@@ -400,6 +376,9 @@ namespace PyTK.CustomElementHandler
                 object o = Activator.CreateInstance(T);
 
                 if (!(hasSaveType(o)))
+                    return replacement;
+
+                if (o is Building && replacement is Chest)
                     return replacement;
 
                 Dictionary<string, string> additionalSaveData = new Dictionary<string, string>();
@@ -505,16 +484,51 @@ namespace PyTK.CustomElementHandler
                 b.Name = dataString;
             if (o is Ring r)
                 r.Name = dataString;
-            /* if (o is Building bl)
-                bl.nameOfIndoors = dataString; */
+            if (o is Mill bl)
+            {
+                if (bl.input.Value == null)
+                    bl.input.Value = new Chest(true);
+                bl.input.Value.name = dataString;
+            }
             if (o is GameLocation gl)
-                gl.lastQuestionKey = dataString;
+                gl.uniqueName.Value = dataString;
             if (o is FarmAnimal a)
                 a.Name = dataString;
             if (o is NPC n)
                 n.Name = dataString;
             if (o is FruitTree ft)
                 ft.fruitSeason.Value = dataString;
+        }
+
+        internal static string getDataString(object o)
+        {
+            string data = "not available";
+
+            if (o is SObject obj)
+                data = obj.name;
+            if (o is Tool t)
+                data = t.Name;
+            if (o is Furniture f)
+                data = f.name;
+            if (o is Hat h)
+                data = h.Name;
+            if (o is Boots b)
+                data = b.Name;
+            if (o is Ring r)
+                data = r.Name;
+            if (o is Mill bl && bl.input.Value is Chest bgl)
+                data = bgl.name;
+            if (o is GameLocation gl)
+                data = gl.uniqueName.Value;
+            if (o is FarmAnimal a)
+                data = a.Name;
+            if (o is NPC n)
+                data = n.Name;
+            if (o is FruitTree ft)
+                data = ft.fruitSeason.Value;
+
+            return (data == null ? "not available" : data);
+
         }
 
         private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent)
@@ -617,6 +631,13 @@ namespace PyTK.CustomElementHandler
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
                             noli[index] = (Item)replacer(item);
                         }
+                        else if (key is NetCollection<Building> ncbld)
+                        {
+                            Building[] lobj = new Building[ncbld.Count];
+                            ncbld.CopyTo(lobj, 0);
+                            int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
+                            ncbld[index] = (Building)replacer(item);
+                        }
                         else if (key is Array arr)
                         {
                             object[] lobj = new object[arr.Length];
@@ -624,11 +645,18 @@ namespace PyTK.CustomElementHandler
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
                             arr.SetValue(replacer(item), index);
                         }
-
                         else if (key is KeyValuePair<FieldInfo, object> kpv)
                         {
                             kpv.Key.SetValue(kpv.Value, replacer(item));
                         }
+                        else if (key is NetArray<SObject, NetRef<SObject>> naso)
+                        {
+                            List<SObject> slist = naso.ToList();
+                            int idx = slist.ToList().FindIndex(s => s == (SObject)(object)item);
+                            if (idx >= 0)
+                                naso[idx] = (SObject) replacer(item);
+                        }
+
                     }
                 }
             }
@@ -680,6 +708,11 @@ namespace PyTK.CustomElementHandler
                             int index = noli.ToList<Item>().FindIndex(p => p is TIn && p == obj);
                             noli.RemoveAt(index);
                         }
+                        else if (key is NetCollection<Building> ncbld)
+                        {
+                            int index = ncbld.ToList<Building>().FindIndex(p => p is TIn && p == obj);
+                            ncbld.RemoveAt(index);
+                        }
                         else if (key is List<Furniture> furniture)
                         {
                             int index = furniture.FindIndex(p => p is TIn && p == obj);
@@ -689,6 +722,14 @@ namespace PyTK.CustomElementHandler
                         {
                             kpv.Key.SetValue(kpv.Value, null);
                         }
+                        else if (key is NetArray<SObject, NetRef<SObject>> naso)
+                        {
+                            List<SObject> slist = naso.ToList();
+                            int idx = slist.ToList().FindIndex(s => s == (SObject)(object)item);
+                            if (idx >= 0)
+                                naso[idx] = null;
+                        }
+
 
                     }
             }

@@ -53,5 +53,11 @@ namespace SplitMoney
             return new GoldItem(CustomObjectData.collection[additionalSaveData["id"]]);
         }
 
+
+        public override bool canStackWith(Item other)
+        {
+            bool result = base.canStackWith(other) && this.Name == other.Name;
+            return result;
+        }
     }
 }

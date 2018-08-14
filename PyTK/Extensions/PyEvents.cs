@@ -289,7 +289,7 @@ namespace PyTK.Extensions
                 ShopMenu shop = (ShopMenu)e.NewMenu;
                 List<Item> forSale = shop.getForSale();
                 Dictionary<Item, int[]> priceAndStock = shop.getItemPriceAndStock();
-                forSale.Add(inventory.item);
+                forSale.AddOrReplace(inventory.item);
                 priceAndStock.AddOrReplace(inventory.item, new int[] { inventory.price, inventory.stock });
             };
 
@@ -303,6 +303,13 @@ namespace PyTK.Extensions
         public static EventHandler<EventArgsClickableMenuChanged> addToNPCShop(this InventoryItem item, string shopkeeper)
         {
             return item.addToShop((shop) => shop.portraitPerson is NPC npc && npc.Name == shopkeeper);
+        }
+
+        /// <summary>Generates a method that adds this inventory to a shop of an NPC adds it to MenuEvents.MenuChanged.</summary>
+        /// <returns>Returns the method.</returns>
+        public static EventHandler<EventArgsClickableMenuChanged> addToNPCShop(this InventoryItem item, string shopkeeper, string conditions)
+        {
+            return item.addToShop((shop) => shop.portraitPerson is NPC npc && npc.Name == shopkeeper && PyUtils.CheckEventConditions(conditions));
         }
 
         /// <summary>Generates a method that adds this inventory to the furniture catalogue and adds it to MenuEvents.MenuChanged.</summary>

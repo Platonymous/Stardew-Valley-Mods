@@ -7,6 +7,7 @@ using StardewValley.Menus;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace PyTK.ConsoleCommands
 {
@@ -18,7 +19,6 @@ namespace PyTK.ConsoleCommands
         private static MethodInfo update = Game1.game1.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).ToList().Find(m => m.Name == "Update");
         private static MethodInfo draw = Game1.game1.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).ToList().Find(m => m.Name == "Draw");
 
-
         public static ConsoleCommand skip()
         {
             return new ConsoleCommand("pytk_skip", "Fast forwards to 2200 or specified time of day.", (s,p) => TimeSkip(p.Length > 0 ? p[0] : "2200", true));
@@ -26,6 +26,9 @@ namespace PyTK.ConsoleCommands
 
         public static void TimeSkip(string p, bool showTextInConsole = false)
         {
+            Overrides.OvGame.skipping = true;
+            Program.gamePtr.IsFixedTimeStep = false;
+
             try
             {
                 int t = Math.Min(Math.Max(int.Parse(p), Game1.timeOfDay), 2400);
@@ -35,7 +38,17 @@ namespace PyTK.ConsoleCommands
 
                 while (Game1.timeOfDay < t)
                 {
-                    update.Invoke(Game1.game1, new[] { Game1.currentGameTime });
+                    Program.gamePtr.IsFixedTimeStep = false;
+
+                        try
+                        {
+                            update.Invoke(Game1.game1, new[] { new AltGameTime(Game1.currentGameTime.TotalGameTime,Game1.currentGameTime.ElapsedGameTime) });
+                        }
+                        catch
+                        {
+
+                        }
+
                     if (Game1.CurrentEvent != null)
                         Game1.CurrentEvent.skipEvent();
                     if (Game1.activeClickableMenu is DialogueBox db)
@@ -48,6 +61,8 @@ namespace PyTK.ConsoleCommands
             {
 
             }
+            Program.gamePtr.IsFixedTimeStep = true;
+            Overrides.OvGame.skipping = false;
 
         }
     }

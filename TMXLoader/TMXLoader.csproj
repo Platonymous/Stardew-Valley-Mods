@@ -4,6 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <ProjectGuid>{51A3F67D-418C-4E12-ACF3-45388BE5F8DE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -11,6 +12,8 @@
     <AssemblyName>TMXLoader</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,33 +45,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Maps\UlithiumDragon.CutContent\Bus%28people%29.tmx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Maps\UlithiumDragon.CutContent\CityBus.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTemple.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleExterior.tmx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleInterior.tmx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleJunction01.tmx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleLeftRoom01.tmx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleRightRoom01.tmx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Maps\UlithiumDragon.JungleTemple\Woods.tmx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Maps\UlithiumDragon.CutContent\Bus%28people%29.tmx" />
+    <None Include="Maps\UlithiumDragon.CutContent\CityBus.json" />
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTemple.json" />
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleExterior.tmx" />
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleInterior.tmx" />
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleJunction01.tmx" />
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleLeftRoom01.tmx" />
+    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleRightRoom01.tmx" />
+    <None Include="Maps\UlithiumDragon.JungleTemple\Woods.tmx" />
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -85,58 +70,36 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Maps\UlithiumDragon.CutContent\zBusPeople.png">
+    <Content Include="Converter\IN\in.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_cave.png">
+    <Content Include="Converter\OUT\out.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_fall_JungleTempleoutdoorsTileSheet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_fall_JungleTempleTileSheet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\paths.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_SewerTiles.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_spring_JungleTempleoutdoorsTileSheet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_spring_JungleTempleTileSheet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\spring_outdoorsTileSheet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_summer_JungleTempleoutdoorsTileSheet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_summer_JungleTempleTileSheet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_winter_JungleTempleoutdoorsTileSheet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_winter_JungleTempleTileSheet.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Maps\UlithiumDragon.JungleTemple\z_WizardHouseTiles.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Maps\UlithiumDragon.CutContent\BusPeople.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\cave.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\fall_JungleTempleoutdoorsTileSheet.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\fall_JungleTempleTileSheet.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\paths.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\SewerTiles.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\spring_JungleTempleoutdoorsTileSheet.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\spring_JungleTempleTileSheet.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\spring_outdoorsTileSheet.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\summer_JungleTempleoutdoorsTileSheet.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\summer_JungleTempleTileSheet.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\winter_JungleTempleoutdoorsTileSheet.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\winter_JungleTempleTileSheet.png" />
+    <Content Include="Maps\UlithiumDragon.JungleTemple\WizardHouseTiles.png" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
+    <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
+  <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0-beta-20180426\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
+    <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
   </Target>
 </Project>

@@ -87,7 +87,6 @@ namespace CustomShirts
 
         public static bool Prefix_draw(Hat __instance, SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, int direction)
         {
-            CustomShirtsMod._monitor.Log("draw");
             if (__instance is CustomHat c)
             {
                 if (direction == 0)
@@ -109,7 +108,7 @@ namespace CustomShirts
 
         public object getReplacement()
         {
-            return new Hat(blueprint.baseid);
+            return new Hat(which);
         }
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)

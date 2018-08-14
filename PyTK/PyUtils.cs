@@ -51,6 +51,10 @@ namespace PyTK
 
         public static bool checkEventConditions(string conditions, object caller = null)
         {
+            Monitor.Log("Check conditions:" + conditions);
+            if (!Context.IsWorldReady)
+                return false;
+
             if (conditions == null || conditions == "")
                 return true;
 
@@ -68,8 +72,18 @@ namespace PyTK
             else if (conditions.StartsWith("LC "))
                 result = checkLuaConditions(conditions.Replace("LC ", ""), caller);
             else
-                result = Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) != -1;
+            {
+                GameLocation location = Game1.currentLocation;
+                if (location == null)
+                    location = Game1.getFarm();
 
+                if (location == null)
+                    result = false;
+                else
+                    result = Helper.Reflection.GetMethod(location, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) != -1;
+            }
+
+            Monitor.Log("Result:" + (result == comparer));
             return result == comparer;
         }
 

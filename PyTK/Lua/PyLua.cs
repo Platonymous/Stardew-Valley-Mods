@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MoonSharp.Interpreter;
+using Netcode;
 using PyTK.CustomElementHandler;
 using PyTK.Extensions;
 using StardewModdingAPI;
@@ -141,14 +142,11 @@ namespace PyTK.Lua
             registerType(typeof(LuaUtils),false,true);
 
             /* XNA */
-            UserData.RegisterType<Vector2>();
-            UserData.RegisterType<Texture2D>();
-            UserData.RegisterType<Point>();
-            UserData.RegisterType<Rectangle>();
-            UserData.RegisterType<Color>();
+            registerType(typeof(Vector2), false, true);
 
             /* SDV */
-            registerType(typeof(Game1), false, true, (at) => !at.ToString().Contains("SerializableDictionary"));
+            registerType(typeof(Game1), false, true);
+            registerType(typeof(NetInt), false, true);
         }
 
         public static void saveScriptToFile(string uniqueId, string path)

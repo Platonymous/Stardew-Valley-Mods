@@ -1,8 +1,8 @@
 ﻿using PyTK.ConsoleCommands;
 using StardewModdingAPI;
 using StardewValley;
+using System;
 using System.Threading;
-
 
 namespace SleepWorker
 {
@@ -12,10 +12,19 @@ namespace SleepWorker
         internal static bool canSleep = false;
         public override void Entry(IModHelper helper)
         {
+            var res = (sum: 0, count: 0);
+            res.count++;
+            res.sum = 100;
+            Monitor.Log(res.sum + ":" + res.count);
             config = helper.ReadConfig<Config>();
-            PyTK.Events.PyTimeEvents.BeforeSleepEvents += (s, e) => { if (!canSleep) { e.Response.responseKey = "No"; Thread tThread = new Thread(callTimeSkip); tThread.Start(); } };
+            PyTK.Events.PyTimeEvents.BeforeSleepEvents += (s, e) =>
+            {
+                if (!Game1.IsMultiplayer && !canSleep)
+                {
+                    e.Response.responseKey = "No"; Thread tThread = new Thread(callTimeSkip); tThread.Start();
+                }
+            };
         }
-
         public void callTimeSkip()
         {
             Game1.playSound("coin");

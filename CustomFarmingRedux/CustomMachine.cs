@@ -48,6 +48,8 @@ namespace CustomFarmingRedux
         public GameLocation location;
         private CustomObjectData data;
         private bool meetsConditions = true;
+        private bool checkedToday = false;
+        private bool skipDrop = false;
         private int frame {
             get
             {
@@ -227,7 +229,7 @@ namespace CustomFarmingRedux
             if (blueprint.production == null || activeRecipe == null)
                 return;
 
-            minutesUntilReady.Value = -1;
+            minutesUntilReady.Set(-1);
             completionTime = null;
             heldObject.Value = createProduce();
             readyForHarvest.Value = true;
@@ -261,7 +263,10 @@ namespace CustomFarmingRedux
             if (completionTime == null)
                 completionTime = STime.CURRENT + recipe.time;
 
-            meetsConditions = PyUtils.CheckEventConditions(conditions, this);
+            if (!checkedToday)
+                meetsConditions = PyUtils.CheckEventConditions(conditions, this);
+
+            checkedToday = true;
 
             if (!meetsConditions)
             {
@@ -271,7 +276,7 @@ namespace CustomFarmingRedux
                 completionTime += recipe.time;
             }
 
-            minutesUntilReady.Value = (completionTime - STime.CURRENT).timestamp;
+            minutesUntilReady.Set((completionTime - STime.CURRENT).timestamp);
             
             if (starterRecipe != null)
                 starterRecipe.consumeIngredients(items);
@@ -322,7 +327,7 @@ namespace CustomFarmingRedux
            base.updateWhenCurrentLocation(time, environment);
 
             if (completionTime != null)
-                minutesUntilReady.Value = Math.Max((completionTime - STime.CURRENT).timestamp,0);
+                minutesUntilReady.Set(Math.Max((completionTime - STime.CURRENT).timestamp,0));
         }
 
         public override string DisplayName { get => name; set => base.DisplayName = value; }
@@ -478,6 +483,7 @@ namespace CustomFarmingRedux
             else
                 completionTime = STime.CURRENT;
 
+            checkedToday = false;
             meetsConditions = PyUtils.CheckEventConditions(conditions, this);
 
             if (completionTime != null && completionTime > STime.CURRENT && !meetsConditions)
@@ -559,6 +565,8 @@ namespace CustomFarmingRedux
 
         public bool deliverProduce(SFarmer who, bool toInventory = true)
         {
+            skipDrop = true;
+
             if (toInventory && !who.addItemToInventoryBool(heldObject, false))
             {
                 Game1.showRedMessage("Inventory Full");
@@ -582,7 +590,7 @@ namespace CustomFarmingRedux
         {
             if (!isWorking && blueprint.production != null && blueprint.production[0].materials == null)
                 startProduction(null, blueprint.production[0], null);
-            else if (config.automation)
+            else if (config.automation && heldObject.Value == null)
                 startAutomation();
         }
 
@@ -611,6 +619,14 @@ namespace CustomFarmingRedux
 
         public override bool performObjectDropInAction(Item dropInItem, bool probe, SFarmer who)
         {
+            if (skipDrop || heldObject.Value != null)
+            {
+                skipDrop = false;
+                return false;
+            }
+            
+            checkedToday = false;
+
             if (!(dropInItem is SObject))
                 return false;
 
@@ -630,7 +646,7 @@ namespace CustomFarmingRedux
             RecipeBlueprint recipe = findRecipeFor(maxed((SObject)dropInItem));
             bool hasRecipe = recipe != null;
             bool hasStarter = hasStarterMaterials(items);
-            bool hasIngredients = hasRecipe && recipe.hasIngredients(items);
+            bool hasIngredients = hasRecipe && recipe.hasIngredients(items, dropInItem);
             bool canProduce = hasIngredients && hasStarter;
 
             if (probe)
@@ -640,7 +656,20 @@ namespace CustomFarmingRedux
 
                 return canProduce;
             }
-                
+
+            if (canProduce && blueprint.conditionaldropin)
+            {
+                if (!checkedToday)
+                    meetsConditions = PyUtils.CheckEventConditions(conditions, this);
+
+                checkedToday = true;
+
+                if (!meetsConditions)
+                {
+                    Game1.showRedMessage($"This machine is not working under the current conditions");
+                    return false;
+                }
+            }
 
             if (canProduce)
             {

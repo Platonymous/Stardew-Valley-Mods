@@ -15,6 +15,7 @@ using xTile.Layers;
 using SFarmer = StardewValley.Farmer;
 using Harmony;
 using System.Reflection;
+using System.Linq;
 
 namespace TMXLoader
 {
@@ -23,11 +24,11 @@ namespace TMXLoader
         internal static string contentFolder = "Maps";
         internal static IMonitor monitor;
         internal static IModHelper helper;
-        internal static List<Map> maplayers;
+        internal static Dictionary<string, Map> mapsToSync = new Dictionary<string, Map>();
+        internal static List<SFarmer> syncedFarmers = new List<SFarmer>();
 
         public override void Entry(IModHelper helper)
         {
-            maplayers = new List<Map>();
             TMXLoaderMod.helper = Helper;
             monitor = Monitor;
             Monitor.Log("Environment:" + PyUtils.getContentFolder());
@@ -41,7 +42,37 @@ namespace TMXLoader
             PyLua.addGlobal("TMX", new TMXActions());
             fixCompatibilities();
             harmonyFix();
-            PlayerEvents.Warped += (s, e) => { if (e.NewLocation is GameLocation l && l.map is Map m) { addMoreMapLayers(m); } };
+            
+            GameEvents.OneSecondTick += (s, e) =>
+            {
+                if (Context.IsWorldReady && Game1.IsServer && Game1.IsMultiplayer)
+                    if (Game1.otherFarmers.Values.Where(f => f.isActive() && !syncedFarmers.Contains(f)) is IEnumerable<SFarmer> ef && ef.Count() is int i && i > 0)
+                        syncMaps(ef);
+            };
+
+            TimeEvents.AfterDayStarted += (s, e) => {
+
+                List<SFarmer> toRemove = new List<SFarmer>();
+
+                foreach (SFarmer farmer in syncedFarmers)
+                    if (!Game1.otherFarmers.ContainsKey(farmer.UniqueMultiplayerID) || !Game1.otherFarmers[farmer.UniqueMultiplayerID].isActive())
+                        toRemove.Add(farmer);
+
+                foreach (SFarmer remove in toRemove)
+                    syncedFarmers.Remove(remove);
+
+            };
+        }
+
+        private void syncMaps(IEnumerable<SFarmer> farmers)
+        {
+            foreach (SFarmer farmer in farmers)
+            {
+                foreach (KeyValuePair<string, Map> map in mapsToSync)
+                    PyNet.syncMap(map.Value, map.Key, Game1.player);
+
+                syncedFarmers.AddOrReplace(farmer);
+            }
         }
 
         private void fixCompatibilities()
@@ -72,27 +103,25 @@ namespace TMXLoader
 
         private void loadContentPacks()
         {
-            List<TMXContentPack> packs = new List<TMXContentPack>();
-            PyUtils.loadContentPacks<TMXContentPack>(out packs, Path.Combine(Helper.DirectoryPath, contentFolder), SearchOption.AllDirectories, Monitor);
-
-            foreach (TMXContentPack pack in packs)
+            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
             {
-                if (pack.scripts.Count > 0)
-                    foreach (string script in pack.scripts)
-                        PyLua.loadScriptFromFile(Path.Combine(Helper.DirectoryPath, contentFolder, pack.folderName, script), pack.folderName);
+                TMXContentPack tmxPack = pack.ReadJsonFile<TMXContentPack>("content.json");
 
+                if (tmxPack.scripts.Count > 0)
+                    foreach (string script in tmxPack.scripts)
+                        PyLua.loadScriptFromFile(Path.Combine(pack.DirectoryPath, script), pack.Manifest.UniqueID);
 
-                foreach (MapEdit edit in pack.addMaps)
+                foreach (MapEdit edit in tmxPack.addMaps)
                 {
-                    string filePath = Path.Combine(contentFolder, pack.folderName, edit.file);
-                    Map map = TMXContent.Load(filePath, Helper);
+                    string filePath = Path.Combine(pack.DirectoryPath, edit.file);
+                    Map map = TMXContent.Load(edit.file, Helper,pack);
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
                     map.inject("Maps/" + edit.name);
-                    addMoreMapLayers(map);
+                    map.enableMoreMapLayers();
                     GameLocation location;
                     if (map.Properties.ContainsKey("Outdoors") && map.Properties["Outdoors"] == "F")
                     {
-                        location = new GameLocation(Path.Combine("Maps",edit.name), edit.name) { IsOutdoors = false };
+                        location = new GameLocation(Path.Combine("Maps", edit.name), edit.name) { IsOutdoors = false };
                         location.loadLights();
                         location.IsOutdoors = false;
                     }
@@ -100,24 +129,25 @@ namespace TMXLoader
                         location = new GameLocation(Path.Combine("Maps", edit.name), edit.name);
 
                     location.seasonUpdate(Game1.currentSeason);
-
+                    mapsToSync.AddOrReplace(edit.name, map);
                     SaveEvents.AfterLoad += (s, e) => Game1.locations.Add(location);
                 }
 
-                foreach (MapEdit edit in pack.replaceMaps)
+                foreach (MapEdit edit in tmxPack.replaceMaps)
                 {
-                    string filePath = Path.Combine(contentFolder, pack.folderName, edit.file);
-                    Map map = TMXContent.Load(filePath, Helper);
-                    addMoreMapLayers(map);
+                    string filePath = Path.Combine(pack.DirectoryPath, edit.file);
+                    Map map = TMXContent.Load(edit.file, Helper, pack);
+                    map.enableMoreMapLayers();
                     Map original = edit.retainWarps ? Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent) : map;
-                    editWarps(map, edit.addWarps, edit.removeWarps, original);                   
+                    editWarps(map, edit.addWarps, edit.removeWarps, original);
                     map.injectAs("Maps/" + edit.name);
+                    mapsToSync.AddOrReplace(edit.name, map);
                 }
 
-                foreach (MapEdit edit in pack.mergeMaps)
+                foreach (MapEdit edit in tmxPack.mergeMaps)
                 {
-                    string filePath = Path.Combine(contentFolder, pack.folderName, edit.file);
-                    Map map = TMXContent.Load(filePath, Helper);
+                    string filePath = Path.Combine(pack.DirectoryPath, edit.file);
+                    Map map = TMXContent.Load(edit.file, Helper, pack);
 
                     Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
                     Rectangle? sourceArea = null;
@@ -127,29 +157,37 @@ namespace TMXLoader
 
                     map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, true);
                     editWarps(map, edit.addWarps, edit.removeWarps, original);
-                    addMoreMapLayers(map);
+                    map.enableMoreMapLayers();
                     map.injectAs("Maps/" + edit.name);
+                    mapsToSync.AddOrReplace(edit.name, map);
                 }
 
-                foreach (MapEdit edit in pack.onlyWarps)
+                foreach (MapEdit edit in tmxPack.mergeMaps)
+                {
+                    string filePath = Path.Combine(pack.DirectoryPath, edit.file);
+                    Map map = TMXContent.Load(edit.file, Helper, pack);
+
+                    Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
+                    Rectangle? sourceArea = null;
+
+                    if (edit.sourceArea.Length == 4)
+                        sourceArea = new Rectangle(edit.sourceArea[0], edit.sourceArea[1], edit.sourceArea[2], edit.sourceArea[3]);
+
+                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, true);
+                    editWarps(map, edit.addWarps, edit.removeWarps, original);
+                    map.enableMoreMapLayers();
+                    map.injectAs("Maps/" + edit.name);
+                    mapsToSync.AddOrReplace(edit.name, map);
+                }
+
+                foreach (MapEdit edit in tmxPack.onlyWarps)
                 {
                     Map map = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
                     map.injectAs("Maps/" + edit.name);
+                    mapsToSync.AddOrReplace(edit.name, map);
                 }
             }
-        }
-
-        private void addMoreMapLayers(Map map)
-        {
-            if (maplayers.Contains(map))
-                return;
-
-            foreach (Layer layer in map.Layers)
-                if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
-                        maplayer.AfterDraw += (s, e) => layer.Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, Game1.pixelZoom);
-
-            maplayers.Add(map);
         }
 
         private void editWarps(Map map, string[] addWarps, string[] removeWarps, Map original = null)
@@ -182,6 +220,8 @@ namespace TMXLoader
         {
             Monitor.Log("Converting..", LogLevel.Trace);
             string inPath = Path.Combine(Helper.DirectoryPath, "Converter", "IN");
+
+            
 
             string[] directories = Directory.GetDirectories(inPath, "*.*",SearchOption.TopDirectoryOnly);
 
