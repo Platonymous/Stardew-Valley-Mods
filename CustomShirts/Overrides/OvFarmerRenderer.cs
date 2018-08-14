@@ -22,7 +22,7 @@ namespace CustomShirts.Overrides
 
         internal static bool menuIsCC()
         {
-            return Game1.activeClickableMenu is IClickableMenu c && c.GetType().Name.ToLower().Contains("character");
+            return Game1.activeClickableMenu is IClickableMenu c && c.GetType().Name.ToLower() is string s && (s.Contains("character"));
         }
 
         public static void Prefix_drawHairAndAccesories(FarmerRenderer __instance, Farmer who, int facingDirection, Vector2 position, Vector2 origin, float scale, int currentFrame, float rotation, Color overrideColor)
@@ -117,11 +117,6 @@ namespace CustomShirts.Overrides
             
             if (FarmerRenderer.shirtsTexture is ScaledTexture2D st)
                 st.ForcedSourceRectangle = new Rectangle?(new Rectangle(0, (int)((facingDirection == 0 ? 24 : facingDirection == 1 ? 8 : facingDirection == 3 ? 16 : 0) * st.Scale), (int)(8 * st.Scale), (int)(8 * st.Scale)));
-        }
-
-        public static bool Prefix_kiskae()
-        {
-            return false;
         }
 
         public static bool Prefix_doChangeShirt(FarmerRenderer __instance, int whichShirt)

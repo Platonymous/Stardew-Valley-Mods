@@ -67,6 +67,7 @@
     </None>
     <None Include="assets\jungletemple\JungleTempleRightRoom01.tmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="assets\jungletemple\Woods.tmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

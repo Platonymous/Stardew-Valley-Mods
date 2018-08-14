@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\GOG Galaxy\Games\Stardew Valley\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
@@ -66,11 +70,6 @@
     <Compile Include="ShirtSync.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
-      <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
-      <Name>Harmony</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\PyTK\PyTK.csproj">
       <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
       <Name>PyTK</Name>

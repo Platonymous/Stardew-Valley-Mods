@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LeBoyLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\LeBoyLib\bin\Debug\LeBoyLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -62,10 +66,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\LeBoyLib\LeBoyLib.csproj">
-      <Project>{773ee896-771e-4739-a5ac-542c3c3f42e9}</Project>
-      <Name>LeBoyLib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PyTK\PyTK.csproj">
       <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
       <Name>PyTK</Name>

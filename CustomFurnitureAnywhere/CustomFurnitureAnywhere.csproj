@@ -65,11 +65,6 @@
       <Name>Harmony</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\CustomElementHandler\CustomElementHandler.csproj">
-      <Project>{7a31daf1-0ac8-48f7-bd2d-e861850adc72}</Project>
-      <Name>CustomElementHandler</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\CustomFurniture\CustomFurniture.csproj">
       <Project>{b60cc08a-abd5-4b7b-81bf-c0295c11a025}</Project>
       <Name>CustomFurniture</Name>

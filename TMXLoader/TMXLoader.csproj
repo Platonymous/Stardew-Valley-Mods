@@ -45,15 +45,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Maps\UlithiumDragon.CutContent\Bus%28people%29.tmx" />
-    <None Include="Maps\UlithiumDragon.CutContent\CityBus.json" />
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTemple.json" />
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleExterior.tmx" />
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleInterior.tmx" />
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleJunction01.tmx" />
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleLeftRoom01.tmx" />
-    <None Include="Maps\UlithiumDragon.JungleTemple\JungleTempleRightRoom01.tmx" />
-    <None Include="Maps\UlithiumDragon.JungleTemple\Woods.tmx" />
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -76,20 +67,6 @@
     <Content Include="Converter\OUT\out.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Maps\UlithiumDragon.CutContent\BusPeople.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\cave.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\fall_JungleTempleoutdoorsTileSheet.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\fall_JungleTempleTileSheet.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\paths.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\SewerTiles.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\spring_JungleTempleoutdoorsTileSheet.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\spring_JungleTempleTileSheet.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\spring_outdoorsTileSheet.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\summer_JungleTempleoutdoorsTileSheet.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\summer_JungleTempleTileSheet.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\winter_JungleTempleoutdoorsTileSheet.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\winter_JungleTempleTileSheet.png" />
-    <Content Include="Maps\UlithiumDragon.JungleTemple\WizardHouseTiles.png" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Pathoschild.Stardew.ModBuildConfig.2.1.0\analyzers\dotnet\cs\StardewModdingAPI.ModBuildConfig.Analyzer.dll" />
