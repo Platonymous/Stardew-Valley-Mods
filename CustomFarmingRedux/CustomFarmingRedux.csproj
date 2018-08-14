@@ -64,6 +64,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Machines\Platonymous.Dresser\Dresser.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Machines\Platonymous.Examples\Examples.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -82,6 +85,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Machines\Platonymous.Dresser\dresser.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Machines\Platonymous.Examples\lemonade.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -1,0 +1,17 @@
+{
+   "name": "Standart Dresser",
+   "author": "Platonymous",
+   "version": "1.0.0",
+   "machines":
+   [
+	   {
+		   "id": 0,
+		   "name": "Standart Dresser for Kisekae",
+		   "description": "A Dresser",
+		   "category": "Dresser",
+		   "texture": "dresser.png",
+		   "crafting": "388 10",
+		   "pulsate": false
+		}
+   ]
+}

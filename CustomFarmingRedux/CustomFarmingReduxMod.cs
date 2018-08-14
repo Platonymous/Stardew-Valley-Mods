@@ -27,6 +27,8 @@ namespace CustomFarmingRedux
         public static IMonitor _monitor;
         public static List<CustomMachineBlueprint> machines = new List<CustomMachineBlueprint>();
         public static Config _config;
+        public static bool hasKisekae = false;
+        public static IMod kisekae = null;
         public static string folder = "Machines";
         public static string legacyFolder = "MachinesCF1";
         internal static Dictionary<string, int> craftingrecipes = new Dictionary<string, int>();
@@ -37,6 +39,23 @@ namespace CustomFarmingRedux
             _helper = Helper;
             _monitor = Monitor;
             _config = Helper.ReadConfig<Config>();
+
+            hasKisekae = helper.ModRegistry.IsLoaded("Kabigon.kisekae");
+
+            if (hasKisekae)
+            {
+                var registry = helper.ModRegistry.GetType().GetField("Registry", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(helper.ModRegistry);
+                System.Collections.IList list = (System.Collections.IList) registry.GetType().GetField("Mods", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(registry);
+                foreach (var m in list)
+                {
+                    IManifest mmanifest = (IManifest)m.GetType().GetProperty("Manifest").GetValue(m);
+                    if (mmanifest.UniqueID == "Kabigon.kisekae")
+                    {
+                        kisekae = (IMod)m.GetType().GetProperty("Mod").GetValue(m);
+                        break;
+                    }
+                }
+            }
 
             loadPacks();
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;

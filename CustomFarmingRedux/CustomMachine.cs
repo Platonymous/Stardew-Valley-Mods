@@ -12,6 +12,7 @@ using PyTK.Extensions;
 using PyTK.Types;
 using StardewValley.Tools;
 using PyTK;
+using System.Reflection;
 
 namespace CustomFarmingRedux
 {
@@ -339,6 +340,9 @@ namespace CustomFarmingRedux
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
+            if (blueprint.category == "Dresser")
+                active = false;
+
             if (blueprint.category == "Mailbox" && Game1.mailbox is IList<string> mb && mb.Count == 0)
                 active = false;
             else
@@ -530,6 +534,22 @@ namespace CustomFarmingRedux
                     Game1.getFarm().mailbox();
                 else
                     Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\StringsFromCSFiles:GameLocation.cs.8429"));
+
+                return false;
+            }
+
+            if (blueprint.category == "Dresser")
+            {
+                if (justCheckingForActivity)
+                    return true;
+
+                shakeTimer = 100;
+
+
+                if (CustomFarmingReduxMod.hasKisekae && CustomFarmingReduxMod.kisekae is Mod ks)
+                    ks.GetType().GetMethod("OpenMenu",BindingFlags.NonPublic | BindingFlags.Instance).Invoke(ks,null);
+                else
+                    Game1.showRedMessage($"Kisekae must be installed to use this dresser.");
 
                 return false;
             }
