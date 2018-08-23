@@ -20,11 +20,15 @@ namespace SplitMoney
     {
         internal static PyResponder<bool, int> moneyReceiver;
         internal static string moneyReceiverName = "Platonymous.MoneyReceiver";
+        internal static int moneyToSplit = -1;
+        internal static Config config = new Config();
 
         public override void Entry(IModHelper helper)
         {
+            config = helper.ReadConfig<Config>();
             moneyReceiver = new PyResponder<bool, int>(moneyReceiverName, (i) => { Game1.player.Money += i; return true; }, 30);
             moneyReceiver.start();
+            StardewModdingAPI.Events.TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
             #region moneyItem
             new CustomObjectData("Platonymous.G", "G/1/-300/Basic/G/The common currency of Pelican Town.", Game1.mouseCursors.getArea(new Rectangle(280, 410, 16, 16)), Color.White, type: typeof(GoldItem));
             ButtonClick.ActionButton.onClick((pos) => new List<IClickableMenu>(Game1.onScreenMenus).Exists(m => m is DayTimeMoneyBox && m.isWithinBounds(pos.X, pos.Y - 180) && m.isWithinBounds(pos.X, pos.Y) && m.isWithinBounds(pos.X, pos.Y + 50)), (p) => convertMoney());
@@ -35,6 +39,21 @@ namespace SplitMoney
             instance.PatchAll(Assembly.GetExecutingAssembly());
             #endregion
         }
+
+        #region Events
+        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        {
+            if (moneyToSplit > 0)
+            {
+                List<Farmer> others = Game1.otherFarmers.Values.Where(f => f.isActive()).ToList();
+                int num = others.Count;
+                int split = moneyToSplit / (num + 1);
+                Game1.player.Money -= split * num;
+                others.ForEach(p => sendMoney(p, split));
+                moneyToSplit = -1;
+            }
+        }
+        #endregion
 
         #region methods
         private void convertMoney()
@@ -61,9 +80,35 @@ namespace SplitMoney
             Game1.player.addItemByMenuIfNecessary(gold);
             Game1.playSound("purchase");
         }
+
+        internal static void sendMoney(Farmer receiver, int money)
+        {
+            Task.Run(async () =>
+            {
+                await PyNet.sendRequestToFarmer<bool>(moneyReceiverName, money, receiver, (b) => { if (!b) { Game1.player.Money += money; } }, SerializationType.PLAIN, 3000);
+            });
+        }
         #endregion
 
         #region overrides
+        [HarmonyPatch]
+        internal class ShippingSplitFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return PyUtils.getTypeSDV("Menus.ShippingMenu").GetMethod("parseItems");
+            }
+
+            public static void Postfix(ShippingMenu __instance, IList<Item> items)
+            {
+
+                if (config.Shipping && Game1.IsMultiplayer && Game1.IsServer && Game1.IsMasterGame)
+                {
+                    List<int> categoryTotals = (List<int>)__instance.GetType().GetField("categoryTotals", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance);
+                    moneyToSplit = categoryTotals[5];
+                }
+            }
+        }
 
         [HarmonyPatch]
         internal class FriendShipFix
@@ -117,7 +162,7 @@ namespace SplitMoney
                 if (!__instance.friendships.ContainsKey("money"))
                     __instance.friendships.Add("money", new int[] { 500 });
 
-                    __result = __instance.friendships["money"][0];
+                __result = __instance.friendships["money"][0];
 
                 return false;
             }
@@ -161,10 +206,7 @@ namespace SplitMoney
                 if (proposalType == ProposalType.Gift && gift is GoldItem)
                 {
                     int money = Game1.player.ActiveObject.Stack;
-                    Task.Run(async () =>
-                   {
-                       await PyNet.sendRequestToFarmer<bool>(moneyReceiverName, money, receiver, (b) => { if (!b) { Game1.player.Money += money; } }, SerializationType.PLAIN, 3000);
-                   });
+                    sendMoney(receiver, money);
                     Game1.player.removeItemFromInventory(Game1.player.ActiveObject);
                     return false;
                 }
