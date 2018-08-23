@@ -41,9 +41,10 @@ namespace PyTK.Tiled
             Dictionary<TileSheet, Texture2D> tilesheets = Helper.Reflection.GetField<Dictionary<TileSheet, Texture2D>>(Game1.mapDisplayDevice, "m_tileSheetTextures").GetValue();
             Map map = tmx2map(Path.Combine(contentPack != null ? contentPack.DirectoryPath : helper.DirectoryPath,path));
             string fileName = new FileInfo(path).Name;
-
+            Monitor.Log(path);
             foreach (TileSheet t in map.TileSheets)
             {
+                t.ImageSource = t.ImageSource.Replace(".png", "");
                 string[] seasons = new string[] { "summer_", "fall_", "winter_" };
                 string tileSheetPath = path.Replace(fileName, t.ImageSource + ".png");
 
@@ -53,6 +54,7 @@ namespace PyTK.Tiled
                 {
                     Texture2D tilesheet = contentPack != null ? contentPack.LoadAsset<Texture2D>(tileSheetPath) : helper.Content.Load<Texture2D>(tileSheetPath);
                     tilesheet.inject(t.ImageSource);
+                    tilesheet.inject("Maps/" + t.ImageSource);
 
                     if (syncTexturesToClients && Game1.IsMultiplayer && Game1.IsServer)
                         foreach (Farmer farmhand in Game1.otherFarmers.Values)

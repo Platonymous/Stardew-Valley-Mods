@@ -155,25 +155,7 @@ namespace TMXLoader
                     if (edit.sourceArea.Length == 4)
                         sourceArea = new Rectangle(edit.sourceArea[0], edit.sourceArea[1], edit.sourceArea[2], edit.sourceArea[3]);
 
-                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, true);
-                    editWarps(map, edit.addWarps, edit.removeWarps, original);
-                    map.enableMoreMapLayers();
-                    map.injectAs("Maps/" + edit.name);
-                    mapsToSync.AddOrReplace(edit.name, map);
-                }
-
-                foreach (MapEdit edit in tmxPack.mergeMaps)
-                {
-                    string filePath = Path.Combine(pack.DirectoryPath, edit.file);
-                    Map map = TMXContent.Load(edit.file, Helper, pack);
-
-                    Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
-                    Rectangle? sourceArea = null;
-
-                    if (edit.sourceArea.Length == 4)
-                        sourceArea = new Rectangle(edit.sourceArea[0], edit.sourceArea[1], edit.sourceArea[2], edit.sourceArea[3]);
-
-                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, true);
+                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, edit.removeEmpty);
                     editWarps(map, edit.addWarps, edit.removeWarps, original);
                     map.enableMoreMapLayers();
                     map.injectAs("Maps/" + edit.name);
