@@ -88,6 +88,12 @@ namespace SplitMoney
                 await PyNet.sendRequestToFarmer<bool>(moneyReceiverName, money, receiver, (b) => { if (!b) { Game1.player.Money += money; } }, SerializationType.PLAIN, 3000);
             });
         }
+
+        public override object GetApi()
+        {
+            return new SplitMoneyAPI();
+        }
+
         #endregion
 
         #region overrides

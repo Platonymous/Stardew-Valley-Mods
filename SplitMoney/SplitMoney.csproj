@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="GoldItem.cs" />
+    <Compile Include="SplitMoneyAPI.cs" />
     <Compile Include="SplitMoneyMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
