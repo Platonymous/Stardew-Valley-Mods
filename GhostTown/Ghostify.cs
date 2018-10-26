@@ -34,18 +34,18 @@ namespace GhostTown
             if (!GhostTownMod.config.critters && asset.AssetName.Contains("critters"))
                 return false;
 
-            if (!GhostTownMod.config.houses && asset.AssetName.Contains("_town"))
-                return false;
-
             if (!GhostTownMod.config.people && (asset.AssetName.Contains("Portraits") || asset.AssetName.Contains("Characters")))
                 return false;
 
+            if (asset.AssetNameEquals("Characters/Gunther") || asset.AssetNameEquals("Characters/Marlon") || asset.AssetNameEquals("Characters/Krobus") || asset.AssetNameEquals("Characters/Bouncer") || asset.AssetNameEquals("Characters/Morris") || asset.AssetNameEquals("Characters/Sandy") || asset.AssetNameEquals("Characters/Henchman") || asset.AssetNameEquals("Characters/Dwarf") || asset.AssetNameEquals("Characters/Henchman") || asset.AssetNameEquals("Characters/Junimo") || asset.AssetNameEquals("Characters/MrQi") || asset.AssetNameEquals("Characters/robot") || asset.AssetNameEquals("Characters/Mariner"))
+                return false;
+            
             return asset.DataType.Equals(typeof(Texture2D)) && !asset.AssetName.Contains("Farmer");
         }
 
         public void Edit<T>(IAssetData asset)
         {
-            asset.AsImage().ReplaceWith(asset.AsImage().Data.changeColor(asset.AssetName.Contains("Portraits") ? portraitGhostifyer : (asset.AssetName.Contains("_town") || asset.AssetName.Contains("Animals") || asset.AssetName.Contains("critters") || (asset.AssetName.Contains("Characters") && !asset.AssetName.Contains("Monsters"))) ? spriteGhostifyer : mapsGhostifyer));
+            asset.AsImage().ReplaceWith(asset.AsImage().Data.changeColor(asset.AssetName.Contains("Portraits") ? portraitGhostifyer : (asset.AssetName.Contains("Animals") || asset.AssetName.Contains("critters") || (asset.AssetName.Contains("Characters") && !asset.AssetName.Contains("Monsters"))) ? spriteGhostifyer : mapsGhostifyer));
         }
 
     }
