@@ -83,7 +83,7 @@ namespace CustomFurniture
                     if (i is Chest chest && furniturePile.Keys.Any(f => f.Equals(i.Name)))
                     {
                         Item cf = furniturePile[furniturePile.Keys.FirstOrDefault(f => f.Equals(i.Name))];
-                        items.Add(cf, new int[] { chest.preservedParentSheetIndex, int.MaxValue });
+                        items.Add(cf, new int[] { chest.preservedParentSheetIndex.Value, int.MaxValue });
                         additions.Add(cf);
                         remove.Add(i);
                     }
@@ -175,7 +175,7 @@ namespace CustomFurniture
                         if (!f.data.sellAtShop || (f.data.conditions != "none" && !meetsConditions(f.data.conditions)))
                             continue;
 
-                        if (Game1.getCharacterFromName(f.data.shopkeeper) is NPC sk && !sk.isInvisible)
+                        if (Game1.getCharacterFromName(f.data.shopkeeper) is NPC sk && !sk.IsInvisible)
                             shopkeeper = f.data.shopkeeper;
                         else
                             shopkeeper = "Robin";
@@ -187,8 +187,8 @@ namespace CustomFurniture
                             continue;
                         }
 
-                        if ((shop.portraitPerson is NPC shopk && shopk.name == shopkeeper) || isCatalogue)
-                                newItemsToSell.Add(f, isCatalogue ? 0 : f.price);
+                        if ((shop.portraitPerson is NPC shopk && shopk.Name == shopkeeper) || isCatalogue)
+                                newItemsToSell.Add(f, isCatalogue ? 0 : f.Price);
                     }
 
                     foreach (Item item in newItemsToSell.Keys)
