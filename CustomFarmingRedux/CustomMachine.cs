@@ -13,6 +13,7 @@ using PyTK.Types;
 using StardewValley.Tools;
 using PyTK;
 using System.Reflection;
+using StardewValley.Menus;
 
 namespace CustomFarmingRedux
 {
@@ -94,6 +95,9 @@ namespace CustomFarmingRedux
                 syncObject = new PySync(this);
                 syncObject.init();
             }
+
+            if (blueprint.category == "Chest" && !(heldObject.Value is Chest))
+                heldObject.Value = new Chest(true);
 
             if (data == null)
                 data = CustomObjectData.collection.ContainsKey(blueprint.fullid) ? CustomObjectData.collection[blueprint.fullid] : new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, typeof(CustomMachine), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.name, blueprint.crafting));
@@ -340,7 +344,7 @@ namespace CustomFarmingRedux
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
-            if (blueprint.category == "Dresser")
+            if (blueprint.category == "Dresser" || blueprint.category == "Chest")
                 active = false;
 
             if (blueprint.category == "Mailbox" && Game1.mailbox is IList<string> mb && mb.Count == 0)
@@ -538,6 +542,13 @@ namespace CustomFarmingRedux
                 return false;
             }
 
+            if (blueprint.category == "Chest")
+            {
+                if (justCheckingForActivity)
+                    return true;
+                Game1.activeClickableMenu = (IClickableMenu)new ItemGrabMenu((IList<Item>)(heldObject.Value as Chest).items, false, true, new InventoryMenu.highlightThisItem(InventoryMenu.highlightAllItems), new ItemGrabMenu.behaviorOnItemSelect((heldObject.Value as Chest).grabItemFromInventory), (string)null, new ItemGrabMenu.behaviorOnItemSelect((heldObject.Value as Chest).grabItemFromChest), false, true, true, true, true, 1, null, -1, (object)null);
+            }
+
             if (blueprint.category == "Dresser")
             {
                 if (justCheckingForActivity)
@@ -547,9 +558,9 @@ namespace CustomFarmingRedux
 
 
                 if (CustomFarmingReduxMod.hasKisekae && CustomFarmingReduxMod.kisekae is Mod ks)
-                    ks.GetType().GetMethod("OpenMenu",BindingFlags.NonPublic | BindingFlags.Instance).Invoke(ks,null);
+                    ks.GetType().GetMethod("OpenMenu", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(ks, null);
                 else
-                    Game1.showRedMessage($"Kisekae must be installed to use this dresser.");
+                    Game1.activeClickableMenu = new CharacterCustomization(CharacterCustomization.Source.Wizard);
 
                 return false;
             }
@@ -716,6 +727,9 @@ namespace CustomFarmingRedux
 
         public override bool performToolAction(Tool t, GameLocation location)
         {
+            if (blueprint.category == "Chest" && (heldObject.Value as Chest).items.Count != 0)
+                return false;
+
             Farmer farmer = t.getLastFarmerToUse();
 
             if (heldObject.Value != null && !blueprint.asdisplay && readyForHarvest)
