@@ -52,7 +52,10 @@ namespace CustomFarmingRedux
         public string workconditions { get; set; } = "";
         public bool conditionaldropin { get; set; } = false;
         public bool conditionalanimation { get; set; } = false;
-
+        public bool lightsource { get; set; } = false;
+        public int[] lightcolor { get; set; } = new int[] { 0, 139, 139, 255 };
+        public bool worklight { get; set; } = true;
+        public float lightradius { get; set; } = 1.5f;
 
         public Texture2D getTexture(IModHelper helper = null)
         {
