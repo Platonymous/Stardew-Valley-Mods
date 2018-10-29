@@ -6,7 +6,7 @@ id : a number that is unique within the pack
 name : Name of the Machine
 legacy : if your Machine is a port of a CF machine (CF1 had a different format), you likely won't need that.
 description : The description
-category : Name of the Category, when in doubt use "Crafting", "Mailbox" will behave like a mailbox, "Scarecrow" like a scarecrow
+category : Name of the Category, when in doubt use "Crafting", "Mailbox" will behave like a mailbox, "Scarecrow" like a scarecrow, "Chest" like a chest or drawer
 texture : the filename of the machine tilesheet(within the same folder)
 tileindex : the tileindex of the machine on the tilesheet, if it's only one machine on the sheets it's 0
 readyindex: the tileindex showing the machine in it's ready state (produce ready to harvest)
@@ -30,6 +30,10 @@ asdisplay: is this a sign or display case and not actually a machine
 workconditions: conditions under which the machine should work (checked when starting production or at the start of the day) *
 conditionalanimation: true or false, should machine animation stop if workconditions aren't met 
 * exp. "w rainy", "LC caller.location.IsOutdoors" (caller is the machine)
+lightsource: false, or true if it has a lightsource
+worklight: true or false, will only show the light when working (default: true)
+lightcolor: [r,g,b,a] color of the light exp. [0,0,0,255], default is [ 0, 139, 139, 255 ] (like the furnace)
+lightradius: radius of the light, default is 1.5
 
 production: what the machine produces, can include multiple productions
 production=>index : the parentsheetindex of the produce, alternatively you can leave this out and pick the produce by using:
