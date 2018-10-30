@@ -65,7 +65,10 @@ namespace HarpOfYobaRedux
             SaveHandler.BeforeRebuilding += SaveHandler_BeforeRebuilding2;
             SaveHandler_BeforeRebuilding(sender, e);
 
-            TimeEvents.AfterDayStarted += (s,ev) => Delivery.checkMail();
+            TimeEvents.TimeOfDayChanged += (s,ev) => {
+                if (ev.NewInt == 620)
+                    Delivery.checkMail();
+            };
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
         }
 
