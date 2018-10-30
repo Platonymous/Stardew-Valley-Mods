@@ -1,7 +1,7 @@
 {
   "Name": "SDVGameBoy",
   "Author": "Platonymous",
-  "Version": "0.1.0",
+  "Version": "0.1.1",
   "Description": "Like playing GameBoy, but worse.. way worse",
   "UniqueID": "Platonymous.SDVGameBoy",
   "EntryDll": "SDVGameBoy.dll",

@@ -225,6 +225,11 @@ namespace SDVGameBoy
             if (emulatorThread != null && emulatorThread.IsAlive)
                 emulatorThread.Abort();
         }
+
+        public bool doMainGameUpdates()
+        {
+            return false;
+        }
     }
 
     public class MicroStopwatch : System.Diagnostics.Stopwatch
