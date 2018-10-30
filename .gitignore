@@ -28,5 +28,8 @@ nuget.exe
 
 # Hidden config
 *.hidden.*
+**_dev
+**_backup
+**_releases
 
 **/TTS/

@@ -37,6 +37,7 @@ namespace TMXLoader
             loadContentPacks();
             setTileActions();
             PlayerEvents.Warped += LocationEvents_CurrentLocationChanged;
+            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
@@ -62,6 +63,12 @@ namespace TMXLoader
                     syncedFarmers.Remove(remove);
 
             };
+        }
+
+        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        {
+            if (Game1.currentLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
+                TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
         }
 
         private void syncMaps(IEnumerable<SFarmer> farmers)
@@ -117,7 +124,6 @@ namespace TMXLoader
                     Map map = TMXContent.Load(edit.file, Helper,pack);
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
                     map.inject("Maps/" + edit.name);
-                    map.enableMoreMapLayers();
                     GameLocation location;
                     if (map.Properties.ContainsKey("Outdoors") && map.Properties["Outdoors"] == "F")
                     {
@@ -137,7 +143,6 @@ namespace TMXLoader
                 {
                     string filePath = Path.Combine(pack.DirectoryPath, edit.file);
                     Map map = TMXContent.Load(edit.file, Helper, pack);
-                    map.enableMoreMapLayers();
                     Map original = edit.retainWarps ? Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent) : map;
                     editWarps(map, edit.addWarps, edit.removeWarps, original);
                     map.injectAs("Maps/" + edit.name);
@@ -157,7 +162,6 @@ namespace TMXLoader
 
                     map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, edit.removeEmpty);
                     editWarps(map, edit.addWarps, edit.removeWarps, original);
-                    map.enableMoreMapLayers();
                     map.injectAs("Maps/" + edit.name);
                     mapsToSync.AddOrReplace(edit.name, map);
                 }

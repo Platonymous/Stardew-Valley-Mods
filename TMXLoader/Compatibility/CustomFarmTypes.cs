@@ -22,7 +22,7 @@ namespace TMXLoader.Compatibility
         internal static IModHelper TMXHelper => TMXLoaderMod.helper;
 
         internal static void LoadingTheMaps()
-        {
+        {            
             Type mod = Type.GetType("CustomFarmTypes.Mod, CustomFarmTypes");
             if (mod == null)
                 return;
