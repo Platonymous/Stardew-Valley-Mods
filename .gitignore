@@ -30,6 +30,5 @@ nuget.exe
 *.hidden.*
 **_dev
 **_backup
-**_releases
 
 **/TTS/
