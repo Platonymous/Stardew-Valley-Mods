@@ -72,6 +72,7 @@
     <Compile Include="CustomElementHandler\ISyncableElement.cs" />
     <Compile Include="CustomElementHandler\NetReplacable.cs" />
     <Compile Include="CustomElementHandler\PySObject.cs" />
+    <Compile Include="CustomElementHandler\SaveHandler.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
     <Compile Include="Events\PyTimeEvents.cs" />
     <Compile Include="Extensions\PyAssets.cs" />
@@ -80,7 +81,6 @@
     <Compile Include="Extensions\PyTextures.cs" />
     <Compile Include="ConsoleCommands\CcLocations.cs" />
     <Compile Include="CustomElementHandler\ISaveElement.cs" />
-    <Compile Include="CustomElementHandler\SaveHandler.cs" />
     <Compile Include="Lua\LuaUtils.cs" />
     <Compile Include="Lua\PyLua.cs" />
     <Compile Include="Overrides\OvReadyCheck.cs" />

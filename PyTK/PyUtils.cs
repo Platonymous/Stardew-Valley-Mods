@@ -51,7 +51,6 @@ namespace PyTK
 
         public static bool checkEventConditions(string conditions, object caller = null)
         {
-            Monitor.Log("Check conditions:" + conditions);
             if (!Context.IsWorldReady)
                 return false;
 
@@ -65,6 +64,7 @@ namespace PyTK
             {
                 conditions = conditions.Replace("NOT ", "");
                 comparer = false;
+                
             }
 
             if (conditions.StartsWith("PC "))
@@ -83,7 +83,6 @@ namespace PyTK
                     result = Helper.Reflection.GetMethod(location, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) != -1;
             }
 
-            Monitor.Log("Result:" + (result == comparer));
             return result == comparer;
         }
 

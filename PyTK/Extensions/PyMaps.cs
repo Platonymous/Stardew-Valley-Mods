@@ -85,21 +85,21 @@ namespace PyTK.Extensions
             return false;
         }
 
-        public static Map enableMoreMapLayers (this Map map)
+        public static Map enableMoreMapLayers(this Map map)
         {
             foreach (Layer layer in map.Layers)
                 if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
                 {
-                    maplayer.AfterDraw -= drawLayer;
-                    maplayer.AfterDraw += drawLayer;
+                    maplayer.AfterDraw -= (s, e) => drawLayer(layer);
+                    maplayer.AfterDraw += (s, e) => drawLayer(layer);
                 }
 
             return map;
         }
 
-        private static void drawLayer(object sender, LayerEventArgs e)
+        private static void drawLayer(Layer layer)
         {
-            e.Layer.Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, Game1.pixelZoom);
+            layer.Draw(Game1.mapDisplayDevice, Game1.viewport, Location.Origin, false, Game1.pixelZoom);
         }
 
         public static Map switchLayers(this Map t, string layer1, string layer2)

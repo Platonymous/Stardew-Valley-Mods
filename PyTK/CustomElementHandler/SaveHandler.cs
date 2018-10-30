@@ -26,6 +26,8 @@ namespace PyTK.CustomElementHandler
         public static event EventHandler BeforeRemoving;
         public static event EventHandler FinishedRemoving;
         internal static IPyResponder TypeChecker;
+        internal static Dictionary<Type, FieldInfo[]> fieldInfoChache;
+        internal static Dictionary<Type, PropertyInfo[]> propInfoChache;
         public static bool inSync = false;
 
         internal static IModHelper Helper { get; } = PyTKMod._helper;
@@ -115,6 +117,9 @@ namespace PyTK.CustomElementHandler
             if (ceh)
                 cehType = Type.GetType("CustomElementHandler.ISaveElement, CustomElementHandler");
 
+            fieldInfoChache = new Dictionary<Type, FieldInfo[]>();
+            propInfoChache = new Dictionary<Type, PropertyInfo[]>();
+
             SaveEvents.BeforeSave += (s, e) => Replace();
             SaveEvents.AfterSave += (s, e) => Rebuild();
             SaveEvents.AfterLoad += (s, e) => Rebuild();
@@ -124,6 +129,7 @@ namespace PyTK.CustomElementHandler
                 Game1.objectSpriteSheet.Tag = "cod_objects";
                     Game1.bigCraftableSpriteSheet.Tag = "cod_bigobject";
             };
+
             TypeChecker = new PyResponder<bool, string>(typeCheckerName, (s) =>
               {
                   return Type.GetType(s) != null;
@@ -290,6 +296,7 @@ namespace PyTK.CustomElementHandler
             OverlaidDictionary<Vector2, SObject> ovd = value as OverlaidDictionary<Vector2, SObject>;
             NetObjectList<Item> noli = value as NetObjectList<Item>;
             NetCollection<Building> netBuildings = value as NetCollection<Building>;
+            NetCollection<Furniture> netFurniture = value as NetCollection<Furniture>;
             NetArray<SObject, NetRef<SObject>> netObjectArray = value as NetArray<SObject, NetRef<SObject>>;
 
 
@@ -311,6 +318,9 @@ namespace PyTK.CustomElementHandler
             else if (netBuildings != null)
                 foreach (object item in netBuildings)
                     FindAllInstances(item, propNames, exploredObjects, found, netBuildings);
+            else if (netFurniture != null)
+                foreach (object item in netFurniture)
+                    FindAllInstances(item, propNames, exploredObjects, found, netFurniture);
             else if (netObjectArray != null)
                 foreach (SObject item in netObjectArray.Where(no => no != null))
                     FindAllInstances(item, propNames, exploredObjects, found, netObjectArray);
@@ -323,17 +333,22 @@ namespace PyTK.CustomElementHandler
 
                 Type type = value.GetType();
 
-                FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.GetProperty);
+                FieldInfo[] fields;
 
-                foreach (FieldInfo field in fields)
+                if (fieldInfoChache.ContainsKey(type))
+                    fields = fieldInfoChache[type];
+                else {
+                    fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    fieldInfoChache.Add(type, fields);
+                }
+
+                foreach (FieldInfo field in fields.Where(f => propNames.Contains(f.Name)))
                 {
-                    if (!propNames.Contains(field.Name))
-                        continue;
-
                     object propertyValue = field.GetValue(value);
                     if (propertyValue != null && propertyValue.GetType() is Type t && t.IsClass)
                         FindAllInstances(propertyValue, propNames, exploredObjects, found, new KeyValuePair<FieldInfo, object>(field, value));
                 }
+
             }
         }
 
@@ -533,7 +548,7 @@ namespace PyTK.CustomElementHandler
 
         private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent)
         {
-            return FindAllInstances(obj, parent, new List<string>() {"netObjects","overlayObjects", "farmhand","owner", "elements", "parent", "array", "value", "Value", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
+            return FindAllInstances(obj, parent, new List<string>() {"netObjects","overlayObjects", "farmhand","owner", "elements", "parent","value", "array", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
         }
 
         private static void ReplaceAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate, Func<TIn, object> replacer, bool reverse = false)
@@ -638,6 +653,13 @@ namespace PyTK.CustomElementHandler
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
                             ncbld[index] = (Building)replacer(item);
                         }
+                        else if (key is NetCollection<Furniture> ncfur)
+                        {
+                            Furniture[] lobj = new Furniture[ncfur.Count];
+                            ncfur.CopyTo(lobj, 0);
+                            int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
+                            ncfur[index] = (Furniture)replacer(item);
+                        }
                         else if (key is Array arr)
                         {
                             object[] lobj = new object[arr.Length];
@@ -648,6 +670,10 @@ namespace PyTK.CustomElementHandler
                         else if (key is KeyValuePair<FieldInfo, object> kpv)
                         {
                             kpv.Key.SetValue(kpv.Value, replacer(item));
+                        }
+                        else if (key is KeyValuePair<PropertyInfo, object> kppv)
+                        {
+                            kppv.Key.SetValue(kppv.Value, replacer(item));
                         }
                         else if (key is NetArray<SObject, NetRef<SObject>> naso)
                         {
@@ -713,6 +739,11 @@ namespace PyTK.CustomElementHandler
                             int index = ncbld.ToList<Building>().FindIndex(p => p is TIn && p == obj);
                             ncbld.RemoveAt(index);
                         }
+                        else if (key is NetCollection<Furniture> ncfur)
+                        {
+                            int index = ncfur.ToList<Furniture>().FindIndex(p => p is TIn && p == obj);
+                            ncfur.RemoveAt(index);
+                        }
                         else if (key is List<Furniture> furniture)
                         {
                             int index = furniture.FindIndex(p => p is TIn && p == obj);
@@ -721,6 +752,10 @@ namespace PyTK.CustomElementHandler
                         else if (key is KeyValuePair<FieldInfo, object> kpv)
                         {
                             kpv.Key.SetValue(kpv.Value, null);
+                        }
+                        else if (key is KeyValuePair<PropertyInfo, object> kppv)
+                        {
+                            kppv.Key.SetValue(kppv.Value, null);
                         }
                         else if (key is NetArray<SObject, NetRef<SObject>> naso)
                         {

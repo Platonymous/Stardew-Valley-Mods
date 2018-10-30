@@ -11,6 +11,7 @@ namespace PyTK.Extensions
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
+        internal static Dictionary<string, int> indexCache = new Dictionary<string, int>();
 
         public static IDictionary<TKey, TValue> AddOrReplace<TKey, TValue>(this IDictionary<TKey, TValue> t, TKey key, TValue value)
         {
@@ -159,18 +160,23 @@ namespace PyTK.Extensions
 
         public static int getIndexByName(this IDictionary<int, string> dictionary, string name)
         {
+            if (indexCache.ContainsKey(name))
+                return indexCache[name];
+
+            int found = 0;
+
             if (name.StartsWith("startswith:"))
-                return (dictionary.Where(d => d.Value.Split('/')[0].StartsWith(name.Split(':')[1])).FirstOrDefault()).Key;
+                found = (dictionary.Where(d => d.Value.Split('/')[0].StartsWith(name.Split(':')[1])).FirstOrDefault()).Key;
+            else if (name.StartsWith("endswith:"))
+                found = (dictionary.Where(d => d.Value.Split('/')[0].EndsWith(name.Split(':')[1])).FirstOrDefault()).Key;
+            else if (name.StartsWith("contains:"))
+                found = (dictionary.Where(d => d.Value.Split('/')[0].Contains(name.Split(':')[1])).FirstOrDefault()).Key;
+            else
+                found = (dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Key;
 
-            if (name.StartsWith("endswith:"))
-                return (dictionary.Where(d => d.Value.Split('/')[0].EndsWith(name.Split(':')[1])).FirstOrDefault()).Key;
+            indexCache.Add(name, found);
 
-            if (name.StartsWith("contains:"))
-                return (dictionary.Where(d => d.Value.Split('/')[0].Contains(name.Split(':')[1])).FirstOrDefault()).Key;
-
-            Monitor.Log(name + "=>" +(dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Key + ":" + (dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Value);
-
-            return (dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Key;
+            return found;
         }
     }
 }
