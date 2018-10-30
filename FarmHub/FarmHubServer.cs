@@ -8,12 +8,15 @@ using StardewValley;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 
 namespace FarmHub
 {
     public class FarmHubServer
     {
         public string InviteCode { get; set; }
+        public string IP { get; set; }
         public string Name { get; set; }
         public int MaxPlayers { get; set; }
         public int CurrentPlayers { get; set; }
@@ -43,10 +46,21 @@ namespace FarmHub
             
         }
 
+        public static string GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    return ip.ToString();
+
+            return "na";
+        }
+
         public FarmHubServer(IGameServer server, IMonitor monitor)
         {
             Monitor = monitor;
-            InviteCode = server.getInviteCode(); ;
+            InviteCode = server.getInviteCode();
+            IP = FarmHubMod.config.UseIP ? GetLocalIPAddress() : "na";
             Name = Game1.player.farmName.Value;
             Password = FarmHubMod.password.toMD5Hash();
             Guid = FarmHubMod.guid;

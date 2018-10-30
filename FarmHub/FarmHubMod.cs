@@ -6,9 +6,11 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -89,7 +91,7 @@ namespace FarmHub
                 return;
             }
 
-            joinServer(server.InviteCode);
+            joinServer(server.InviteCode, server.IP);
         }
 
         private void writeListToConsole(List<FarmHubServer> list)
@@ -103,24 +105,32 @@ namespace FarmHub
             for (int i = 0; i < list.Count; i++)
             {
                 FarmHubServer f = list[i];
-                Monitor.Log($"{i} : {f.Name} ({f.CurrentPlayers}/{f.MaxPlayers}) [{ (f.Password == open ? "open" : "pw") }]", LogLevel.Info);
+                Monitor.Log($"{i} : {f.Name} ({f.CurrentPlayers} online) [{ (f.Password == open ? "open" : "pw") } [{ (f.IP == "na" ? "(IP not available)" : "(IP available)") }]", LogLevel.Info);
                 bool hMods = hasMods(f.RequiredMods);
                 Monitor.Log("Required Mods: " + string.Join(",", f.RequiredMods), hMods ? LogLevel.Info : LogLevel.Error);
                 Monitor.Log("---------------------------",LogLevel.Info);
             }
         }
 
-        private void joinServer(string code)
+        private void joinServer(string code, string ip = "na")
         {
             Monitor.Log("Joining server.. ", LogLevel.Info);
 
-            object lobbyFromInviteCode = Program.sdk.Networking.GetLobbyFromInviteCode(code);
-            if (lobbyFromInviteCode == null)
+            if (!config.UseIP || ip == null || ip == "na")
             {
-                Monitor.Log("Server isn't available", LogLevel.Error);
-                return;
+                object lobbyFromInviteCode = Program.sdk.Networking.GetLobbyFromInviteCode(code);
+                if (lobbyFromInviteCode == null)
+                {
+                    Monitor.Log("Server isn't available", LogLevel.Error);
+                    return;
+                }
+                Game1.activeClickableMenu = new FarmhandMenu(Program.sdk.Networking.CreateClient(lobbyFromInviteCode));
             }
-            Game1.activeClickableMenu = new FarmhandMenu(Program.sdk.Networking.CreateClient(lobbyFromInviteCode));
+            else
+            {
+                Multiplayer multiplayer = (Multiplayer)typeof(Game1).GetField("multiplayer", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                Game1.activeClickableMenu = new FarmhandMenu(multiplayer.InitClient(new LidgrenClient(code)));
+            }
         }
 
         private bool hasMods(string[] modIds)
@@ -180,6 +190,7 @@ namespace FarmHub
                 {
                     Task.Run(() => waitForServerConnection(() => {
                         Monitor.Log("InviteCode:" + Game1.server.getInviteCode());
+                        Monitor.Log("IP:" + FarmHubServer.GetLocalIPAddress());
                         myServer = new FarmHubServer(Game1.server, Monitor);
                         Monitor.Log("Joining Farmhub", LogLevel.Info);
                     }));                    
