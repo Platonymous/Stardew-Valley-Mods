@@ -1,7 +1,7 @@
 {
   "Name": "Custom Furniture",
   "Author": "Platonymous",
-  "Version": "0.8.2-unofficial.1-KirbyLink",
+  "Version": "0.8.3",
   "Description": "Helper Mod for Custom Furniture creation.",
   "UniqueID": "Platonymous.CustomFurniture",
   "EntryDll": "CustomFurniture.dll",
@@ -9,7 +9,8 @@
   "UpdateKeys": [ "Nexus:1254" ],
   "Dependencies": [
     {
-      "UniqueID": "Platonymous.Toolkit"
+      "UniqueID": "Platonymous.Toolkit",
+      "MinimumVersion": "1.4.5"
     }
   ]
 }

@@ -6,7 +6,7 @@
     {
       "id": 0,
       "texture": "example.png",
-      "name": "Kirby's Weathercock",
+      "name": "Weathercock",
       "description": "A Weathercock",
       "type": "decor",
       "price": 100,
@@ -23,7 +23,7 @@
     {
       "id": 1,
       "texture": "example.png",
-      "name": "Kirby's Master Sword",
+      "name": "Master Sword",
       "description": "The Master Sword",
       "type": "decor",
       "price": 100,
@@ -40,7 +40,7 @@
     {
       "id": 2,
       "texture": "example.png",
-      "name": "Kirby's Statue",
+      "name": "Statue",
       "description": "A small Statue",
       "type": "decor",
       "price": 100,
@@ -54,7 +54,7 @@
     {
       "id": 3,
       "texture": "example.png",
-      "name": "Kirby's Agahnim",
+      "name": "Agahnim",
       "description": "A big Statue",
       "type": "decor",
       "price": 100,
@@ -68,7 +68,7 @@
     {
       "id": 4,
       "texture": "example.png",
-      "name": "Kirby's Rug",
+      "name": "Rug",
       "description": "A Rug",
       "type": "rug",
       "price": 100,

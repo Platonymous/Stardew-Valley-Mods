@@ -64,6 +64,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Format.md" />
     <None Include="Machines\Platonymous.Dresser\Dresser.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
