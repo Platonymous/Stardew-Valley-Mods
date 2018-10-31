@@ -37,8 +37,8 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\GOG Galaxy\Games\Stardew Valley\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="PyTK">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\PyTK\PyTK.dll</HintPath>
+    <Reference Include="PyTK, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platonymous.PyTK.1.4.4\lib\net45\PyTK.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compatibility\CustomFarmTypes.cs" />
+    <Compile Include="SpouseRoom.cs" />
     <Compile Include="MapEdit.cs" />
     <Compile Include="TMXActions.cs" />
     <Compile Include="TMXContentPack.cs" />
@@ -55,8 +56,12 @@
   <ItemGroup>
     <None Include="manifest.json" />
     <None Include="packages.config" />
+    <None Include="sr.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\nuget-icon.png" />
     <Content Include="Converter\IN\in.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -118,6 +118,31 @@ namespace TMXLoader
                     foreach (string script in tmxPack.scripts)
                         PyLua.loadScriptFromFile(Path.Combine(pack.DirectoryPath, script), pack.Manifest.UniqueID);
 
+                PyLua.loadScriptFromFile(Path.Combine(Helper.DirectoryPath, "sr.lua"), "Platonymous.TMXLoader.SpouseRoom");
+
+                List<MapEdit> spouseRoomMaps = new List<MapEdit>();
+
+                foreach (SpouseRoom room in tmxPack.spouseRooms) {
+                    spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "FarmHouse1_marriage", file = room.file, position = new[] { 29, 1 } });
+                    spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "FarmHouse2_marriage", file = room.file, position = new[] { 35, 10 } });
+                }
+
+                foreach (MapEdit edit in spouseRoomMaps)
+                {
+                    string filePath = Path.Combine(pack.DirectoryPath, edit.file);
+                    Map map = TMXContent.Load(edit.file, Helper, pack);
+
+                    if(edit.info != "none")
+                        foreach (Layer layer in map.Layers)
+                            layer.Id = layer.Id.Replace("Spouse", edit.info);
+
+                    map.Properties.Add("EntryAction", "Lua Platonymous.TMXLoader.SpouseRoom entry");
+                    Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
+                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), null, true);
+                    map.injectAs("Maps/" + edit.name);
+                    mapsToSync.AddOrReplace(edit.name, map);
+                }
+
                 foreach (MapEdit edit in tmxPack.addMaps)
                 {
                     string filePath = Path.Combine(pack.DirectoryPath, edit.file);
@@ -270,7 +295,6 @@ namespace TMXLoader
                 TMXContent.Save(map, exportPath, true, Monitor);
             }
         }
-
        
     }
 }
