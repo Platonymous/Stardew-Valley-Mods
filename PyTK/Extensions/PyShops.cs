@@ -30,6 +30,12 @@ namespace PyTK.Extensions
             return (!(shop.portraitPerson is NPC) && shop.sellsOnly<Furniture>());
         }
 
+        public static bool isWallpaperCatalogue(this ShopMenu shop)
+        {
+            List<Item> items = shop.getForSale();
+            return (!(shop.portraitPerson is NPC) && shop.sellsOnly<Wallpaper>());
+        }
+
         public static bool isHatShop(this ShopMenu shop)
         {
             List<Item> items = shop.getForSale();

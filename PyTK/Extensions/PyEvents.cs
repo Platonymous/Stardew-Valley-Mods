@@ -273,6 +273,14 @@ namespace PyTK.Extensions
             return items.addToShop(p => p.isFurnitureCataogue());
         }
 
+        /// <summary>Generates a method that adds this inventory to the wallpaper catalogue and adds it to MenuEvents.MenuChanged.</summary>
+        /// <returns>Returns the method.</returns>
+        public static EventHandler<EventArgsClickableMenuChanged> addToWallpaperCatalogue(this List<InventoryItem> items)
+        {
+            return items.addToShop(p => p.isWallpaperCatalogue());
+        }
+
+
         /// <summary>Generates a method that adds this inventory to the hat shop and adds it to MenuEvents.MenuChanged.</summary>
         /// <returns>Returns the method.</returns>
         public static EventHandler<EventArgsClickableMenuChanged> addToHatShop(this List<InventoryItem> items)
@@ -317,6 +325,13 @@ namespace PyTK.Extensions
         public static EventHandler<EventArgsClickableMenuChanged> addToFurnitureCatalogue(this InventoryItem item)
         {
             return item.addToShop(p => p.isFurnitureCataogue());
+        }
+
+        /// <summary>Generates a method that adds this inventory to the wallpaper catalogue and adds it to MenuEvents.MenuChanged.</summary>
+        /// <returns>Returns the method.</returns>
+        public static EventHandler<EventArgsClickableMenuChanged> addToWallpaperCatalogue(this InventoryItem item)
+        {
+            return item.addToShop(p => p.isWallpaperCatalogue());
         }
 
         /// <summary>Generates a method that adds this inventory to the hat shop and adds it to MenuEvents.MenuChanged.</summary>
