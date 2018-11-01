@@ -33,7 +33,6 @@
   <ItemGroup>
     <PackageReference Include="Lib.Harmony" Version="1.2.0.1" />
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="2.1.0" />
-    <PackageReference Include="Platonymous.PyTK" Version="1.4.4" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
