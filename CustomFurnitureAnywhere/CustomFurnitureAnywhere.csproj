@@ -30,6 +30,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="1.2.0.1" />
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
@@ -60,11 +61,6 @@
     <None Include="manifest.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
-      <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
-      <Name>Harmony</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\CustomFurniture\CustomFurniture.csproj">
       <Project>{b60cc08a-abd5-4b7b-81bf-c0295c11a025}</Project>
       <Name>CustomFurniture</Name>

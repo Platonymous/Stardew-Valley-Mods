@@ -31,6 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="1.2.0.1" />
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
@@ -54,11 +55,6 @@
     <None Include="manifest.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Harmony\Harmony\Harmony.csproj">
-      <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
-      <Name>Harmony</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\PyTK\PyTK.csproj">
       <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
       <Name>PyTK</Name>
