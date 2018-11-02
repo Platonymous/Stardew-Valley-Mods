@@ -58,7 +58,6 @@
     <Compile Include="CustomElementHandler\IDrawFromCustomObjectData.cs" />
     <Compile Include="CustomElementHandler\ICustomObject.cs" />
     <Compile Include="CustomElementHandler\ISyncableElement.cs" />
-    <Compile Include="CustomElementHandler\NetReplacable.cs" />
     <Compile Include="CustomElementHandler\PySObject.cs" />
     <Compile Include="CustomElementHandler\SaveHandler.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
