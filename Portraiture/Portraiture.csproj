@@ -5,7 +5,6 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CDDBC248-8B88-4B29-9AB6-49D9AE9F60E1}</ProjectGuid>
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Portraiture</RootNamespace>
@@ -57,5 +56,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\deploy-mod.targets" />
+  <Import Project="$(SolutionDir)\common.targets" />
 </Project>

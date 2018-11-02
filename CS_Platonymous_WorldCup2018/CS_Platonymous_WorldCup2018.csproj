@@ -4,7 +4,6 @@
   <PropertyGroup>
     <IgnoreModFilePatterns>\.dll$, \.pdb$</IgnoreModFilePatterns>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <ModFolderName>[CS]WordCup2018</ModFolderName>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{2D69E926-F8A4-422D-9659-D7734E0A9413}</ProjectGuid>
@@ -86,4 +85,5 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\common.targets" />
 </Project>

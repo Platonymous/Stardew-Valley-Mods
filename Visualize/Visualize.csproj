@@ -4,7 +4,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <ProjectGuid>{A9A81F01-58DD-4030-BB82-AE7E71D68D99}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -137,4 +136,5 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\common.targets" />
 </Project>

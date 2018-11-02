@@ -5,7 +5,6 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{7043F841-158F-4977-B10E-A733A5E648AC}</ProjectGuid>
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CustomWallsAndFloors</RootNamespace>
@@ -68,4 +67,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\common.targets" />
 </Project>

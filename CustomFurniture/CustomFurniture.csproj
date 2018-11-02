@@ -4,7 +4,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <ProjectGuid>{B60CC08A-ABD5-4B7B-81BF-C0295C11A025}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -70,5 +69,5 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\deploy-mod.targets" />
+  <Import Project="$(SolutionDir)\common.targets" />
 </Project>
