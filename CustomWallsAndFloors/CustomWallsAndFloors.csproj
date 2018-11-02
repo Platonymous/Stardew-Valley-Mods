@@ -45,12 +45,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimatedTile.cs" />
+    <Compile Include="Animations.cs" />
     <Compile Include="ContentRequest.cs" />
     <Compile Include="CustomWallpaper.cs" />
     <Compile Include="CustomWallsAndFloorsMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SavedRoom.cs" />
     <Compile Include="SaveFile.cs" />
+    <Compile Include="AnimatedTexture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json">

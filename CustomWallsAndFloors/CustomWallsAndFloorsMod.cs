@@ -114,15 +114,27 @@ namespace CustomWallsAndFloors
         {
             foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
             {
+                Animations animations = null;
+
+                if (File.Exists(Path.Combine(pack.DirectoryPath, "animations.json")))
+                    animations = helper.ReadJsonFile<Animations>(Path.Combine(pack.DirectoryPath, "animations.json"));
+
                 if (File.Exists(Path.Combine(pack.DirectoryPath, "walls.png")) && !CustomWallpaper.Walls.ContainsKey(pack.Manifest.UniqueID))
                 {
                     Texture2D wallTexture = pack.LoadAsset<Texture2D>("walls.png");
+
+                    if (animations != null)
+                        wallTexture = AnimatedTexture.FromTexture(wallTexture, animations.AnimatedTiles);
+
                     CustomWallpaper.Walls.Add(pack.Manifest.UniqueID, wallTexture);
                     string key = Path.Combine(pack.Manifest.UniqueID, "walls");
                     wallTexture.inject(key);
                     int walls = (wallTexture.Width / 16) * (wallTexture.Height / 48);
                     for (int i = 0; i < walls; i++)
                     {
+                        if (wallTexture is AnimatedTexture awall && awall.AnimatedTiles.Find(t => !t.Floor && i > t.Index && i < t.Index + t.Frames) != null)
+                            continue;
+
                         InventoryItem inv = new InventoryItem(new CustomWallpaper(pack.Manifest.UniqueID, i, false), 100);
                         inv.addToWallpaperCatalogue();
                     }
@@ -131,6 +143,10 @@ namespace CustomWallsAndFloors
                 if (File.Exists(Path.Combine(pack.DirectoryPath, "floors.png")) && !CustomWallpaper.Floors.ContainsKey(pack.Manifest.UniqueID))
                 {
                     Texture2D floorTexture = pack.LoadAsset<Texture2D>("floors.png");
+
+                    if (animations != null)
+                        floorTexture = AnimatedTexture.FromTexture(floorTexture, animations.AnimatedTiles);
+
                     CustomWallpaper.Floors.Add(pack.Manifest.UniqueID, floorTexture);
                     string key = Path.Combine(pack.Manifest.UniqueID, "floors");
                     floorTexture.inject(key);
@@ -138,6 +154,9 @@ namespace CustomWallsAndFloors
                     int floors = (floorTexture.Width / 32) * (floorTexture.Height / 32);
                     for (int i = 0; i < floors; i++)
                     {
+                        if (floorTexture is AnimatedTexture awall && awall.AnimatedTiles.Find(t => t.Floor && i > t.Index && i < t.Index + t.Frames) != null)
+                            continue;
+
                         InventoryItem inv = new InventoryItem(new CustomWallpaper(pack.Manifest.UniqueID, i, true), 100);
                         inv.addToWallpaperCatalogue();
                     }

@@ -10,6 +10,7 @@ using xTile;
 using xTile.Tiles;
 using System.IO;
 using System;
+using System.Linq;
 
 namespace CustomWallsAndFloors
 {
@@ -116,6 +117,8 @@ namespace CustomWallsAndFloors
 
         public void setChangeEventsAfterLoad(DecoratableLocation dec, int whichRoom)
         {
+            CustomWallsAndFloorsMod.skip = true;
+
             if (isFloor)
             {
                 floorChange = (r, w) => Floor_OnChange(r, w, dec);
@@ -128,6 +131,13 @@ namespace CustomWallsAndFloors
                 dec.setWallpaper((int)((NetFieldBase<int, NetInt>)this.parentSheetIndex), whichRoom, true);
                 dec.wallPaper.OnChange += wallChange;
             }
+
+            PyTK.PyUtils.setDelayedAction(500, () => CustomWallsAndFloorsMod.skip = false);
+
+            if(isFloor)
+                dec.setFloor((int)((NetFieldBase<int, NetInt>)this.parentSheetIndex), whichRoom, true);
+            else
+                dec.setWallpaper((int)((NetFieldBase<int, NetInt>)this.parentSheetIndex), whichRoom, true);
         }
 
 
@@ -144,7 +154,12 @@ namespace CustomWallsAndFloors
         private void WallPaper_OnChange(int whichRoom, int which, DecoratableLocation dec)
         {
             TileSheet tilesheet = initTilesheet(ref dec.map);
-            setWallsTilesheet(whichRoom, which, tilesheet, dec);
+            AnimatedTile anim = null;
+
+            if (Texture is AnimatedTexture && (Texture as AnimatedTexture).AnimatedTiles.Find(a => a.Index == which && a.Floor == isFloor) is AnimatedTile aList)
+                anim = aList;
+
+            setWallsTilesheet(whichRoom, which, tilesheet, dec, anim);
 
             if (savFile.rooms.Find(sr => sr.Id == Game1.player.UniqueMultiplayerID && sr.Location == dec.Name && sr.Room == whichRoom) is SavedRoom sav)
             {
@@ -170,7 +185,12 @@ namespace CustomWallsAndFloors
         private void Floor_OnChange(int whichRoom, int which, DecoratableLocation dec)
         {
             TileSheet tilesheet = initTilesheet(ref dec.map);
-            setFloorsTilesheet(whichRoom, which, tilesheet, dec);
+            AnimatedTile anim = null;
+
+            if (Texture is AnimatedTexture && (Texture as AnimatedTexture).AnimatedTiles.Find(a => a.Index == which && a.Floor == isFloor) is AnimatedTile aList)
+                anim = aList;
+
+            setFloorsTilesheet(whichRoom, which, tilesheet, dec, anim);
 
             if (savFile.rooms.Find(sr => sr.Id == Game1.player.UniqueMultiplayerID && sr.Location == dec.Name && sr.Room == whichRoom) is SavedRoom sav)
             {
@@ -183,7 +203,7 @@ namespace CustomWallsAndFloors
             dec.floor.OnChange -= floorChange;
         }
 
-        public static void setWallsTilesheet(int whichRoom, int which, TileSheet tilesheet, DecoratableLocation dec)
+        public static void setWallsTilesheet(int whichRoom, int which, TileSheet tilesheet, DecoratableLocation dec, AnimatedTile animations = null)
         {
             List<Rectangle> walls = dec.getWalls();
             if (whichRoom == -1)
@@ -192,14 +212,14 @@ namespace CustomWallsAndFloors
                 {
                     for (int x = rectangle.X; x < rectangle.Right; ++x)
                     {
-                        setMapTilesheet(dec.map, tilesheet, x, rectangle.Y, "Back", 0);
-                        setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 1, "Back", 0);
+                        setMapTilesheet(dec.map, tilesheet, x, rectangle.Y, "Back", 0, 0, animations);
+                        setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 1, "Back", 0, 0, animations);
                         if (rectangle.Height >= 3)
                         {
                             if (dec.map.GetLayer("Buildings").Tiles[x, rectangle.Y + 2].TileSheet.Equals(dec.map.TileSheets[2]) || dec.map.GetLayer("Buildings").Tiles[x, rectangle.Y + 2].TileSheet.Id.StartsWith("zCWF"))
-                                setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 2, "Buildings", 0);
+                                setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 2, "Buildings", 0, 0, animations);
                             else
-                                setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 2, "Back", 0);
+                                setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 2, "Back", 0, 0, animations);
                         }
                     }
                 }
@@ -222,9 +242,12 @@ namespace CustomWallsAndFloors
                     }
                 }
             }
+
+
+            PyTK.PyUtils.setDelayedAction(500, () => dec.updateMap());
         }
 
-        public static void setFloorsTilesheet(int whichRoom, int which, TileSheet tilesheet, DecoratableLocation dec)
+        public static void setFloorsTilesheet(int whichRoom, int which, TileSheet tilesheet, DecoratableLocation dec, AnimatedTile animations = null)
         {
             List<Rectangle> floors = dec.getFloors();
             int i = 336;
@@ -239,13 +262,13 @@ namespace CustomWallsAndFloors
                         while (y < rectangle.Bottom)
                         {
                             if (rectangle.Contains(x, y))
-                                setMapTilesheet(dec.map, tilesheet, x, y, "Back", 0, i);
+                                setMapTilesheet(dec.map, tilesheet, x, y, "Back", 0, i, animations);
                             if (rectangle.Contains(x + 1, y))
-                                setMapTilesheet(dec.map, tilesheet, x + 1, y, "Back", 0, i);
+                                setMapTilesheet(dec.map, tilesheet, x + 1, y, "Back", 0, i, animations);
                             if (rectangle.Contains(x, y + 1))
-                                setMapTilesheet(dec.map, tilesheet, x, y + 1, "Back", 0, i);
+                                setMapTilesheet(dec.map, tilesheet, x, y + 1, "Back", 0, i, animations);
                             if (rectangle.Contains(x + 1, y + 1))
-                                setMapTilesheet(dec.map, tilesheet, x + 1, y + 1, "Back", 0, i);
+                                setMapTilesheet(dec.map, tilesheet, x + 1, y + 1, "Back", 0, i, animations);
                             y += 2;
                         }
                         x += 2;
@@ -264,18 +287,20 @@ namespace CustomWallsAndFloors
                     while (y < rectangle.Bottom)
                     {
                         if (rectangle.Contains(x, y))
-                            setMapTilesheet(dec.map, tilesheet, x, y, "Back", 0, i);
+                            setMapTilesheet(dec.map, tilesheet, x, y, "Back", 0, i, animations);
                         if (rectangle.Contains(x + 1, y))
-                            setMapTilesheet(dec.map, tilesheet, x + 1, y, "Back", 0, i);
+                            setMapTilesheet(dec.map, tilesheet, x + 1, y, "Back", 0, i, animations);
                         if (rectangle.Contains(x, y + 1))
-                            setMapTilesheet(dec.map, tilesheet, x, y + 1, "Back", 0, i);
+                            setMapTilesheet(dec.map, tilesheet, x, y + 1, "Back", 0, i, animations);
                         if (rectangle.Contains(x + 1, y + 1))
-                            setMapTilesheet(dec.map, tilesheet, x + 1, y + 1, "Back", 0, i);
+                            setMapTilesheet(dec.map, tilesheet, x + 1, y + 1, "Back", 0, i, animations);
                         y += 2;
                     }
                     x += 2;
                 }
             }
+
+            PyTK.PyUtils.setDelayedAction(500, () => dec.updateMap());
         }
 
         public TileSheet initTilesheet(ref Map map)
@@ -300,14 +325,24 @@ namespace CustomWallsAndFloors
             return tilesheet;
         }
 
-        public static void setMapTilesheet(Map map, TileSheet tilesheet, int tileX, int tileY, string layer, int whichTileSheet = 0, int index = 0)
+        public static void setMapTilesheet(Map map, TileSheet tilesheet, int tileX, int tileY, string layer, int whichTileSheet = 0, int index = 0, AnimatedTile animations = null)
         {
             try
             {
                 if (!tilesheet.Id.Contains("zCWF"))
                     index = 0;
                 Tile tile = map.GetLayer(layer).Tiles[tileX, tileY];
-                PyTK.PyUtils.setDelayedAction(100, () => map.GetLayer(layer).Tiles[tileX, tileY] = new StaticTile(map.GetLayer(layer), tilesheet, BlendMode.Alpha, tile.TileIndex - index));
+
+                if (animations != null)
+                {
+                    List<StaticTile> statics = new List<StaticTile>();
+                    for (int i = 0; i < animations.Frames; i++)
+                        statics.Add(new StaticTile(map.GetLayer(layer), tilesheet, BlendMode.Alpha, (i * (animations.Floor ? 2 : 1)) + (tile.TileIndex - index)));
+
+                    PyTK.PyUtils.setDelayedAction(200, () => map.GetLayer(layer).Tiles[tileX, tileY] = new xTile.Tiles.AnimatedTile(map.GetLayer(layer), statics.ToArray(), animations.Length));
+                }
+                else
+                    PyTK.PyUtils.setDelayedAction(200, () => map.GetLayer(layer).Tiles[tileX, tileY] = new StaticTile(map.GetLayer(layer), tilesheet, BlendMode.Alpha, tile.TileIndex - index));
             }
             catch
             {
