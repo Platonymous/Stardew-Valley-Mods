@@ -1,11 +1,11 @@
 {
   "Name": "Seed Bag",
   "Author": "Platonymous",
-  "Version": "1.2.4",
+  "Version": "1.2.5-beta",
   "Description": "Adds a Seed Bag to the Game",
   "UniqueID": "Platonymous.SeedBag",
   "EntryDll": "SeedBag.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.8-beta",
   "UpdateKeys": [ "Nexus:1133" ],
   "Dependencies": [
     {

@@ -1,11 +1,11 @@
 {
   "Name": "Custom Furniture",
   "Author": "Platonymous",
-  "Version": "0.8.3",
+  "Version": "0.8.4-beta",
   "Description": "Helper Mod for Custom Furniture creation.",
   "UniqueID": "Platonymous.CustomFurniture",
   "EntryDll": "CustomFurniture.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.8-beta",
   "UpdateKeys": [ "Nexus:1254" ],
   "Dependencies": [
     {
