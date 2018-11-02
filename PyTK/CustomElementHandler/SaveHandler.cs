@@ -293,7 +293,7 @@ namespace PyTK.CustomElementHandler
             IDictionary dict = value as IDictionary;
             IList list = value as IList;
             ICollection col = value as ICollection;
-            OverlaidDictionary<Vector2, SObject> ovd = value as OverlaidDictionary<Vector2, SObject>;
+            OverlaidDictionary ovd = value as OverlaidDictionary;
             NetObjectList<Item> noli = value as NetObjectList<Item>;
             NetCollection<Building> netBuildings = value as NetCollection<Building>;
             NetCollection<Furniture> netFurniture = value as NetCollection<Furniture>;
@@ -573,7 +573,7 @@ namespace PyTK.CustomElementHandler
                                 {
                                     if (obj is SObject sobj && splitElemets(sobj.name).Count() > 2 && splitElemets(sobj.name)[1] == "Terrain")
                                     {
-                                        GameLocation gl = PyUtils.getAllLocationsAndBuidlings().Find(l => l.objects == dict);
+                                        GameLocation gl = PyUtils.getAllLocationsAndBuidlings().Find(l => l.overlayObjects == dict);
                                         if (gl != null)
                                         {
                                             if (gl.terrainFeatures.ContainsKey(k))
@@ -590,7 +590,7 @@ namespace PyTK.CustomElementHandler
                                     break;
                                 }
                         }
-                        else if (key is OverlaidDictionary<Vector2, SObject> ovdict)
+                        else if (key is OverlaidDictionary ovdict)
                         {
                             foreach (Vector2 k in ovdict.Keys.Reverse())
                                 if (ovdict[k] == obj)
@@ -706,7 +706,7 @@ namespace PyTK.CustomElementHandler
                                     break;
                                 }
                         }
-                        else if (key is OverlaidDictionary<Vector2, SObject> ovdict)
+                        else if (key is OverlaidDictionary ovdict)
                         {
                             foreach (Vector2 k in ovdict.Keys)
                                 if (ovdict[k] == obj)

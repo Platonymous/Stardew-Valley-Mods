@@ -27,6 +27,11 @@ namespace PyTK.CustomElementHandler
 
         public virtual XmlSerializer ReplacementSerializer { get; set; }
 
+        public bool Tick()
+        {
+            return false;
+        }
+
         public virtual void Read(BinaryReader reader, NetVersion version)
         {
             string dataString = PyNet.DecompressString(reader.ReadString());
@@ -132,6 +137,9 @@ namespace PyTK.CustomElementHandler
             }
         }
 
+        public bool NeedsTick { get; set; } = false;
+        public bool ChildNeedsTick { get; set; } = false;
+
         public virtual INetRoot Root { get; private set; }
 
         public INetSerializable Parent
@@ -157,7 +165,7 @@ namespace PyTK.CustomElementHandler
             if (this.Root != null)
             {
                 this.minNextDirtyTime = this.Root.Clock.GetLocalTick() + (uint)this.DeltaAggregateTicks;
-                this.ChangeVersion.Set((NetVersion)this.Root.Clock);
+                this.ChangeVersion.Set(this.Root.Clock.netVersion);
             }
             else
             {
@@ -215,7 +223,7 @@ namespace PyTK.CustomElementHandler
         protected NetVersion GetLocalVersion()
         {
             if (this.Root != null)
-                return new NetVersion((NetVersion)this.Root.Clock);
+                return new NetVersion(this.Root.Clock.netVersion);
             return new NetVersion();
         }
 
