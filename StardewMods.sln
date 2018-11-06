@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".metadata", ".metadata", "{
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		deploy-mod.targets = deploy-mod.targets
+		common.targets = common.targets
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -45,7 +45,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMXLoader", "TMXLoader\TMXL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcadePong", "ArcadePong\ArcadePong.csproj", "{35F9BEC0-4C51-47A2-8CC4-159108F3B5FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snake", "Snake\Snake.csproj", "{0FEA4C7A-4228-41AA-B987-B773313F4582}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcadeSnake", "Snake\ArcadeSnake.csproj", "{0FEA4C7A-4228-41AA-B987-B773313F4582}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arcade2048", "Arcade2048\Arcade2048.csproj", "{016C7B2E-4C46-4BBF-B63A-41FED1909BED}"
 EndProject
@@ -78,6 +78,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GhostTown", "GhostTown\GhostTown.csproj", "{65A2832E-B9B5-4E48-8360-394DDEC9C33F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomWallsAndFloors", "CustomWallsAndFloors\CustomWallsAndFloors.csproj", "{7043F841-158F-4977-B10E-A733A5E648AC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Archived", "Archived", "{6FEBF53B-2A2B-478F-B4CE-DA23EF41E309}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -341,6 +343,11 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{D04B971E-CCAE-4E96-AB10-A6BFBD25303A} = {6FEBF53B-2A2B-478F-B4CE-DA23EF41E309}
+		{FFA58F5D-536B-4D0A-BADA-04BABFEFAAB1} = {6FEBF53B-2A2B-478F-B4CE-DA23EF41E309}
+		{788A164A-4023-4553-844B-D8A2170CC3AF} = {6FEBF53B-2A2B-478F-B4CE-DA23EF41E309}
+		{4B5FC017-74C2-4C03-9A55-41DCD90C489B} = {6FEBF53B-2A2B-478F-B4CE-DA23EF41E309}
+		{5608957C-0FAB-4CCD-B8B9-CCBCF4208062} = {6FEBF53B-2A2B-478F-B4CE-DA23EF41E309}
 		{50554142-D2CB-4D86-ADB0-CD9F546FD1BA} = {9D6EE4CA-FAEC-46D0-96EA-C3C2B6A81C0A}
 		{2D69E926-F8A4-422D-9659-D7734E0A9413} = {50554142-D2CB-4D86-ADB0-CD9F546FD1BA}
 		{0F0DC916-0290-4267-AE59-5B39B58BB3A0} = {9D6EE4CA-FAEC-46D0-96EA-C3C2B6A81C0A}

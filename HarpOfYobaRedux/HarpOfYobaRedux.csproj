@@ -5,7 +5,6 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1D875951-1F85-4D1B-A73C-7384EFA5BE5F}</ProjectGuid>
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HarpOfYobaRedux</RootNamespace>
@@ -82,5 +81,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\deploy-mod.targets" />
+  <Import Project="$(SolutionDir)\common.targets" />
 </Project>

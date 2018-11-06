@@ -4,7 +4,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <ProjectGuid>{A8E6272F-A6A1-4BFE-BA8F-021F63596987}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -58,7 +57,6 @@
     <Compile Include="CustomElementHandler\IDrawFromCustomObjectData.cs" />
     <Compile Include="CustomElementHandler\ICustomObject.cs" />
     <Compile Include="CustomElementHandler\ISyncableElement.cs" />
-    <Compile Include="CustomElementHandler\NetReplacable.cs" />
     <Compile Include="CustomElementHandler\PySObject.cs" />
     <Compile Include="CustomElementHandler\SaveHandler.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
@@ -146,4 +144,5 @@
     <Content Include="Assets\nuget-icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\common.targets" />
 </Project>

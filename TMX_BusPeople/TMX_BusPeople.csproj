@@ -4,7 +4,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <IgnoreModFilePatterns>\.dll$, \.pdb$</IgnoreModFilePatterns>
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
     <ModFolderName>[TMX]JungleTempleAndCityBus</ModFolderName>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{696831AF-BCF5-4B9B-8ACF-271D48C95B87}</ProjectGuid>
@@ -126,4 +125,5 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\common.targets" />
 </Project>

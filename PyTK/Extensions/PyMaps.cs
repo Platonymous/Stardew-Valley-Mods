@@ -13,9 +13,8 @@ using System.IO;
 using PyTK.Types;
 using xTile.Dimensions;
 using System;
+using Netcode;
 using xTile.ObjectModel;
-using PyTK.Extensions;
-using PyTK.Tiled;
 
 namespace PyTK.Extensions
 {
@@ -30,9 +29,10 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is GameLocation location)
             {
-                Dictionary<Vector2, SObject> objects = (Dictionary<Vector2, SObject>)location.objects.Pairs;
-                if (objects.ContainsKey(t) && (objects[t] is T))
-                    return ((T) objects[t]);
+                if (location.netObjects.FieldDict.TryGetValue(t, out NetRef<SObject> netRaw) && netRaw.Value is T netValue)
+                    return netValue;
+                if (location.overlayObjects.TryGetValue(t, out SObject overlayRaw) && overlayRaw is T overlayValue)
+                    return overlayValue;
             }
             return null;
         }
@@ -43,9 +43,8 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is GameLocation location)
             {
-                Dictionary<Vector2, TerrainFeature> terrain = (Dictionary < Vector2, TerrainFeature > ) location.terrainFeatures.FieldDict;
-                if (terrain.ContainsKey(t) && (terrain[t] is T))
-                    return ((T) terrain[t]);
+                if (location.terrainFeatures.FieldDict.TryGetValue(t, out NetRef<TerrainFeature> raw) && raw.Value is T value)
+                    return value;
             }
 
             return null;
@@ -69,9 +68,10 @@ namespace PyTK.Extensions
         {
             if (Game1.currentLocation is GameLocation location)
             {
-                Dictionary<Vector2, SObject> objects = (Dictionary<Vector2, SObject>) location.objects.Pairs;
-                if (objects.ContainsKey(t))
-                    return objects[t];
+                if (location.netObjects.FieldDict.TryGetValue(t, out NetRef<SObject> netObj))
+                    return netObj;
+                if (location.overlayObjects.TryGetValue(t, out SObject overlayObj))
+                    return overlayObj;
             }
             return null;
         }

@@ -1,0 +1,9 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- put release zips in _releases folder -->
+    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
+
+    <!-- don't add PyTK dependencies to other mod's releases -->
+    <IgnoreModFilePatterns Condition="'$(MSBuildProjectName)' != 'PyTK'">DotNetZip\.dll, MoonSharp.Interpreter\.(?:dll|pdb), NCalc.dll</IgnoreModFilePatterns>
+  </PropertyGroup>
+</Project>
