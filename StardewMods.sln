@@ -81,6 +81,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomWallsAndFloors", "Cus
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Archived", "Archived", "{6FEBF53B-2A2B-478F-B4CE-DA23EF41E309}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomMusic", "CustomMusic\CustomMusic.csproj", "{3D1D38BE-B747-40D9-AE55-20F195C89C9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PelicanTTS Redux", "PelicanTTS Redux\PelicanTTS Redux.csproj", "{8EE95ECB-49E6-488B-8F7A-9AAB32D06EBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -338,6 +342,22 @@ Global
 		{7043F841-158F-4977-B10E-A733A5E648AC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7043F841-158F-4977-B10E-A733A5E648AC}.Release|x86.ActiveCfg = Release|Any CPU
 		{7043F841-158F-4977-B10E-A733A5E648AC}.Release|x86.Build.0 = Release|Any CPU
+		{3D1D38BE-B747-40D9-AE55-20F195C89C9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D1D38BE-B747-40D9-AE55-20F195C89C9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D1D38BE-B747-40D9-AE55-20F195C89C9B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3D1D38BE-B747-40D9-AE55-20F195C89C9B}.Debug|x86.Build.0 = Debug|Any CPU
+		{3D1D38BE-B747-40D9-AE55-20F195C89C9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D1D38BE-B747-40D9-AE55-20F195C89C9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D1D38BE-B747-40D9-AE55-20F195C89C9B}.Release|x86.ActiveCfg = Release|Any CPU
+		{3D1D38BE-B747-40D9-AE55-20F195C89C9B}.Release|x86.Build.0 = Release|Any CPU
+		{8EE95ECB-49E6-488B-8F7A-9AAB32D06EBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EE95ECB-49E6-488B-8F7A-9AAB32D06EBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EE95ECB-49E6-488B-8F7A-9AAB32D06EBB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8EE95ECB-49E6-488B-8F7A-9AAB32D06EBB}.Debug|x86.Build.0 = Debug|Any CPU
+		{8EE95ECB-49E6-488B-8F7A-9AAB32D06EBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EE95ECB-49E6-488B-8F7A-9AAB32D06EBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EE95ECB-49E6-488B-8F7A-9AAB32D06EBB}.Release|x86.ActiveCfg = Release|Any CPU
+		{8EE95ECB-49E6-488B-8F7A-9AAB32D06EBB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
