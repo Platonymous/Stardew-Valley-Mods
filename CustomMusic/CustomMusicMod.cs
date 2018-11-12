@@ -47,7 +47,6 @@ namespace CustomMusic
                 Music.Remove(music.Id);
 
             SoundEffect soundEffect = OggLoader.Load(path);
-
             Music.Add(music.Id, new StoredMusic(music.Id, soundEffect, music.Ambient, music.Loop));
         }
     }

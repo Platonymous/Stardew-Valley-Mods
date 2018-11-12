@@ -19,6 +19,7 @@ namespace CustomMusic
             this.Id = id;
             this.Sound = sound;
             this.Ambient = ambient;
+            this.Loop = loop;
         }
     }
 }
