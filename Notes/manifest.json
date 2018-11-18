@@ -1,0 +1,16 @@
+﻿{
+  "Name": "Notes",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Write and place notes",
+  "UniqueID": "Platonymous.Notes",
+  "EntryDll": "Notes.dll",
+  "MinimumApiVersion": "2.6",
+  "UpdateKeys": [ "Nexus:" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit",
+      "MinimumVersion": "1.4.10-beta"
+    }
+  ]
+}
