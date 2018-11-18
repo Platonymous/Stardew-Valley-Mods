@@ -4,6 +4,6 @@
     <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
 
     <!-- don't add PyTK dependencies to other mod's releases -->
-    <IgnoreModFilePatterns Condition="'$(MSBuildProjectName)' != 'PyTK'">DotNetZip\.dll, MoonSharp.Interpreter\.(?:dll|pdb), NCalc.dll</IgnoreModFilePatterns>
+    <IgnoreModFilePatterns Condition="'$(MSBuildProjectName)' != 'PyTK'">DotNetZip\.dll, PyTK\.dll, DotNetZip\.dll, MoonSharp.Interpreter\.(?:dll|pdb), NCalc.dll</IgnoreModFilePatterns>
   </PropertyGroup>
 </Project>
