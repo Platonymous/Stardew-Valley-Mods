@@ -16,6 +16,8 @@ using SFarmer = StardewValley.Farmer;
 using Harmony;
 using System.Reflection;
 using System.Linq;
+using xTile.Tiles;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TMXLoader
 {
@@ -141,6 +143,23 @@ namespace TMXLoader
                     map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), null, true);
                     map.injectAs("Maps/" + edit.name);
                     mapsToSync.AddOrReplace(edit.name, map);
+                }
+
+                foreach (NPCPlacement edit in tmxPack.festivalSpots)
+                {
+                    Map reference = Helper.Content.Load<Map>("Maps/Town", ContentSource.GameContent);
+                    Map original = Helper.Content.Load<Map>("Maps/" + edit.map, ContentSource.GameContent);
+                    Texture2D springTex = Helper.Content.Load<Texture2D>("Maps/spring_outdoorsTileSheet", ContentSource.GameContent);
+                    Dictionary<string, string> source = Helper.Content.Load<Dictionary<string, string>>("Data\\NPCDispositions",ContentSource.GameContent);
+                    int index = source.Keys.ToList().IndexOf(edit.name);
+                    TileSheet spring = original.GetTileSheet("ztemp");
+                    if (spring == null) {
+                        spring = new TileSheet("ztemp", original, "Maps/spring_outdoorsTileSheet", new xTile.Dimensions.Size(springTex.Width,springTex.Height), original.TileSheets[0].TileSize);
+                        original.AddTileSheet(spring);
+                    }
+                    original.GetLayer("Set-Up").Tiles[edit.position[0], edit.position[1]] = new StaticTile(original.GetLayer("Set-Up"), spring, BlendMode.Alpha, (index * 4) + edit.direction);
+                    original.injectAs("Maps/" + edit.map);
+                    mapsToSync.AddOrReplace(edit.map, original);
                 }
 
                 foreach (MapEdit edit in tmxPack.addMaps)
