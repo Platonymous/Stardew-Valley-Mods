@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Audio;
 using Ogg2XNA;
 using Harmony;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace CustomMusic
 {
@@ -24,7 +26,7 @@ namespace CustomMusic
             harmony.Patch(typeof(Cue).GetMethod("Dispose"), new HarmonyMethod(typeof(Overrides), "Dispose"));
             harmony.Patch(typeof(Cue).GetMethod("SetVariable"), new HarmonyMethod(typeof(Overrides), "SetVariable"));
             harmony.Patch(typeof(Cue).GetProperty("IsPlaying").GetGetMethod(false), new HarmonyMethod(typeof(Overrides), "IsPlaying"));
-
+            harmony.Patch(typeof(SoundBank).GetMethod("GetCue"), new HarmonyMethod(typeof(Overrides), "GetCue"));
         }
 
         private void loadContentPacks()
@@ -36,20 +38,29 @@ namespace CustomMusic
                 foreach (MusicItem music in content.Music)
                 {
                     string path = Path.Combine(pack.DirectoryPath, music.File);
-                    addMusic(path, music);
+                    if (Music.ContainsKey(music.Id))
+                        Music.Remove(music.Id);
+
+                    if (!music.Preload)
+                        Task.Run(() =>
+                        {
+                            addMusic(path, music);
+                        });
+                    else
+                        addMusic(path, music);
                 }
             }
         }
 
         private void addMusic(string path, MusicItem music)
         {
-            if (Music.ContainsKey(music.Id))
-                Music.Remove(music.Id);
-
+            Monitor.Log("Loading " + music.File + " ...", LogLevel.Info);
             SoundEffect soundEffect = OggLoader.Load(path);
-            Music.Add(music.Id, new StoredMusic(music.Id, soundEffect, music.Ambient, music.Loop));
+            Monitor.Log(music.File + " Loaded", LogLevel.Trace);
+            string[] ids = music.Id.Split(',').Select(p => p.Trim()).ToArray();
+            foreach(string id in ids)
+                Music.Add(id, new StoredMusic(id, soundEffect, music.Ambient, music.Loop));
         }
     }
-
 }
 

@@ -46,8 +46,14 @@ namespace CustomMusic
 
         public void Stop()
         {
-            IsPlaying = false;
-            Sound?.Stop();
+            try
+            {
+                IsPlaying = false;
+                Sound?.Stop();
+            }
+            catch
+            {
+            }
         }
 
         public void Play()

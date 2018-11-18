@@ -8,18 +8,20 @@ namespace CustomMusic
         public string File { get; set; }
         public bool Loop { get; set; } = true;
         public bool Ambient { get; set; } = false;
+        public bool Preload { get; set; } = false;
 
         public MusicItem()
         {
 
         }
 
-        public MusicItem(string id, string file, bool ambient, bool loop)
+        public MusicItem(string id, string file, bool ambient, bool loop, bool preload)
         {
             this.Id = id;
             this.File = file;
             this.Loop = loop;
             this.Ambient = ambient;
+            this.Preload = preload;
         }
     }
 }
