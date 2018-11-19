@@ -12,11 +12,13 @@ namespace CustomFarmingRedux
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
 
         public int id { get; set; }
+        public string useid => pack.useid;
         public string fullid
         {
             get
             {
-                return $"{folder}.{file}.{id}";
+                string folderid = (useid != "") ? useid : folder;
+                return $"{folderid}.{file}.{id}";
             }
         }
         public string name { get; set; }
@@ -69,8 +71,12 @@ namespace CustomFarmingRedux
                 if (texture == null || texture == "")
                     texture2d = Game1.objectSpriteSheet;
                 else
-                    texture2d = helper.Content.Load<Texture2D>($"{pack.baseFolder}/{folder}/{texture}");
-
+                {
+                    if (pack.baseFolder != "ContentPack")
+                        texture2d = helper.Content.Load<Texture2D>($"{pack.baseFolder}/{folder}/{texture}");
+                    else
+                        texture2d = pack.contentPack.LoadAsset<Texture2D>(texture);
+                }
             return texture2d;
         }
 

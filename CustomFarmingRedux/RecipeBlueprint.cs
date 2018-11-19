@@ -24,7 +24,7 @@ namespace CustomFarmingRedux
         public int _index = -1;
         public int[] exclude;
         public int[] include;
-        public string id => name + "." + index + "." + quality + "." + stack;
+        public string id => _name + "." + _index + "." + quality + "." + stack;
         public string price = "original";
         private int dropInQuality = -1;
         public string name
@@ -32,9 +32,9 @@ namespace CustomFarmingRedux
             get
             {
                 if (_name == "" && index > 0)
-                    _name = Game1.objectInformation[index].Split('/')[4];
-               
-                    return _name;
+                    _name = item.StartsWith("random:") ? " " : Game1.objectInformation[index].Split('/')[4];
+
+                return _name;
             }
             set
             {
@@ -83,7 +83,7 @@ namespace CustomFarmingRedux
                         if (item.StartsWith("random:"))
                         {
                             string[] items = item.Split(':')[1].Split(',');
-                            return Game1.bigCraftablesInformation.getIndexByName(items[rnd.Next(0,items.Length)]);
+                            return Game1.bigCraftablesInformation.getIndexByName(items[rnd.Next(0, items.Length)]);
                         }
                         else
                         _index = Game1.bigCraftablesInformation.getIndexByName(item);
@@ -205,8 +205,12 @@ namespace CustomFarmingRedux
                 if (texture == null || texture == "")
                     texture2d = Game1.objectSpriteSheet;
                 else
-                    texture2d = Helper.Content.Load<Texture2D>($"{mBlueprint.pack.baseFolder}/{mBlueprint.folder}/{texture}");
-
+                {
+                    if (mBlueprint.pack.baseFolder != "ContentPack")
+                        texture2d = Helper.Content.Load<Texture2D>($"{mBlueprint.pack.baseFolder}/{mBlueprint.folder}/{texture}");
+                    else
+                        texture2d = mBlueprint.pack.contentPack.LoadAsset<Texture2D>(texture);
+                }
             return texture2d;
         }
 

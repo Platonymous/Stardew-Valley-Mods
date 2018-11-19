@@ -93,6 +93,8 @@ namespace CustomFarmingRedux
 
         private void build(CustomMachineBlueprint blueprint)
         {
+            StardewModdingAPI.Events.TimeEvents.AfterDayStarted += (s,e) => checkedToday = false; 
+
             if (syncObject == null)
             {
                 syncObject = new PySync(this);
@@ -258,10 +260,25 @@ namespace CustomFarmingRedux
             completionTime = null;
             heldObject.Value = createProduce();
             readyForHarvest.Value = true;
+            activeRecipe = null;
 
             if(config.automation)
                 if (deliverToNearChest(heldObject))
                     startAutomation();
+            syncObject.MarkDirty();
+        }
+
+        private void setReadyForHarvest()
+        {
+            minutesUntilReady.Set(-1);
+            completionTime = null;
+            readyForHarvest.Value = true;
+            activeRecipe = null;
+
+            if (config.automation)
+                if (deliverToNearChest(heldObject))
+                    startAutomation();
+
             syncObject.MarkDirty();
         }
 
@@ -287,6 +304,9 @@ namespace CustomFarmingRedux
             activeRecipe = recipe;
             if (completionTime == null)
                 completionTime = STime.CURRENT + recipe.time;
+
+            if (location == null)
+                location = new List<GameLocation>(Game1.locations).Find(g => new List<SObject>(g.Objects.Values).Contains(this));
 
             if (!checkedToday)
                 meetsConditions = PyUtils.CheckEventConditions(conditions, this);
@@ -476,6 +496,9 @@ namespace CustomFarmingRedux
             if (activeRecipe != null && !blueprint.asdisplay)
                 data.Add("recipe", activeRecipe.id.ToString());
 
+            if (readyForHarvest)
+                data.Add("ready", "true");
+
             if (completionTime != null)
                 data.Add("completionTime", completionTime.timestamp.ToString());
 
@@ -519,7 +542,7 @@ namespace CustomFarmingRedux
 
             if (additionalSaveData.ContainsKey("recipe"))
                 activeRecipe = blueprint.production.Find(r => r.id == additionalSaveData["recipe"]);
-
+            
             if (additionalSaveData.ContainsKey("completionTime"))
                 completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
             else
@@ -551,6 +574,9 @@ namespace CustomFarmingRedux
             updateWhenCurrentLocation(Game1.currentGameTime, location);
             startAutoProduction();
             wasBuild = true;
+
+            if (additionalSaveData.ContainsKey("ready") && additionalSaveData["ready"] == "true")
+                setReadyForHarvest();
         }
 
         public override void DayUpdate(GameLocation location)

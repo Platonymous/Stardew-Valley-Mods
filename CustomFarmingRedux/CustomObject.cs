@@ -239,7 +239,7 @@ namespace CustomFarmingRedux
         public Dictionary<string, string> getAdditionalSaveData()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("mid", $"{mBlueprint.folder}.{mBlueprint.file}.{mBlueprint.id}");
+            data.Add("mid", mBlueprint.fullid);
             data.Add("id", blueprint.id.ToString());
             data.Add("name", _name);
             data.Add("stack", stack.ToString());

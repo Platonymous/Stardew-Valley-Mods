@@ -254,6 +254,44 @@ namespace CustomFarmingRedux
             }
         }
 
+        private List<CustomFarmingPack> loadContentPacks()
+        {
+            List<CustomFarmingPack> packs = new List<CustomFarmingPack>();
+
+            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
+            {
+                List<CustomFarmingPack> cpPacks = loadCP(pack);
+                packs.AddRange(cpPacks);
+            }
+
+            return packs;
+        }
+
+        public List<CustomFarmingPack> loadCP(StardewModdingAPI.IContentPack contentPack, SearchOption option = SearchOption.TopDirectoryOnly,  string filesearch = "*.json")
+        {
+            List<CustomFarmingPack> packs = new List<CustomFarmingPack>();
+            string[] files = Directory.GetFiles(contentPack.DirectoryPath, filesearch, option);
+            foreach (string file in files)
+            {
+                FileInfo fileInfo = new FileInfo(file);
+                DirectoryInfo directoryInfo = fileInfo.Directory;
+                string filename = fileInfo.Name;
+                if (filename == "manifest.json")
+                    continue;
+
+                CustomFarmingPack pack = Helper.ReadJsonFile<CustomFarmingPack>(file);
+                pack.fileName = filename;
+                pack.folderName = directoryInfo.Name;
+                pack.author = contentPack.Manifest.Author;
+                pack.version = contentPack.Manifest.Version.ToString();
+                pack.baseFolder = "ContentPack";
+                pack.contentPack = contentPack;
+                packs.Add(pack);
+            }
+
+            return packs;
+        }
+
         private void loadPacks()
         {
             List<CustomFarmingPack> packs = new List<CustomFarmingPack>();
@@ -274,10 +312,13 @@ namespace CustomFarmingRedux
 
             newPacks.AddRange(legacyPacks);
 
+            newPacks.AddRange(loadContentPacks());
+
             foreach (CustomFarmingPack lPack in newPacks)
             {
                 if (!lPack.legacy)
                 {
+                    packs.RemoveAll(p => p.folderName == lPack.useid && p.fileName == lPack.fileName);
                     packs.AddOrReplace(lPack);
                     continue;
                 }
@@ -408,6 +449,7 @@ namespace CustomFarmingRedux
 
                     if (blueprint.forsale)
                         new InventoryItem(new CustomMachine(blueprint), blueprint.price).addToNPCShop(blueprint.shop, blueprint.condition);
+                    Monitor.Log("Added:" + blueprint.fullid);
                 }
             
             Monitor.Log(packs.Count + " Content Packs with " + machines.Count + " machines found.", LogLevel.Trace);
