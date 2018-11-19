@@ -15,6 +15,21 @@ namespace PyTK.Overrides
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
         [HarmonyPatch]
+        internal class GLBugFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "Equals",new[] { PyUtils.getTypeSDV("GameLocation") });
+            }
+
+            internal static bool Prefix(GameLocation __instance, GameLocation other, ref bool __result)
+            {
+                __result = object.Equals((object)__instance.Name, (object)other.Name) && object.Equals((object)__instance.uniqueName.Value, (object)other.uniqueName.Value ) && object.Equals((object)__instance.isStructure.Value, (object)other.isStructure.Value);
+                return false;
+            }
+        }
+
+        [HarmonyPatch]
         internal class TouchActionFix
         {
             internal static MethodInfo TargetMethod()
