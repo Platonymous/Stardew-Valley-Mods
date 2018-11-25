@@ -56,8 +56,8 @@ namespace PyTK.Types
             {
                 string t = text;
                 string type = (attachmentType == AttachmentType.QUEST || attachmentType == AttachmentType.QUEST_COMPLETION) ? "quest" : (attachmentType == AttachmentType.TOOLS) ? "tools" : "object";
-                if (attachments != null)
-                    t += $" %item { type } { String.Join(" ", (attachmentType == AttachmentType.QUEST_COMPLETION) ? attachments + " true" : attachments)}  %%";
+                if (attachments != null && attachments != "")
+                    t += $" %item { type } { String.Join(" ", (attachmentType == AttachmentType.QUEST_COMPLETION) ? attachments + " true" : attachments)} %%";
 
                 return asset.AddOrReplace(id, t);
             });

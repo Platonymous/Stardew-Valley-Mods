@@ -1,9 +1,12 @@
 ﻿using Harmony;
 using Microsoft.Xna.Framework;
+using PyTK.CustomElementHandler;
 using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.Locations;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -28,6 +31,21 @@ namespace PyTK.Overrides
                 return false;
             }
         }
+
+        [HarmonyPatch]
+        internal class BLoadBugFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("Buildings.Building"), "load");
+            }
+
+            internal static bool Prefix(Building __instance)
+            {
+                return !(__instance is Mill m && (SaveHandler.getDataString(__instance).StartsWith(SaveHandler.newPrefix)) && m.indoors.Value is GameLocation gl && (SaveHandler.getDataString(gl).StartsWith(SaveHandler.newPrefix)));
+            }
+        }
+
 
         [HarmonyPatch]
         internal class TouchActionFix

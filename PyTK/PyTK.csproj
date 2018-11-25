@@ -140,9 +140,6 @@
     </None>
     <None Include="PyTK.nuspec" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Assets\nuget-icon.png" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\common.targets" />
 </Project>

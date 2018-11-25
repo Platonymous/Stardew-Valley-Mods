@@ -6,8 +6,10 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Buildings;
+using StardewValley.Locations;
 using StardewValley.Network;
 using StardewValley.Objects;
+using StardewValley.Projectiles;
 using StardewValley.TerrainFeatures;
 using System;
 using System.Collections;
@@ -34,14 +36,8 @@ namespace PyTK.CustomElementHandler
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
         internal static bool inSaveMode { get; set; } = false;
 
-        private static bool ceh = false;
-
-        public static Type cehType;
-
         public static char seperator = '|';
-        public static char seperatorLegacy = '/';
         public static char valueSeperator = '=';
-        public static string oldPrefix = "CEHe";
         public static string newPrefix = "PyTK";
         internal static string typeCheckerName = "PyTK.TypeChecker";
 
@@ -50,7 +46,7 @@ namespace PyTK.CustomElementHandler
 
         public static bool hasSaveType(object o)
         {
-            return (o is ISaveElement || ceh && o.GetType().GetInterfaces().Contains(cehType));
+            return (o is ISaveElement);
         }
 
         public static void addPreprocessor(Func<string,string> pp)
@@ -63,18 +59,28 @@ namespace PyTK.CustomElementHandler
             objectPreProcessors.AddOrReplace(pp);
         }
 
-        internal static void rebuildIfAvailable()
+        internal static void rebuildIfAvailable(bool all = true)
         {
             Task.Run(() =>
             {
                 OnBeforeRebuilding(EventArgs.Empty);
 
-                ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
-                ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+                ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1, all), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+                if(Game1.currentLocation is GameLocation gl)
+                    ReplaceAllObjects<object>(FindAllObjects(gl, Game1.locations, all), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+                ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1, all), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
                 foreach (Farmer farmer in Game1.otherFarmers.Values)
-                    ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+                    ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1, all), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
 
                 OnFinishedRebuilding(EventArgs.Empty);
+
+                if (!all)
+                {
+                    aRebuild = Task.Run(() =>
+                    {
+                        rebuildIfAvailable();
+                    });
+                }
 
             });
         }
@@ -83,7 +89,10 @@ namespace PyTK.CustomElementHandler
 
         internal static bool canBeRebuildInMultiplayer(object obj)
         {
-            if (!(getDataString(obj).StartsWith(newPrefix) || getDataString(obj).StartsWith(oldPrefix)))
+            if (!PyTKMod.config.multiplayerSafety)
+                return true;
+
+            if (!(getDataString(obj).StartsWith(newPrefix)))
                 return false;
 
             string dataString = getDataString(obj);
@@ -112,20 +121,15 @@ namespace PyTK.CustomElementHandler
 
         internal static void setUpEventHandlers()
         {
-            ceh = Helper.ModRegistry.IsLoaded("Platonymous.CustomElementHandler");
-
-            if (ceh)
-                cehType = Type.GetType("CustomElementHandler.ISaveElement, CustomElementHandler");
-
             fieldInfoChache = new Dictionary<Type, FieldInfo[]>();
             propInfoChache = new Dictionary<Type, PropertyInfo[]>();
 
             SaveEvents.BeforeSave += (s, e) => Replace();
-            SaveEvents.AfterSave += (s, e) => Rebuild();
-            SaveEvents.AfterLoad += (s, e) => Rebuild();
+            SaveEvents.AfterSave += (s, e) => Rebuild(false);
+            SaveEvents.AfterLoad += (s, e) => Rebuild(false);
             Events.PyTimeEvents.BeforeSleepEvents += (s, e) => { if (Game1.IsClient) { Replace(); } };
+
             TimeEvents.AfterDayStarted += (s, e) => {
-                Rebuild();
                 Game1.objectSpriteSheet.Tag = "cod_objects";
                     Game1.bigCraftableSpriteSheet.Tag = "cod_bigobject";
             };
@@ -139,7 +143,7 @@ namespace PyTK.CustomElementHandler
 
         private static bool isRebuildable(object o)
         {
-            return getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix);
+            return getDataString(o).StartsWith(newPrefix);
         }
 
         public static Dictionary<string,string> getAdditionalSaveData(object obj)
@@ -171,7 +175,21 @@ namespace PyTK.CustomElementHandler
 
         public static void RebuildAll(object obj, object parent)
         {
-            ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
+            if (Game1.IsMultiplayer && PyTKMod.config.multiplayerSafety)
+            {
+                rebuildAllIfAvailable(obj,parent);
+                return;
+            }
+
+            ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
+        }
+
+        internal static void rebuildAllIfAvailable(object obj, object parent)
+        {
+            Task.Run(() =>
+            {
+                ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
+            });
         }
 
         public static void ReplaceAll(object obj, object parent)
@@ -181,6 +199,11 @@ namespace PyTK.CustomElementHandler
 
         internal static void Replace()
         {
+            while (aRebuild != null && !aRebuild.IsCompleted)
+            {   
+            }
+
+            aRebuild = null;
             OnBeforeRemoving(EventArgs.Empty);
             ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
             ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
@@ -189,32 +212,42 @@ namespace PyTK.CustomElementHandler
             OnFinishedRemoving(EventArgs.Empty);
         }
 
-        internal static void Rebuild()
+        internal static Task aRebuild = null;
+
+        internal static void Rebuild(bool all = true)
         {
-            if (Game1.IsMultiplayer)
+            if (Game1.IsMultiplayer && PyTKMod.config.multiplayerSafety)
             {
-                rebuildIfAvailable();
+                rebuildIfAvailable(all);
                 return;
             }
 
             OnBeforeRebuilding(EventArgs.Empty);
-            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
-            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
-            foreach (Farmer farmer in Game1.otherFarmers.Values)
-                ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o));
-            OnFinishedRebuilding(EventArgs.Empty);
-        }
-     
-        internal static void RebuildRev()
-        {
-            if (Game1.IsMultiplayer && Game1.numberOfPlayers() > 1 && Game1.IsServer)
-                return;
 
-            OnBeforeRebuilding(EventArgs.Empty);
-            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o), true);
-            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix), o => rebuildElement(getDataString(o), o), true);
+
+            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1, all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
+            if (Game1.currentLocation is GameLocation gl)
+                ReplaceAllObjects<object>(FindAllObjects(gl, Game1.locations, all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
+
+            if (all)
+                ReplaceAllObjects<object>(FindAllObjects(Game1.getFarm().terrainFeatures, Game1.getFarm(), all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
+            else
+                ReplaceAllObjects<object>(FindAllObjects(Game1.getFarm().buildings, Game1.getFarm(), true), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
+               
+            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1, all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
+            
+            foreach (Farmer farmer in Game1.otherFarmers.Values)
+                ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1, all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
             OnFinishedRebuilding(EventArgs.Empty);
-        }
+
+            if (!all)
+            {
+                aRebuild = Task.Run(() =>
+                {
+                    Rebuild();
+                });
+            }
+        }       
 
         internal static void Cleanup()
         {
@@ -232,7 +265,7 @@ namespace PyTK.CustomElementHandler
 
         private static bool cleanupPredicate(object o)
         {
-            if(checkForErrorItem(o) || getDataString(o).StartsWith(newPrefix) || getDataString(o).StartsWith(oldPrefix))
+            if(checkForErrorItem(o) || getDataString(o).StartsWith(newPrefix))
             {
                 if(o is Item i)
                     Monitor.Log("Removing " + i.Name);
@@ -284,25 +317,29 @@ namespace PyTK.CustomElementHandler
             return found;
         }
 
+
         private static void FindAllInstances(object value, List<string> propNames, HashSet<object> exploredObjects, Dictionary<object, List<object>> found, object parent)
         {
-            if (value == null || exploredObjects.Contains(value))
-                return;
+               if (value == null || exploredObjects.Contains(value))
+                   return;
 
-            exploredObjects.Add(value);
-            IDictionary dict = value as IDictionary;
-            IList list = value as IList;
-            ICollection col = value as ICollection;
-            OverlaidDictionary ovd = value as OverlaidDictionary;
-            NetObjectList<Item> noli = value as NetObjectList<Item>;
-            NetCollection<Building> netBuildings = value as NetCollection<Building>;
-            NetCollection<Furniture> netFurniture = value as NetCollection<Furniture>;
-            NetArray<SObject, NetRef<SObject>> netObjectArray = value as NetArray<SObject, NetRef<SObject>>;
-
+               exploredObjects.Add(value);
+               IDictionary dict = value as IDictionary;
+               IList list = value as IList;
+               ICollection col = value as ICollection;
+               OverlaidDictionary ovd = value as OverlaidDictionary;
+               NetObjectList<Item> noli = value as NetObjectList<Item>;
+               NetCollection<Building> netBuildings = value as NetCollection<Building>;
+               NetCollection<Furniture> netFurniture = value as NetCollection<Furniture>;
+               NetArray<SObject, NetRef<SObject>> netObjectArray = value as NetArray<SObject, NetRef<SObject>>;
+               NetVector2Dictionary<TerrainFeature, NetRef<TerrainFeature>> terrain = value as NetVector2Dictionary<TerrainFeature, NetRef<TerrainFeature>>;
 
             if (dict != null)
-                foreach (object item in dict.Values)
-                    FindAllInstances(item, propNames, exploredObjects, found, dict);
+                foreach (object item in dict.Keys)
+                {
+                    if (dict[item] != null)
+                        FindAllInstances(dict[item], propNames, exploredObjects, found, new KeyValuePair<IDictionary, object>(dict, item));
+                }
             else if (list != null)
                 foreach (object item in list)
                     FindAllInstances(item, propNames, exploredObjects, found, list);
@@ -310,8 +347,12 @@ namespace PyTK.CustomElementHandler
                 foreach (object item in col)
                     FindAllInstances(item, propNames, exploredObjects, found, col);
             else if (ovd != null)
-                foreach (object item in ovd.Values)
+                foreach (Vector2 item in ovd.Keys)
+                {
+                    if (ovd[item] != null)
+                        FindAllInstances(ovd[item], propNames, exploredObjects, found, new KeyValuePair<OverlaidDictionary, object>(ovd, item));
                     FindAllInstances(item, propNames, exploredObjects, found, ovd);
+                }
             else if (noli != null)
                 foreach (object item in noli)
                     FindAllInstances(item, propNames, exploredObjects, found, noli);
@@ -324,6 +365,12 @@ namespace PyTK.CustomElementHandler
             else if (netObjectArray != null)
                 foreach (SObject item in netObjectArray.Where(no => no != null))
                     FindAllInstances(item, propNames, exploredObjects, found, netObjectArray);
+            else if (terrain != null)
+            {
+                var fd = terrain.FieldDict;
+                foreach (var item in terrain.Keys.Where(v => terrain[v] != null && terrain[v] is ISaveElement || getDataString(terrain[v]).StartsWith(newPrefix)))
+                        FindAllInstances(fd[item], propNames, exploredObjects, found, new KeyValuePair<IDictionary, object>(fd, item));
+            }
             else
             {
                 if (found.ContainsKey(parent))
@@ -337,7 +384,8 @@ namespace PyTK.CustomElementHandler
 
                 if (fieldInfoChache.ContainsKey(type))
                     fields = fieldInfoChache[type];
-                else {
+                else
+                {
                     fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                     fieldInfoChache.Add(type, fields);
                 }
@@ -345,16 +393,15 @@ namespace PyTK.CustomElementHandler
                 foreach (FieldInfo field in fields.Where(f => propNames.Contains(f.Name)))
                 {
                     object propertyValue = field.GetValue(value);
-                    if (propertyValue != null && propertyValue.GetType() is Type t && t.IsClass)
+                    if (propertyValue != null && propertyValue.GetType() is Type ty && ty.IsClass)
                         FindAllInstances(propertyValue, propNames, exploredObjects, found, new KeyValuePair<FieldInfo, object>(field, value));
                 }
-
             }
         }
 
         private static object checkReplacement(object replacement)
         {
-            if (replacement is Chest chest)
+            if (replacement is Chest chest && !chest.playerChest)
             {
                 Chest rchest = new Chest(true);
                 rchest.name = chest.name;
@@ -367,9 +414,6 @@ namespace PyTK.CustomElementHandler
 
         public static string[] splitElemets(string dataString)
         {
-            if (!dataString.Contains(seperator) && dataString.Contains(seperatorLegacy))
-                return dataString.Split(seperatorLegacy);
-
             return dataString.Split(seperator);
         }
 
@@ -412,16 +456,6 @@ namespace PyTK.CustomElementHandler
 
                 if (o is ISaveElement ise)
                     ise.rebuild(additionalSaveData, replacement);
-                else
-                {
-                    Dictionary<string, string> cehAdditionalSaveData = new Dictionary<string, string>();
-                    foreach (KeyValuePair<string, string> k in additionalSaveData)
-                        cehAdditionalSaveData.Add(k.Key, k.Value);
-
-                    MethodInfo rebuild = cehType.GetMethods(BindingFlags.Instance | BindingFlags.Public).ToList().Find(m => m.Name == "rebuild");
-                    Monitor.Log(rebuild.Name + " - " + o.GetType().AssemblyQualifiedName);
-                    rebuild.Invoke(o, new[] { cehAdditionalSaveData, replacement });
-                }
 
                 return o;
             }
@@ -475,8 +509,6 @@ namespace PyTK.CustomElementHandler
 
             if (element is ISaveElement ise)
                 replacement = getReplacement(ise);
-            else
-                replacement = Helper.Reflection.GetMethod(element, "getReplacement").Invoke<object>();
 
             if (element is TerrainFeature && !(replacement is FruitTree))
                 replacement = new FruitTree(628, 1);
@@ -489,29 +521,29 @@ namespace PyTK.CustomElementHandler
         {
             if (o is SObject obj)
                 obj.name = dataString;
-            if (o is Tool t)
+            else if (o is Tool t)
                 t.Name = dataString;
-            if (o is Furniture f)
+            else if (o is Furniture f)
                 f.name = dataString;
-            if (o is Hat h)
+            else if (o is Hat h)
                 h.Name = dataString;
-            if (o is Boots b)
+            else if (o is Boots b)
                 b.Name = dataString;
-            if (o is Ring r)
+            else if (o is Ring r)
                 r.Name = dataString;
-            if (o is Mill bl)
+            else if (o is Mill bl)
             {
                 if (bl.input.Value == null)
                     bl.input.Value = new Chest(true);
                 bl.input.Value.name = dataString;
             }
-            if (o is GameLocation gl)
+            else if (o is GameLocation gl)
                 gl.uniqueName.Value = dataString;
-            if (o is FarmAnimal a)
+            else if (o is FarmAnimal a)
                 a.Name = dataString;
-            if (o is NPC n)
+            else if (o is NPC n)
                 n.Name = dataString;
-            if (o is FruitTree ft)
+            else if (o is FruitTree ft)
                 ft.fruitSeason.Value = dataString;
         }
 
@@ -521,34 +553,34 @@ namespace PyTK.CustomElementHandler
 
             if (o is SObject obj)
                 data = obj.name;
-            if (o is Tool t)
+            else if (o is Tool t)
                 data = t.Name;
-            if (o is Furniture f)
+            else if (o is Furniture f)
                 data = f.name;
-            if (o is Hat h)
+            else if (o is Hat h)
                 data = h.Name;
-            if (o is Boots b)
+            else if (o is Boots b)
                 data = b.Name;
-            if (o is Ring r)
+            else if (o is Ring r)
                 data = r.Name;
-            if (o is Mill bl && bl.input.Value is Chest bgl)
+            else if (o is Mill bl && bl.input.Value is Chest bgl)
                 data = bgl.name;
-            if (o is GameLocation gl)
+            else if (o is GameLocation gl)
                 data = gl.uniqueName.Value;
-            if (o is FarmAnimal a)
+            else if (o is FarmAnimal a)
                 data = a.Name;
-            if (o is NPC n)
+            else if (o is NPC n)
                 data = n.Name;
-            if (o is FruitTree ft)
+            else if (o is FruitTree ft)
                 data = ft.fruitSeason.Value;
 
             return (data == null ? "not available" : data);
 
         }
 
-        private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent)
+        private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent, bool all = true)
         {
-            return FindAllInstances(obj, parent, new List<string>() {"displayItem","netObjects","overlayObjects", "farmhand","owner", "elements", "parent","value", "array", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
+            return FindAllInstances(obj, parent, new List<string>() {"displayItem","netObjects","overlayObjects", "farmhand","owner", "elements", "parent","value", "array", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", all ? "terrainFeatures" : "skipterrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
         }
 
         private static void ReplaceAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate, Func<TIn, object> replacer, bool reverse = false)
@@ -562,127 +594,84 @@ namespace PyTK.CustomElementHandler
             {
                 foreach (object obj in found[key])
                 {
-
                     if (obj is TIn item && predicate(item))
                     {
+                        var r = replacer(item);
 
                         if (key is IDictionary<Vector2, SObject> dict)
                         {
-                            foreach (Vector2 k in dict.Keys.Reverse())
-                                if (dict[k] == obj)
-                                {
-                                    if (obj is SObject sobj && splitElemets(sobj.name).Count() > 2 && splitElemets(sobj.name)[1] == "Terrain")
-                                    {
-                                        GameLocation gl = PyUtils.getAllLocationsAndBuidlings().Find(l => l.overlayObjects == dict);
-                                        if (gl != null)
-                                        {
-                                            if (gl.terrainFeatures.ContainsKey(k))
-                                                gl.terrainFeatures[k] = (TerrainFeature)replacer(item);
-                                            else
-                                                gl.terrainFeatures.Add(k, (TerrainFeature)replacer(item));
-                                        }
-
-                                        dict.Remove(k);
-                                    }
-                                    else
-                                        dict[k] = (SObject)replacer(item);
-
-                                    break;
-                                }
+                            foreach (Vector2 k in dict.Keys.Where(v => dict[v] == obj))
+                                dict[k] = (SObject)r;
                         }
                         else if (key is OverlaidDictionary ovdict)
                         {
-                            foreach (Vector2 k in ovdict.Keys.Reverse())
-                                if (ovdict[k] == obj)
-                                {
-                                    if (obj is SObject sobj && splitElemets(sobj.name).Count() > 2 && splitElemets(sobj.name)[1] == "Terrain")
-                                    {
-                                        GameLocation gl = PyUtils.getAllLocationsAndBuidlings().Find(l => l.objects == ovdict);
-                                        if (gl != null)
-                                        {
-                                            if (gl.terrainFeatures.ContainsKey(k))
-                                                gl.terrainFeatures[k] = (TerrainFeature)replacer(item);
-                                            else
-                                                gl.terrainFeatures.Add(k, (TerrainFeature)replacer(item));
-                                        }
-
-                                        ovdict.Remove(k);
-                                    }
-                                    else
-                                        ovdict[k] = (SObject)replacer(item);
-
-                                    break;
-                                }
+                            foreach (Vector2 k in ovdict.Keys.Where(v => ovdict[v] == obj))
+                                ovdict[k] = (SObject)r;
                         }
                         else if (key is SerializableDictionary<Vector2, TerrainFeature> sdictT)
                         {
-                            foreach (Vector2 k in sdictT.Keys.Reverse())
-                                if (sdictT[k] == obj)
-                                {
-                                    sdictT[k] = (TerrainFeature)replacer(item);
-                                    break;
-                                }
+                            foreach (Vector2 k in sdictT.Keys.Where(v => sdictT[v] == obj))
+                                sdictT[k] = (TerrainFeature)r;
                         }
                         else if (key is IDictionary<Vector2, TerrainFeature> dictT)
                         {
-                            foreach (Vector2 k in dictT.Keys.Reverse())
-                                if (dictT[k] == obj)
-                                {
-                                    dictT[k] = (TerrainFeature)replacer(item);
-                                    break;
-                                }
+                            foreach (Vector2 k in dictT.Keys.Where(v => dictT[v] == obj))
+                                dictT[k] = (TerrainFeature)r;
                         }
                         else if (key is IList list)
                         {
                             object[] lobj = new object[list.Count];
                             list.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
-                            list[index] = replacer(item);
+                            list[index] = r;
                         }
                         else if (key is NetObjectList<Item> noli)
                         {
                             Item[] lobj = new Item[noli.Count];
                             noli.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
-                            noli[index] = (Item)replacer(item);
+                            noli[index] = (Item)r;
                         }
                         else if (key is NetCollection<Building> ncbld)
                         {
                             Building[] lobj = new Building[ncbld.Count];
                             ncbld.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
-                            ncbld[index] = (Building)replacer(item);
+                            ncbld[index] = (Building)r;
                         }
                         else if (key is NetCollection<Furniture> ncfur)
                         {
                             Furniture[] lobj = new Furniture[ncfur.Count];
                             ncfur.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
-                            ncfur[index] = (Furniture)replacer(item);
+                            ncfur[index] = (Furniture)r;
                         }
                         else if (key is Array arr)
                         {
                             object[] lobj = new object[arr.Length];
                             arr.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
-                            arr.SetValue(replacer(item), index);
+                            arr.SetValue(r, index);
                         }
                         else if (key is KeyValuePair<FieldInfo, object> kpv)
                         {
-                            kpv.Key.SetValue(kpv.Value, replacer(item));
+                            kpv.Key.SetValue(kpv.Value, r);
                         }
                         else if (key is KeyValuePair<PropertyInfo, object> kppv)
                         {
-                            kppv.Key.SetValue(kppv.Value, replacer(item));
+                            kppv.Key.SetValue(kppv.Value, r);
                         }
                         else if (key is NetArray<SObject, NetRef<SObject>> naso)
                         {
                             List<SObject> slist = naso.ToList();
                             int idx = slist.ToList().FindIndex(s => s == (SObject)(object)item);
                             if (idx >= 0)
-                                naso[idx] = (SObject) replacer(item);
+                                naso[idx] = (SObject)r;
                         }
-
+                        else if (key is KeyValuePair<IDictionary, object> idict)
+                            idict.Key[idict.Value] = r;
+                        else if (key is KeyValuePair<OverlaidDictionary, object> odict)
+                            odict.Key[(Vector2)odict.Value] = (SObject)r;                       
                     }
                 }
             }
@@ -764,6 +753,10 @@ namespace PyTK.CustomElementHandler
                             if (idx >= 0)
                                 naso[idx] = null;
                         }
+                        else if (key is KeyValuePair<IDictionary, object> idict)
+                            idict.Key.Remove(idict.Value);
+                        else if (key is KeyValuePair<OverlaidDictionary, object> odict)
+                            odict.Key.Remove((Vector2) odict.Value);
 
 
                     }
