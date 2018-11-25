@@ -25,6 +25,7 @@ _ReSharper*/
 *.nuget.targets
 *.nuspec
 nuget.exe
+*nuget*.*
 
 # Hidden config
 *.hidden.*
@@ -32,3 +33,4 @@ nuget.exe
 **_backup
 
 **/TTS/
+*.lnk
