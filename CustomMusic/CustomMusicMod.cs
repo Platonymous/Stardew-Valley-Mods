@@ -6,18 +6,21 @@ using Harmony;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using StardewValley;
 
 namespace CustomMusic
 {
     public class CustomMusicMod : Mod
     {
-        internal static Dictionary<string, StoredMusic> Music = new Dictionary<string, StoredMusic>();
+        internal static HashSet<StoredMusic> Music = new HashSet<StoredMusic>();
         internal static HashSet<ActiveMusic> Active = new HashSet<ActiveMusic>();
         internal static IMonitor SMonitor;
+        internal static IModHelper SHelper;
 
         public override void Entry(IModHelper helper)
         {
             SMonitor = Monitor;
+            SHelper = Helper;
             loadContentPacks();
             var harmony = HarmonyInstance.Create("Platonymous.CustomMusic");
             harmony.Patch(typeof(AudioCategory).GetMethod("SetVolume"), new HarmonyMethod(typeof(Overrides), "SetVolume"));
@@ -33,14 +36,12 @@ namespace CustomMusic
         {
             foreach (IContentPack pack in Helper.GetContentPacks())
             {
-                MusicContent content = Helper.ReadJsonFile<MusicContent>(Path.Combine(pack.DirectoryPath, "content.json"));
+                MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
 
                 foreach (MusicItem music in content.Music)
                 {
                     string path = Path.Combine(pack.DirectoryPath, music.File);
-                    if (Music.ContainsKey(music.Id))
-                        Music.Remove(music.Id);
-
+   
                     if (!music.Preload)
                         Task.Run(() =>
                         {
@@ -59,7 +60,22 @@ namespace CustomMusic
             Monitor.Log(music.File + " Loaded", LogLevel.Trace);
             string[] ids = music.Id.Split(',').Select(p => p.Trim()).ToArray();
             foreach(string id in ids)
-                Music.Add(id, new StoredMusic(id, soundEffect, music.Ambient, music.Loop));
+                Music.Add(new StoredMusic(id, soundEffect, music.Ambient, music.Loop, music.Conditions));
+        }
+
+        public static bool checkConditions(string condition)
+        {
+            if (condition == null || condition == "")
+                return true;
+
+            GameLocation location = Game1.currentLocation;
+            if (location == null)
+                location = Game1.getFarm();
+
+            if (location == null)
+                return false;
+            else
+                return (SHelper.Reflection.GetMethod(location, "checkEventPrecondition").Invoke<int>("9999999/" + condition) != -1);
         }
     }
 }

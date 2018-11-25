@@ -28,12 +28,12 @@ namespace CustomMusic
 
         public static bool GetCue(SoundBank __instance, string name, ref Cue __result)
         {
-            if (name.StartsWith("cm_"))
+            if (name.StartsWith("cm:"))
             {
-                string[] n = name.Split('_');
+                string[] n = name.Split(':');
                 string next = n.Length > 2 ? n[2] : "MainTheme";
                 __result = __instance.GetCue(next);
-                nextCue = new KeyValuePair<string, string>(next, name);
+                nextCue = new KeyValuePair<string, string>(next, n[1]);
                 return false;
             }
 
@@ -58,12 +58,20 @@ namespace CustomMusic
                 name = nextCue.Value;
                 nextCue = new KeyValuePair<string, string>("none", "none");
             }
-            CustomMusicMod.SMonitor.Log("Playing: " + name + (CustomMusicMod.Music.ContainsKey(name) ? (custom ? " (custom)" : " (Changed)") : ""), StardewModdingAPI.LogLevel.Trace);
+            bool ret = true;
 
-            if (CustomMusicMod.Music.ContainsKey(name) && CustomMusicMod.Music[name] is StoredMusic music)
-                CustomMusicMod.Active.Add(new ActiveMusic(__instance.Name, music.Sound.CreateInstance(), ref __instance, music.Ambient, music.Loop));
+            var songs = CustomMusicMod.Music.Where(m => m.Id == name && CustomMusicMod.checkConditions(m.Conditions));
 
-            return !CustomMusicMod.Music.ContainsKey(name);
+            if (songs.Count() > 0 && songs.First() is StoredMusic music) {
+                ActiveMusic active = new ActiveMusic(__instance.Name, music.Sound.CreateInstance(), ref __instance, music.Ambient, music.Loop);
+                CustomMusicMod.Active.Add(active);
+                CustomMusicMod.SMonitor.Log("Playing: " + name + (custom ? " (custom)" : " (Changed)"), StardewModdingAPI.LogLevel.Trace);
+                ret = false;
+            }
+            else
+                CustomMusicMod.SMonitor.Log("Playing: " + name, StardewModdingAPI.LogLevel.Trace);
+
+            return ret;
         }
 
         public static void SetVariable(Cue __instance, string name, ref float value)
@@ -71,5 +79,7 @@ namespace CustomMusic
             if (CustomMusicMod.Active.ToList().Find(a => a.Id == __instance.Name) is ActiveMusic am)
                 am.SetVolume(value);
         }
+
+       
     }
 }

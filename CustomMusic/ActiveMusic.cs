@@ -65,18 +65,24 @@ namespace CustomMusic
         public void Dispose()
         {
             Stop();
-            Sound.Dispose();
+            //Sound.Dispose();
         }
 
         public void Update()
         {
             Sound?.Play();
             IsPlaying = true;
-
-            while (!Sound.IsDisposed && IsPlaying && LinkedCue is Cue c)
+            try
             {
-                float vol = c.GetVariable("Volume");
-                SetVolume(vol != 0 ? vol : (Ambient ? Game1.musicPlayerVolume : Game1.ambientPlayerVolume));
+                while (!Sound.IsDisposed && IsPlaying && LinkedCue is Cue c)
+                {
+                    float vol = c.GetVariable("Volume");
+                    SetVolume(vol != 0 ? vol : (Ambient ? Game1.musicPlayerVolume : Game1.ambientPlayerVolume));
+                }
+            }
+            catch
+            {
+
             }
 
             IsPlaying = false;
