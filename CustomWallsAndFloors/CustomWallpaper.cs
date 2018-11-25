@@ -231,14 +231,14 @@ namespace CustomWallsAndFloors
                 Rectangle rectangle = walls[whichRoom];
                 for (int x = rectangle.X; x < rectangle.Right; ++x)
                 {
-                    setMapTilesheet(dec.map, tilesheet, x, rectangle.Y, "Back", 0);
-                    setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 1, "Back", 0);
+                    setMapTilesheet(dec.map, tilesheet, x, rectangle.Y, "Back", 0, 0, animations);
+                    setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 1, "Back", 0, 0, animations);
                     if (rectangle.Height >= 3)
                     {
                         if (dec.map.GetLayer("Buildings").Tiles[x, rectangle.Y + 2].TileSheet.Equals(dec.map.TileSheets[2]) || dec.map.GetLayer("Buildings").Tiles[x, rectangle.Y + 2].TileSheet.Id.StartsWith("zCWF"))
-                            setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 2, "Buildings", 0);
+                            setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 2, "Buildings", 0, 0, animations);
                         else
-                            setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 2, "Back", 0);
+                            setMapTilesheet(dec.map, tilesheet, x, rectangle.Y + 2, "Back", 0, 0, animations);
                     }
                 }
             }
