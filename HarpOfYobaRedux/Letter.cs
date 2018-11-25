@@ -13,8 +13,10 @@ namespace HarpOfYobaRedux
         }
 
         public Letter(string id, string text, Item item = null)
-            :base(id,text,388)
+            :base()
         {
+            this.text = text + " %item object 388 1 %%";
+            this.attachments = null;
             if (item == null)
                 item = new SheetMusic(id);
 

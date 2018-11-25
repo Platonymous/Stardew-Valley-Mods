@@ -12,14 +12,6 @@ namespace HarpOfYobaRedux
         {
 
         }
-        
-
-        public static void checkMail()
-        {
-            Letter nextLetter = checkForLetter();
-            if (nextLetter != null && !Game1.mailbox.Contains(nextLetter.id))
-                Game1.mailbox.Add(nextLetter.id);
-        }
 
         public static void checkForProgress(GameLocation location, SheetMusic sheet)
         {
@@ -66,44 +58,42 @@ namespace HarpOfYobaRedux
 
         }
 
-        private static Letter checkForLetter()
+        public static void checkMail()
         {
             Dictionary<string, string> stats = Instrument.allAdditionalSaveData;
 
-            if (!Instrument.hasInstument("harp"))
-                return DataLoader.getLetter("hoy_birthday");
+            if (!Game1.player.mailReceived.Contains("hoy_birthday"))
+                Game1.addMailForTomorrow("hoy_birthday");
 
-            if (Game1.player.isMarried() && !SheetMusic.hasSheet("yoba"))
-                return DataLoader.getLetter("hoy_yoba");
+            if (Game1.player.isMarried() && !Game1.player.mailReceived.Contains("hoy_yoba"))
+                Game1.addMailForTomorrow("hoy_yoba");
 
-            if (Game1.player.eventsSeen.Contains(2) && !SheetMusic.hasSheet("thunder"))
-                return DataLoader.getLetter("hoy_thunder");
+            if (Game1.player.eventsSeen.Contains(2) && !Game1.player.mailReceived.Contains("hoy_thunder"))
+                Game1.addMailForTomorrow("hoy_thunder");
 
-            if (Game1.player.eventsSeen.Contains(14) && !SheetMusic.hasSheet("animals"))
-                return DataLoader.getLetter("hoy_animals");
+            if (Game1.player.eventsSeen.Contains(14) && !Game1.player.mailReceived.Contains("hoy_animals"))
+                Game1.addMailForTomorrow("hoy_animals");
 
-            if (Game1.stats.monstersKilled >= 100 && !SheetMusic.hasSheet("adventure"))
-                return DataLoader.getLetter("hoy_adventure");
+            if (Game1.stats.monstersKilled >= 100 && !Game1.player.mailReceived.Contains("hoy_adventure"))
+                Game1.addMailForTomorrow("hoy_adventure");
 
-            if (Game1.player.eventsSeen.Contains(191393) && !SheetMusic.hasSheet("wanderer"))
-                return DataLoader.getLetter("hoy_wanderer");
+            if (Game1.player.eventsSeen.Contains(191393) && !Game1.player.mailReceived.Contains("hoy_wanderer"))
+                Game1.addMailForTomorrow("hoy_wanderer");
 
-            if (stats.ContainsKey("wizard") && stats["wizard"] == "true" && !SheetMusic.hasSheet("dark"))
-                return DataLoader.getLetter("hoy_dark");
+            if (stats.ContainsKey("wizard") && stats["wizard"] == "true" && !Game1.player.mailReceived.Contains("hoy_dark"))
+                Game1.addMailForTomorrow("hoy_dark");
 
-            if (stats.ContainsKey("mariner") && stats["mariner"].Split(' ').Length >= 5 && !SheetMusic.hasSheet("fisher"))
-                return DataLoader.getLetter("hoy_mariner");
+            if (stats.ContainsKey("mariner") && stats["mariner"].Split(' ').Length >= 5 && !Game1.player.mailReceived.Contains("hoy_mariner"))
+                Game1.addMailForTomorrow("hoy_mariner");
 
-            if (stats.ContainsKey("granpa") && stats["granpa"].Split(' ').Length >= 2 && !SheetMusic.hasSheet("granpa"))
-                return DataLoader.getLetter("hoy_granpa");
+            if (stats.ContainsKey("granpa") && stats["granpa"].Split(' ').Length >= 2 && !Game1.player.mailReceived.Contains("hoy_granpa"))
+                Game1.addMailForTomorrow("hoy_granpa");
 
-            if (Game1.player.eventsSeen.Contains(18) && !SheetMusic.hasSheet("time"))
-                return DataLoader.getLetter("hoy_time");
+            if (Game1.player.eventsSeen.Contains(18) && !Game1.player.mailReceived.Contains("hoy_time"))
+                Game1.addMailForTomorrow("hoy_time");
 
-            if (SheetMusic.hasSheet("thunder") && SheetMusic.hasSheet("animals") && !SheetMusic.hasSheet("lua"))
-                return DataLoader.getLetter("hoy_lua");
-
-            return null;
+            if (Game1.player.mailReceived.Contains("hoy_thunder") && Game1.player.mailReceived.Contains("hoy_animals") && !Game1.player.mailReceived.Contains("hoy_lua"))
+                Game1.addMailForTomorrow("hoy_lua");
         }
 
     }

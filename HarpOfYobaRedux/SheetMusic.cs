@@ -13,7 +13,6 @@ namespace HarpOfYobaRedux
         internal static Dictionary<string, SheetMusic> allSheets;
         public string sheetMusicID;
         private string sheetDescription;
-        private bool owned;
         private Texture2D texture;
         private Color color;
         private string music;
@@ -41,9 +40,7 @@ namespace HarpOfYobaRedux
             displayName = name;
             sheetDescription = description;
             sheetMusicID = id;
-
             allSheets.AddOrReplace(id, this);
-            owned = false;
         }
 
         public override string Name { get => name; }
@@ -64,8 +61,6 @@ namespace HarpOfYobaRedux
             music = allSheets[id].music;
             lenght = allSheets[id].lenght;
             magic = allSheets[id].magic;
-            allSheets[id].owned = true;
-            owned = true;
             sheetMusicID = id;
             playedToday = false;
         }
@@ -90,11 +85,6 @@ namespace HarpOfYobaRedux
             return false;
         }
 
-        public static bool hasSheet(string id)
-        {
-           return allSheets[id].owned;
-        }
-
         public override string getDescription()
         {
             string text = this.sheetDescription;
@@ -113,12 +103,6 @@ namespace HarpOfYobaRedux
         public object getReplacement()
         {
             return new StardewValley.Object(685,1); 
-        }
-
-        public static void beforeRebuilding()
-        {
-            foreach (SheetMusic sheet in allSheets.Values)
-                sheet.owned = false;
         }
 
         public override Item getOne()
