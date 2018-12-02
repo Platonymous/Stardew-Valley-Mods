@@ -39,7 +39,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="FurnitureAnywhere">
-      <HintPath>.\FurnitureAnywhere.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\GOG Galaxy\Games\Stardew Valley\Mods\FurnitureAnywhere\FurnitureAnywhere.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -64,6 +64,11 @@
     <ProjectReference Include="..\CustomFurniture\CustomFurniture.csproj">
       <Project>{b60cc08a-abd5-4b7b-81bf-c0295c11a025}</Project>
       <Name>CustomFurniture</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\PyTK\PyTK.csproj">
+      <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
+      <Name>PyTK</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

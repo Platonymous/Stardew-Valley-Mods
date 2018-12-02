@@ -1,6 +1,8 @@
 ﻿using Harmony;
 using StardewModdingAPI;
+using System;
 using System.Reflection;
+using Entoarox.FurnitureAnywhere;
 
 namespace CustomFurnitureAnywhere
 {
