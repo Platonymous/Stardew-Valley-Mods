@@ -7,12 +7,15 @@ using Microsoft.Xna.Framework;
 using PyTK.CustomElementHandler;
 using System.Collections.Generic;
 using System.Linq;
+using StardewValley.Locations;
+using Netcode;
 
 namespace CustomFurniture
 {
     public class CustomFurniture : Furniture, ISaveElement
     {
         public Texture2D texture;
+        public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
         private int animationFrames;
         private int frame;
         private Rectangle animatedSourceRect;
@@ -49,7 +52,9 @@ namespace CustomFurniture
             rotatedBoxHeight = data.rotatedBoxHeight == -1 ? data.boxWidth : data.rotatedBoxHeight;
             rotatedBoxHeight *= Game1.tileSize;
             string folder = new DirectoryInfo(data.folderName).Name;
-            texture = CustomFurnitureMod.helper.Content.Load<Texture2D>($"Furniture/{folder}/{data.texture}");
+            string tkey = $"{folder}/{data.texture}";
+            if(Textures.ContainsKey(tkey))
+                texture = Textures[($"{folder}/{data.texture}")];
             animationFrames = data.animationFrames;
             this.data = data;
             frameWidth = data.setWidth;
