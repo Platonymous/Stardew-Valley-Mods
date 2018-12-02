@@ -17,16 +17,16 @@ namespace HarpOfYobaRedux
             SheetMusic.allSheets = new Dictionary<string, SheetMusic>();
             Texture2D texture = loadTexture(helper, "tilesheet.png");
             new Instrument("harp", texture, "Harp of Yoba", "Add Sheet Music to play.",new HarpAnimation());
-            new SheetMusic("thunder", texture, "Serenade of Thunder", "Rain on me", Microsoft.Xna.Framework.Color.Blue, !cm ? "AbigailFluteDuet" : "cm:HOY-SerenadeOfThunder:AbigailFluteDuet", 10000, new RainMagic());
-            new SheetMusic("birthday", texture, "Birthday Sonata", "Popular on birthdays", Microsoft.Xna.Framework.Color.DarkBlue, !cm ? "shimmeringbastion" : "cm:HOY-BirthdaySonata:shimmeringbastion", 10000, new BirthdayMagic());
-            new SheetMusic("wanderer", texture, "Ballad of the Wanderer", "Wander off and return", Microsoft.Xna.Framework.Color.Orange, !cm ? "honkytonky" : "cm:HOY-BalladOfTheWanderer:honkytonky", 10000, new TeleportMagic());
-            new SheetMusic("yoba", texture, "Prelude to Yoba", "Can you hear the trees sing along", Microsoft.Xna.Framework.Color.ForestGreen, !cm ? "wedding" : "cm:HOY-PreludeToYoba:wedding", 10000, new TreeMagic());
+            new SheetMusic("thunder", texture, "Serenade of Thunder", "Rain on me", Microsoft.Xna.Framework.Color.Blue, !cm ? "AbigailFluteDuet" : "cm:HOY-SerenadeOfThunder:AbigailFluteDuet", 15000, new RainMagic());
+            new SheetMusic("birthday", texture, "Birthday Sonata", "Popular on birthdays", Microsoft.Xna.Framework.Color.DarkBlue, !cm ? "shimmeringbastion" : "cm:HOY-BirthdaySonata:shimmeringbastion", 11000, new BirthdayMagic());
+            new SheetMusic("wanderer", texture, "Ballad of the Wanderer", "Wander off and return", Microsoft.Xna.Framework.Color.Orange, !cm ? "honkytonky" : "cm:HOY-BalladOfTheWanderer:honkytonky", 12000, new TeleportMagic());
+            new SheetMusic("yoba", texture, "Prelude to Yoba", "Can you hear the trees sing along", Microsoft.Xna.Framework.Color.ForestGreen, !cm ? "wedding" : "cm:HOY-PreludeToYoba:wedding", 14000, new TreeMagic());
             new SheetMusic("fisher", texture, "The Fisherman's Lament", "The old mariners lucky melody", Microsoft.Xna.Framework.Color.DarkMagenta, !cm ? "poppy" : "cm:HOY-FishermentsLament:poppy", 10000, new FisherMagic());
             new SheetMusic("dark", texture, "Ode to the Dark", "All monsters are created equal", Microsoft.Xna.Framework.Color.Red, !cm ? "tribal" : "cm:HOY-OdeToTheDark:tribal", 10000, new MonsterMagic());
-            new SheetMusic("animals", texture, "Animals' Aria", "Beloved by Farmanimals", Microsoft.Xna.Framework.Color.Brown, !cm ? "tinymusicbox" : "cm:HOY-AnimalsAria:tinymusicbox", 10000, new AnimalMagic());
-            new SheetMusic("adventure", texture, "Adventurer's Allegro", "An energizing tune", Microsoft.Xna.Framework.Color.LightCoral, !cm ? "aerobics" : "cm:HOY-AdventurersAllegro:aerobics", 10000, new BoosterMagic());
-            new SheetMusic("granpa", texture, "Farmer's Lullaby", "Stand on fertile ground", Microsoft.Xna.Framework.Color.Magenta, !cm ? "grandpas_theme" : "cm:HOY-FarmersLullaby:grandpas_theme", 10000, new SeedMagic());
-            new SheetMusic("time", texture, "Rondo of Time", "Play ahead to pass the time", Microsoft.Xna.Framework.Color.LightCyan, !cm ? "50s" : "cm:HOY-RondoOfTime:50s", 10000, new TimeMagic());
+            new SheetMusic("animals", texture, "Animals' Aria", "Beloved by Farmanimals", Microsoft.Xna.Framework.Color.Brown, !cm ? "tinymusicbox" : "cm:HOY-AnimalsAria:tinymusicbox", 11000, new AnimalMagic());
+            new SheetMusic("adventure", texture, "Adventurer's Allegro", "An energizing tune", Microsoft.Xna.Framework.Color.LightCoral, !cm ? "aerobics" : "cm:HOY-AdventurersAllegro:aerobics", 11000, new BoosterMagic());
+            new SheetMusic("granpa", texture, "Farmer's Lullaby", "Stand on fertile ground", Microsoft.Xna.Framework.Color.Magenta, !cm ? "grandpas_theme" : "cm:HOY-FarmersLullaby:grandpas_theme", 12000, new SeedMagic());
+            new SheetMusic("time", texture, "Rondo of Time", "Play ahead to pass the time", Microsoft.Xna.Framework.Color.LightCyan, !cm ? "50s" : "cm:HOY-RondoOfTime:50s", 30000, new TimeMagic());
             new SheetMusic("lua", texture, "Lua Crescendo", "Play lua", Microsoft.Xna.Framework.Color.BlueViolet, HarpOfYobaReduxMod.config.luamusic, 10000, new LuaMagic(helper));
             loadLetters();
         }

@@ -98,7 +98,12 @@ namespace HarpOfYobaRedux
             SObject priorAttachement = null;
 
             if (attachments.Length > 0 && attachments[0] != null)
-                priorAttachement = (SheetMusic)attachments[0].getOne();
+            {
+                if (!(attachments[0] is SheetMusic))
+                    SaveHandler.RebuildAll(attachments[0], attachments);
+
+                    priorAttachement = (SObject) attachments[0].getOne();
+            }
 
             if (o is SheetMusic)
             {
@@ -150,7 +155,12 @@ namespace HarpOfYobaRedux
         {
             build(additionalSaveData["id"]);
             if (replacement is Tool t && t.attachments.Count > 0)
+            {
+                if (!(t.attachments[0] is SheetMusic))
+                    SaveHandler.RebuildAll(t.attachments[0], t.attachments);
+
                 attachments[0] = t.attachments[0];
+            }
 
             foreach (string key in additionalSaveData.Keys)
                 if (key != "id" && !allAdditionalSaveData.ContainsKey(key))

@@ -16,9 +16,12 @@ namespace HarpOfYobaRedux
         {
             Game1.player.forceTimePass = true;
             Game1.playSound("stardrop");
-            STime time = STime.CURRENT + STime.HOUR;
+            STime time = STime.CURRENT + (STime.HOUR * 3);
             int timeInt = (time.hour * 100 + time.minute * 10);
-            if (timeInt < 2600) 
+            if (timeInt > 2600)
+                timeInt = 2600;
+
+            if (Game1.timeOfDay < 2600) 
                 Task.Run(() => {
                     try
                     {

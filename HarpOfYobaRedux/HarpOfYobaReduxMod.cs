@@ -58,8 +58,8 @@ namespace HarpOfYobaRedux
             if (e.NewMenu is LetterViewerMenu lvm)
             {
                 string mailTitle = Helper.Reflection.GetField<string>(lvm, "mailTitle").GetValue();
-                if (mailTitle.StartsWith("hoy_"))
-                    lvm.itemsToGrab[0].item = DataLoader.getLetter(mailTitle).item;
+                if (mailTitle is string mt && mt.StartsWith("hoy_"))
+                    lvm.itemsToGrab[0].item = DataLoader.getLetter(mt).item;
             }
         }
     }
