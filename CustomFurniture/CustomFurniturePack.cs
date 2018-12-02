@@ -2,6 +2,7 @@
 {
     class CustomFurniturePack
     {
+        public string useid { get; set; } = "none";
         public string folderName { get; set; }
         public string fileName { get; set; }
         public string author { get; set; } = "none";

@@ -57,15 +57,14 @@
     <Compile Include="WallpaperData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Furniture\Example\example.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Furniture\Example\example.json" />
     <None Include="manifest.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\nuget-icon.png" />
-    <Content Include="Furniture\Example\example.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="Furniture\Example\example.png" />
+    <Content Include="Furniture\non-cp-packs-go-here.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

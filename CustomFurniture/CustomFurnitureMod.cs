@@ -11,6 +11,7 @@ using System;
 using Harmony;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
+using PyTK.Extensions;
 
 namespace CustomFurniture
 {
@@ -119,13 +120,62 @@ namespace CustomFurniture
             int countPacks = 0;
             int countObjects = 0;
 
+            var contentPacks = Helper.GetContentPacks();
+            var usedids = new List<string>();
+
+            foreach (IContentPack cpack in contentPacks)
+            {
+                string[] cfiles = parseDir(cpack.DirectoryPath, "*.json");
+
+                countPacks += (cfiles.Length - 1);
+
+                foreach (string file in cfiles)
+                {
+                    if (file.ToLower().Contains("manifest.json"))
+                        continue;
+
+                    CustomFurniturePack pack = cpack.ReadJsonFile<CustomFurniturePack>(new FileInfo(file).Name);
+
+                    if (pack.useid != "none")
+                        usedids.AddOrReplace(pack.useid);
+
+                    pack.author = cpack.Manifest.Author;
+                    pack.version = cpack.Manifest.Version.ToString();
+                    string author = pack.author == "none" ? "" : " by " + pack.author;
+                    Monitor.Log(pack.name + " " + pack.version + author, LogLevel.Info);
+                    foreach (CustomFurnitureData data in pack.furniture)
+                    {
+                        countObjects++;
+                        data.folderName = pack.useid == "none" ? cpack.Manifest.UniqueID : pack.useid;
+                        string pileID = data.folderName + "." + new FileInfo(file).Name + "." + data.id;
+                        string objectID = pileID;
+                        CustomFurnitureMod.log("Load:" + objectID);
+                        string tkey = $"{data.folderName}/{ data.texture}";
+                        if (!CustomFurniture.Textures.ContainsKey(tkey))
+                            CustomFurniture.Textures.Add(tkey, cpack.LoadAsset<Texture2D>(data.texture));
+                        CustomFurniture f = new CustomFurniture(data, objectID, Vector2.Zero);
+                        furniturePile.Add(pileID, f);
+                        furniture.Add(objectID, f);
+                    }
+                }
+
+            }
+
             string[] files = parseDir(Path.Combine(Helper.DirectoryPath, "Furniture"), "*.json");
 
-            countPacks = files.Length;
+            countPacks += files.Length;
 
             foreach (string file in files)
             {
                 CustomFurniturePack pack = Helper.ReadJsonFile<CustomFurniturePack>(file);
+
+                string packid = new DirectoryInfo(Path.GetDirectoryName(file)).Name;
+
+                if (usedids.Contains(packid))
+                    continue;
+
+                countPacks++;
+
                 string author = pack.author == "none" ? "" : " by " + pack.author;
                 Monitor.Log(pack.name + " " + pack.version + author, LogLevel.Info);
                 foreach (CustomFurnitureData data in pack.furniture)
@@ -135,11 +185,16 @@ namespace CustomFurniture
                     string pileID = new DirectoryInfo(data.folderName).Name + "." + new FileInfo(file).Name+ "." + data.id;
                     string objectID = pileID;
                     CustomFurnitureMod.log("Load:" + objectID);
+                    string tkey = $"{new DirectoryInfo(data.folderName).Name}/{ data.texture}";
+                    if (!CustomFurniture.Textures.ContainsKey(tkey))
+                        CustomFurniture.Textures.Add(tkey, Helper.Content.Load<Texture2D>($"Furniture/{new DirectoryInfo(data.folderName).Name}/{data.texture}"));
                     CustomFurniture f = new CustomFurniture(data, objectID, Vector2.Zero);
                     furniturePile.Add(pileID, f);
                     furniture.Add(objectID, f);
                 }
             }
+
+           
 
             Monitor.Log(countPacks + " Content Packs with " + countObjects + " Objects found.");
         }
