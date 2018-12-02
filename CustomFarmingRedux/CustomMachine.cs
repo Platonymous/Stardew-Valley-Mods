@@ -216,7 +216,7 @@ namespace CustomFarmingRedux
             if (player != null)
                 items.Add(player.Items);
 
-            if (config.automation)
+            /*if (config.automation)
             {
                 if (location is GameLocation)
                     if (tileLocation == Vector2.Zero)
@@ -229,7 +229,7 @@ namespace CustomFarmingRedux
                     foreach (Vector2 tile in tiles)
                         if (location.objects.ContainsKey(tile) && location.objects[tile] is Chest c)
                             items.AddOrReplace(c.items);
-            }
+            }*/
 
             return items;
         }
@@ -262,9 +262,9 @@ namespace CustomFarmingRedux
             readyForHarvest.Value = true;
             activeRecipe = null;
 
-            if(config.automation)
+            /*if(config.automation)
                 if (deliverToNearChest(heldObject))
-                    startAutomation();
+                    startAutomation();*/
             syncObject.MarkDirty();
         }
 
@@ -275,14 +275,14 @@ namespace CustomFarmingRedux
             readyForHarvest.Value = true;
             activeRecipe = null;
 
-            if (config.automation)
+            /*if (config.automation)
                 if (deliverToNearChest(heldObject))
-                    startAutomation();
+                    startAutomation();*/
 
             syncObject.MarkDirty();
         }
 
-        private void startAutomation()
+        /*private void startAutomation()
         {
             List<IList<Item>> items = getItemLists(null);
             RecipeBlueprint recipe = findRecipe(items);
@@ -297,7 +297,7 @@ namespace CustomFarmingRedux
                             return;
                         }
             }
-        }
+        }*/
 
         private void startProduction(SObject obj, RecipeBlueprint recipe, List<IList<Item>> items)
         {
@@ -681,8 +681,8 @@ namespace CustomFarmingRedux
         {
             if (!isWorking && blueprint.production != null && blueprint.production[0].materials == null)
                 startProduction(null, blueprint.production[0], null);
-            else if (config.automation && heldObject.Value == null)
-                startAutomation();
+            /*else if (config.automation && heldObject.Value == null)
+                startAutomation();*/
         }
 
         private void clear()
