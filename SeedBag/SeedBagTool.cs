@@ -109,7 +109,7 @@ namespace SeedBag
             InitialParentTileIndex = 77;
             CurrentParentTileIndex = 77;
             IndexOfMenuItemView = 0;
-            UpgradeLevel = 5;
+            UpgradeLevel = 4;
            
             InstantUse = false;
             inUse = false;

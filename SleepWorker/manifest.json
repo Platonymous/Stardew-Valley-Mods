@@ -1,11 +1,11 @@
 {
   "Name": "SleepWorker",
   "Author": "Platonymous",
-  "Version": "1.1.1",
+  "Version": "1.1.2",
   "Description": "Skips time before you sleep",
   "UniqueID": "Platonymous.SleepWorker",
   "EntryDll": "SleepWorker.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.8",
   "UpdateKeys": [ "Nexus:2062" ],
   "Dependencies": [
     {
