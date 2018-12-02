@@ -1,0 +1,15 @@
+﻿{
+  "Name": "JoJaBan - Arcade Sokoban",
+  "Author": "Platonymous",
+  "Version": "0.4.0",
+  "Description": "Help JoJa clean up",
+  "UniqueID": "Platonymous.JoJaBan",
+  "EntryDll": "JoJaBan.dll",
+  "MinimumApiVersion": "2.8",
+  "UpdateKeys": [ "Nexus:3118" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ]
+}

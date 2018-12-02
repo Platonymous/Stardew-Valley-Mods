@@ -1,11 +1,11 @@
 {
   "Name": "Snake",
   "Author": "Platonymous",
-  "Version": "1.0.4",
+  "Version": "1.0.6",
   "Description": "Play Snake.",
   "UniqueID": "Platonymous.Snake",
   "EntryDll": "Snake.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.8",
   "UpdateKeys": [ "Nexus:2056" ],
   "Dependencies": [
     {
