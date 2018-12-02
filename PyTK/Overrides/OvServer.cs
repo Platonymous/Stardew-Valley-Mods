@@ -3,6 +3,7 @@ using PyTK.CustomElementHandler;
 using StardewValley.Network;
 using System.Reflection;
 using StardewModdingAPI.Events;
+using System;
 
 namespace PyTK.Overrides
 {
@@ -55,6 +56,8 @@ namespace PyTK.Overrides
             }
         }
 
+        internal static bool gsskip = false;
+
         [HarmonyPatch]
         internal class ServerFix3
         {
@@ -63,12 +66,26 @@ namespace PyTK.Overrides
                 return AccessTools.Method(PyUtils.getTypeSDV("Network.GameServer"), "processIncomingMessage");
             }
 
-            internal static bool Prefix(IncomingMessage message)
+            internal static bool Prefix(GameServer __instance, IncomingMessage message)
             {
-                if (message.MessageType == 99)
-                    PyNet.receiveMessage(message);
-                else
+                if (gsskip)
                     return true;
+                try
+                {
+                    if (message.MessageType == 99)
+                        PyNet.receiveMessage(message);
+                    else
+                    {
+                        gsskip = true;
+                        __instance.processIncomingMessage(message);
+                        gsskip = false;
+                    }
+                }
+                catch(Exception e)
+                {
+                    PyTKMod._monitor.Log("Errot processing Message: Type:" + message.MessageType + " Data:" + message.Data, StardewModdingAPI.LogLevel.Error);
+                    PyTKMod._monitor.Log(e.Message + ":" + e.StackTrace, StardewModdingAPI.LogLevel.Error);
+                }
 
                 return false;
             }

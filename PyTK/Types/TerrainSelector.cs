@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using PyTK.Extensions;
 using Microsoft.Xna.Framework;
+using System.Linq;
 
 namespace PyTK.Types
 {
@@ -21,8 +22,8 @@ namespace PyTK.Types
         {
             if (location == null)
                 location = Game1.currentLocation;
-            List<Vector2> list = (location.terrainFeatures.FieldDict).toList(t => predicate(t.Value.Value) ? t.Key : new Vector2(-1,-1));
-            list.RemoveAll(p => p.X < 0);
+            List<Vector2> list = (location.terrainFeatures.FieldDict).Keys.ToList();
+            list.RemoveAll(k => !predicate(location.terrainFeatures.FieldDict[k]));
             return list;
         }
 
