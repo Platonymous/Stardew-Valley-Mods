@@ -86,7 +86,7 @@ namespace JoJaBan
 
         private static void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
         {
-            if (e.KeyPressed == Keys.Escape && Game1.currentLocation.Name.StartsWith("JoJaBanLevel"))
+            if (e.KeyPressed == Keys.Escape && Game1.currentLocation is GameLocation gl && gl.Name.StartsWith("JoJaBanLevel"))
             {
                 resetLevel(Game1.currentLocation);
                 loadLevel(currentLevel);
