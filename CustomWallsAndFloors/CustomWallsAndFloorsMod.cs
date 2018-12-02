@@ -48,23 +48,33 @@ namespace CustomWallsAndFloors
 
             foreach (SavedRoom room in CustomWallpaper.savFile.rooms.Where(r => r.Id == Game1.player.UniqueMultiplayerID))
             {
-                DecoratableLocation dec = (DecoratableLocation) Game1.getLocationFromName(room.Location);
-                if(room.Walls != "na")
+                try
                 {
-                    CustomWallpaper walls = new CustomWallpaper(room.Walls, room.WallsNr, false);
-                    if (CustomWallpaper.Walls.ContainsKey(room.Walls))
-                        walls.Texture = CustomWallpaper.Floors[room.Walls];
-                    walls.setChangeEventsAfterLoad(dec, room.Room);
-                }
+                    DecoratableLocation dec = (DecoratableLocation)Game1.getLocationFromName(room.Location);
+                    if (room.Walls != "na")
+                    {
+                        CustomWallpaper walls = new CustomWallpaper(room.Walls, room.WallsNr, false);
+                        if (CustomWallpaper.Walls.ContainsKey(room.Walls))
+                        {
+                            walls.Texture = CustomWallpaper.Floors[room.Walls];
+                            walls.setChangeEventsAfterLoad(dec, room.Room);
+                        }
+                    }
 
-                if (room.Floors != "na")
+                    if (room.Floors != "na")
+                    {
+                        CustomWallpaper floors = new CustomWallpaper(room.Floors, room.FloorsNr, true);
+                        if (CustomWallpaper.Floors.ContainsKey(room.Floors))
+                        {
+                            floors.Texture = CustomWallpaper.Floors[room.Floors];
+                            floors.setChangeEventsAfterLoad(dec, room.Room);
+                        }
+                    }
+                }
+                catch
                 {
-                    CustomWallpaper floors = new CustomWallpaper(room.Floors, room.FloorsNr, true);
-                    if (CustomWallpaper.Floors.ContainsKey(room.Floors))
-                        floors.Texture = CustomWallpaper.Floors[room.Floors];
-                    floors.setChangeEventsAfterLoad(dec, room.Room);
-                }
 
+                }
             }
         }
 
