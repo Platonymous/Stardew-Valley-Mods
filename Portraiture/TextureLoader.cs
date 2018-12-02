@@ -90,6 +90,41 @@ namespace Portraiture
                         pTextures[folderName + ">" + name] = scaled;
                 }
             }
+
+            var contentPacks = PortraitureMod.helper.GetContentPacks();
+
+            foreach (StardewModdingAPI.IContentPack pack in contentPacks)
+            {
+                string folderName = pack.Manifest.UniqueID;
+
+                folders.Add(folderName);
+
+                foreach (string file in Directory.EnumerateFiles(pack.DirectoryPath, "*.*", SearchOption.TopDirectoryOnly).Where(s => s.EndsWith(".png") || s.EndsWith(".xnb")))
+                {
+                    string fileName = Path.GetFileName(file);
+                    string name = Path.GetFileNameWithoutExtension(file);
+                    string extention = Path.GetExtension(file).ToLower();
+
+                    if (extention == "xnb")
+                        fileName = name;
+                    Texture2D texture = pack.LoadAsset<Texture2D>($"{fileName}");
+                    int tileWith = Math.Max(texture.Width / 2, 64);
+                    float scale = tileWith / 64;
+                    ScaledTexture2D scaled;
+                    try
+                    {
+                        scaled = ScaledTexture2D.FromTexture(Game1.getCharacterFromName(name).Portrait, texture, scale);
+                    }
+                    catch
+                    {
+                        scaled = ScaledTexture2D.FromTexture(Game1.getCharacterFromName("Pierre").Portrait, texture, scale);
+                    }
+                    if (!pTextures.ContainsKey(folderName + ">" + name))
+                        pTextures.Add(folderName + ">" + name, scaled);
+                    else
+                        pTextures[folderName + ">" + name] = scaled;
+                }
+            }
         }
         
         public static string getFolderName()
