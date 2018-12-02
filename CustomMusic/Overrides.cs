@@ -51,6 +51,12 @@ namespace CustomMusic
         public static bool Play(ref Cue __instance)
         {
             string name = __instance.Name;
+
+            foreach (ActiveMusic a in CustomMusicMod.Active.Where(m => m.Id == name))
+                a.Dispose();
+
+            CustomMusicMod.Active.RemoveWhere(m => m.Id == name);
+
             bool custom = false;
             if(nextCue.Key == name)
             {

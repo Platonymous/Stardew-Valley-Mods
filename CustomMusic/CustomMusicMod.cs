@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using StardewValley;
+using System;
 
 namespace CustomMusic
 {
@@ -30,6 +31,18 @@ namespace CustomMusic
             harmony.Patch(typeof(Cue).GetMethod("SetVariable"), new HarmonyMethod(typeof(Overrides), "SetVariable"));
             harmony.Patch(typeof(Cue).GetProperty("IsPlaying").GetGetMethod(false), new HarmonyMethod(typeof(Overrides), "IsPlaying"));
             harmony.Patch(typeof(SoundBank).GetMethod("GetCue"), new HarmonyMethod(typeof(Overrides), "GetCue"));
+        }
+
+        public static Type getTypeSDV(string type)
+        {
+            string prefix = "StardewValley.";
+            Type defaulSDV = Type.GetType(prefix + type + ", Stardew Valley");
+
+            if (defaulSDV != null)
+                return defaulSDV;
+            else
+                return Type.GetType(prefix + type + ", StardewValley");
+
         }
 
         private void loadContentPacks()

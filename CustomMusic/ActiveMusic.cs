@@ -65,7 +65,6 @@ namespace CustomMusic
         public void Dispose()
         {
             Stop();
-            //Sound.Dispose();
         }
 
         public void Update()
