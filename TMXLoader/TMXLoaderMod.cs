@@ -28,14 +28,18 @@ namespace TMXLoader
         internal static IModHelper helper;
         internal static Dictionary<string, Map> mapsToSync = new Dictionary<string, Map>();
         internal static List<SFarmer> syncedFarmers = new List<SFarmer>();
+        internal static Config config;
 
         public override void Entry(IModHelper helper)
         {
+            config = Helper.ReadConfig<Config>();
             TMXLoaderMod.helper = Helper;
             monitor = Monitor;
-            Monitor.Log("Environment:" + PyUtils.getContentFolder());
-            exportAllMaps();
-            convert();
+            if (config.converter)
+            {
+                exportAllMaps();
+                convert();
+            }
             loadContentPacks();
             setTileActions();
             PlayerEvents.Warped += LocationEvents_CurrentLocationChanged;
@@ -43,6 +47,11 @@ namespace TMXLoader
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
+            new ConsoleCommand("loadmap", "Teleport to a map", (s, st) => {
+
+                Game1.player.warpFarmer(new Warp(int.Parse(st[1]), int.Parse(st[2]), st[0], int.Parse(st[1]), int.Parse(st[2]), false));
+
+            });
             fixCompatibilities();
             harmonyFix();
             
@@ -108,6 +117,8 @@ namespace TMXLoader
             TileAction Say = new TileAction("Say", TMXActions.sayAction).register();
             TileAction SwitchLayers = new TileAction("SwitchLayers", TMXActions.switchLayersAction).register();
             TileAction Lua = new TileAction("Lua", TMXActions.luaAction).register();
+            TileAction Confirm = new TileAction("Confirm", TMXActions.confirmAction).register();
+            TileAction Game = new TileAction("Game", TMXActions.gameAction).register();
         }
 
         private void loadContentPacks()
@@ -123,10 +134,16 @@ namespace TMXLoader
                 PyLua.loadScriptFromFile(Path.Combine(Helper.DirectoryPath, "sr.lua"), "Platonymous.TMXLoader.SpouseRoom");
 
                 List<MapEdit> spouseRoomMaps = new List<MapEdit>();
+                foreach (SpouseRoom room in tmxPack.spouseRooms)
+                {
+                    if(room.tilefix && !Overrides.NPCs.Contains(room.name))
+                        Overrides.NPCs.Add(room.name);
 
-                foreach (SpouseRoom room in tmxPack.spouseRooms) {
-                    spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "FarmHouse1_marriage", file = room.file, position = new[] { 29, 1 } });
-                    spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "FarmHouse2_marriage", file = room.file, position = new[] { 35, 10 } });
+                    if (room.file != "none")
+                    {
+                        spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "FarmHouse1_marriage", file = room.file, position = new[] { 29, 1 } });
+                        spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "FarmHouse2_marriage", file = room.file, position = new[] { 35, 10 } });
+                    }
                 }
 
                 foreach (MapEdit edit in spouseRoomMaps)

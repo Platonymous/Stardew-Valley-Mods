@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using PyTK;
 using PyTK.Extensions;
 using PyTK.Lua;
 using PyTK.Types;
@@ -38,6 +39,30 @@ namespace TMXLoader
             Game1.drawDialogueNoTyping(action); return true;
         }
 
+        public static bool gameAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            List<string> text = action.Split(' ').ToList();
+            text.RemoveAt(0);
+            action = String.Join(" ", text);
+            return location.performAction(action, Game1.player, new Location((int)tile.X, (int)tile.Y));
+        }
+
+        public static bool confirmAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            List<string> text = action.Split(' ').ToList();
+            text.RemoveAt(0);
+            action = String.Join(" ", text);
+            Game1.activeClickableMenu = new StardewValley.Menus.ConfirmationDialog(action, (who) =>
+            {
+                if (Game1.activeClickableMenu is StardewValley.Menus.ConfirmationDialog cd)
+                    cd.cancel();
+
+            TileAction.invokeCustomTileActions("Success", location, tile, layer);
+            });
+            
+            return true;
+        }
+
         public static bool sayAction(string action)
         {
             return sayAction(action, Game1.currentLocation, Vector2.Zero, "Map");
@@ -67,7 +92,6 @@ namespace TMXLoader
                                 PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Tile.\")", id);
                         }
                     }
-
                     PyLua.callFunction(id, a[2], new object[] { location, tile, layer });
                 }
                 else
@@ -102,6 +126,57 @@ namespace TMXLoader
             }
 
             return true;
+        }
+
+        public static bool copyLayersAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            string[] actions = action.Split(' ');
+
+            foreach (string s in actions)
+            {
+                string[] layers = s.Split(':');
+                if (layers.Length > 1)
+                {
+                    if (layers.Length < 4)
+                        copyLayers(location.map, layers[0], layers[1]);
+                    else
+                    {
+                        string[] xStrings = layers[2].Split('-');
+                        string[] yStrings = layers[3].Split('-');
+                        Range xRange = new Range(int.Parse(xStrings[0]), int.Parse(xStrings.Last()) + 1);
+                        Range yRange = new Range(int.Parse(yStrings[0]), int.Parse(yStrings.Last()) + 1);
+
+                        foreach (int x in xRange.toArray())
+                            foreach (int y in yRange.toArray())
+                                copyTileBetweenLayers(location.map, layers[0], layers[1], x, y);
+                    }
+                }
+
+            }
+
+            return true;
+        }
+
+        public static Map copyLayers(Map t, string layer1, string layer2)
+        {
+            Layer newLayer2 = t.GetLayer(layer1);
+            t.RemoveLayer(t.GetLayer(layer2));
+
+            newLayer2.Id = layer2;
+            t.AddLayer(newLayer2);
+
+            return t;
+        }
+
+        public static Map copyTileBetweenLayers(Map t, string layer1, string layer2, int x, int y)
+        {
+            Location tileLocation = new Location(x, y);
+
+            Tile tile1 = t.GetLayer(layer1).Tiles[tileLocation];
+            Tile tile2 = t.GetLayer(layer2).Tiles[tileLocation];
+
+            t.GetLayer(layer2).Tiles[tileLocation] = tile1;
+            return t;
         }
 
         public static bool switchLayersAction(string action, GameLocation location)

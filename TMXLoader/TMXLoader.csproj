@@ -39,7 +39,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compatibility\CustomFarmTypes.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="NPCPlacement.cs" />
+    <Compile Include="Overrides.cs" />
     <Compile Include="SpouseRoom.cs" />
     <Compile Include="MapEdit.cs" />
     <Compile Include="TMXActions.cs" />

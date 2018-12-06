@@ -1,5 +1,6 @@
 lastNPC = nil
 lastpos = nil
+lastposf = nil
 currentSpouse = nil
 x1 = 0
 y1 = 0
@@ -14,18 +15,20 @@ function entry(location,tile,layer)
 	
 	if(size > 42) then x1 = 35 y1 = 10  end
 
-	local y2 = y1 + h
-	local x2 = x1 + w
+	local y2 = y1 + h - 1
+	local x2 = x1 + w - 1
 	local pos = ":" .. x1 .. "-" .. x2 .. ":" .. y1 .. "-" .. y2;
+	local posf = ":" .. x1 .. "-" .. x2 .. ":" .. y1 .. "-" .. y2 - 1;
 
 	if(lastpos == nil) then
 		local lastpos = pos
+		local lastposf = posf
 	end
 	
 	if currentSpouse ~= Game1.player.spouse or lastpos ~= pos then
 
 		if lastNPC ~= nil then
-			TMX.switchLayersAction("SwitchLayers AlwaysFront:AlwaysFront" .. lastNPC .. lastpos .. " Front:Front" .. lastNPC .. lastpos .. "  Buildings:Buildings" .. lastNPC .. lastpos .. "  Back:Back" .. lastNPC .. lastpos, location)
+			TMX.switchLayersAction("SwitchLayers AlwaysFront:AlwaysFront" .. lastNPC .. lastposf .. " Front:Front" .. lastNPC .. lastposf .. "  Buildings:Buildings" .. lastNPC .. lastpos .. "  Back:Back" .. lastNPC .. lastpos, location)
 		end
 		
 		nextNPC = ""
@@ -38,10 +41,11 @@ function entry(location,tile,layer)
 		end
 
 		if TMX.hasLayer(location.map, "Back" .. nextNPC) then
-			TMX.switchLayersAction("SwitchLayers AlwaysFront:AlwaysFront" .. nextNPC .. pos .. " Front:Front" .. nextNPC .. pos .. "  Buildings:Buildings" .. nextNPC .. pos .. "  Back:Back" .. nextNPC .. pos, location)
+			TMX.switchLayersAction("SwitchLayers AlwaysFront:AlwaysFront" .. nextNPC .. posf .. " Front:Front" .. nextNPC .. posf .. "  Buildings:Buildings" .. nextNPC .. pos .. "  Back:Back" .. nextNPC .. pos, location)
 		end
 
 		lastNPC = nextNPC
 		lastpos = pos
+		lastposf = posf
 	end
 end
