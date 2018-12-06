@@ -27,7 +27,7 @@ namespace NoSoilDecayRedux
 
         private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
         {
-            if (!Game1.IsMultiplayer || Game1.IsServer)
+            if (!Game1.IsMultiplayer || Game1.IsMasterGame)
             {
                 savedata = Helper.Data.ReadSaveData<SaveData>("nsd.save");
                 if (savedata == null)
@@ -38,30 +38,33 @@ namespace NoSoilDecayRedux
 
         private void restoreHoeDirt()
         {
-            foreach (SaveTiles st in savedata.data)
-                foreach (GameLocation l in PyUtils.getAllLocationsAndBuidlings().Where(lb => lb.name == st.location))
-                {
-                    if (config.farmonly && !(l is Farm || l.IsGreenhouse || l is BuildableGameLocation))
-                        continue;
+            if (!Game1.IsMultiplayer || Game1.IsMasterGame)
+            {
+                foreach (SaveTiles st in savedata.data)
+                    foreach (GameLocation l in PyUtils.getAllLocationsAndBuidlings().Where(lb => lb.name == st.location))
+                    {
+                        if (config.farmonly && !(l is Farm || l.IsGreenhouse || l is BuildableGameLocation))
+                            continue;
 
-                    foreach (Vector2 v in st.tiles)
-                        if (!l.terrainFeatures.ContainsKey(v) || !(l.terrainFeatures[v] is HoeDirt))
-                        {
-                            l.terrainFeatures.Remove(v);
-                            l.terrainFeatures.Add(v, Game1.isRaining ? new HoeDirt(1) : new HoeDirt(0));
+                        foreach (Vector2 v in st.tiles)
+                            if (!l.terrainFeatures.ContainsKey(v) || !(l.terrainFeatures[v] is HoeDirt))
+                            {
+                                l.terrainFeatures.Remove(v);
+                                l.terrainFeatures.Add(v, Game1.isRaining ? new HoeDirt(1) : new HoeDirt(0));
 
-                            if (l.objects.Keys.Contains(v) && l.objects[v] is SObject o && (o.Name.Equals("Weeds") || o.Name.Equals("Stone") || o.Name.Equals("Twig")))
-                                l.objects.Remove(v);
-                        }
+                                if (l.objects.Keys.Contains(v) && l.objects[v] is SObject o && (o.Name.Equals("Weeds") || o.Name.Equals("Stone") || o.Name.Equals("Twig")))
+                                    l.objects.Remove(v);
+                            }
 
-                    foreach (SObject o in l.objects.Values.Where(obj => obj.name.Contains("Sprinkler")))
-                        o.DayUpdate(l);
-                }
+                        foreach (SObject o in l.objects.Values.Where(obj => obj.name.Contains("Sprinkler")))
+                            o.DayUpdate(l);
+                    }
+            }
         }
 
         private void saveHoeDirt()
         {
-            if (!Game1.IsMultiplayer || Game1.IsServer)
+            if (!Game1.IsMultiplayer || Game1.IsMasterGame)
             {
                 var hoeDirtChache = new Dictionary<GameLocation, List<Vector2>>();
                 foreach (GameLocation location in PyUtils.getAllLocationsAndBuidlings())
