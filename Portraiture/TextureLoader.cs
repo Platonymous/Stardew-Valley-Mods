@@ -73,8 +73,9 @@ namespace Portraiture
                     if (extention == "xnb")
                         fileName = name;
                     Texture2D texture = PortraitureMod.helper.Content.Load<Texture2D>($"Portraits/{folderName}/{fileName}");
-                    int tileWith = Math.Max(texture.Width / 2, 64);
-                    float scale = tileWith / 64;
+                    double tileWith = Convert.ToDouble(Math.Max(texture.Width / 2, 64));
+                    float scale = (float)(tileWith / 64);
+
                     ScaledTexture2D scaled;
                     try
                     {
