@@ -66,9 +66,9 @@ namespace CustomMusic
             }
             bool ret = true;
 
-            var songs = CustomMusicMod.Music.Where(m => m.Id == name && CustomMusicMod.checkConditions(m.Conditions));
+            var songs = CustomMusicMod.Music.Where(m => m.Id == name && CustomMusicMod.checkConditions(m.Conditions)).ToList();
 
-            if (songs.Count() > 0 && songs.First() is StoredMusic music) {
+            if (songs.Count > 0 && songs.First() is StoredMusic music) {
                 ActiveMusic active = new ActiveMusic(__instance.Name, music.Sound.CreateInstance(), ref __instance, music.Ambient, music.Loop);
                 CustomMusicMod.Active.Add(active);
                 CustomMusicMod.SMonitor.Log("Playing: " + name + (custom ? " (custom)" : " (Changed)"), StardewModdingAPI.LogLevel.Trace);

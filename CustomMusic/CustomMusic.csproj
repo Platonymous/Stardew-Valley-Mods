@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomMusicMod.cs" />
+    <Compile Include="LocationItem.cs" />
     <Compile Include="MusicContent.cs" />
     <Compile Include="ActiveMusic.cs" />
     <Compile Include="StoredMusic.cs" />
