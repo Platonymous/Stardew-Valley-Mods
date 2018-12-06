@@ -91,7 +91,8 @@ namespace JoJaBan
 
         public override bool clicked(Farmer who)
         {
-            return checkForAction(who, false);
+            checkForAction(who, false);
+            return false;
         }
 
         public override bool performToolAction(Tool t, GameLocation location)
