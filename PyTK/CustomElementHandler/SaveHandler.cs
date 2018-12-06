@@ -44,6 +44,9 @@ namespace PyTK.CustomElementHandler
         private static List<Func<string, string>> preProcessors = new List<Func<string, string>>();
         private static List<Func<object, object>> objectPreProcessors = new List<Func<object, object>>();
 
+        internal static List<string> typeCheckCache = new List<string>();
+        internal static List<string> promisedTypes = new List<string>();
+
         public static bool hasSaveType(object o)
         {
             return (o is ISaveElement);
@@ -85,7 +88,10 @@ namespace PyTK.CustomElementHandler
             });
         }
 
-        internal static List<string> typeCheckCache = new List<string>();
+        public static void promiseType(Type type)
+        {
+            promisedTypes.AddOrReplace(getAssemblyTypeName(type));
+        }
 
         internal static bool canBeRebuildInMultiplayer(object obj)
         {
@@ -103,12 +109,12 @@ namespace PyTK.CustomElementHandler
 
             bool result = true;
 
-            if (typeCheckCache.Contains(data[2]))
+            if (typeCheckCache.Contains(data[2]) || promisedTypes.Contains(data[2]))
                 return true;
 
             foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive() && f != Game1.player))
             {
-                Task<bool> fResult = PyNet.sendRequestToFarmer<bool>(typeCheckerName, data[2], farmer);
+                Task<bool> fResult = PyNet.sendRequestToFarmer<bool>(typeCheckerName, data[2], farmer,timeout:5000);
                 fResult.Wait();
                 result = result && fResult.Result;
             }

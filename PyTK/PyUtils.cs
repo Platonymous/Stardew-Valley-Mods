@@ -78,7 +78,15 @@ namespace PyTK
                     location = Game1.getFarm();
 
                 if (location == null)
+                {
+                    if (conditions.StartsWith("r "))
+                    {
+                        string[] cond = conditions.Split(' ');
+                        return Game1.random.NextDouble() <= double.Parse(cond[1]);
+                    }
+
                     result = false;
+                }
                 else
                     result = Helper.Reflection.GetMethod(location, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) != -1;
             }

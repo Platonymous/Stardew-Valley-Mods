@@ -103,7 +103,7 @@ namespace PyTK.Overrides
             {
                 if (skip)
                     return true;
-                
+
                 if (!skip && texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
                 {
                     var newDestination = new Vector4(destination.X, destination.Y, destination.Z / s.Scale, destination.W / s.Scale);

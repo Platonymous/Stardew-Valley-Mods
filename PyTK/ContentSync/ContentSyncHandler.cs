@@ -23,6 +23,8 @@ namespace PyTK.ContentSync
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static string responderName = "PyTK.ContentResponder";
         internal static string receiverName = "PyTK.ContentReceiver";
+        internal const int dTimeout = 3000;
+
 
         internal static void initialize()
         {
@@ -33,7 +35,7 @@ namespace PyTK.ContentSync
             contentReceiver.start();
         }
 
-        internal static void requestContent<T>(string assetName, Farmer fromFarmer, Action<T> callback, int timeout = 1000)
+        internal static void requestContent<T>(string assetName, Farmer fromFarmer, Action<T> callback, int timeout = dTimeout)
         {
             ContentType? type = getContentType<T>();
             if (type.HasValue)
@@ -42,7 +44,7 @@ namespace PyTK.ContentSync
                 PyTKMod._monitor.Log("ContentRequest Failed: Type (" + typeof(T).ToString() + ") not supported for " + assetName);
         }
 
-        internal static void requestGameContent<T>(string assetName, Farmer fromFarmer, Action<T> callback, int timeout = 1000)
+        internal static void requestGameContent<T>(string assetName, Farmer fromFarmer, Action<T> callback, int timeout = dTimeout)
         {
             ContentType? type = getContentType<T>();
             if (type.HasValue)
@@ -51,7 +53,7 @@ namespace PyTK.ContentSync
                 PyTKMod._monitor.Log("ContentRequest Failed: Type (" + typeof(T).ToString() + ") not supported for " + assetName);
         }
 
-        internal static void sendContent<T>(string assetName, T asset, Farmer toFarmer, Action<bool> callback, int timeout = 1000)
+        internal static void sendContent<T>(string assetName, T asset, Farmer toFarmer, Action<bool> callback, int timeout = dTimeout)
         {
             ContentType? type = getContentType<T>();
             if (type.HasValue)
@@ -60,7 +62,7 @@ namespace PyTK.ContentSync
                 PyTKMod._monitor.Log("ContentRequest Failed: Type (" + typeof(T).ToString() + ") not supported for " + assetName);
         }
 
-        internal static void sendGameContent<T>(string assetName, T asset, Farmer toFarmer, Action<bool> callback, int timeout = 1000)
+        internal static void sendGameContent<T>(string assetName, T asset, Farmer toFarmer, Action<bool> callback, int timeout = dTimeout)
         {
             ContentType? type = getContentType<T>();
             if (type.HasValue)
@@ -69,7 +71,7 @@ namespace PyTK.ContentSync
                 PyTKMod._monitor.Log("ContentRequest Failed: Type (" + typeof(T).ToString() + ") not supported for " + assetName);
         }
 
-        internal static void sendGameContent<T>(string[] assetName, T asset, Farmer toFarmer, Action<bool> callback, int timeout = 1000)
+        internal static void sendGameContent<T>(string[] assetName, T asset, Farmer toFarmer, Action<bool> callback, int timeout = dTimeout)
         {
             ContentType? type = getContentType<T>();
             if (type.HasValue)
@@ -85,10 +87,7 @@ namespace PyTK.ContentSync
                await PyNet.sendRequestToFarmer<bool>(receiverName, new ContentResponse(assetName, (int)type, serialize(asset, type), toGameContent), farmer, (r) =>
                 {
                     if (!r)
-                    {
-                        PyTKMod._monitor.Log("ContentRequest Failed: Could not send asset: " + assetName + " to " + farmer.Name);
                         callback(false);
-                    }
                     else
                         callback(r);
                 }, SerializationType.JSON, timeout);
@@ -102,10 +101,7 @@ namespace PyTK.ContentSync
                 await PyNet.sendRequestToFarmer<bool>(receiverName, new ContentResponse(String.Join("|", assetName), (int)type, serialize(asset, type), toGameContent), farmer, (r) =>
                      {
                          if (!r)
-                         {
-                             PyTKMod._monitor.Log("ContentRequest Failed: Could not send asset: " + String.Join("|", assetName) + " to " + farmer.Name);
                              callback(false);
-                         }
                          else
                              callback(r);
                      }, SerializationType.JSON, timeout);
