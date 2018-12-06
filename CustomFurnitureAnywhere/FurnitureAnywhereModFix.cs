@@ -99,22 +99,41 @@ namespace CustomFurnitureAnywhere
         }
     }
 
-    
+    public class FakeObject : StardewValley.Object
+    {
+        public override bool clicked(Farmer who)
+        {
+            return false;
+        }
+    }
+
     [HarmonyPatch]
     public class FurnitureAnywhereModFix5
     {
+        
+
         internal static MethodInfo TargetMethod()
         {
-            if (Type.GetType("StardewValley.Object, Stardew Valley") != null)
-                return AccessTools.Method(Type.GetType("StardewValley.Object, Stardew Valley"), "clicked");
-            else
-                return AccessTools.Method(Type.GetType("StardewValley.Object, StardewValley"), "clicked");
+            try
+            {
+                if (Type.GetType("StardewValley.Object, Stardew Valley") != null)
+                    return AccessTools.Method(Type.GetType("StardewValley.Object, Stardew Valley"), "clicked");
+                else
+                    return AccessTools.Method(Type.GetType("StardewValley.Object, StardewValley"), "clicked");
+            }
+            catch
+            {
+                return AccessTools.Method(typeof(FakeObject), "clicked");
+            }
         }
 
         internal static void Postfix(StardewValley.Object __instance, StardewValley.Farmer who, ref bool __result)
         {
-            if (!(Game1.currentLocation is DecoratableLocation) && __instance is Furniture)
-                __result = __instance.clicked(who);
+            if (who == null)
+                who = Game1.player;
+
+            if (!(Game1.currentLocation is DecoratableLocation) && __instance is Furniture f)
+                __result = f.clicked(who);
         }
     }  
 }
