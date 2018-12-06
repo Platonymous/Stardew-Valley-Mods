@@ -1,0 +1,18 @@
+﻿{
+  "Name": "ScaleUp",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Allows adding higher resolution textures via ContentPatcher",
+  "UniqueID": "Platonymous.ScaleUp",
+  "EntryDll": "ScaleUp.dll",
+  "MinimumApiVersion": "2.8",
+  "UpdateKeys": [ "Nexus:3130" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    },
+    {
+      "UniqueID": "Pathoschild.ContentPatcher"
+    }
+  ]
+}
