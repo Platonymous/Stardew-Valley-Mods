@@ -57,7 +57,7 @@ namespace TMXLoader
             
             GameEvents.OneSecondTick += (s, e) =>
             {
-                if (Context.IsWorldReady && Game1.IsServer && Game1.IsMultiplayer)
+                if (Context.IsWorldReady && Game1.IsMasterGame && Game1.IsMultiplayer)
                     if (Game1.otherFarmers.Values.Where(f => f.isActive() && !syncedFarmers.Contains(f)) is IEnumerable<SFarmer> ef && ef.Count() is int i && i > 0)
                         syncMaps(ef);
             };
@@ -87,7 +87,7 @@ namespace TMXLoader
             foreach (SFarmer farmer in farmers)
             {
                 foreach (KeyValuePair<string, Map> map in mapsToSync)
-                    PyNet.syncMap(map.Value, map.Key, Game1.player);
+                    PyNet.syncMap(map.Value, map.Key, farmer);
 
                 syncedFarmers.AddOrReplace(farmer);
             }
