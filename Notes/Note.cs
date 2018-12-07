@@ -1,11 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using PyTK.CustomElementHandler;
 using StardewValley;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Notes
 {
@@ -14,8 +10,14 @@ namespace Notes
         public string text = "";
 
         public Note() : base() { }
-        public Note(CustomObjectData data) : base(data) { }
-        public Note(CustomObjectData data, Vector2 tileLocation) : base( data, tileLocation) { }
+        public Note(CustomObjectData data) : base(data) {
+
+            syncObject.init();
+        }
+        public Note(CustomObjectData data, Vector2 tileLocation) : base( data, tileLocation) {
+
+            syncObject.init();
+        }
 
         public override Item getOne()
         {
@@ -49,6 +51,19 @@ namespace Notes
             var data = base.getAdditionalSaveData();
             data.Add("text", text);
             return data;
+        }
+
+        public Dictionary<string, string> getSyncData()
+        {
+            var data = new Dictionary<string, string>();
+            data.Add("text", text);
+            return data;
+        }
+
+        public void sync(Dictionary<string, string> syncData)
+        {
+            if (syncData.ContainsKey("text"))
+                text = syncData["text"];
         }
     }
 }
