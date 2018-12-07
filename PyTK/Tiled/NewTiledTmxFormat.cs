@@ -329,9 +329,15 @@ namespace PyTK.Tiled
                            {
                                Tile tile = layer.Tiles[x, y];
                                List<TiledProperty> properties = tiledObject.Properties;
-                               if (properties != null)
+                               if (properties != null && tile != null)
                                {
-                                   Action<TiledProperty> action2 = prop => tile.Properties[prop.Name] = prop.Value;
+                                   Action<TiledProperty> action2 = prop =>
+                                   {
+                                       if (!tile.Properties.ContainsKey(prop.Name))
+                                           tile.Properties.Add(prop.Name, prop.Value);
+                                       else
+                                           tile.Properties[prop.Name] = prop.Value;
+                                   };
                                    properties.ForEach(action2);
                                }
                            }
