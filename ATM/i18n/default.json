@@ -1,0 +1,12 @@
+﻿{
+  "ATM_Deposit": "Deposit Money",
+  "ATM_Daily_Deposit": "Daily Deposit Order",
+  "ATM_Withdraw": "Withdraw Money",
+  "ATM_Close": "Leave",
+  "Fail_Main": "Only the main Player can access the ATM.",
+  "Line_Credit": "Line of Credit",
+  "Account_Ballance": "Account Balance",
+  "Daily_Deposite": "Daily Deposite",
+  "New_Credit": "New line of credit",
+  "Interest": "Interest"
+}

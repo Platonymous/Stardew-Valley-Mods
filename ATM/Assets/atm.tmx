@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.1" orientation="orthogonal" renderorder="right-down" width="1" height="2" tilewidth="16" tileheight="16" infinite="0" nextobjectid="2">
+ <tileset firstgid="1" name="zATM" tilewidth="16" tileheight="16" tilecount="2" columns="1">
+  <image source="atm.png" width="16" height="32"/>
+ </tileset>
+ <layer name="Buildings" width="1" height="2">
+  <data encoding="csv">
+0,
+2
+</data>
+ </layer>
+ <objectgroup name="Buildings">
+  <object id="1" name="TileData" x="0" y="0" width="16" height="32">
+   <properties>
+    <property name="Action" value="OpenATM"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer name="Front" width="1" height="2">
+  <data encoding="csv">
+1,
+0
+</data>
+ </layer>
+</map>

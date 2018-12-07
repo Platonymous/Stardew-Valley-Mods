@@ -1,0 +1,16 @@
+﻿{
+  "Name": "ATM",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Adds an ATM to the Town",
+  "UniqueID": "Platonymous.ATM",
+  "EntryDll": "ATM.dll",
+  "MinimumApiVersion": "2.8",
+  "UpdateKeys": [ "Nexus:3135" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit",
+      "MinimumVersion": "1.4.23"
+    }
+  ]
+}
