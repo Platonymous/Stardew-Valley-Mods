@@ -46,10 +46,10 @@ namespace CustomMusic
 
         private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
         {
-            if (Game1.currentLocation == null)
+            if (Game1.currentLocation == null || !locations.ContainsKey(Game1.currentLocation.Name))
                 return;
 
-            var name = Game1.currentLocation.Name;
+            var name = locations[Game1.currentLocation.Name];
 
             if (name.StartsWith("cm:"))
             {
@@ -58,7 +58,7 @@ namespace CustomMusic
                     name += ":" + s;
             }
 
-            DelayedAction d = new DelayedAction(500, () => Game1.nextMusicTrack = locations[name]);
+            DelayedAction d = new DelayedAction(500, () => Game1.nextMusicTrack = name);
             Game1.delayedActions.Add(d);
         }
 
