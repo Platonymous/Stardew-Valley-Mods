@@ -32,7 +32,6 @@ namespace CustomMusic
             SHelper = Helper;
             loadContentPacks();
             var harmony = HarmonyInstance.Create("Platonymous.CustomMusic");
-            harmony.Patch(typeof(AudioCategory).GetMethod("SetVolume"), new HarmonyMethod(typeof(Overrides), "SetVolume"));
             harmony.Patch(typeof(Cue).GetMethod("Stop"), new HarmonyMethod(typeof(Overrides), "Stop"));
             harmony.Patch(typeof(Cue).GetMethod("Play"), new HarmonyMethod(typeof(Overrides), "Play"));
             harmony.Patch(typeof(Cue).GetMethod("Dispose"), new HarmonyMethod(typeof(Overrides), "Dispose"));

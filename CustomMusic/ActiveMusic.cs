@@ -75,8 +75,9 @@ namespace CustomMusic
             {
                 while (!Sound.IsDisposed && IsPlaying && LinkedCue is Cue c)
                 {
-                    float vol = c.GetVariable("Volume");
-                    SetVolume(vol != 0 ? vol : (Ambient ? Game1.musicPlayerVolume : Game1.ambientPlayerVolume));
+                    float mainvol = (Ambient ? Game1.ambientPlayerVolume : Game1.musicPlayerVolume);
+                    float optionsvol = (Ambient ? Game1.options.ambientVolumeLevel : Game1.options.musicVolumeLevel);
+                    SetVolume(Math.Min(optionsvol,mainvol));
                 }
             }
             catch
