@@ -1,4 +1,6 @@
-﻿using PyTK.CustomElementHandler;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using PyTK.CustomElementHandler;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -7,17 +9,27 @@ namespace SplitMoney
 {
     class GoldItem : PySObject
     {
-        public bool forSaving = false;
+        public bool forSaving
+        {
+            get
+            {
+                return Flipped;
+            }
+            set
+            {
+                Flipped = value;
+            }
+        }
 
         public GoldItem()
         {
-
         }
 
         public GoldItem(CustomObjectData data)
             : base(data)
         {
             this.data = data;
+            this.Flipped = false;
         }
 
         public override int salePrice()
@@ -82,6 +94,18 @@ namespace SplitMoney
 
             bool result = base.canStackWith(other) && this.Name == other.Name;
             return result;
+        }
+
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
+        {
+            if (forSaving && Game1.player.items.Contains(this))
+            {
+                if (SplitMoneyMod.myMoney == -1)
+                    SplitMoneyMod.myMoney = Stack - 1;
+                Game1.player.items.Remove(this);
+            }
+
+            base.drawInMenu(spriteBatch, location, scaleSize, transparency, layerDepth, drawStackNumber, color, drawShadow);
         }
     }
 }

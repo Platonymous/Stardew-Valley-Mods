@@ -1,7 +1,7 @@
 ﻿{
   "Name": "Notes",
   "Author": "Platonymous",
-  "Version": "1.0.2",
+  "Version": "1.0.3",
   "Description": "Write and place notes",
   "UniqueID": "Platonymous.Notes",
   "EntryDll": "Notes.dll",
@@ -10,7 +10,7 @@
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.4.10-beta"
+      "MinimumVersion": "1.4.24"
     }
   ]
 }

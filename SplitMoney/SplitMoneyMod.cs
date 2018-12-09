@@ -10,13 +10,8 @@ using StardewValley.Menus;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using System;
-using SObject = StardewValley.Object;
 using System.Threading.Tasks;
 using System.Linq;
-using StardewValley.BellsAndWhistles;
-using Netcode;
-using StardewValley.Buildings;
-using StardewValley.Locations;
 using StardewModdingAPI.Events;
 
 namespace SplitMoney
@@ -24,7 +19,9 @@ namespace SplitMoney
     public class SplitMoneyMod : Mod
     {
         internal static PyResponder<bool, int> moneyReceiver;
+        internal static PyResponder<bool, string> moneyPoolReceiver;
         internal static string moneyReceiverName = "Platonymous.MoneyReceiver";
+        internal static string moneyPoolName = "Platonymous.MoneyPool";
         internal static int startMoney = 500;
         internal static List<Farmer> players = new List<Farmer>();
         internal static List<Farmer> top4 = new List<Farmer>();
@@ -33,6 +30,7 @@ namespace SplitMoney
         internal static Dictionary<Farmer, int> moneyToSplitPerFarmer { get; set; } = new Dictionary<Farmer, int>();
         internal static int myMoney = -1;
         internal static bool lockMoney = true;
+        internal static Dictionary<string, int> moneyPool = new Dictionary<string, int>();
 
         public override void Entry(IModHelper helper)
         {
@@ -40,6 +38,15 @@ namespace SplitMoney
             SHelper = Helper;
             moneyReceiver = new PyResponder<bool, int>(moneyReceiverName, (i) => { Game1.player.Money += i; return true; }, 30);
             moneyReceiver.start();
+            moneyPoolReceiver = new PyResponder<bool, string>(moneyPoolName, (s) => 
+            {
+                if(s.Split('>') is string[] split && split.Length > 1)
+                    moneyPool.AddOrReplace(split[0], int.Parse(split[1]));
+
+                return true;
+            }, 30);
+            moneyPoolReceiver.start();
+
             SaveHandler.promiseType(typeof(GoldItem));
 
             SaveEvents.AfterReturnToTitle += (s, e) => { myMoney = -1; lockMoney = true; };
@@ -72,6 +79,7 @@ namespace SplitMoney
 
             SaveEvents.AfterLoad += (s, e) =>
             {
+                moneyPool = new Dictionary<string, int>();
                 lockMoney = false;
             };
 
@@ -92,7 +100,7 @@ namespace SplitMoney
         {
             if (item is StardewValley.Object obj)
             {
-                obj.name = obj.name + ">>" + who.Name;
+                obj.name = obj.name + ">" + who.Name;
                 obj.owner.Value = who.UniqueMultiplayerID;
             }
         }
@@ -148,6 +156,11 @@ namespace SplitMoney
                     await PyNet.sendRequestToFarmer<bool>(moneyReceiverName, money, receiver);
                 });
             }
+        }
+
+        internal static void sendMoneyPoolUpdate()
+        {
+            PyNet.sendRequestToAllFarmers<bool>(moneyPoolName, Game1.player.Name + ">" + myMoney, null, SerializationType.PLAIN, 30, null);
         }
 
         public override object GetApi()
@@ -211,8 +224,13 @@ namespace SplitMoney
                     {
                         if (u != Game1.player.UniqueMultiplayerID && !moneyToSplitPerFarmer.Keys.ToList().Exists(k => k.UniqueMultiplayerID == u))
                         {
-                            if (players.Find(f => f.Name == obj.netName.Value.Split(new string[] { ">>" }, StringSplitOptions.None)[1]) is Farmer otherFarmer)
-                                u = otherFarmer.UniqueMultiplayerID;
+                            if (obj.netName.Value is string name && name.Split('>') is string[] splitname && splitname.Length > 1)
+                            {
+                                if (players.Find(f => f.Name == splitname[1]) is Farmer otherFarmer)
+                                    u = otherFarmer.UniqueMultiplayerID;
+                                else
+                                    u = Game1.MasterPlayer.UniqueMultiplayerID;
+                            }
                             else
                                 u = Game1.MasterPlayer.UniqueMultiplayerID;
 
@@ -257,8 +275,8 @@ namespace SplitMoney
 
             internal static void Postfix(StardewValley.Object __instance, ref string __result)
             {
-                if (__result != null && __result.Contains(">>"))
-                    __result = __result.Split(new string[] { ">>" },StringSplitOptions.None)[0];
+                if (__result != null && __result.Contains(">"))
+                    __result = __result.Split('>')[0];
             }
         }
 
@@ -444,7 +462,8 @@ namespace SplitMoney
                     return false;
 
                 myMoney = value;
-                SMonitor.Log("Set Money to:" + value);
+
+                sendMoneyPoolUpdate();
 
                 return false;
             }

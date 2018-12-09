@@ -1,22 +1,50 @@
 ﻿using Microsoft.Xna.Framework;
 using PyTK.CustomElementHandler;
 using StardewValley;
+using System;
 using System.Collections.Generic;
 
 namespace Notes
 {
     class Note : PySObject
     {
-        public string text = "";
+        public string text
+        {
+            get
+            {
+                if (netName.Value.Split('>') is string[] split && split.Length > 1)
+                    return split[1];
+                else
+                    return "";
+            }
+            set
+            {
+                netName.Value = netName.Value.Split('>')[0] + ">" + value;
+            }
+        }
 
-        public Note() : base() { }
+        public override string Name {
+
+            get => netName.Value.Split('>')[0];
+
+            set
+            {
+                if (netName.Value.Split('>') is string[] split && split.Length > 1)
+                    netName.Value = value + ">" + split[1];
+                else
+                    netName.Value = value;
+            }
+        }
+
+        public Note() : base() {
+            
+        }
+
         public Note(CustomObjectData data) : base(data) {
 
-            syncObject.init();
         }
         public Note(CustomObjectData data, Vector2 tileLocation) : base( data, tileLocation) {
-
-            syncObject.init();
+ 
         }
 
         public override Item getOne()
@@ -51,19 +79,6 @@ namespace Notes
             var data = base.getAdditionalSaveData();
             data.Add("text", text);
             return data;
-        }
-
-        public Dictionary<string, string> getSyncData()
-        {
-            var data = new Dictionary<string, string>();
-            data.Add("text", text);
-            return data;
-        }
-
-        public void sync(Dictionary<string, string> syncData)
-        {
-            if (syncData.ContainsKey("text"))
-                text = syncData["text"];
         }
     }
 }

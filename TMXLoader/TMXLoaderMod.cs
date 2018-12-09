@@ -61,19 +61,6 @@ namespace TMXLoader
                     if (Game1.otherFarmers.Values.Where(f => f.isActive() && !syncedFarmers.Contains(f)) is IEnumerable<SFarmer> ef && ef.Count() is int i && i > 0)
                         syncMaps(ef);
             };
-
-            TimeEvents.AfterDayStarted += (s, e) => {
-
-                List<SFarmer> toRemove = new List<SFarmer>();
-
-                foreach (SFarmer farmer in syncedFarmers)
-                    if (!Game1.otherFarmers.ContainsKey(farmer.UniqueMultiplayerID) || !Game1.otherFarmers[farmer.UniqueMultiplayerID].isActive())
-                        toRemove.Add(farmer);
-
-                foreach (SFarmer remove in toRemove)
-                    syncedFarmers.Remove(remove);
-
-            };
         }
 
         private void TimeEvents_AfterDayStarted(object sender, EventArgs e)

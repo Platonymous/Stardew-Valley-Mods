@@ -1,7 +1,7 @@
 {
   "Name": "SplitMoney",
   "Author": "Platonymous",
-  "Version": "1.2.1",
+  "Version": "1.2.2",
   "Description": "Seperates the money in multiplayer",
   "UniqueID": "Platonymous.SplitMoney",
   "EntryDll": "SplitMoney.dll",
@@ -10,7 +10,7 @@
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.4.22"
+      "MinimumVersion": "1.4.24"
     }
   ]
 }
