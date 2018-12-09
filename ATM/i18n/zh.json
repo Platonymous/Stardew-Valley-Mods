@@ -1,0 +1,12 @@
+﻿{
+  "ATM_Deposit": "存款",
+  "ATM_Daily_Deposit": "心愿储蓄（设置每日自动存款）",
+  "ATM_Withdraw": "取款",
+  "ATM_Close": "离开",
+  "Fail_Main": "只有服务器主人才能使用ATM机。",
+  "Line_Credit": "信用贷款额度",
+  "Account_Ballance": "账户余额",
+  "Daily_Deposite": "心愿储蓄",
+  "New_Credit": "本月最新信用贷款额度",
+  "Interest": "利息"
+}

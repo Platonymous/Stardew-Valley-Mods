@@ -1,0 +1,12 @@
+﻿{
+  "ATM_Deposit": "Geld einzahlen",
+  "ATM_Daily_Deposit": "Täglicher Einzahlungsauftrag",
+  "ATM_Withdraw": "Geld abheben",
+  "ATM_Close": "Schließen",
+  "Fail_Main": "Nur der Host Spieler kann den Geldautomaten bedienen.",
+  "Line_Credit": "Kreditrahmen",
+  "Account_Ballance": "Kontostand",
+  "Daily_Deposite": "Einzahlungsauftrag",
+  "New_Credit": "Neuer Kreditrahmen",
+  "Interest": "Zinsen"
+}
