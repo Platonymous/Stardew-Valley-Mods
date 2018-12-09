@@ -12,6 +12,8 @@ using System.Xml;
 using xTile;
 using PyTK.Extensions;
 using System.Text;
+using System.Linq;
+using StardewModdingAPI.Events;
 
 namespace PyTK.ContentSync
 {
@@ -20,6 +22,7 @@ namespace PyTK.ContentSync
         internal static IPyResponder contentResponder;
         internal static IPyResponder contentReceiver;
         internal static Dictionary<string,object> content;
+        internal static Dictionary<Farmer,List<string>> contentPipe;
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static string responderName = "PyTK.ContentResponder";
         internal static string receiverName = "PyTK.ContentReceiver";
@@ -29,6 +32,7 @@ namespace PyTK.ContentSync
         internal static void initialize()
         {
             content = new Dictionary<string, object>();
+            contentPipe = new Dictionary<Farmer, List<string>>();
             contentResponder = new PyResponder<ContentResponse, ContentRequest>(responderName, getSerializedContent, 8, SerializationType.JSON, SerializationType.JSON);
             contentReceiver = new PyResponder<bool, ContentResponse>(receiverName, receiveInstruction, 16, SerializationType.JSON, SerializationType.JSON);
             contentResponder.start();
@@ -57,7 +61,7 @@ namespace PyTK.ContentSync
         {
             ContentType? type = getContentType<T>();
             if (type.HasValue)
-                sendInstruction(assetName, asset, type.Value,false, toFarmer,callback, timeout);
+                sendInstruction(assetName, asset, type.Value, false, toFarmer, callback, timeout);
             else
                 PyTKMod._monitor.Log("ContentRequest Failed: Type (" + typeof(T).ToString() + ") not supported for " + assetName);
         }
@@ -82,6 +86,14 @@ namespace PyTK.ContentSync
 
         private static void sendInstruction<T>(string assetName, T asset, ContentType type, bool toGameContent, Farmer farmer, Action<bool> callback, int timeout)
         {
+            if (contentPipe.ContainsKey(farmer) && contentPipe[farmer].Contains(assetName))
+                return;
+
+            if (contentPipe.ContainsKey(farmer))
+                contentPipe[farmer].AddOrReplace(assetName);
+            else
+                contentPipe.Add(farmer, new List<string>() { assetName });
+
             Task.Run(async () =>
            {
                await PyNet.sendRequestToFarmer<bool>(receiverName, new ContentResponse(assetName, (int)type, serialize(asset, type), toGameContent), farmer, (r) =>
@@ -96,40 +108,29 @@ namespace PyTK.ContentSync
 
         private static void sendInstruction<T>(string[] assetName, T asset, ContentType type, bool toGameContent, Farmer farmer, Action<bool> callback, int timeout)
         {
-            Task.Run(async () =>
-            {
-                await PyNet.sendRequestToFarmer<bool>(receiverName, new ContentResponse(String.Join("|", assetName), (int)type, serialize(asset, type), toGameContent), farmer, (r) =>
-                     {
-                         if (!r)
-                             callback(false);
-                         else
-                             callback(r);
-                     }, SerializationType.JSON, timeout);
-            });
+            foreach (string assetKey in assetName)
+                sendInstruction(assetKey, asset, type, toGameContent, farmer, callback, timeout);
         }
 
         private static bool receiveInstruction(ContentResponse instruction)
         {
-            PyTKMod._monitor.Log("Receiving Content: " + instruction.assetName);
+            if (contentPipe.ContainsKey(Game1.player) && contentPipe[Game1.player].Contains(instruction.assetName))
+                return true;
+
+            if (contentPipe.ContainsKey(Game1.player))
+                contentPipe[Game1.player].AddOrReplace(instruction.assetName);
+            else
+                contentPipe.Add(Game1.player, new List<string>() { instruction.assetName });
+
+            PyTKMod._monitor.Log("Receiving Content: " + instruction.assetName + " (" + (instruction.toGameContent ? "Game Content" : "Content") + ")");
             try
             {
                 if (instruction.toGameContent)
-                {
-                    if (!instruction.assetName.Contains("|"))
-                        incjectToGameContent(instruction);
-                    else
-                       incjectToGameContent(instruction, instruction.assetName.Split('|'));
-                }
+                    incjectToGameContent(instruction);
                 else
-                {
-                    if (!content.ContainsKey(instruction.assetName))
-                        content.Add(instruction.assetName, deserialize<object>(instruction));
-                    else
-                        content[instruction.assetName] = deserialize<object>(instruction);
-                }
-
+                    content.AddOrReplace(instruction.assetName, deserialize<object>(instruction));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 PyTKMod._monitor.Log(e.Message + ":" + e.StackTrace);
                 return false;
