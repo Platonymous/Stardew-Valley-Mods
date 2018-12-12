@@ -12,7 +12,6 @@ using PyTK.Tiled;
 using System.IO;
 using xTile;
 using System;
-using Microsoft.Xna.Framework.Input;
 
 namespace JoJaBan
 {
@@ -44,7 +43,7 @@ namespace JoJaBan
             Texture2D townInterior = Helper.Content.Load<Texture2D>(@"Maps/townInterior", ContentSource.GameContent);
             boxTexture = townInterior.getArea(new Rectangle(304, 1024, 16, 32));
             boxData = new CustomObjectData("JoJa Box", "JoJa Box/0/-300/Crafting -9/JoJa Box/true/true/0/JoJa Box", boxTexture, Color.White, bigCraftable: true, type:typeof(JoJaBox));
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
             SaveEvents.AfterLoad += (o, e) => addToCatalogue();
         }
 
@@ -84,9 +83,9 @@ namespace JoJaBan
             return true;
         }
 
-        private static void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private static void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            if (e.KeyPressed == Keys.Escape && Game1.currentLocation is GameLocation gl && gl.Name.StartsWith("JoJaBanLevel"))
+            if (e.Button == SButton.Escape && Game1.currentLocation is GameLocation gl && gl.Name.StartsWith("JoJaBanLevel"))
             {
                 resetLevel(Game1.currentLocation);
                 loadLevel(currentLevel);

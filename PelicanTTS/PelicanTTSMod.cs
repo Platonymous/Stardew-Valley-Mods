@@ -131,15 +131,15 @@ namespace PelicanTTS
 
 
 
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             ModConfig config = Helper.ReadConfig<ModConfig>();
             if (config.polly == "off" || !pollySetup)
             {
-                if (e.KeyPressed == Keys.F7)
+                if (e.Button == SButton.F7)
                     SpeechHandler.showInstalledVoices();
 
-                if (e.KeyPressed == Keys.F8)
+                if (e.Button == SButton.F8)
                     SpeechHandler.demoVoices();
             }
         }
@@ -147,7 +147,7 @@ namespace PelicanTTS
         private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
         {
             GameEvents.OneSecondTick -= GameEvents_OneSecondTick;
-            ControlEvents.KeyPressed -= ControlEvents_KeyPressed;
+            Helper.Events.Input.ButtonPressed -= OnButtonPressed;
             ModConfig config = Helper.ReadConfig<ModConfig>();
             if (config.polly == "on" && pollySetup)
                 SpeechHandlerPolly.stop();
@@ -178,13 +178,12 @@ namespace PelicanTTS
             {
                 SpeechHandlerPolly.Monitor = Monitor;
                 SpeechHandlerPolly.start(Helper);
-                
             }
             else
                 SpeechHandler.start(Helper,Monitor);
-            
+
             GameEvents.OneSecondTick += GameEvents_OneSecondTick;
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            Helper.Events.Input.ButtonPressed += OnButtonPressed;
         }
 
 

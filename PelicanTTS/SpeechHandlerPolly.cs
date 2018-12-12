@@ -78,14 +78,12 @@ namespace PelicanTTS
 
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
 
-            //ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-
+            //h.Events.Input.ButtonPressed += OnButtonPressed;
         }
 
-        private static void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private static void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            
-            if (e.KeyPressed.ToString() == "K")
+            if (e.Button == SButton.K)
             {
                 gThread = new Thread(generateAllDialogs);
                 gThread.Start();

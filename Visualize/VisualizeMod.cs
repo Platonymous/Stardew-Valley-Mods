@@ -35,7 +35,7 @@ namespace Visualize
             _helper = Helper;
             loadProfiles();
             setActiveProfile(new Profile());
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            this.Helper.Events.Input.ButtonPressed += OnButtonPressed;
             GameEvents.HalfSecondTick += GameEvents_HalfSecondTick;
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
@@ -67,23 +67,23 @@ namespace Visualize
             return true;
         }
 
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            if (e.KeyPressed == _config.next)
+            if (e.Button == _config.next)
                 switchProfile(1);
 
-            if (e.KeyPressed == _config.previous)
+            if (e.Button == _config.previous)
                 switchProfile(-1);
 
-            if (e.KeyPressed == _config.reset)
+            if (e.Button == _config.reset)
                 reset();
 
-            if (e.KeyPressed == _config.satHigher || e.KeyPressed == _config.satLower)
+            if (e.Button == _config.satHigher || e.Button == _config.satLower)
             {
-                if (e.KeyPressed == _config.satHigher)
+                if (e.Button == _config.satHigher)
                     _config.saturation = MathHelper.Min(200, _config.saturation + 10);
 
-                if (e.KeyPressed == _config.satLower)
+                if (e.Button == _config.satLower)
                     _config.saturation = MathHelper.Max(0, _config.saturation - 10);
 
                 emptyCache();

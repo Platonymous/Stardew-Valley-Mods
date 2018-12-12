@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using StardewModdingAPI;
 
 namespace Visualize
 {
@@ -6,11 +6,11 @@ namespace Visualize
     {
         public string activeProfile { get; set; } = "Platonymous.Original";
         public float saturation { get; set; } = 100;
-        public Keys next { get; set; } = Keys.PageDown;
-        public Keys previous { get; set; } = Keys.PageUp;
-        public Keys satHigher { get; set; } = Keys.NumPad9;
-        public Keys satLower { get; set; } = Keys.NumPad6;
-        public Keys reset { get; set; } = Keys.NumPad0;
+        public SButton next { get; set; } = SButton.PageDown;
+        public SButton previous { get; set; } = SButton.PageUp;
+        public SButton satHigher { get; set; } = SButton.NumPad9;
+        public SButton satLower { get; set; } = SButton.NumPad6;
+        public SButton reset { get; set; } = SButton.NumPad0;
         public int passes { get; set; } = 10;
 
     }

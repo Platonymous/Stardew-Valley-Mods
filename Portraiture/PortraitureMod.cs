@@ -45,7 +45,7 @@ namespace Portraiture
             GameEvents.FourthUpdateTick -= GameEvents_FourthUpdateTick;
             MenuEvents.MenuClosed -= MenuEvents_MenuClosed;
             MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
-            ControlEvents.KeyPressed -= ControlEvents_KeyPressed;
+            helper.Events.Input.ButtonPressed -= OnButtonPressed;
         }
 
         public static void log (string text)
@@ -59,7 +59,7 @@ namespace Portraiture
             GameEvents.FourthUpdateTick += GameEvents_FourthUpdateTick;
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
         }
 
         private void GameEvents_FourthUpdateTick(object sender, System.EventArgs e)
@@ -90,10 +90,9 @@ namespace Portraiture
                 Utility.drawTextWithShadow(b, activeFolderText, Game1.smallFont, new Vector2(displayBoxPos.X + ((displayBoxWidth - textlength) / 2), Game1.pixelZoom + displayBoxPos.Y + ((displayBoxHeight - textheight) / 2)), Game1.textColor);
         }
 
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            
-            if (e.KeyPressed == config.changeKey && Game1.activeClickableMenu is DialogueBox d && d.isPortraitBox() && Game1.currentSpeaker is NPC cs)
+            if (e.Button == config.changeKey && Game1.activeClickableMenu is DialogueBox d && d.isPortraitBox() && Game1.currentSpeaker is NPC cs)
             {
                 if (d.width < 107 * Game1.pixelZoom * 3 / 2 || Helper.Reflection.GetField<bool>(d, "transitioning").GetValue() || Helper.Reflection.GetField<bool>(d, "isQuestion").GetValue())
                     return;

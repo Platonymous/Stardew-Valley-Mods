@@ -18,7 +18,7 @@ namespace ArcadePong
         internal static IModHelper pongHelper;
         internal static IMonitor monitor;
         internal static Mod pong;
-        internal static List<EventHandler<EventArgsKeyPressed>> keyEvents = new List<EventHandler<EventArgsKeyPressed>>();
+        internal static List<EventHandler<ButtonPressedEventArgs>> keyEvents = new List<EventHandler<ButtonPressedEventArgs>>();
         internal CustomObjectData pdata; 
 
 
@@ -29,8 +29,8 @@ namespace ArcadePong
             SaveEvents.AfterLoad += (o, e) => setup();
             SaveEvents.AfterReturnToTitle += (s, o) =>
             {
-                foreach (EventHandler<EventArgsKeyPressed> a in keyEvents)
-                    ControlEvents.KeyPressed -= a;
+                foreach (EventHandler<ButtonPressedEventArgs> a in keyEvents)
+                    helper.Events.Input.ButtonPressed -= a;
             };
             pdata = new CustomObjectData("Pong", "Pong/0/-300/Crafting -9/Play 'Pong by Cat' at home!/true/true/0/Pong", Game1.bigCraftableSpriteSheet.getTile(159, 16, 32).setSaturation(0).setLight(130), Color.Yellow, bigCraftable: true, type: typeof(PongMachine));
            
@@ -41,13 +41,13 @@ namespace ArcadePong
             new InventoryItem(pdata.getObject(), 0, 1).addToFurnitureCatalogue();
             PongMinigame.game = Helper.Reflection.GetField<object>(pong, "game").GetValue();
             pongHelper = (IModHelper)typeof(Mod).GetProperty("Helper", BindingFlags.Public | BindingFlags.Instance).GetValue(pong);
-            keyEvents.AddOrReplace(Keys.Space.onPressed(() =>
+            keyEvents.AddOrReplace(SButton.Space.onPressed(() =>
             {
                 if (Game1.currentMinigame is PongMinigame p)
                     Helper.Reflection.GetMethod(PongMinigame.game, "Start").Invoke();
             }));
 
-            keyEvents.AddOrReplace(Keys.Escape.onPressed(() =>
+            keyEvents.AddOrReplace(SButton.Escape.onPressed(() =>
             {
                 if (Game1.currentMinigame is PongMinigame p)
                     if (Helper.Reflection.GetMethod(PongMinigame.game, "HasStarted").Invoke<bool>())
@@ -58,7 +58,7 @@ namespace ArcadePong
                         Game1.options.zoomLevel = PongMachine.zoom;
                     }
             }));
-            keyEvents.AddOrReplace(Keys.P.onPressed(() =>
+            keyEvents.AddOrReplace(SButton.P.onPressed(() =>
             {
                 if (Game1.currentMinigame is PongMinigame p)
                     Helper.Reflection.GetMethod(PongMinigame.game, "TogglePaused").Invoke();

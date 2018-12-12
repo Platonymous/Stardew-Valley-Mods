@@ -4,10 +4,7 @@ using StardewValley;
 using StardewValley.Menus;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using PyTK.Extensions;
 using PyTK.CustomElementHandler;
-using System.Collections.Generic;
-using System.Linq;
 using StardewValley.Objects;
 
 namespace Notes
@@ -27,7 +24,7 @@ namespace Notes
             NoteInfo = i18n.Get("notes.note.info");
             initNotes();
 
-            ControlEvents.MouseChanged += (s,e) => checkForSigns();
+            helper.Events.Input.CursorMoved += (s,e) => checkForSigns(e.NewPosition);
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
         }
 
@@ -38,14 +35,12 @@ namespace Notes
             IClickableMenu.drawHoverText(Game1.spriteBatch, displayNote, Game1.smallFont, 0, 0, -1);
         }
 
-        public static void checkForSigns()
+        public static void checkForSigns(ICursorPosition cursor)
         {
             if (Game1.activeClickableMenu != null)
                 return;
-            int xTile = (Game1.viewport.X + Game1.getOldMouseX()) / 64;
-            int yTile = (Game1.viewport.Y + Game1.getOldMouseY()) / 64;
-            Vector2 oneDown = new Vector2(xTile, yTile + 1);
-            Vector2 pos = new Vector2(xTile, yTile);
+            Vector2 pos = cursor.Tile;
+            Vector2 oneDown = new Vector2(pos.X, pos.Y + 1);
             if (Game1.currentLocation != null
                 && Game1.currentLocation.objects.ContainsKey(pos)
                 && Game1.currentLocation.objects[pos] is Sign sign

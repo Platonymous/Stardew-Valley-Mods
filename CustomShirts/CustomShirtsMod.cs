@@ -119,7 +119,7 @@ namespace CustomShirts
 
             loadContentPacks();
 
-            if(config.SwitchKey != Keys.Escape)
+            if(config.SwitchKey != SButton.Escape)
                 config.SwitchKey.onPressed(() => Game1.activeClickableMenu = new CharacterCustomization(CharacterCustomization.Source.Wizard));
 
             GameEvents.QuarterSecondTick += (s, e) =>
