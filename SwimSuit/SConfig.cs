@@ -1,16 +1,15 @@
-﻿
-using Microsoft.Xna.Framework.Input;
+﻿using StardewModdingAPI;
 
 namespace SwimSuit
 {
     class SConfig
     {
 
-        public Keys swimKey { get; set; }
+        public SButton swimKey { get; set; }
 
         public SConfig()
         {
-            swimKey = Keys.J;
+            swimKey = SButton.J;
         }
 
     }

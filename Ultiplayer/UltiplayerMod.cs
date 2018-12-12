@@ -11,7 +11,6 @@ using StardewValley;
 using StardewValley.Network;
 using StardewValley.Quests;
 using StardewModdingAPI.Events;
-using Microsoft.Xna.Framework.Input;
 using StardewValley.Menus;
 using StardewValley.Locations;
 using StardewValley.Buildings;
@@ -51,7 +50,7 @@ namespace Ultiplayer
             #region events
             TimeEvents.AfterDayStarted += (s, e) => SaveFarmhand();
             SaveEvents.AfterLoad += (s, e) => LoadFarmhands();
-            ControlEvents.KeyPressed += (s, e) => keyPressed(e.KeyPressed);
+            helper.Events.Input.ButtonPressed += (s, e) => OnButtonPressed(e.Button);
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             #endregion
         }
@@ -71,7 +70,7 @@ namespace Ultiplayer
 
         #region inputHandling
 
-        internal void keyPressed(Keys key)
+        internal void OnButtonPressed(SButton key)
         {
             if (Game1.IsClient)
             {
@@ -90,11 +89,11 @@ namespace Ultiplayer
                     Game1.getLocationFromName("FarmHouse").map.inject(@"Maps/FarmHouse_" + Game1.player.UniqueMultiplayerID);
                     Game1.locations.Add(new FarmHouse(@"Maps/FarmHouse_" + Game1.player.UniqueMultiplayerID, "FarmHouse_" + Game1.player.UniqueMultiplayerID));
                 }
-                if (key == Keys.J)
+                if (key == SButton.J)
                     Game1.warpFarmer("FarmHouse_" + Game1.player.UniqueMultiplayerID, 100, 50, 1);
             }
 
-            if (Game1.activeClickableMenu is TitleMenu t && key == Keys.U)
+            if (Game1.activeClickableMenu is TitleMenu t && key == SButton.U)
             {
                 ultiplayer = !ultiplayer;
                 mon.Log(ultiplayer ? "Ultiplayer activated" : "Ultiplayer deactivated", LogLevel.Info);

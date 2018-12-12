@@ -36,6 +36,7 @@ namespace PyTK
     public class PyTKMod : Mod
     {
         internal static IModHelper _helper;
+        internal static IModEvents _events => _helper.Events;
         internal static IMonitor _monitor;
         internal static bool _activeSpriteBatchFix = true;
         internal static string sdvContentFolder => PyUtils.getContentFolder();
@@ -263,7 +264,7 @@ namespace PyTK
             CustomObjectData.newObject("Platonymous.Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Yellow, "Rubici", "Rubici Test", 16, "Rubici", "Minerals -2", 50, -300);
             new CustomObjectData("Platonymous.Rubico" + Color.Red.ToString(), "Rubico/250/-300/Minerals -2/Rubico/A precious stone that is sought after for its rich color and beautiful fluster.", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Red, 16);
 
-            Keys.K.onPressed(() => Monitor.Log($"Played: {Game1.currentGameTime.TotalGameTime.Minutes} min"));
+            SButton.K.onPressed(() => Monitor.Log($"Played: {Game1.currentGameTime.TotalGameTime.Minutes} min"));
             ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log($"Number of Weeds: {o.numberOfWeeds}", LogLevel.Info));
             new InventoryItem(new Chest(true), 100).addToNPCShop("Pierre");
             new ItemSelector<SObject>(p => p.name == "Chest").whenAddedToInventory(l => l.useAll(i => i.name = "Test"));

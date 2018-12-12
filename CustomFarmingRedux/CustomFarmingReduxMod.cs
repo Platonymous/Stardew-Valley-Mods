@@ -15,7 +15,6 @@ using SObject = StardewValley.Object;
 using Microsoft.Xna.Framework;
 using System;
 using StardewValley.Tools;
-using Microsoft.Xna.Framework.Input;
 using PyTK.Lua;
 using Microsoft.Xna.Framework.Graphics;
 

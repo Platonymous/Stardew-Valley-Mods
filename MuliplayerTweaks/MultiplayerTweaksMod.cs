@@ -34,7 +34,7 @@ namespace MuliplayerTweaks
                 overflow = config.LimitPositonSyncOverflow;
             }
 
-            /*Keys.U.onPressed( () => 
+            /*SButton.U.onPressed( () => 
             {
                 Game1.game1.IsFixedTimeStep = false;
                 Game1.debugMode = true;

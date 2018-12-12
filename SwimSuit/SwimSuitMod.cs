@@ -17,15 +17,13 @@ namespace SwimSuit
 
         public override void Entry(IModHelper helper)
         {
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
             config = Helper.ReadConfig<SConfig>(); 
         }
 
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-
-
-            if(e.KeyPressed == config.swimKey)
+            if(e.Button == config.swimKey)
             {
 
                 List<Vector2> tiles = getSurroundingTiles();
