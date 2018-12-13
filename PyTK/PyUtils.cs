@@ -141,9 +141,7 @@ namespace PyTK
             {
                 FileInfo file = new FileInfo(fullPath);
 
-                TModel pack = PyTKMod._helper
-                    .CreateTemporaryContentPack(file.Directory.FullName, Guid.NewGuid().ToString("N"), "temp pack", null, null, new SemanticVersion(1, 0, 0))
-                    .ReadJsonFile<TModel>(file.Name);
+                TModel pack = PyTKMod._helper.ContentPacks.CreateFake(file.Directory.FullName).ReadJsonFile<TModel>(file.Name);
 
                 packs.Add(pack);
 

@@ -96,7 +96,7 @@ namespace CustomMusic
 
         private void loadContentPacks()
         {
-            foreach (IContentPack pack in Helper.GetContentPacks())
+            foreach (IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
 

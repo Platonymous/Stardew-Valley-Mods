@@ -128,9 +128,7 @@ namespace CustomFarmingRedux
             if (options != null && options.ContainsKey("baseFolder"))
                 baseFolder = options["baseFolder"];
 
-            CustomFarmingPack pack = this.Helper
-                .CreateTemporaryContentPack(Path.Combine(baseFolder, folderName), Guid.NewGuid().ToString("N"), "temp pack", null, null, new SemanticVersion(1, 0, 0))
-                .ReadJsonFile<CustomFarmingPack>(fileName);
+            CustomFarmingPack pack = this.Helper.ContentPacks.CreateFake(Path.Combine(baseFolder, folderName)).ReadJsonFile<CustomFarmingPack>(fileName);
 
             pack.baseFolder = baseFolder;
 

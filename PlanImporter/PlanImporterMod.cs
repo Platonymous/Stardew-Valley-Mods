@@ -282,9 +282,7 @@ namespace PlanImporter
             foreach (string fullPath in files) {
                 FileInfo file = new FileInfo(fullPath);
 
-                Import import = this.Helper
-                    .CreateTemporaryContentPack(file.Directory.FullName, Guid.NewGuid().ToString("N"), "temp pack", null, null, new SemanticVersion(1, 0, 0))
-                    .ReadJsonFile<Import>(file.Name);
+                Import import = this.Helper.ContentPacks.CreateFake(file.Directory.FullName).ReadJsonFile<Import>(file.Name);
 
                 import.id = import.id == "" ? Path.GetFileNameWithoutExtension(fullPath) : import.id;
                 if (Imports.ContainsKey(import.id))

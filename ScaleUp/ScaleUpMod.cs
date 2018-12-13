@@ -21,7 +21,7 @@ namespace ScaleUp
             foreach(string fullPath in files)
             {
                 FileInfo manifestFile = new FileInfo(fullPath);
-                IContentPack contentPack = this.Helper.CreateTemporaryContentPack(manifestFile.Directory.FullName, Guid.NewGuid().ToString("N"), "temp pack", null, null, new SemanticVersion(1, 0, 0));
+                IContentPack contentPack = this.Helper.ContentPacks.CreateFake(manifestFile.Directory.FullName);
                 Manifest manifest = contentPack.ReadJsonFile<Manifest>(manifestFile.Name);
 
                 if (manifest != null && manifest.ContentPackFor is ManifestContentPackFor m && m.UniqueID == "Pathoschild.ContentPatcher")

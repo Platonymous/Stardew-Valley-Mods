@@ -258,7 +258,7 @@ namespace CustomFarmingRedux
         {
             List<CustomFarmingPack> packs = new List<CustomFarmingPack>();
 
-            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
+            foreach (StardewModdingAPI.IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 List<CustomFarmingPack> cpPacks = loadCP(pack);
                 packs.AddRange(cpPacks);
@@ -279,9 +279,7 @@ namespace CustomFarmingRedux
                 if (filename == "manifest.json")
                     continue;
 
-                CustomFarmingPack pack = this.Helper
-                    .CreateTemporaryContentPack(directoryInfo.FullName, Guid.NewGuid().ToString("N"), "temp pack", null, null, new SemanticVersion(1, 0, 0))
-                    .ReadJsonFile<CustomFarmingPack>(filename);
+                CustomFarmingPack pack = this.Helper.ContentPacks.CreateFake(directoryInfo.FullName).ReadJsonFile<CustomFarmingPack>(filename);
 
                 pack.fileName = filename;
                 pack.folderName = directoryInfo.Name;
