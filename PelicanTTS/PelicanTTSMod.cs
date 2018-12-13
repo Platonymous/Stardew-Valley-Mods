@@ -1,7 +1,6 @@
 ﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using System;
-using Microsoft.Xna.Framework.Input;
 using StardewValley;
 
 using System.IO;
@@ -26,13 +25,13 @@ namespace PelicanTTS
                     //Directory.Move(Path.Combine(Helper.DirectoryPath, "TTS"), tmppath);
             }
 
-            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
         }
 
-        private void GameEvents_OneSecondTick(object sender, EventArgs e)
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!greeted && Game1.timeOfDay == 600 && Game1.activeClickableMenu == null)
+            if (e.IsOneSecond && !greeted && Game1.timeOfDay == 600 && Game1.activeClickableMenu == null)
             {
                 ModConfig config = Helper.ReadConfig<ModConfig>();
                 if (config.polly == "on" && pollySetup && SpeechHandlerPolly.culturelang.ToLower() == "en")
@@ -45,7 +44,7 @@ namespace PelicanTTS
         }
 
 
-        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             greeted = false;
         }
@@ -144,9 +143,9 @@ namespace PelicanTTS
             }
         }
 
-        private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
+        private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
         {
-            GameEvents.OneSecondTick -= GameEvents_OneSecondTick;
+            Helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
             Helper.Events.Input.ButtonPressed -= OnButtonPressed;
             ModConfig config = Helper.ReadConfig<ModConfig>();
             if (config.polly == "on" && pollySetup)
@@ -167,12 +166,12 @@ namespace PelicanTTS
                     pollySetup = true;
             
         }
-        private void SaveEvents_AfterLoad(object sender, EventArgs e)
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             pollySetup = false;
             checkPollySetup();
 
-            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+            Helper.Events.GameLoop.DayStarted += OnDayStarted;
             ModConfig config = Helper.ReadConfig<ModConfig>();
             if(config.polly == "on" && pollySetup)
             {
@@ -182,7 +181,7 @@ namespace PelicanTTS
             else
                 SpeechHandler.start(Helper,Monitor);
 
-            GameEvents.OneSecondTick += GameEvents_OneSecondTick;
+            Helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
             Helper.Events.Input.ButtonPressed += OnButtonPressed;
         }
 

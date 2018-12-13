@@ -41,15 +41,15 @@ namespace PyTK.Types
         public void start()
         {
             tick = 0;
-            GameEvents.UpdateTick += checkForRequests;
+            PyTKMod._events.GameLoop.UpdateTicked += checkForRequests;
         }
 
         public void stop()
         {
-            GameEvents.UpdateTick -= checkForRequests;
+            PyTKMod._events.GameLoop.UpdateTicked -= checkForRequests;
         }
 
-        private void checkForRequests(object sender, EventArgs e)
+        private void checkForRequests(object sender, UpdateTickedEventArgs e)
         {
             tick++;
             if (tick != interval)

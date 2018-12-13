@@ -42,28 +42,29 @@ namespace TMXLoader
             }
             loadContentPacks();
             setTileActions();
-            PlayerEvents.Warped += LocationEvents_CurrentLocationChanged;
-            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+            helper.Events.Player.Warped += OnWarped;
+            helper.Events.GameLoop.DayStarted += OnDayStarted;
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
             new ConsoleCommand("loadmap", "Teleport to a map", (s, st) => {
 
                 Game1.player.warpFarmer(new Warp(int.Parse(st[1]), int.Parse(st[2]), st[0], int.Parse(st[1]), int.Parse(st[2]), false));
-
             });
             fixCompatibilities();
             harmonyFix();
-            
-            GameEvents.OneSecondTick += (s, e) =>
+
+            helper.Events.GameLoop.UpdateTicked += (s, e) =>
             {
-                if (Context.IsWorldReady && Game1.IsMasterGame && Game1.IsMultiplayer)
+                if (e.IsOneSecond && Context.IsWorldReady && Game1.IsMasterGame && Game1.IsMultiplayer)
+                {
                     if (Game1.otherFarmers.Values.Where(f => f.isActive() && !syncedFarmers.Contains(f)) is IEnumerable<SFarmer> ef && ef.Count() is int i && i > 0)
                         syncMaps(ef);
+                }
             };
         }
 
-        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             if (Game1.currentLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
                 TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
@@ -83,7 +84,7 @@ namespace TMXLoader
         private void fixCompatibilities()
         {
             Compatibility.CustomFarmTypes.LoadingTheMaps();
-            SaveEvents.AfterLoad +=(s,e) => Compatibility.CustomFarmTypes.fixGreenhouseWarp();
+            helper.Events.GameLoop.SaveLoaded +=(s,e) => Compatibility.CustomFarmTypes.fixGreenhouseWarp();
         }
 
         private void harmonyFix()
@@ -92,9 +93,9 @@ namespace TMXLoader
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 
-        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsPlayerWarped e)
+        private void OnWarped(object sender, WarpedEventArgs e)
         {
-            if (e.NewLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
+            if (e.IsLocalPlayer && e.NewLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
                 TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero,"Map");
         }
 
@@ -184,7 +185,7 @@ namespace TMXLoader
 
                     location.seasonUpdate(Game1.currentSeason);
                     mapsToSync.AddOrReplace(edit.name, map);
-                    SaveEvents.AfterLoad += (s, e) => Game1.locations.Add(location);
+                    helper.Events.GameLoop.SaveLoaded += (s, e) => Game1.locations.Add(location);
                 }
 
                 foreach (MapEdit edit in tmxPack.replaceMaps)

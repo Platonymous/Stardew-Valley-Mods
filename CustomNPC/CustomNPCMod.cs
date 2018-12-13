@@ -11,7 +11,6 @@ using System;
 using System.Text.RegularExpressions;
 using xTile;
 using xTile.Layers;
-using Microsoft.Xna.Framework.Input;
 using xTile.Tiles;
 using StardewValley.Locations;
 using StardewValley.Objects;
@@ -66,19 +65,18 @@ namespace CustomNPC
                         }
                 }
 
-
-            SaveEvents.BeforeSave += SaveEvents_BeforeSave;
-            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
-            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged;
-            SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+            Helper.Events.GameLoop.Saving += OnSaving;
+            Helper.Events.GameLoop.DayStarted += OnDayStarted;
+            Helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
+            Helper.Events.Player.Warped += OnWarped;
         }
 
-        private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
+        private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
         {
-            MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
+            Helper.Events.Display.MenuChanged -= OnMenuChanged;
         }
 
-        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             placeLocations();
             placeNPCs();
@@ -117,11 +115,11 @@ namespace CustomNPC
                 npcMapLocationsSet = true;
             }
 
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            Helper.Events.Display.MenuChanged += OnMenuChanged;
+            Helper.Events.Input.ButtonPressed += OnButtonPressed;
         }
 
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
 
         }
@@ -370,8 +368,10 @@ namespace CustomNPC
         }
 
 
-        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
+        private void OnWarped(object sender, WarpedEventArgs e)
         {
+            if (!e.IsLocalPlayer)
+                return;
 
             if (waitingForShop)
             {
@@ -381,13 +381,13 @@ namespace CustomNPC
             if (waitingForDancePartner)
             {
                 waitingForDancePartner = false;
-                MenuEvents.MenuClosed -= MenuEvents_MenuClosed;
+                Helper.Events.Display.MenuChanged -= OnMenuChanged_Closed;
             }
 
             if (Game1.CurrentEvent is Event && Game1.CurrentEvent.isFestival)
             {
                 GameLocation temp = Helper.Reflection.GetField<GameLocation>(Game1.CurrentEvent, "temporaryLocation").GetValue();
-                GameEvents.OneSecondTick += GameEvents_OneSecondTick;
+                Helper.Events.GameLoop.UpdateTicked += OnUpdateTicked_OneSecond;
             }
             else if (shoplocations.ContainsKey(Game1.currentLocation.name))
             {
@@ -399,15 +399,18 @@ namespace CustomNPC
 
         }
 
-        private void MenuEvents_MenuClosed1(object sender, EventArgsClickableMenuClosed e)
+        private void OnMenuChanged_Closed1(object sender, MenuChangedEventArgs e)
         {
-            menuChanging = false;
-            MenuEvents.MenuClosed -= MenuEvents_MenuClosed1;
-            if (Game1.CurrentEvent is Event evt)
-                evt.skipEvent();
+            if (e.NewMenu == null)
+            {
+                menuChanging = false;
+                Helper.Events.Display.MenuChanged -= OnMenuChanged_Closed1;
+                if (Game1.CurrentEvent is Event evt)
+                    evt.skipEvent();
+            }
         }
 
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
             if (menuChanging || !(Game1.activeClickableMenu is DialogueBox box) || !(box.getCurrentString().Contains("NPCShop") || box.getCurrentString().Contains("CustomItemGrab")))
                 return;
@@ -450,8 +453,7 @@ namespace CustomNPC
 
             }
 
-            MenuEvents.MenuClosed += MenuEvents_MenuClosed1;
-            
+            Helper.Events.Display.MenuChanged += OnMenuChanged_Closed1;
         }
 
         private string getClosedString(string shopkeeper)
@@ -487,15 +489,19 @@ namespace CustomNPC
             Helper.ConsoleCommands.Trigger("replace_custom_furniture", new string[] { "shop" });
         }
 
-        private void GameEvents_OneSecondTick(object sender, EventArgs e)
+        private void OnUpdateTicked_OneSecond(object sender, UpdateTickedEventArgs e)
         {
-            GameEvents.OneSecondTick -= GameEvents_OneSecondTick;
-            if (Game1.CurrentEvent.FestivalName == "Flower Dance")
+            if (e.IsOneSecond)
             {
-                waitingForDancePartner = true;
-                MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+                Helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked_OneSecond;
+                if (Game1.CurrentEvent.FestivalName == "Flower Dance")
+                {
+                    waitingForDancePartner = true;
+                    Helper.Events.Display.MenuChanged += OnMenuChanged_Closed;
+                }
+
+                addToFestival();
             }
-            addToFestival();
         }
 
         private bool isCustomNPC(string name)
@@ -503,13 +509,12 @@ namespace CustomNPC
             return (NPCS.Find(blueprint => blueprint.name == name) != null);
         }
 
-        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        private void OnMenuChanged_Closed(object sender, MenuChangedEventArgs e)
         {
-
-            if (e.PriorMenu is DialogueBox && Game1.player.dancePartner != null && isCustomNPC(Game1.player.dancePartner.name))
+            if (e.NewMenu == null && e.OldMenu is DialogueBox && Game1.player.dancePartner != null && isCustomNPC(Game1.player.dancePartner.name))
             {
                 waitingForDancePartner = false;
-                MenuEvents.MenuClosed -= MenuEvents_MenuClosed;
+                Helper.Events.Display.MenuChanged -= OnMenuChanged_Closed;
                 setUpFlowerDanceMainEvent();
             }
         }
@@ -672,7 +677,7 @@ namespace CustomNPC
             return String.Join(" ", positioning);
         }
 
-        private void SaveEvents_BeforeSave(object sender, EventArgs e)
+        private void OnSaving(object sender, SavingEventArgs e)
         {
             foreach (NPCBlueprint blueprint in NPCS)
             {

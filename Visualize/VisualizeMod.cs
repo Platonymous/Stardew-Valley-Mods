@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 using StardewValley;
-using System;
-using System.Linq;
 
 namespace Visualize
 {
@@ -36,26 +34,30 @@ namespace Visualize
             loadProfiles();
             setActiveProfile(new Profile());
             this.Helper.Events.Input.ButtonPressed += OnButtonPressed;
-            GameEvents.HalfSecondTick += GameEvents_HalfSecondTick;
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+            this.Helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+            this.Helper.Events.Display.MenuChanged += OnMenuChanged;
+            this.Helper.Events.GameLoop.DayStarted += OnDayStarted;
             harmonyFix();
         }
 
-        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             emptyCache();
         }
 
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
-        {            
-            setActiveProfile();
-            MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
+        {
+            if (e.NewMenu != null)
+            {
+                setActiveProfile();
+                this.Helper.Events.Display.MenuChanged -= OnMenuChanged;
+            }
         }
 
-        private void GameEvents_HalfSecondTick(object sender, EventArgs e)
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            pass = 0;
+            if (e.IsMultipleOf(30)) // half-second tick
+                pass = 0;
         }
 
         internal static bool callDrawHandlers(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)

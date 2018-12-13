@@ -17,7 +17,7 @@ namespace Arcade2048
         {
             monitor = Monitor;
             sdata = new CustomObjectData("2048", "2048/0/-300/Crafting -9/Play '2048 by Platonymous' at home!/true/true/0/2048", helper.Content.Load<Texture2D>(@"Assets/arcade.png"), Color.White, bigCraftable: true, type: typeof(Machine2048));
-            SaveEvents.AfterLoad += (o, e) => addToCatalogue();
+            helper.Events.GameLoop.SaveLoaded += (o, e) => addToCatalogue();
         }
 
         public void addToCatalogue()

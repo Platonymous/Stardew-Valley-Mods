@@ -1,18 +1,18 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using StardewModdingAPI;
 
 namespace Speedster
 {
     class SConfig
     {
-        public Keys speedKey { get; set; }
-        public Keys timeKey { get; set; }
+        public SButton speedKey { get; set; }
+        public SButton timeKey { get; set; }
         public int topSpeed { get; set; }
         public int normalSpeed { get; set; }
 
         public SConfig()
         {
-            speedKey = Keys.Space;
-            timeKey = Keys.OemComma;
+            speedKey = SButton.Space;
+            timeKey = SButton.OemComma;
             topSpeed = 24;
             normalSpeed = 6;
         }

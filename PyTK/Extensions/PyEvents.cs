@@ -180,71 +180,71 @@ namespace PyTK.Extensions
 
         /* Menu */
 
-        /// <summary>Wraps the the method so it only executes if a menu of the requested type opens and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Wraps the the method so it only executes if a menu of the requested type opens and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the wrapped method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> onActivation<T>(this IClickableMenu t, EventHandler<EventArgsClickableMenuChanged> handler) where T : IClickableMenu
+        public static EventHandler<MenuChangedEventArgs> onActivation<T>(this IClickableMenu t, EventHandler<MenuChangedEventArgs> handler) where T : IClickableMenu
         {
-            EventHandler<EventArgsClickableMenuChanged> d = delegate (object sender, EventArgsClickableMenuChanged e)
+            EventHandler<MenuChangedEventArgs> d = delegate (object sender, MenuChangedEventArgs e)
             {
                 if (e.NewMenu is T)
                     handler.Invoke(sender, e);
             };
 
-            MenuEvents.MenuChanged += d;
+            PyEvents.Events.Display.MenuChanged += d;
 
             return d;
         }
 
-        /// <summary>Wraps the the method so it only executes if a menu of the requested type opens and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Wraps the the method so it only executes if a menu of the requested type opens and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the wrapped method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> onActivation<T>(this IClickableMenu t, Action<T> action) where T : IClickableMenu
+        public static EventHandler<MenuChangedEventArgs> onActivation<T>(this IClickableMenu t, Action<T> action) where T : IClickableMenu
         {
-            EventHandler<EventArgsClickableMenuChanged> d = delegate (object sender, EventArgsClickableMenuChanged e)
+            EventHandler<MenuChangedEventArgs> d = delegate (object sender, MenuChangedEventArgs e)
             {
                 if (e.NewMenu is T)
                     action.Invoke((T) e.NewMenu);
             };
 
-            MenuEvents.MenuChanged += d;
+            PyEvents.Events.Display.MenuChanged += d;
 
             return d;
         }
 
         /// <summary>Wraps the the method so it only executes if a menu of the requested type closes and adds it to MenuEvents.MenuClosed.</summary>
         /// <returns>Returns the wrapped method.</returns>
-        public static EventHandler<EventArgsClickableMenuClosed> onClose<T>(this IClickableMenu t, EventHandler<EventArgsClickableMenuClosed> handler) where T : IClickableMenu
+        public static EventHandler<MenuChangedEventArgs> onClose<T>(this IClickableMenu t, EventHandler<MenuChangedEventArgs> handler) where T : IClickableMenu
         {
-            EventHandler<EventArgsClickableMenuClosed> d = delegate (object sender, EventArgsClickableMenuClosed e)
+            EventHandler<MenuChangedEventArgs> d = delegate (object sender, MenuChangedEventArgs e)
             {
-                if (e.PriorMenu is T)
+                if (e.OldMenu is T)
                     handler.Invoke(sender, e);
             };
 
-            MenuEvents.MenuClosed += d;
+            PyEvents.Events.Display.MenuChanged += d;
 
             return d;
         }
 
         /// <summary>Wraps the the method so it only executes if a menu of the requested type closes and adds it to MenuEvents.MenuClosed.</summary>
         /// <returns>Returns the wrapped method.</returns>
-        public static EventHandler<EventArgsClickableMenuClosed> onClose<T>(this IClickableMenu t, Action<T> action) where T : IClickableMenu
+        public static EventHandler<MenuChangedEventArgs> onClose<T>(this IClickableMenu t, Action<T> action) where T : IClickableMenu
         {
-            EventHandler<EventArgsClickableMenuClosed> d = delegate (object sender, EventArgsClickableMenuClosed e)
+            EventHandler<MenuChangedEventArgs> d = delegate (object sender, MenuChangedEventArgs e)
             {
-                if (e.PriorMenu is T)
-                    action.Invoke((T) e.PriorMenu);
+                if (e.OldMenu is T oldMenu)
+                    action.Invoke(oldMenu);
             };
 
-            MenuEvents.MenuClosed += d;
+            PyEvents.Events.Display.MenuChanged += d;
 
             return d;
         }
 
-        /// <summary>Generates a method that adds this inventory to a shop that matches the defined conditions and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to a shop that matches the defined conditions and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToShop(this List<InventoryItem> inventory, Func<ShopMenu, bool> predicate)
+        public static EventHandler<MenuChangedEventArgs> addToShop(this List<InventoryItem> inventory, Func<ShopMenu, bool> predicate)
         {
-            EventHandler<EventArgsClickableMenuChanged> d = delegate (object sender, EventArgsClickableMenuChanged e)
+            EventHandler<MenuChangedEventArgs> d = delegate (object sender, MenuChangedEventArgs e)
             {
                 ShopMenu shop = (ShopMenu)e.NewMenu;
                 List<Item> forSale = shop.getForSale();
@@ -258,40 +258,40 @@ namespace PyTK.Extensions
             return Game1.activeClickableMenu.onActivation<ShopMenu>(d);
         }
 
-        /// <summary>Generates a method that adds this inventory to a shop of an NPC adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to a shop of an NPC adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToNPCShop(this List<InventoryItem> items, string shopkeeper)
+        public static EventHandler<MenuChangedEventArgs> addToNPCShop(this List<InventoryItem> items, string shopkeeper)
         {
             return items.addToShop((shop) => shop.portraitPerson.Name == shopkeeper);
         }
 
-        /// <summary>Generates a method that adds this inventory to the furniture catalogue and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to the furniture catalogue and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToFurnitureCatalogue(this List<InventoryItem> items)
+        public static EventHandler<MenuChangedEventArgs> addToFurnitureCatalogue(this List<InventoryItem> items)
         {
             return items.addToShop(p => p.isFurnitureCataogue());
         }
 
-        /// <summary>Generates a method that adds this inventory to the wallpaper catalogue and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to the wallpaper catalogue and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToWallpaperCatalogue(this List<InventoryItem> items)
+        public static EventHandler<MenuChangedEventArgs> addToWallpaperCatalogue(this List<InventoryItem> items)
         {
             return items.addToShop(p => p.isWallpaperCatalogue());
         }
 
 
-        /// <summary>Generates a method that adds this inventory to the hat shop and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to the hat shop and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToHatShop(this List<InventoryItem> items)
+        public static EventHandler<MenuChangedEventArgs> addToHatShop(this List<InventoryItem> items)
         {
             return items.addToShop(p => p.isHatShop());
         }
 
-        /// <summary>Generates a method that adds this inventory to a shop that matches the defined conditions and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to a shop that matches the defined conditions and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToShop(this InventoryItem inventory, Func<ShopMenu, bool> predicate)
+        public static EventHandler<MenuChangedEventArgs> addToShop(this InventoryItem inventory, Func<ShopMenu, bool> predicate)
         {
-            EventHandler<EventArgsClickableMenuChanged> d = delegate (object sender, EventArgsClickableMenuChanged e)
+            EventHandler<MenuChangedEventArgs> d = delegate (object sender, MenuChangedEventArgs e)
             {
                 ShopMenu shop = (ShopMenu)e.NewMenu;
                 List<Item> forSale = shop.getForSale();
@@ -305,37 +305,37 @@ namespace PyTK.Extensions
             return Game1.activeClickableMenu.onActivation<ShopMenu>(d);
         }
 
-        /// <summary>Generates a method that adds this inventory to a shop of an NPC adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to a shop of an NPC adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToNPCShop(this InventoryItem item, string shopkeeper)
+        public static EventHandler<MenuChangedEventArgs> addToNPCShop(this InventoryItem item, string shopkeeper)
         {
             return item.addToShop((shop) => shop.portraitPerson is NPC npc && npc.Name == shopkeeper);
         }
 
-        /// <summary>Generates a method that adds this inventory to a shop of an NPC adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to a shop of an NPC adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToNPCShop(this InventoryItem item, string shopkeeper, string conditions)
+        public static EventHandler<MenuChangedEventArgs> addToNPCShop(this InventoryItem item, string shopkeeper, string conditions)
         {
             return item.addToShop((shop) => shop.portraitPerson is NPC npc && npc.Name == shopkeeper && PyUtils.CheckEventConditions(conditions));
         }
 
-        /// <summary>Generates a method that adds this inventory to the furniture catalogue and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to the furniture catalogue and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToFurnitureCatalogue(this InventoryItem item)
+        public static EventHandler<MenuChangedEventArgs> addToFurnitureCatalogue(this InventoryItem item)
         {
             return item.addToShop(p => p.isFurnitureCataogue());
         }
 
-        /// <summary>Generates a method that adds this inventory to the wallpaper catalogue and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to the wallpaper catalogue and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToWallpaperCatalogue(this InventoryItem item)
+        public static EventHandler<MenuChangedEventArgs> addToWallpaperCatalogue(this InventoryItem item)
         {
             return item.addToShop(p => p.isWallpaperCatalogue());
         }
 
-        /// <summary>Generates a method that adds this inventory to the hat shop and adds it to MenuEvents.MenuChanged.</summary>
+        /// <summary>Generates a method that adds this inventory to the hat shop and adds it to <see cref="IDisplayEvents.MenuChanged"/>.</summary>
         /// <returns>Returns the method.</returns>
-        public static EventHandler<EventArgsClickableMenuChanged> addToHatShop(this InventoryItem item)
+        public static EventHandler<MenuChangedEventArgs> addToHatShop(this InventoryItem item)
         {
             return item.addToShop(p => p.isHatShop());
         }
@@ -646,35 +646,43 @@ namespace PyTK.Extensions
 
         /* Objects */
 
-        /// <summary>Wraps the the method so it only executes if objects of the requested type are added to the players inventory and adds it to PlayerEvents.InventoryChanged.</summary>
+        /// <summary>Wraps the the method so it only executes if objects of the requested type are added to the players inventory and adds it to <see cref="IPlayerEvents.InventoryChanged"/>.</summary>
         /// <returns>Returns the wrapped method.</returns>
-        public static EventHandler<EventArgsInventoryChanged> whenAddedToInventory<T>(this ItemSelector<T> t, EventHandler<List<T>> handler) where T : Item
+        public static EventHandler<InventoryChangedEventArgs> whenAddedToInventory<TItem>(this ItemSelector<TItem> t, EventHandler<List<TItem>> handler) where TItem : Item
         {
-            EventHandler<EventArgsInventoryChanged> d = delegate (object sender, EventArgsInventoryChanged e)
+            EventHandler<InventoryChangedEventArgs> d = delegate (object sender, InventoryChangedEventArgs e)
             {
-                if (e.Added.Exists(p => p.Item is T && t.predicate((T) p.Item)))
-                    handler.Invoke(sender, e.Added.FindAll(p => p.Item is T && t.predicate((T) p.Item)).ConvertAll(p => (T) p.Item));
+                if (e.IsLocalPlayer)
+                {
+                    List<TItem> items = e.Added.OfType<TItem>().Where(p => t.predicate(p)).ToList();
+                    if (items.Any())
+                        handler.Invoke(sender, items);
+                }
             };
 
-            PlayerEvents.InventoryChanged += d;
+            PyEvents.Events.Player.InventoryChanged += d;
 
             return d;
         }
 
-        /// <summary>Wraps the the method so it only executes if objects of the requested type are added to the players inventory and adds it to PlayerEvents.InventoryChanged.</summary>
+        /// <summary>Wraps the the method so it only executes if objects of the requested type are added to the players inventory and adds it to <see cref="IPlayerEvents.InventoryChanged"/>.</summary>
         /// <returns>Returns the wrapped method.</returns>
-        public static EventHandler<EventArgsInventoryChanged> whenAddedToInventory<T>(this ItemSelector<T> t, Action<List<T>> action) where T : Item
+        public static EventHandler<InventoryChangedEventArgs> whenAddedToInventory<TItem>(this ItemSelector<TItem> t, Action<List<TItem>> action) where TItem : Item
         {
-            EventHandler<EventArgsInventoryChanged> d = delegate (object sender, EventArgsInventoryChanged e)
+            EventHandler<InventoryChangedEventArgs> d = delegate (object sender, InventoryChangedEventArgs e)
             {
-                if (e.Added.Exists(p => p.Item is T && t.predicate((T) p.Item)))
-                    action.Invoke(e.Added.FindAll(p => p.Item is T && t.predicate((T) p.Item)).ConvertAll(p => (T) p.Item));
+                if (e.IsLocalPlayer)
+                {
+                    List<TItem> items = e.Added.OfType<TItem>().Where(p => t.predicate(p)).ToList();
+                    if (items.Any())
+                        action.Invoke(items);
+                }
             };
 
-            PlayerEvents.InventoryChanged += d;
+            PyEvents.Events.Player.InventoryChanged += d;
 
             return d;
-        }    
+        }
 
         /*
         public static Dictionary<GameLocation, NotifyCollectionChangedEventHandler> whenAddedToLocation<T>(this ItemSelector<T> t, Action<GameLocation,List<Vector2>> action, GameLocation l = null) where T : SObject
@@ -764,28 +772,28 @@ namespace PyTK.Extensions
 
         /* Locations */
         
-        public static EventHandler<EventArgsPlayerWarped> onEntry(this GameLocation t, EventHandler<EventArgsPlayerWarped> handler)
+        public static EventHandler<WarpedEventArgs> onEntry(this GameLocation location, EventHandler<WarpedEventArgs> handler)
         {
-            EventHandler<EventArgsPlayerWarped> d = delegate (object sender, EventArgsPlayerWarped e)
+            EventHandler<WarpedEventArgs> d = delegate (object sender, WarpedEventArgs e)
             {
-                if (e.NewLocation == t)
+                if (e.IsLocalPlayer && e.NewLocation == location)
                     handler.Invoke(sender, e);
             };
 
-            PlayerEvents.Warped += d;
+            PyEvents.Events.Player.Warped += d;
 
             return d;
         }
 
-        public static EventHandler<EventArgsPlayerWarped> onExit(this GameLocation t, EventHandler<EventArgsPlayerWarped> handler)
+        public static EventHandler<WarpedEventArgs> onExit(this GameLocation t, EventHandler<WarpedEventArgs> handler)
         {
-            EventHandler<EventArgsPlayerWarped> d = delegate (object sender, EventArgsPlayerWarped e)
+            EventHandler<WarpedEventArgs> d = delegate (object sender, WarpedEventArgs e)
             {
-                if (e.PriorLocation == t)
+                if (e.IsLocalPlayer && e.OldLocation == t)
                     handler.Invoke(sender, e);
             };
 
-            PlayerEvents.Warped += d;
+            PyEvents.Events.Player.Warped += d;
 
             return d;
         }

@@ -1,19 +1,17 @@
-﻿
-using Microsoft.Xna.Framework.Input;
+﻿using StardewModdingAPI;
 
 namespace RingOfFire
 {
     class ROFConfig
     {
 
-        public Keys actionKey { get; set; }
+        public SButton actionKey { get; set; }
         public int price { get; set; }
 
         public ROFConfig()
         {
-            actionKey = Keys.Space;
+            actionKey = SButton.Space;
             price = 50000;
         }
-
     }
 }

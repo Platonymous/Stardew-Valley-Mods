@@ -33,7 +33,7 @@ namespace FarmHub
 
         }
 
-        public void Update(object sender = null, EventArgsIntChanged e = null)
+        public void Update(object sender = null, TimeChangedEventArgs e = null)
         {
             Multiplayer multiplayer = (Multiplayer)typeof(Game1).GetField("multiplayer", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             MaxPlayers = multiplayer.MaxPlayers;
@@ -64,18 +64,18 @@ namespace FarmHub
             Name = Game1.player.farmName.Value;
             Password = FarmHubMod.password.toMD5Hash();
             Guid = FarmHubMod.guid;
-            TimeEvents.TimeOfDayChanged += Update;
-            SaveEvents.AfterReturnToTitle += DelistServer;
+            FarmHubMod.events.GameLoop.TimeChanged += Update;
+            FarmHubMod.events.GameLoop.ReturnedToTitle += DelistServer;
             Id = "Farm_" + Name + "_" + Guid;
             RequiredMods = FarmHubMod.requiredMods;
             Update();
         }
 
-        private void DelistServer(object sender = null, EventArgs e = null)
+        private void DelistServer(object sender = null, ReturnedToTitleEventArgs e = null)
         {
             Monitor.Log("Delisting FarmHubServer");
-            TimeEvents.TimeOfDayChanged -= Update;
-            SaveEvents.AfterReturnToTitle -= DelistServer;
+            FarmHubMod.events.GameLoop.TimeChanged -= Update;
+            FarmHubMod.events.GameLoop.ReturnedToTitle -= DelistServer;
             Task.Run(() => farms.Child(Id).DeleteAsync());
             FarmHubMod.myServer = null;
         }

@@ -26,15 +26,13 @@ namespace TheJunimoExpress
 
         public override void Entry(IModHelper helper)
         {
-           
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            SaveEvents.BeforeSave += SaveEvents_BeforeSave;
-            SaveEvents.AfterSave += SaveEvents_AfterSave;
-            GameEvents.HalfSecondTick += GameEvents_HalfSecondTick; 
-            GameEvents.UpdateTick += GameEvents_UpdateTick;
-            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged;
-            TimeEvents.TimeOfDayChanged += TimeEvents_TimeOfDayChanged;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.GameLoop.Saving += OnSaving;
+            helper.Events.GameLoop.Saved += OnSaved;
+            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+            helper.Events.GameLoop.TimeChanged += OnTimeChanged;
+            helper.Events.Player.Warped += OnWarped;
 
         }
 
@@ -47,63 +45,54 @@ namespace TheJunimoExpress
             DataLoader.LoadFromString(savestring);
         }
 
-        private void SaveEvents_AfterSave(object sender, EventArgs e)
+        private void OnSaved(object sender, SavedEventArgs e)
         {
             reloadContent();
         }
 
-        private void SaveEvents_BeforeSave(object sender, EventArgs e)
+        private void OnSaving(object sender, SavingEventArgs e)
         {
             string save = DataLoader.SaveAndRemove(Game1.uniqueIDForThisGame, Game1.player.name);
             this.started = false;
         }
 
-        private void SaveEvents_AfterLoad(object sender, EventArgs e)
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             reloadContent();
         }
 
-        private void TimeEvents_TimeOfDayChanged(object sender, EventArgsIntChanged e)
+        private void OnTimeChanged(object sender, TimeChangedEventArgs e)
         {
-           
-            int time = e.PriorInt;
+           int time = e.OldTime;
 
             if (time % 100 == 0 && !Game1.isDarkOut())
             {
-
                 for (int i = 0; i < LoadData.objectlist.Count(); i++)
                 {
-                    if (LoadData.objectlist[i] is JunimoHelper)
+                    if (LoadData.objectlist[i] is JunimoHelper helper)
                     {
-                        (LoadData.objectlist[i] as JunimoHelper).helperAction();
+                        helper.helperAction();
                     }
                 }
             }
         }
 
-        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
+        private void OnWarped(object sender, WarpedEventArgs e)
         {
-
-            LoadData.previousLocation =  e.PriorLocation;
+            if (e.IsLocalPlayer)
+                LoadData.previousLocation =  e.OldLocation;
         }
-        
-        private void GameEvents_UpdateTick(object sender, EventArgs e)
+
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-           
             for (int i = 0; i < LoadData.objectlist.Count(); i++)
             {
-                if (LoadData.objectlist[i] is JunimoHelper) { 
-                (LoadData.objectlist[i] as JunimoHelper).run();
-                }
+                if (LoadData.objectlist[i] is JunimoHelper helper)
+                    helper.run();
             }
-        }
-   
-        private void GameEvents_HalfSecondTick(object sender, EventArgs e)
-        {
-            if (Game1.hasLoadedGame)
-            {
+
+            if (e.IsMultipleOf(15) && Game1.hasLoadedGame) // half-second
                 this.transform();
-            }
         }
 
 
@@ -251,31 +240,22 @@ namespace TheJunimoExpress
 
         
 
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
+            if (e.Button == SButton.I)
+            {
+
+            }
             
-
-            if (e.KeyPressed.ToString() == "I")
+            if (e.Button == SButton.O)
             {
 
             }
 
-
-            if (e.KeyPressed.ToString() == "O")
+            if (e.Button == SButton.P)
             {
 
-     
             }
-
-            
-            if (e.KeyPressed.ToString() == "P")
-            {
-                
-     
-            }
-
         }
-
-        
     }
 }

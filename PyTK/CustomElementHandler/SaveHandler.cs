@@ -130,12 +130,12 @@ namespace PyTK.CustomElementHandler
             fieldInfoChache = new Dictionary<Type, FieldInfo[]>();
             propInfoChache = new Dictionary<Type, PropertyInfo[]>();
 
-            SaveEvents.BeforeSave += (s, e) => Replace();
-            SaveEvents.AfterSave += (s, e) => Rebuild(false);
-            SaveEvents.AfterLoad += (s, e) => Rebuild(false);
+            Helper.Events.GameLoop.Saving += (s, e) => Replace();
+            Helper.Events.GameLoop.Saved += (s, e) => Rebuild(false);
+            Helper.Events.GameLoop.SaveLoaded += (s, e) => Rebuild(false);
             Events.PyTimeEvents.BeforeSleepEvents += (s, e) => { if (Game1.IsClient) { Replace(); } };
 
-            TimeEvents.AfterDayStarted += (s, e) => {
+            Helper.Events.GameLoop.DayStarted += (s, e) => {
                 Game1.objectSpriteSheet.Tag = "cod_objects";
                     Game1.bigCraftableSpriteSheet.Tag = "cod_bigobject";
             };

@@ -2,7 +2,6 @@
 using Harmony;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using PyTK;
 using PyTK.Extensions;
 using PyTK.Types;
@@ -122,16 +121,16 @@ namespace CustomShirts
             if(config.SwitchKey != SButton.Escape)
                 config.SwitchKey.onPressed(() => Game1.activeClickableMenu = new CharacterCustomization(CharacterCustomization.Source.Wizard));
 
-            GameEvents.QuarterSecondTick += (s, e) =>
+            helper.Events.GameLoop.UpdateTicked += (s, e) =>
             {
-                if (recolor)
+                if (e.IsMultipleOf(15) && recolor) // quarter second
                 {
                     OvFarmerRenderer.recolorShirt(Game1.player.UniqueMultiplayerID);
                     recolor = false;
                 }
             };
 
-            SaveEvents.AfterLoad += (s, e) =>
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
                 setShirt();
                 PyUtils.setDelayedAction(500, () =>
@@ -144,10 +143,13 @@ namespace CustomShirts
                 PyNet.sendRequestToAllFarmers<long>(ShirtReloaderName, Game1.player.UniqueMultiplayerID, null);
             };
 
-            MenuEvents.MenuClosed += (s, e) =>
+            helper.Events.Display.MenuChanged += (s, e) =>
             {
-                if (e.PriorMenu is CharacterCustomization || e.PriorMenu.GetType().Name.ToLower().Contains("character"))
-                    setShirt(true);
+                if (e.NewMenu == null)
+                {
+                    if (e.OldMenu is CharacterCustomization || e.OldMenu.GetType().Name.ToLower().Contains("character"))
+                        setShirt(true);
+                }
             };
 
             foreach (SavedShirt sj in config.SavedShirts)
@@ -202,7 +204,7 @@ namespace CustomShirts
                     }
             }
 
-            TimeEvents.AfterDayStarted += (s, e) =>
+            Helper.Events.GameLoop.DayStarted += (s, e) =>
             {
                 vanillaShirts = Helper.Content.Load<Texture2D>(@"Characters/Farmer/shirts", ContentSource.GameContent);
                 vanillaHats = Helper.Content.Load<Texture2D>(@"Characters/Farmer/hats", ContentSource.GameContent);

@@ -20,12 +20,12 @@ namespace NoSoilDecayRedux
         public override void Entry(IModHelper helper)
         {
             config = Helper.ReadConfig<Config>();
-            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            TimeEvents.AfterDayStarted += (s,e) => restoreHoeDirt();
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.GameLoop.DayStarted += (s,e) => restoreHoeDirt();
             PyTimeEvents.BeforeSleepEvents += (s, e) => saveHoeDirt();
         }
 
-        private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             if (!Game1.IsMultiplayer || Game1.IsMasterGame)
             {

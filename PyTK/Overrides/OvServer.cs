@@ -25,13 +25,13 @@ namespace PyTK.Overrides
             internal static void Postfix()
             {
                 SaveHandler.Rebuild();
-                TimeEvents.TimeOfDayChanged += DelayedRebuild;
+                PyTKMod._events.GameLoop.TimeChanged += DelayedRebuild;
             }
 
-            private static void DelayedRebuild(object sender, EventArgsIntChanged e)
+            private static void DelayedRebuild(object sender, TimeChangedEventArgs e)
             {
                 SaveHandler.Rebuild();
-                TimeEvents.TimeOfDayChanged -= DelayedRebuild;
+                PyTKMod._events.GameLoop.TimeChanged -= DelayedRebuild;
             }
         }
 

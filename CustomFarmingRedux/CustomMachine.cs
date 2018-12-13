@@ -93,7 +93,7 @@ namespace CustomFarmingRedux
 
         private void build(CustomMachineBlueprint blueprint)
         {
-            StardewModdingAPI.Events.TimeEvents.AfterDayStarted += (s,e) => checkedToday = false; 
+            CustomFarmingReduxMod._helper.Events.GameLoop.DayStarted += (s,e) => checkedToday = false; 
 
             if (syncObject == null)
             {

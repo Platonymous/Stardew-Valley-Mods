@@ -16,7 +16,6 @@ using Microsoft.Xna.Framework;
 using System;
 using StardewValley.Tools;
 using PyTK.Lua;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace CustomFarmingRedux
 {
@@ -57,8 +56,8 @@ namespace CustomFarmingRedux
             }
 
             loadPacks();
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            SaveEvents.AfterLoad += (s, e) =>
+            helper.Events.Display.MenuChanged += OnMenuChanged;
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
                 foreach (var c in craftingrecipes)
                     if (Game1.player.craftingRecipes.ContainsKey(c.Key))
@@ -235,14 +234,15 @@ namespace CustomFarmingRedux
             typeof(SObjectBAI).PatchType(typeof(ColoredObject), Helper);
         }
 
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
-            if (Game1.activeClickableMenu is GameMenu activeMenu && Helper.Reflection.GetField<List<IClickableMenu>>(activeMenu, "pages").GetValue().Find(p => p is CraftingPage) is CraftingPage craftingPage)
+            if (e.NewMenu is GameMenu activeMenu && Helper.Reflection.GetField<List<IClickableMenu>>(activeMenu, "pages").GetValue().Find(p => p is CraftingPage) is CraftingPage craftingPage)
             {
                 foreach (CustomMachineBlueprint blueprint in machines.Where(m => m.crafting != null))
-                    for (int i = 0; i < craftingPage.pagesOfCraftingRecipes.Count; i++)
+                {
+                    foreach (var page in craftingPage.pagesOfCraftingRecipes)
                     {
-                        if (craftingPage.pagesOfCraftingRecipes[i].Find(k => k.Value.name == blueprint.fullid) is KeyValuePair<ClickableTextureComponent, CraftingRecipe> kv && kv.Value != null && kv.Key != null)
+                        if (page.Find(k => k.Value.name == blueprint.fullid) is KeyValuePair<ClickableTextureComponent, CraftingRecipe> kv && kv.Value != null && kv.Key != null)
                         {
                             kv.Key.texture = blueprint.getTexture();
                             kv.Key.sourceRect = Game1.getSourceRectForStandardTileSheet(kv.Key.texture, blueprint.tileindex, blueprint.tilewidth, blueprint.tileheight);
@@ -250,6 +250,7 @@ namespace CustomFarmingRedux
                             Helper.Reflection.GetField<string>(kv.Value, "description").SetValue(blueprint.description);
                         }
                     }
+                }
             }
         }
 

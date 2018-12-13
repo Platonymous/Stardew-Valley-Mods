@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using System.Collections.Generic;
 using PyTK.CustomElementHandler;
-using StardewModdingAPI.Events;
 using PyTK.Types;
 
 namespace SDVGameBoy
@@ -30,7 +29,7 @@ namespace SDVGameBoy
             gbData = new CustomObjectData("GameBoy", "GameBoy/0/-300/Crafting -9/A classic GameBoy,but it looks damaged./GameBoy", helper.Content.Load<Texture2D>(@"Assets/gameboy.png"), Color.White, type: typeof(GameBoy));
             loadRoms();
 
-            SaveEvents.AfterLoad += (s, e) =>
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
                 cData.ForEach(c => new InventoryItem(c.getObject(), 500, 1).addToNPCShop("Gus"));
                 new InventoryItem(gbData.getObject(), 2000, 1).addToNPCShop("Gus");

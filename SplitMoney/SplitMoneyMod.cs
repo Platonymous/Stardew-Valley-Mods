@@ -49,8 +49,8 @@ namespace SplitMoney
 
             SaveHandler.promiseType(typeof(GoldItem));
 
-            SaveEvents.AfterReturnToTitle += (s, e) => { myMoney = -1; lockMoney = true; };
-            SaveEvents.BeforeSave += (s, e) =>
+            helper.Events.GameLoop.ReturnedToTitle += (s, e) => { myMoney = -1; lockMoney = true; };
+            helper.Events.GameLoop.Saving += (s, e) =>
             {
                 if (Game1.IsMasterGame)
                 {
@@ -77,7 +77,7 @@ namespace SplitMoney
                 }
             };
 
-            SaveEvents.AfterLoad += (s, e) =>
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
                 moneyPool = new Dictionary<string, int>();
                 lockMoney = false;

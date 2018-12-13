@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
-
-namespace ATM
+﻿namespace ATM
 {
     class Config
     {

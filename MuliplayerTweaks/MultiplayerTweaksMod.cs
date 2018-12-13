@@ -7,7 +7,6 @@ using System.Reflection;
 using StardewValley.Network;
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Input;
 using PyTK.Extensions;
 
 namespace MuliplayerTweaks
