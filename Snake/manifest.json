@@ -5,7 +5,7 @@
   "Description": "Play Snake.",
   "UniqueID": "Platonymous.Snake",
   "EntryDll": "Snake.dll",
-  "MinimumApiVersion": "2.8",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:2056" ],
   "Dependencies": [
     {

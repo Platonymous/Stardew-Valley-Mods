@@ -5,6 +5,6 @@
   "Description": "Helps you add new NPCs to the Game",
   "UniqueID": "Platonymous.CustomNPC",
   "EntryDll": "CustomNPC.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:1607" ]
 }

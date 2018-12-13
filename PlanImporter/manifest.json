@@ -5,6 +5,6 @@
   "Description": "Import plans from stardew.info.",
   "UniqueID": "Platonymous.PlanImporter",
   "EntryDll": "PlanImporter.dll",
-  "MinimumApiVersion": "2.8",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:2071" ]
 }

@@ -5,7 +5,7 @@
   "Description": "Stops soil from decaying",
   "UniqueID": "Platonymous.NoSoilDecayRedux",
   "EntryDll": "NoSoilDecayRedux.dll",
-  "MinimumApiVersion": "2.8-beta",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:1084" ],
   "Dependencies": [
     {

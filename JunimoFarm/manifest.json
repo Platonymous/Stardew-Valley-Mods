@@ -5,6 +5,6 @@
   "Description": "Let Junimos help you on the farm.",
   "UniqueID": "Platonymous.JunimoFarm",
   "EntryDll": "JunimoFarm.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:984" ]
 }

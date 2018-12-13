@@ -5,7 +5,7 @@
   "Description": "Allows adding higher resolution textures via ContentPatcher",
   "UniqueID": "Platonymous.ScaleUp",
   "EntryDll": "ScaleUp.dll",
-  "MinimumApiVersion": "2.8",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:3130" ],
   "Dependencies": [
     {

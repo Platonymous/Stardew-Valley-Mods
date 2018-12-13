@@ -5,7 +5,7 @@
   "Description": "Takes Cat's Pong and puts it where it belongs.",
   "UniqueID": "Platonymous.ArcadePong",
   "EntryDll": "ArcadePong.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:2044" ],
   "Dependencies": [
     {
