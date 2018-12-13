@@ -179,9 +179,10 @@ namespace Visualize
         {
             string[] files = parseDir(Path.Combine(Helper.DirectoryPath, "Profiles"), "*.json");
 
-            foreach (string file in files)
+            foreach (string fullPath in files)
             {
-                Profile profile = Helper.ReadJsonFile<Profile>(file);
+                string filename = Path.GetFileName(fullPath);
+                Profile profile = Helper.Data.ReadJsonFile<Profile>(Path.Combine("Profiles", filename));
 
                 if (profile.id == "auto")
                     profile.id = profile.author + "." + profile.name;

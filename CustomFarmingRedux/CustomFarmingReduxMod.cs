@@ -279,7 +279,10 @@ namespace CustomFarmingRedux
                 if (filename == "manifest.json")
                     continue;
 
-                CustomFarmingPack pack = Helper.ReadJsonFile<CustomFarmingPack>(file);
+                CustomFarmingPack pack = this.Helper
+                    .CreateTemporaryContentPack(directoryInfo.FullName, Guid.NewGuid().ToString("N"), "temp pack", null, null, new SemanticVersion(1, 0, 0))
+                    .ReadJsonFile<CustomFarmingPack>(filename);
+
                 pack.fileName = filename;
                 pack.folderName = directoryInfo.Name;
                 pack.author = contentPack.Manifest.Author;
