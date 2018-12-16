@@ -35,8 +35,8 @@ namespace CustomFurniture
                 Monitor.Log("Harmony Error: Custom deco won't work on tables." + e.StackTrace, LogLevel.Error);
             }
             loadPacks();
-            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
             helper.ConsoleCommands.Add("replace_custom_furniture", "Triggers Custom Furniture Replacement", replaceCustomFurniture);
         }
 
@@ -105,14 +105,14 @@ namespace CustomFurniture
             instance.Monitor.Log(text);
         }
 
-        private void SaveEvents_AfterReturnToTitle(object sender, System.EventArgs e)
+        private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
         {
-            MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
+            Helper.Events.Display.MenuChanged -= OnMenuChanged;
         }
 
-        private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
-        {  
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        {
+            Helper.Events.Display.MenuChanged += OnMenuChanged;
         }
 
         private void loadPacks()
@@ -120,7 +120,7 @@ namespace CustomFurniture
             int countPacks = 0;
             int countObjects = 0;
 
-            var contentPacks = Helper.GetContentPacks();
+            var contentPacks = Helper.ContentPacks.GetOwned();
             var usedids = new List<string>();
 
             foreach (IContentPack cpack in contentPacks)
@@ -208,7 +208,7 @@ namespace CustomFurniture
             return (Helper.Reflection.GetMethod(Game1.currentLocation, "checkEventPrecondition").Invoke<int>("9999984/" + conditions) != -1);
         }
 
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
             if (Game1.activeClickableMenu is ShopMenu)
             {

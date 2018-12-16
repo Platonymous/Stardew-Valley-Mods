@@ -17,8 +17,8 @@ namespace HarpOfYobaRedux
         {
             config = Helper.ReadConfig<Config>();
             new ConsoleCommand("hoy_cheat", "Get all sheets without doing anything.", (c, p) => cheat(p)).register();
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            SaveEvents.BeforeSave += SaveEvents_BeforeSave;
+            helper.Events.Display.MenuChanged += OnMenuChanged;
+            helper.Events.GameLoop.Saving += OnSaving;
             DataLoader.load(Helper, Helper.ModRegistry.IsLoaded("Platonymous.CustomMusic"));
         }
 
@@ -48,12 +48,12 @@ namespace HarpOfYobaRedux
                 Game1.activeClickableMenu = new ItemGrabMenu(items);
         }
 
-        private void SaveEvents_BeforeSave(object sender, EventArgs e)
+        private void OnSaving(object sender, SavingEventArgs e)
         {
             Delivery.checkMail();
         }
 
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
             if (e.NewMenu is LetterViewerMenu lvm)
             {

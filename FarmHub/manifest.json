@@ -5,7 +5,7 @@
   "Description": "Active Server List for SDV",
   "UniqueID": "Platonymous.FarmHub",
   "EntryDll": "FarmHub.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:2309" ],
   "Dependencies": [
     {

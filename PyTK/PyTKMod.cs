@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
@@ -63,7 +62,7 @@ namespace PyTK
             PyLua.init();
             SaveHandler.setUpEventHandlers();
             ContentSync.ContentSyncHandler.initialize();
-            PlayerEvents.Warped += (s, e) => e.NewLocation?.Map.enableMoreMapLayers();
+            this.Helper.Events.Player.Warped += (s, e) => e.NewLocation?.Map.enableMoreMapLayers();
         }
 
         private void harmonyFix()
@@ -247,7 +246,7 @@ namespace PyTK
         private void messageTest()
         {
             PyNet.sendMessage("Platonymous.PyTK.Test", "TestMessage");
-            TimeEvents.TimeOfDayChanged += (s, e) => 
+            Helper.Events.GameLoop.TimeChanged += (s, e) => 
             {
                 foreach(MPMessage msg in PyNet.getNewMessages("Platonymous.PyTK.Test"))
                 {
@@ -287,7 +286,7 @@ namespace PyTK
                 "Town".toLocation().Map.addAction(new Vector2(18, 60), new TileAction("testaction", tileActionTest).register(),"Smells interesting");
             };
 
-            SaveEvents.AfterLoad += (s, e) => mapMergeTest();
+            Helper.Events.GameLoop.SaveLoaded += (s, e) => mapMergeTest();
         }
     }
 }

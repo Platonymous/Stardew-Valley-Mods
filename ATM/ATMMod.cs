@@ -23,9 +23,9 @@ namespace ATM
         {
             config = helper.ReadConfig<Config>();
 
-            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            SaveEvents.BeforeSave += SaveEvents_BeforeSave;
-            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+            helper.Events.GameLoop.Saving += OnSaving;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.GameLoop.DayStarted += OnDayStarted;
 
             responses = new List<Response>();
             responses.Add(new Response("ATM_Deposit", i18n.Get("ATM_Deposit")));
@@ -86,7 +86,7 @@ namespace ATM
             Game1.activeClickableMenu = null;
         }
 
-        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             if (Game1.IsMasterGame)
             {
@@ -109,13 +109,13 @@ namespace ATM
             }
         }
 
-        private void SaveEvents_BeforeSave(object sender, System.EventArgs e)
+        private void OnSaving(object sender, SavingEventArgs e)
         {
             if (Game1.IsMasterGame)
                 Helper.Data.WriteSaveData("Platonymous.ATM.BankAccount", bankAccount);
         }
 
-        private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             if (!Game1.IsMasterGame)
                 return;

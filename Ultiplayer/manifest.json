@@ -5,6 +5,6 @@
   "Description": "Allows for as many Farmhands as you like.",
   "UniqueID": "Platonymous.Ultiplayer",
   "EntryDll": "Ultiplayer.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:2134" ]
 }

@@ -29,13 +29,15 @@ namespace FarmHub
         internal static FHConfig config;
         internal static string open;
         internal static List<FarmHubServer> temp;
+        internal static IModEvents events;
 
         public override void Entry(IModHelper helper)
         {
+            events = helper.Events;
             open = "open".toMD5Hash();
             Guid.NewGuid();
             config = Helper.ReadConfig<FHConfig>();
-            TimeEvents.AfterDayStarted += StartFarmHubServer;
+            helper.Events.GameLoop.DayStarted += StartFarmHubServer;
 
            // new ConsoleCommand("menu", "Lists the available servers", (s, p) => Game1.activeClickableMenu = new FarmHubMenu(Game1.game1,Helper)).register();
 
@@ -179,7 +181,7 @@ namespace FarmHub
            
         }
 
-        private void StartFarmHubServer(object sender, EventArgs e)
+        private void StartFarmHubServer(object sender, DayStartedEventArgs e)
         {
             if(Game1.IsServer)
             {

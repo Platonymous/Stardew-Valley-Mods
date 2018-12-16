@@ -4,13 +4,12 @@ using PyTK.Types;
 using PyTK.Extensions;
 using StardewModdingAPI;
 using System.IO;
-using xTile.Tiles;
 using StardewValley;
-using xTile;
 using Harmony;
 using StardewValley.Locations;
 using StardewValley.Objects;
 using System.Linq;
+using StardewModdingAPI.Events;
 
 namespace CustomWallsAndFloors
 {
@@ -30,16 +29,16 @@ namespace CustomWallsAndFloors
             harmony.Patch(PyUtils.getTypeSDV("Objects.Wallpaper").GetMethod("placementAction"), new HarmonyMethod(typeof(CustomWallsAndFloorsMod), "Prefix_placement"),null);
             harmony.Patch(PyUtils.getTypeSDV("GameLocation").GetMethod("setMapTileIndex"), new HarmonyMethod(typeof(CustomWallsAndFloorsMod), "Prefix_setMapTile"), null);
 
-            StardewModdingAPI.Events.SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            StardewModdingAPI.Events.SaveEvents.BeforeSave += SaveEvents_BeforeSave;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.GameLoop.Saving += OnSaving;
         }
 
-        private void SaveEvents_BeforeSave(object sender, System.EventArgs e)
+        private void OnSaving(object sender, SavingEventArgs e)
         {
             saveRoomData();
         }
 
-        private void SaveEvents_AfterLoad(object sender, System.EventArgs e)
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             CustomWallpaper.savFile = helper.Data.ReadSaveData<SaveFile>("Platonymous.CustomWallsAndFloors.Data");
 
@@ -127,7 +126,7 @@ namespace CustomWallsAndFloors
 
         private void loadContentPacks()
         {
-            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
+            foreach (StardewModdingAPI.IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 Animations animations = null;
 

@@ -1,7 +1,6 @@
 ﻿using Harmony;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using Microsoft.Xna.Framework.Input;
 using PyTK.Extensions;
 using StardewValley;
 using Microsoft.Xna.Framework;
@@ -26,8 +25,8 @@ namespace ArcadePong
         {
             monitor = Monitor;
             HarmonyInstance.Create("Platonymous.ArcadePong").PatchAll(Assembly.GetExecutingAssembly());
-            SaveEvents.AfterLoad += (o, e) => setup();
-            SaveEvents.AfterReturnToTitle += (s, o) =>
+            helper.Events.GameLoop.SaveLoaded += (o, e) => setup();
+            helper.Events.GameLoop.ReturnedToTitle += (s, o) =>
             {
                 foreach (EventHandler<ButtonPressedEventArgs> a in keyEvents)
                     helper.Events.Input.ButtonPressed -= a;

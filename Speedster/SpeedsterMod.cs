@@ -8,7 +8,6 @@ using StardewValley;
 using StardewValley.Objects;
 
 using StardewValley.Menus;
-using Microsoft.Xna.Framework.Input;
 
 namespace Speedster
 {
@@ -25,22 +24,21 @@ namespace Speedster
         public override void Entry(IModHelper helper)
         {
             ModHelper = Helper;
-            config = Helper.ReadConfig<SConfig>();
-            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+            config = helper.ReadConfig<SConfig>();
 
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+            helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
         }
 
-        private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
+        private void OnReturnedToTitle(object sender, EventArgs e)
         {
- 
-            ControlEvents.KeyPressed -= ControlEvents_KeyPressed;
-            GameEvents.FourthUpdateTick -= GameEvents_FourthUpdateTick;
-            MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
-            SaveEvents.BeforeSave -= SaveEvents_BeforeSave;
+            Helper.Events.Input.ButtonPressed -= OnButtonPressed;
+            Helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
+            Helper.Events.Display.MenuChanged -= OnMenuChanged;
+            Helper.Events.GameLoop.Saving -= OnSaving;
         }
 
-        private void SaveEvents_AfterLoad(object sender, EventArgs e)
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             start();
         }
@@ -49,22 +47,21 @@ namespace Speedster
         {
             gamePtr = Program.gamePtr;
 
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-            GameEvents.FourthUpdateTick += GameEvents_FourthUpdateTick;
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            SaveEvents.BeforeSave += SaveEvents_BeforeSave;
+            Helper.Events.Input.ButtonPressed += OnButtonPressed;
+            Helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+            Helper.Events.Display.MenuChanged += OnMenuChanged;
+            Helper.Events.GameLoop.Saving += OnSaving;
 
           isSpeeding = false;
         }
 
-        private void SaveEvents_BeforeSave(object sender, EventArgs e)
+        private void OnSaving(object sender, SavingEventArgs e)
         {
             SpeedsterMask.takeOffCostume();
         }
 
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
-
             if (Game1.player.hat is SpeedsterMask && SpeedsterMask.hyperdrive)
             {
                 int index = (Game1.player.hat as SpeedsterMask).index;
@@ -73,7 +70,7 @@ namespace Speedster
                 SpeedsterMask.putOnCostume(index);
             }
 
-            if(Game1.activeClickableMenu is ShopMenu)
+            if(e.NewMenu is ShopMenu)
             {
                 ShopMenu shop = (ShopMenu)Game1.activeClickableMenu;
                 Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
@@ -98,15 +95,18 @@ namespace Speedster
 
         
 
-        private void GameEvents_FourthUpdateTick(object sender, EventArgs e)
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (Game1.player.hat != null && Game1.player.hat is SpeedsterMask)
-            {            
-                SpeedsterMask.putOnCostume((Game1.player.hat as SpeedsterMask).index);
-            }
-            else
-            {    
-                SpeedsterMask.takeOffCostume(); 
+            if (e.IsMultipleOf(4))
+            {
+                if (Game1.player.hat != null && Game1.player.hat is SpeedsterMask)
+                {
+                    SpeedsterMask.putOnCostume((Game1.player.hat as SpeedsterMask).index);
+                }
+                else
+                {
+                    SpeedsterMask.takeOffCostume();
+                }
             }
         }
 
@@ -153,10 +153,10 @@ namespace Speedster
             }
         }
 
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
 
-            if (e.KeyPressed == config.timeKey && Game1.player.hat is SpeedsterMask)
+            if (e.Button == config.timeKey && Game1.player.hat is SpeedsterMask)
             {
                 if (isSpeeding)
                 {
@@ -164,21 +164,17 @@ namespace Speedster
                 }
 
                 speedUp();
-
             }
 
-            if (e.KeyPressed == config.timeKey && (SpeedsterMask.hyperdrive || isSpeeding) && Game1.player.hat is SpeedsterMask)
+            if (e.Button == config.timeKey && (SpeedsterMask.hyperdrive || isSpeeding) && Game1.player.hat is SpeedsterMask)
             {
-
                 if (SpeedsterMask.hyperdrive)
                 {
                     speedUp();
                 }
 
                 timeSpeed();
-
             }
-
         }
 
         private void speedUpTime()

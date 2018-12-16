@@ -135,17 +135,20 @@ namespace PyTK
 
         public static List<TModel> loadContentPacks<TModel>(string folder, SearchOption option = SearchOption.AllDirectories, IMonitor monitor = null, string filesearch = "*.json") where TModel : class
         {
-            List<TModel>  packs = new List<TModel>();
+            List<TModel> packs = new List<TModel>();
             string[] files = Directory.GetFiles(folder, filesearch, option);
-            foreach (string file in files)
+            foreach (string fullPath in files)
             {
-                TModel pack = Helper.ReadJsonFile<TModel>(file);
+                FileInfo file = new FileInfo(fullPath);
+
+                TModel pack = PyTKMod._helper.ContentPacks.CreateFake(file.Directory.FullName).ReadJsonFile<TModel>(file.Name);
+
                 packs.Add(pack);
 
                 if (pack is Types.IContentPack p)
                 {
-                    p.fileName = new FileInfo(file).Name;
-                    p.folderName = new FileInfo(file).Directory.Name;
+                    p.fileName = file.Name;
+                    p.folderName = file.Directory.Name;
 
                     if (monitor != null)
                     {

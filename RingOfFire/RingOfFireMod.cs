@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 
@@ -32,16 +31,16 @@ namespace RingOfFire
             RingOfFire.flameTextures = flameTextures;
             RingOfFire.ringTexture = Helper.Content.Load<Texture2D>("assets/ring.png");
 
-            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-            ControlEvents.KeyReleased += ControlEvents_KeyReleased;
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            GameEvents.UpdateTick += GameEvents_UpdateTick;
-            GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
+            helper.Events.Display.MenuChanged += OnMenuChanged;
+            helper.Events.Display.Rendered += OnRendered;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
+            helper.Events.Input.ButtonReleased += OnButtonReleased;
+            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
         }
 
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
-            if (Game1.activeClickableMenu is ShopMenu)
+            if (e.NewMenu is ShopMenu)
             {
                 ShopMenu shop = (ShopMenu)Game1.activeClickableMenu;
                 Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
@@ -59,39 +58,34 @@ namespace RingOfFire
                         selling.Add(item);
                     }
                 }
-
             }
         }
 
-        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
 
-            if (e.KeyPressed == config.actionKey && (Game1.player.leftRing is RingOfFire || Game1.player.rightRing is RingOfFire))
+            if (e.Button == config.actionKey && (Game1.player.leftRing is RingOfFire || Game1.player.rightRing is RingOfFire))
             {
                 RingOfFire.active = true;
             }
 
-            if(e.KeyPressed == Keys.N)
+            if(e.Button == SButton.N)
             {
                 Game1.player.addItemByMenuIfNecessary(new RingOfFire());
             }
-
         }
-        
 
-        private void ControlEvents_KeyReleased(object sender, EventArgsKeyPressed e)
+        private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
         {
-
-            if (e.KeyPressed == config.actionKey)
+            if (e.Button == config.actionKey)
             {
                 RingOfFire.active = false;
                 StardewValley.Farmer f = Game1.player;
                 f.stopJittering();
             }
-            
         }
 
-        private void GraphicsEvents_OnPostRenderEvent(object sender, System.EventArgs e)
+        private void OnRendered(object sender, RenderedEventArgs e)
         {
 
             RingOfFire ring = null;
@@ -115,7 +109,7 @@ namespace RingOfFire
 
         
 
-        private void GameEvents_UpdateTick(object sender, System.EventArgs e)
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
             RingOfFire ring = null;
 

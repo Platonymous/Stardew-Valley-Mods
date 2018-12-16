@@ -1,4 +1,5 @@
-﻿using StardewModdingAPI;
+﻿using System;
+using StardewModdingAPI;
 using PyTK.Extensions;
 using System.IO;
 
@@ -17,17 +18,17 @@ namespace ScaleUp
             var directory = new DirectoryInfo(Helper.DirectoryPath).Parent;
             string[] files = Directory.GetFiles(directory.FullName, "manifest.json", SearchOption.AllDirectories);
 
-            foreach(string file in files)
+            foreach(string fullPath in files)
             {
-                var manifestFile = Helper.ReadJsonFile<Manifest>(file);
+                FileInfo manifestFile = new FileInfo(fullPath);
+                IContentPack contentPack = this.Helper.ContentPacks.CreateFake(manifestFile.Directory.FullName);
+                Manifest manifest = contentPack.ReadJsonFile<Manifest>(manifestFile.Name);
 
-                if(manifestFile is Manifest manifest && manifest.ContentPackFor is ManifestContentPackFor m && m.UniqueID == "Pathoschild.ContentPatcher")
+                if (manifest != null && manifest.ContentPackFor is ManifestContentPackFor m && m.UniqueID == "Pathoschild.ContentPatcher")
                 {
-                    string contentFile = Path.Combine(Path.GetDirectoryName(file), "content.json");
-                    if (!File.Exists(contentFile))
+                    Content content = contentPack.ReadJsonFile<Content>("content.json");
+                    if (content == null)
                         continue;
-
-                    var content = Helper.ReadJsonFile<Content>(contentFile);
 
                     foreach(Changes change in content.Changes)
                     {

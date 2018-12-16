@@ -14,7 +14,6 @@ using StardewModdingAPI.Events;
 using StardewValley.Menus;
 using StardewValley.Locations;
 using StardewValley.Buildings;
-using PyTK;
 using PyTK.Extensions;
 
 namespace Ultiplayer
@@ -48,16 +47,16 @@ namespace Ultiplayer
             #endregion
 
             #region events
-            TimeEvents.AfterDayStarted += (s, e) => SaveFarmhand();
-            SaveEvents.AfterLoad += (s, e) => LoadFarmhands();
+            helper.Events.GameLoop.DayStarted += (s, e) => SaveFarmhand();
+            helper.Events.GameLoop.SaveLoaded += (s, e) => LoadFarmhands();
             helper.Events.Input.ButtonPressed += (s, e) => OnButtonPressed(e.Button);
-            GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
+            helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
             #endregion
         }
 
         #region ui
 
-        private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
+        private void OnRenderedActiveMenu(object sender, RenderedActiveMenuEventArgs e)
         {
             string message = ultiplayer ? "Ultiplayer activated" : "Ultiplayer deactivated";
 

@@ -5,6 +5,6 @@
   "Description": "Swim almost anywhere",
   "UniqueID": "Platonymous.SwimSuit",
   "EntryDll": "SwimSuit.dll",
-  "MinimumApiVersion": "2.6-beta",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:1215" ]
 }

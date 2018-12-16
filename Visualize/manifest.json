@@ -5,6 +5,6 @@
   "Description": "Mod for Visual Effects",
   "UniqueID": "Platonymous.Visualize",
   "EntryDll": "Visualize.dll",
-  "MinimumApiVersion": "2.8",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:1704" ]
 }

@@ -44,7 +44,7 @@ namespace JoJaBan
             boxTexture = townInterior.getArea(new Rectangle(304, 1024, 16, 32));
             boxData = new CustomObjectData("JoJa Box", "JoJa Box/0/-300/Crafting -9/JoJa Box/true/true/0/JoJa Box", boxTexture, Color.White, bigCraftable: true, type:typeof(JoJaBox));
             helper.Events.Input.ButtonPressed += OnButtonPressed;
-            SaveEvents.AfterLoad += (o, e) => addToCatalogue();
+            helper.Events.GameLoop.SaveLoaded += (o, e) => addToCatalogue();
         }
 
         public static void addToCatalogue()
@@ -58,7 +58,7 @@ namespace JoJaBan
             lastPosition = Game1.player.getTileLocation();
 
             currentLevel = number;
-            GameEvents.UpdateTick += startNextLevel;
+            SHelper.Events.GameLoop.UpdateTicked += startNextLevel;
         }
 
         private static bool exitGame(string s, GameLocation gl, Vector2 vec, string st)
@@ -75,7 +75,7 @@ namespace JoJaBan
                 lastLocation = Game1.currentLocation;
                 lastPosition = Game1.player.getTileLocation();
                 currentLevel = highestLevel;
-                GameEvents.UpdateTick += startNextLevel;
+                SHelper.Events.GameLoop.UpdateTicked += startNextLevel;
             }
             else
                 Game1.activeClickableMenu = new NumberSelectionMenu("JoJaBan : Select Level", selectLevel, -1, 1, highestLevel, highestLevel);
@@ -130,15 +130,15 @@ namespace JoJaBan
         internal static bool nextLevel(GameLocation level)
         {
             currentLevel++;
-            GameEvents.UpdateTick += startNextLevel;
+            SHelper.Events.GameLoop.UpdateTicked += startNextLevel;
             return true;
         }
 
-        private static void startNextLevel(object sender, EventArgs e)
+        private static void startNextLevel(object sender, UpdateTickedEventArgs e)
         {
             Game1.displayHUD = false;
             loadLevel(currentLevel);
-            GameEvents.UpdateTick -= startNextLevel;
+            SHelper.Events.GameLoop.UpdateTicked -= startNextLevel;
         }
 
         private static bool resetLevel(GameLocation level)

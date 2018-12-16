@@ -20,7 +20,7 @@ namespace PyTK.CustomElementHandler
         internal static int minIndex = 1000;
 
         public static Dictionary<string,CustomObjectData> collection = new Dictionary<string, CustomObjectData>();
-        internal static EventHandler<EventArgsInventoryChanged> inventoryCheck;
+        internal static EventHandler<InventoryChangedEventArgs> inventoryCheck;
 
         public string id;
         public string data;

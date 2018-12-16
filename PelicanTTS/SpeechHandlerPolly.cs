@@ -74,9 +74,8 @@ namespace PelicanTTS
 
             speechThread = new Thread(t2sOut);
             speechThread.Start();
-            GameEvents.QuarterSecondTick += GameEvents_QuarterSecondTick;
-
-            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+            h.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+            h.Events.Display.MenuChanged += OnMenuChanged;
 
             //h.Events.Input.ButtonPressed += OnButtonPressed;
         }
@@ -92,19 +91,22 @@ namespace PelicanTTS
 
         }
 
-        private static void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        private static void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
-            lastText = "";
-            lastDialog = "";
-            currentText = "";
-            MediaPlayer.Stop();
-            setVoice("default");
+            if (e.NewMenu == null)
+            {
+                lastText = "";
+                lastDialog = "";
+                currentText = "";
+                MediaPlayer.Stop();
+                setVoice("default");
+            }
         }
 
         public static void stop()
         {
-            GameEvents.QuarterSecondTick -= GameEvents_QuarterSecondTick;
-            MenuEvents.MenuClosed -= MenuEvents_MenuClosed;
+            Helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
+            Helper.Events.Display.MenuChanged -= OnMenuChanged;
             runSpeech = false;
         }
 
@@ -201,41 +203,42 @@ namespace PelicanTTS
         }
 
 
-        private static void GameEvents_QuarterSecondTick(object sender, System.EventArgs e)
+        private static void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-
-            if (Game1.activeClickableMenu is DialogueBox)
+            if (e.IsMultipleOf(15)) // quarter second
             {
-
-                DialogueBox dialogueBox = (DialogueBox)Game1.activeClickableMenu;
-
-                if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
+                if (Game1.activeClickableMenu is DialogueBox)
                 {
-                    setVoice(Game1.currentSpeaker.Name);
+
+                    DialogueBox dialogueBox = (DialogueBox)Game1.activeClickableMenu;
+
+                    if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
+                    {
+                        setVoice(Game1.currentSpeaker.Name);
+                    }
+                    else
+                    {
+                        setVoice("default");
+                    }
+
+                    if (dialogueBox.getCurrentString() != lastDialog)
+                    {
+                        currentText = dialogueBox.getCurrentString();
+                        lastDialog = dialogueBox.getCurrentString();
+
+                    }
+
                 }
-                else
+                else if (Game1.hudMessages.Count > 0)
                 {
-                    setVoice("default");
+                    if (Game1.hudMessages[Game1.hudMessages.Count - 1].Message != lastHud)
+                    {
+                        setVoice("default");
+                        currentText = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
+                        lastHud = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
+                    }
                 }
-
-                if (dialogueBox.getCurrentString() != lastDialog)
-                {
-                    currentText = dialogueBox.getCurrentString();
-                    lastDialog = dialogueBox.getCurrentString();
-
-                }
-
             }
-            else if (Game1.hudMessages.Count > 0)
-            {
-                if (Game1.hudMessages[Game1.hudMessages.Count - 1].Message != lastHud)
-                {
-                    setVoice("default");
-                    currentText = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
-                    lastHud = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
-                }
-            }
-
         }
 
 

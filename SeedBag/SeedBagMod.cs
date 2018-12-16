@@ -11,7 +11,7 @@ namespace SeedBag
     {
         internal static IModHelper _helper;
         internal static IMonitor _monitor;
-        internal static EventHandler<EventArgsClickableMenuChanged> addtoshop;
+        internal static EventHandler<MenuChangedEventArgs> addtoshop;
 
         public override void Entry(IModHelper helper)
         {

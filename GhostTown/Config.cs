@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
-
-namespace GhostTown
+﻿namespace GhostTown
 {
     class Config
     {

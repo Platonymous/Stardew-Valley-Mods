@@ -128,8 +128,7 @@ namespace CustomFarmingRedux
             if (options != null && options.ContainsKey("baseFolder"))
                 baseFolder = options["baseFolder"];
 
-            string path = Path.Combine(baseFolder, folderName, fileName);
-            CustomFarmingPack pack = helper.ReadJsonFile<CustomFarmingPack>(path);
+            CustomFarmingPack pack = this.Helper.ContentPacks.CreateFake(Path.Combine(baseFolder, folderName)).ReadJsonFile<CustomFarmingPack>(fileName);
 
             pack.baseFolder = baseFolder;
 

@@ -25,10 +25,10 @@ namespace Notes
             initNotes();
 
             helper.Events.Input.CursorMoved += (s,e) => checkForSigns(e.NewPosition);
-            GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
+            helper.Events.Display.Rendered += OnRendered;
         }
 
-        private void GraphicsEvents_OnPostRenderEvent(object sender, System.EventArgs e)
+        private void OnRendered(object sender, RenderedEventArgs e)
         {
             if (displayNote == "")
                 return;

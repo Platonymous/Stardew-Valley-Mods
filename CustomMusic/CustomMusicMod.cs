@@ -9,9 +9,8 @@ using System.Linq;
 using StardewValley;
 using System;
 using System.Reflection;
-using StardewValley.Locations;
-using StardewValley.Menus;
 using OggSharp;
+using StardewModdingAPI.Events;
 
 namespace CustomMusic
 {
@@ -42,11 +41,11 @@ namespace CustomMusic
             if (PyUtils != null)
                 checkEventConditions = PyUtils.GetMethod("checkEventConditions");
 
-            StardewModdingAPI.Events.PlayerEvents.Warped += PlayerEvents_Warped;
-            StardewModdingAPI.Events.TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+            helper.Events.Player.Warped += OnWarped;
+            helper.Events.GameLoop.DayStarted += OnDayStarted;
         }
 
-        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             if (Game1.currentLocation == null || !locations.ContainsKey(Game1.currentLocation.Name))
                 return;
@@ -64,9 +63,9 @@ namespace CustomMusic
             Game1.delayedActions.Add(d);
         }
 
-        private void PlayerEvents_Warped(object sender, StardewModdingAPI.Events.EventArgsPlayerWarped e)
+        private void OnWarped(object sender, WarpedEventArgs e)
         {
-            if (e.NewLocation == null)
+            if (e.NewLocation == null || !e.IsLocalPlayer)
                 return;
 
             if (locations.ContainsKey(e.NewLocation.Name))
@@ -97,7 +96,7 @@ namespace CustomMusic
 
         private void loadContentPacks()
         {
-            foreach (IContentPack pack in Helper.GetContentPacks())
+            foreach (IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
 

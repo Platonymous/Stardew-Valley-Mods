@@ -61,26 +61,28 @@ namespace PelicanTTS
 
             speechThread = new Thread(t2sOut);
             speechThread.Start();
-            GameEvents.QuarterSecondTick += GameEvents_QuarterSecondTick;
- 
-            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+            h.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+            h.Events.Display.MenuChanged += OnMenuChanged;
            
         }
 
 
-        private static void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        private static void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
-            lastText = "";
-            lastDialog = "";
-            currentText = "";
-            synth.SpeakAsyncCancelAll();
-            setVoice("default");
+            if (e.NewMenu == null)
+            {
+                lastText = "";
+                lastDialog = "";
+                currentText = "";
+                synth.SpeakAsyncCancelAll();
+                setVoice("default");
+            }
         }
 
         public static void stop()
         {
-            GameEvents.QuarterSecondTick -= GameEvents_QuarterSecondTick;
-            MenuEvents.MenuClosed -= MenuEvents_MenuClosed;
+            Helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
+            Helper.Events.Display.MenuChanged -= OnMenuChanged;
             runSpeech = false;
         }
 
@@ -148,46 +150,48 @@ namespace PelicanTTS
         }
 
 
-        private static void GameEvents_QuarterSecondTick(object sender, System.EventArgs e)
+        private static void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            
-            if (Game1.activeClickableMenu is DialogueBox)
+            if (e.IsMultipleOf(15)) // quarter second
             {
-
-                DialogueBox dialogueBox = (DialogueBox)Game1.activeClickableMenu;
-
-                if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
+                if (Game1.activeClickableMenu is DialogueBox)
                 {
-                    setVoice(Game1.currentSpeaker.name);
+
+                    DialogueBox dialogueBox = (DialogueBox)Game1.activeClickableMenu;
+
+                    if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
+                    {
+                        setVoice(Game1.currentSpeaker.name);
+                    }
+                    else
+                    {
+                        setVoice("default");
+                    }
+
+                    if (dialogueBox.getCurrentString() != lastDialog)
+                    {
+                        currentText = dialogueBox.getCurrentString();
+                        lastDialog = dialogueBox.getCurrentString();
+
+                    }
+
                 }
-                else
+                else if (Game1.activeClickableMenu is LetterViewerMenu lvm)
                 {
                     setVoice("default");
+                    List<string> mailMessage = Helper.Reflection.GetField<List<string>>(lvm, "mailMessage").GetValue();
+                    string letter = mailMessage[Helper.Reflection.GetField<int>(lvm, "page").GetValue()];
+                    currentText = letter;
+                    lastDialog = letter;
                 }
-
-                if (dialogueBox.getCurrentString() != lastDialog)
+                else if(Game1.hudMessages.Count > 0)
                 {
-                    currentText = dialogueBox.getCurrentString();
-                    lastDialog = dialogueBox.getCurrentString();
-
-                }
-
-            }
-            else if (Game1.activeClickableMenu is LetterViewerMenu lvm)
-            {
-                setVoice("default");
-                List<string> mailMessage = Helper.Reflection.GetField<List<string>>(lvm, "mailMessage").GetValue();
-                string letter = mailMessage[Helper.Reflection.GetField<int>(lvm, "page").GetValue()];
-                currentText = letter;
-                lastDialog = letter;
-            }
-            else if(Game1.hudMessages.Count > 0)
-            {
-                if(Game1.hudMessages[Game1.hudMessages.Count-1].Message != lastHud)
-                {
-                    setVoice("default");
-                    currentText = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
-                    lastHud = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
+                    if(Game1.hudMessages[Game1.hudMessages.Count-1].Message != lastHud)
+                    {
+                        setVoice("default");
+                        currentText = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
+                        lastHud = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
+                    }
                 }
             }
         }

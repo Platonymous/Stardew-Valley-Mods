@@ -5,7 +5,7 @@
   "Description": "Makes Custom Furniture work with Furniture Anywhere",
   "UniqueID": "Platonymous.CustomFurnitureAnywhere",
   "EntryDll": "CustomFurnitureAnywhere.dll",
-  "MinimumApiVersion": "2.8",
+  "MinimumApiVersion": "2.9.0",
   "UpdateKeys": [ "Nexus:1254" ],
   "Dependencies": [
     {
