@@ -14,7 +14,7 @@ using PyTK.CustomElementHandler;
 
 namespace SeedBag
 {
-    class SeedBagTool : Hoe, ISaveElement
+    class SeedBagTool : Hoe, ISaveElement, ICustomObject
     {
 
         internal static Texture2D texture;
@@ -59,6 +59,11 @@ namespace SeedBag
                     attachments[1] = (SObject)chest.items[1];
             }
             
+        }
+
+        public SeedBagTool(CustomObjectData data)
+            : this()
+        {
         }
 
         public SeedBagTool()
@@ -301,5 +306,9 @@ namespace SeedBag
 
         }
 
+        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        {
+            return new SeedBagTool();
+        }
     }
 }

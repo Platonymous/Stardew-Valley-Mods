@@ -43,6 +43,11 @@ namespace CustomMusic
 
             helper.Events.Player.Warped += OnWarped;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
+            helper.ConsoleCommands.Add("playmusic", "Play a music cue. Format: playmusic [name]", (s, p) =>
+              {
+                  Monitor.Log("Playing: " + p[0], LogLevel.Info);
+                  Game1.nextMusicTrack = p[0];
+              });
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e)
@@ -96,7 +101,7 @@ namespace CustomMusic
 
         private void loadContentPacks()
         {
-            foreach (IContentPack pack in Helper.ContentPacks.GetOwned())
+            foreach (IContentPack pack in Helper.GetContentPacks())
             {
                 MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
 

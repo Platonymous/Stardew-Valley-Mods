@@ -36,6 +36,7 @@ namespace Visualize
             this.Helper.Events.Input.ButtonPressed += OnButtonPressed;
             this.Helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
             this.Helper.Events.Display.MenuChanged += OnMenuChanged;
+            helper.ConsoleCommands.Add("visrefresh", "Clears the Visualize cache.", (s, p) => emptyCache());
             this.Helper.Events.GameLoop.DayStarted += OnDayStarted;
             harmonyFix();
         }

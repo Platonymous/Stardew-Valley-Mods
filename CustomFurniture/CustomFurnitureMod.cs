@@ -120,7 +120,7 @@ namespace CustomFurniture
             int countPacks = 0;
             int countObjects = 0;
 
-            var contentPacks = Helper.ContentPacks.GetOwned();
+            var contentPacks = Helper.GetContentPacks();
             var usedids = new List<string>();
 
             foreach (IContentPack cpack in contentPacks)

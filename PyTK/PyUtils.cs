@@ -64,7 +64,7 @@ namespace PyTK
             {
                 conditions = conditions.Replace("NOT ", "");
                 comparer = false;
-                
+
             }
 
             if (conditions.StartsWith("PC "))
@@ -103,10 +103,10 @@ namespace PyTK
         {
             var script = PyLua.getNewScript();
             script.Globals["result"] = false;
-            if(caller != null)
+            if (caller != null)
                 script.Globals["caller"] = caller;
             script.DoString("result = (" + conditions + ")");
-            return (bool) script.Globals["result"];
+            return (bool)script.Globals["result"];
         }
 
         public static List<GameLocation> getAllLocationsAndBuidlings()
@@ -128,39 +128,6 @@ namespace PyTK
             return d;
         }
 
-        public static void loadContentPacks<TModel>(out List<TModel> packs, string folder, SearchOption option = SearchOption.AllDirectories, IMonitor monitor = null, string filesearch = "*.json") where TModel : class
-        {
-            packs = loadContentPacks<TModel>(folder,option,monitor,filesearch);
-        }
-
-        public static List<TModel> loadContentPacks<TModel>(string folder, SearchOption option = SearchOption.AllDirectories, IMonitor monitor = null, string filesearch = "*.json") where TModel : class
-        {
-            List<TModel> packs = new List<TModel>();
-            string[] files = Directory.GetFiles(folder, filesearch, option);
-            foreach (string fullPath in files)
-            {
-                FileInfo file = new FileInfo(fullPath);
-
-                TModel pack = PyTKMod._helper.ContentPacks.CreateFake(file.Directory.FullName).ReadJsonFile<TModel>(file.Name);
-
-                packs.Add(pack);
-
-                if (pack is Types.IContentPack p)
-                {
-                    p.fileName = file.Name;
-                    p.folderName = file.Directory.Name;
-
-                    if (monitor != null)
-                    {
-                        string author = p.author == "none" || p.author == null || p.author == "" ? "" : " by " + p.author;
-                        monitor.Log(p.name + " " + p.version + author, LogLevel.Info);
-                    }
-                }
-            }
-
-            return packs;
-        }
-
         public static Type getTypeSDV(string type)
         {
             string prefix = "StardewValley.";
@@ -170,7 +137,6 @@ namespace PyTK
                 return defaulSDV;
             else
                 return Type.GetType(prefix + type + ", StardewValley");
-
         }
 
         public static Texture2D getRectangle(int width, int height, Color color)
@@ -220,7 +186,7 @@ namespace PyTK
             }
         }
 
-        public static float calc(string expression, params KeyValuePair<string,object>[] paramters)
+        public static float calc(string expression, params KeyValuePair<string, object>[] paramters)
         {
             Expression e = new Expression(expression);
 

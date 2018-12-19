@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
 using PyTK.CustomElementHandler;
-using Entoarox.FurnitureAnywhere;
 using System;
 using Netcode;
 

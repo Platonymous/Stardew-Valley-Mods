@@ -1,12 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PyTK;
 using PyTK.Extensions;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Minigames;
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Snake
 {
@@ -55,7 +58,8 @@ namespace Snake
         public string LastMusic { get; set; }
         public Texture2D Background { get; set; }
         public Color BackgroundColor { get; set; }
-        public int Highscore { get; set; }
+        public static HighscoreList HighscoreTable { get; set; } = new HighscoreList();
+        public bool ShowHighscore { get; set; } = false;
 
         #endregion
 
@@ -63,7 +67,6 @@ namespace Snake
 
         public void Initialize(IModHelper helper)
         {
-            Highscore = 0;
             Random = new Random();
             BoardTexture = helper.Content.Load<Texture2D>(@"Assets/board.png");
             BoardDebug = helper.Content.Load<Texture2D>(@"Assets/board_debug.png");
@@ -100,6 +103,23 @@ namespace Snake
 
             Board.SpawnCollectible();
         }
+
+        public static void setScore(string name, int score)
+        {
+            Highscore highscore = new Highscore(name, score);
+            var oldEntry = HighscoreTable.Entries.Find(entry => entry.Name == name && entry.Value >= score);
+
+            if (!(oldEntry is Highscore))
+            {
+                HighscoreTable.Entries.Add(highscore);
+                SnakeMod.monitor.Log("New Highscore!");
+                SnakeMod.monitor.Log(highscore.Name + ": " + highscore.Value);
+                if (Game1.IsMasterGame)
+                    PyNet.sendRequestToAllFarmers<bool>(SnakeMod.highscoreListReceiverName, HighscoreTable, null, serializationType: PyTK.Types.SerializationType.JSON);
+                else
+                    Task.Run(async () => await PyNet.sendRequestToFarmer<bool>(SnakeMod.highscoreReceiverName, highscore, Game1.MasterPlayer,serializationType: PyTK.Types.SerializationType.JSON));
+            }
+        }
         #endregion
 
         #region Menu
@@ -110,9 +130,10 @@ namespace Snake
             string text = Player.score.ToString();
             Vector2 size = font.MeasureString(text);
             float scale = 3;
+            float margin = 10;
             b.DrawString(font, text, new Vector2(Game1.viewport.Width - 20 - size.X * scale, 20), Color.White, 0f,Vector2.Zero,scale,SpriteEffects.None,1f);
 
-            if (Board.Paused)
+            if (Board.Paused && !ShowHighscore)
             {
                 text = "SNAKE";
                 size = font.MeasureString(text);
@@ -120,23 +141,27 @@ namespace Snake
                 float y = 0;
 
                 string text1 = "by Platonymous";
-                float y1 = 10 + y + size.Y * scale;
+                float y1 = margin + y + size.Y * scale;
                 Vector2 size1 = font.MeasureString(text1);
                 float scale1 = 1.5f;
 
                 string text2 = "Press SPACE to start";
-                float y2 = 10 + y1 + size.Y * scale1;
+                float y2 = margin + y1 + size.Y * scale1;
                 Vector2 size2 = font.MeasureString(text2);
 
                 string text3 = "Control: LEFT and RIGHT ";
-                float y3 = 10 + y2 + size.Y * scale1;
+                float y3 = margin + y2 + size.Y * scale1;
                 Vector2 size3 = font.MeasureString(text3);
 
                 string text4 = "Exit: ESCAPE";
-                float y4 = 10 + y3 + size.Y * scale1;
-                Vector2 size4 = font.MeasureString(text4);
+                float y4 = margin + y3 + size.Y * scale1;
+                Vector2 size4 = font.MeasureString(text4);;
 
-                float height = y4 + size.Y * scale1;
+                string text5 = "Toggle Highscores: H";
+                float y5 = margin + y4 + size.Y * scale1;
+                Vector2 size5 = font.MeasureString(text5); ;
+
+                float height = y5 + size.Y * scale1;
                 float offset = (Game1.viewport.Height - height) / 2;
 
                 b.DrawString(font, text, new Vector2((Game1.viewport.Width - size.X * scale) / 2, offset + y), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 1f);
@@ -144,6 +169,88 @@ namespace Snake
                 b.DrawString(font, text2, new Vector2((Game1.viewport.Width - size2.X * scale1) / 2, offset + y2), Color.White, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
                 b.DrawString(font, text3, new Vector2((Game1.viewport.Width - size3.X * scale1) / 2, offset + y3), Color.White, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
                 b.DrawString(font, text4, new Vector2((Game1.viewport.Width - size4.X * scale1) / 2, offset + y4), Color.White, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+                b.DrawString(font, text5, new Vector2((Game1.viewport.Width - size5.X * scale1) / 2, offset + y5), Color.White, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+            }
+            else if (Board.Paused && ShowHighscore)
+            {
+                string text1 = "Highscores";
+                float y1 = 0;
+                Vector2 size1 = font.MeasureString(text1);
+                float scale1 = 1.5f;
+
+                var scores = new List<string>();
+                
+                string text2 = "-----";
+                string text3 = text2;
+                string text4 = text2;
+                string text5 = text2;
+                string text6 = text2;
+                string text7 = text2;
+                List<Highscore> highs = new List<Highscore>(HighscoreTable.Entries);
+
+                if (highs.Count > 0)
+                {
+
+                    var next = highs.Find(entry => entry.Value == highs.Max(ent => ent.Value) && !scores.Contains(entry.Name));
+
+                    if (next is Highscore)
+                    {
+                        text2 = next.Name;
+                        text3 = next.Value.ToString();
+                        scores.AddOrReplace(next.Name);
+                        highs.RemoveAll(ent => ent.Name == next.Name);
+                    }
+
+                    next = highs.Find(entry => entry.Value == highs.Max(ent => ent.Value) && !scores.Contains(entry.Name));
+
+                    if (next is Highscore)
+                    {
+                        text4 = next.Name;
+                        text5 = next.Value.ToString();
+                        scores.AddOrReplace(next.Name);
+                        highs.RemoveAll(ent => ent.Name == next.Name);
+                    }
+
+                    next = highs.Find(entry => entry.Value == highs.Max(ent => ent.Value) && !scores.Contains(entry.Name));
+
+                    if (next is Highscore)
+                    {
+                        text6 = next.Name;
+                        text7 = next.Value.ToString();
+                        scores.AddOrReplace(next.Name);
+                    }
+                }
+
+                Vector2 size2 = font.MeasureString(text2);
+                Vector2 size3 = font.MeasureString(text3);
+                Vector2 size4 = font.MeasureString(text4);
+                Vector2 size5 = font.MeasureString(text5);
+                Vector2 size6 = font.MeasureString(text6);
+                Vector2 size7 = font.MeasureString(text7);
+
+                float y2 = margin * 1.5f + y1 + size1.Y * scale1;
+                float y3 = margin + y2 + size2.Y * scale1;
+                float y4 = margin * 2 + y3 + size3.Y * scale1;
+                float y5 = margin + y4 + size4.Y * scale1;
+                float y6 = margin * 2 + y5 + size5.Y * scale1;
+                float y7 = margin + y6 + size6.Y * scale1;
+
+                string text8 = "Toggle Highscores: H";
+                float y8 = margin * 1.5f + y7 + size7.Y * scale1;
+                Vector2 size8 = font.MeasureString(text8); ;
+
+                float height = y8 + size.Y * scale1;
+                float offset = (Game1.viewport.Height - height) / 2;
+
+                b.DrawString(font, text1, new Vector2((Game1.viewport.Width - size1.X * scale1) / 2, offset + y1), Color.White, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+                b.DrawString(font, text2, new Vector2((Game1.viewport.Width - size2.X * scale1) / 2, offset + y2), Color.Yellow, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+                b.DrawString(font, text3, new Vector2((Game1.viewport.Width - size3.X * scale1) / 2, offset + y3), Color.LightGray, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+                b.DrawString(font, text4, new Vector2((Game1.viewport.Width - size4.X * scale1) / 2, offset + y4), Color.White, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+                b.DrawString(font, text5, new Vector2((Game1.viewport.Width - size5.X * scale1) / 2, offset + y5), Color.LightGray, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+                b.DrawString(font, text6, new Vector2((Game1.viewport.Width - size6.X * scale1) / 2, offset + y6), Color.White, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+                b.DrawString(font, text7, new Vector2((Game1.viewport.Width - size7.X * scale1) / 2, offset + y7), Color.LightGray, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+                b.DrawString(font, text8, new Vector2((Game1.viewport.Width - size8.X * scale1) / 2, offset + y8), Color.White, 0f, Vector2.Zero, scale1, SpriteEffects.None, 1f);
+
             }
         }
 
@@ -228,16 +335,23 @@ namespace Snake
         {
             if(k.Equals(Keys.Left))
                 Player.Turn(Direction.LEFT);
+
             if (k.Equals(Keys.Right))
                 Player.Turn(Direction.RIGHT);
+
             if (k.Equals(Keys.Space))
                 if (Board.GameOver)
                 {
                     StartGame();
                     Board.Paused = false;
+                    ShowHighscore = false;
                 }
                 else
                     Board.Paused = !Board.Paused;
+
+            if (k.Equals(Keys.H) && Board.Paused)
+                ShowHighscore = !ShowHighscore;
+
             if (k.Equals(Keys.Escape))
                 if (!Board.Paused)
                     Board.Paused = true;
@@ -246,10 +360,13 @@ namespace Snake
 
             if (k.Equals(Keys.Up) && debug)
                 SnakeMod.monitor.Log(Player.position.ToString() + ":" + Player.GetBoxPosition().ToString() + ":" + Board.nextCollectible.position.ToString());
+
             if (k.Equals(Keys.Down) && debug)
                 Player.AddNewTailSegment();
+
             if (k.Equals(Keys.F5))
                 debug = !debug;
+
             if (k.Equals(Keys.F6))
                 hideObjects = !hideObjects;
         }

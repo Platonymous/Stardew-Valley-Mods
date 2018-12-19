@@ -49,6 +49,9 @@ namespace Snake
             { 
                 GameInstance.Board.GameOver = true;
                 GameInstance.Board.Paused = true;
+
+                setScore(Game1.player.Name, score);
+
                 Game1.currentSong.Stop(AudioStopOptions.Immediate);
                 Game1.playSound("death");
             }

@@ -92,7 +92,7 @@ namespace Portraiture
                 }
             }
 
-            var contentPacks = PortraitureMod.helper.ContentPacks.GetOwned();
+            var contentPacks = PortraitureMod.helper.GetContentPacks();
 
             foreach (StardewModdingAPI.IContentPack pack in contentPacks)
             {

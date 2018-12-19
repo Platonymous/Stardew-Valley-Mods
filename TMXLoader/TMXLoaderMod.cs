@@ -43,7 +43,6 @@ namespace TMXLoader
             loadContentPacks();
             setTileActions();
             helper.Events.Player.Warped += OnWarped;
-            helper.Events.GameLoop.DayStarted += OnDayStarted;
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
@@ -62,12 +61,6 @@ namespace TMXLoader
                         syncMaps(ef);
                 }
             };
-        }
-
-        private void OnDayStarted(object sender, DayStartedEventArgs e)
-        {
-            if (Game1.currentLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
-                TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
         }
 
         private void syncMaps(IEnumerable<SFarmer> farmers)
@@ -111,7 +104,7 @@ namespace TMXLoader
 
         private void loadContentPacks()
         {
-            foreach (StardewModdingAPI.IContentPack pack in Helper.ContentPacks.GetOwned())
+            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
             {
                 TMXContentPack tmxPack = pack.ReadJsonFile<TMXContentPack>("content.json");
 

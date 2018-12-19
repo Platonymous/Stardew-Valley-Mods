@@ -278,11 +278,11 @@ namespace PlanImporter
 
         public void loadContentPacks() { 
             Imports = new Dictionary<string, Import>();
-            string[] files = Directory.GetFiles(Path.Combine(Helper.DirectoryPath, "imports"), "*.json", SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles(Path.Combine(Helper.DirectoryPath, "imports"), "*.json", SearchOption.TopDirectoryOnly);
             foreach (string fullPath in files) {
                 FileInfo file = new FileInfo(fullPath);
 
-                Import import = this.Helper.ContentPacks.CreateFake(file.Directory.FullName).ReadJsonFile<Import>(file.Name);
+                Import import = this.Helper.Data.ReadJsonFile<Import>(Path.Combine("imports",file.Name));
 
                 import.id = import.id == "" ? Path.GetFileNameWithoutExtension(fullPath) : import.id;
                 if (Imports.ContainsKey(import.id))

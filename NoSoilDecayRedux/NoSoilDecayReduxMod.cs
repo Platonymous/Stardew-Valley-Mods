@@ -22,7 +22,7 @@ namespace NoSoilDecayRedux
             config = Helper.ReadConfig<Config>();
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += (s,e) => restoreHoeDirt();
-            PyTimeEvents.BeforeSleepEvents += (s, e) => saveHoeDirt();
+            helper.Events.GameLoop.DayEnding += (s, e) => saveHoeDirt();
         }
 
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)

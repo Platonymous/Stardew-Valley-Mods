@@ -36,8 +36,22 @@ namespace ATM
             var openATMAction = new TileAction("OpenATM", openATM);
             openATMAction.register();
 
+            var atmWinterCheck = new TileAction("ATMWinterCheck", checkSeason);
+            atmWinterCheck.register();
+
             var atm = TMXContent.Load(Path.Combine("Assets", "atm.tmx"), Helper);
             atm.injectInto(@"Maps/" + config.Map, new Vector2(config.Position[0], config.Position[1]), null);
+        }
+
+        private bool checkSeason(string action, GameLocation location, Vector2 tileposition, string layer)
+        {
+            var tile1 = location.Map.GetLayer("Front").Tiles[config.Position[0], config.Position[1]];
+            var tile2 = location.Map.GetLayer("Buildings").Tiles[config.Position[0], config.Position[1] + 1];
+            bool winter = Game1.currentSeason.ToLower() == "winter";
+            tile1.TileIndex = winter ? 1 : 0;
+            tile2.TileIndex = winter ? 3 : 2;
+
+            return true;
         }
 
         private bool openATM(string action, GameLocation location, Vector2 tileposition, string layer)

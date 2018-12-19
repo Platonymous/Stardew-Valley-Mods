@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.1" orientation="orthogonal" renderorder="right-down" width="1" height="2" tilewidth="16" tileheight="16" infinite="0" nextobjectid="2">
- <tileset firstgid="1" name="zATM" tilewidth="16" tileheight="16" tilecount="2" columns="1">
-  <image source="atm.png" width="16" height="32"/>
+<map version="1.0" tiledversion="1.1.1" orientation="orthogonal" renderorder="right-down" width="1" height="2" tilewidth="16" tileheight="16" infinite="0" nextobjectid="3">
+ <properties>
+  <property name="EntryAction" value="ATMWinterCheck"/>
+ </properties>
+ <tileset firstgid="1" name="zATM" tilewidth="16" tileheight="16" tilecount="4" columns="2">
+  <image source="atm.png" width="32" height="32"/>
  </tileset>
  <layer name="Buildings" width="1" height="2">
   <data encoding="csv">
 0,
-2
+3
 </data>
  </layer>
  <objectgroup name="Buildings">

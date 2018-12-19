@@ -3,7 +3,8 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using PyTK.Types;
 using PyTK.Extensions;
-
+using PyTK.CustomElementHandler;
+using Microsoft.Xna.Framework;
 
 namespace SeedBag
 {
@@ -17,7 +18,9 @@ namespace SeedBag
         {
             _monitor = Monitor;
             _helper = helper;
-            addtoshop = new InventoryItem(new SeedBagTool(), 30000, 1).addToNPCShop("Pierre");
+            SeedBagTool seedbag = new SeedBagTool();
+            addtoshop = new InventoryItem(seedbag, 30000, 1).addToNPCShop("Pierre");
+            CustomObjectData.newObject("Platonymous.SeedBag.Tool", SeedBagTool.texture, Color.White, "Seed Bag", "Empty", 0, customType: typeof(SeedBagTool));
         }
     }
 }

@@ -1,7 +1,7 @@
 {
   "Name": "Visualize",
   "Author": "Platonymous",
-  "Version": "1.5.1",
+  "Version": "1.5.2",
   "Description": "Mod for Visual Effects",
   "UniqueID": "Platonymous.Visualize",
   "EntryDll": "Visualize.dll",

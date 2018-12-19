@@ -22,6 +22,7 @@ using System.Linq;
 using PyTK.Tiled;
 using PyTK.Lua;
 using static PyTK.Overrides.OvSpritebatch;
+using xTile;
 
 namespace PyTK
 {
@@ -62,7 +63,21 @@ namespace PyTK
             PyLua.init();
             SaveHandler.setUpEventHandlers();
             ContentSync.ContentSyncHandler.initialize();
-            this.Helper.Events.Player.Warped += (s, e) => e.NewLocation?.Map.enableMoreMapLayers();
+            this.Helper.Events.Player.Warped += Player_Warped;
+            this.Helper.Events.GameLoop.DayStarted += OnDayStarted;
+        }
+
+        private void Player_Warped(object sender, WarpedEventArgs e)
+        {
+            e.NewLocation?.Map.enableMoreMapLayers();
+            if (e.NewLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
+                TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
+        }
+
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
+        {
+            if (Game1.currentLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
+                TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
         }
 
         private void harmonyFix()

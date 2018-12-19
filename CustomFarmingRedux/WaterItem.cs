@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using PyTK.CustomElementHandler;
-using PyTK.Extensions;
 using StardewValley;
-using System;
 using System.Collections.Generic;
 
 namespace CustomFarmingRedux

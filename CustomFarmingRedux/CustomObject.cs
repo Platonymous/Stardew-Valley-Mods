@@ -19,7 +19,6 @@ namespace CustomFarmingRedux
         public PySync syncObject { get; set; }
         internal IModHelper Helper = CustomFarmingReduxMod._helper;
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
-        internal string folder = CustomFarmingReduxMod.folder;
         internal List<CustomMachineBlueprint> machines = CustomFarmingReduxMod.machines;
 
         private RecipeBlueprint blueprint;

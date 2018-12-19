@@ -39,6 +39,8 @@
   <ItemGroup>
     <Compile Include="Board.cs" />
     <Compile Include="Collectible.cs" />
+    <Compile Include="Highscore.cs" />
+    <Compile Include="HighscoreList.cs" />
     <Compile Include="ISnakeSegement.cs" />
     <Compile Include="SnakeMachine.cs" />
     <Compile Include="SnakeObject.cs" />

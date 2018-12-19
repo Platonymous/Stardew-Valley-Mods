@@ -2,15 +2,27 @@
 using StardewModdingAPI;
 using PyTK.Extensions;
 using System.IO;
+using Harmony;
 
 namespace ScaleUp
 {
     public class ScaleUpMod : Mod
     {
+        public static bool shouldBeTrue = false;
+
         public override void Entry(IModHelper helper)
         {
+            HarmonyInstance instance = HarmonyInstance.Create("Platonymous.ScaleUp");
+            instance.Patch(Type.GetType("StardewModdingAPI.Toolkit.Utilities.PathUtilities, StardewModdingAPI.Toolkit").GetMethod("IsSafeRelativePath"), null, new HarmonyMethod(GetType().GetMethod("IsSafeRelativePath")));
+
             loadContentPacks();
             helper.Content.AssetEditors.Add(new Scaler(helper));
+        }
+
+        public static void IsSafeRelativePath(string path, ref bool __result)
+        {
+            __result = __result || shouldBeTrue;
+            shouldBeTrue = false;
         }
 
         private void loadContentPacks()
@@ -21,12 +33,13 @@ namespace ScaleUp
             foreach(string fullPath in files)
             {
                 FileInfo manifestFile = new FileInfo(fullPath);
-                IContentPack contentPack = this.Helper.ContentPacks.CreateFake(manifestFile.Directory.FullName);
-                Manifest manifest = contentPack.ReadJsonFile<Manifest>(manifestFile.Name);
+                shouldBeTrue = true;
+                Manifest manifest = this.Helper.Data.ReadJsonFile<Manifest>(Path.Combine("..", manifestFile.Directory.Name, manifestFile.Name));
 
                 if (manifest != null && manifest.ContentPackFor is ManifestContentPackFor m && m.UniqueID == "Pathoschild.ContentPatcher")
                 {
-                    Content content = contentPack.ReadJsonFile<Content>("content.json");
+                    shouldBeTrue = true;
+                    Content content = Helper.Data.ReadJsonFile<Content>(Path.Combine("..", manifestFile.Directory.Name, "content.json"));
                     if (content == null)
                         continue;
 

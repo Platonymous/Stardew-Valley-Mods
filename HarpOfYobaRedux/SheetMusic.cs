@@ -8,7 +8,7 @@ using PyTK.Extensions;
 
 namespace HarpOfYobaRedux
 {
-    internal class SheetMusic : StardewValley.Object, ISaveElement
+    internal class SheetMusic : StardewValley.Object, ISaveElement, ICustomObject
     {
         internal static Dictionary<string, SheetMusic> allSheets;
         public string sheetMusicID;
@@ -22,6 +22,12 @@ namespace HarpOfYobaRedux
  
 
         public SheetMusic()
+        {
+
+        }
+
+        public SheetMusic(CustomObjectData data)
+            :this(data.id.Split('.')[2])
         {
 
         }
@@ -67,7 +73,6 @@ namespace HarpOfYobaRedux
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
-            build(additionalSaveData["id"]);
         }
 
         public override bool canBeDropped()
@@ -140,5 +145,9 @@ namespace HarpOfYobaRedux
             spriteBatch.Draw(texture, objectPosition, new Rectangle?(sourceRectangleNote), color, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 3) / 10000f));
         }
 
+        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        {
+            return new SheetMusic(additionalSaveData["id"]);
+        }
     }
 }

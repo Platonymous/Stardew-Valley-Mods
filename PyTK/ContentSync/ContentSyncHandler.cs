@@ -367,7 +367,7 @@ namespace PyTK.ContentSync
 
                 result = serialize(asset, (ContentType)contentRequest.type);
             }
-            catch(Exception e)
+            catch
             {
                 result = "na";
             }

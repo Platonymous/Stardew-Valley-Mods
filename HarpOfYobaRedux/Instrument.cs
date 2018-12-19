@@ -10,7 +10,7 @@ using PyTK;
 
 namespace HarpOfYobaRedux
 {
-    internal class Instrument : Tool, ISaveElement
+    internal class Instrument : Tool, ISaveElement, ICustomObject
     {
         internal static Dictionary<string,Instrument> allInstruments;
         public string instrumentID;
@@ -26,6 +26,12 @@ namespace HarpOfYobaRedux
         public Instrument()
         {
             
+        }
+
+        public Instrument(CustomObjectData data)
+            : this(data.id.Split('.')[2])
+        {
+
         }
 
         public override bool canBeDropped()
@@ -153,7 +159,6 @@ namespace HarpOfYobaRedux
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
-            build(additionalSaveData["id"]);
             if (replacement is Tool t && t.attachments.Count > 0)
             {
                 if (!(t.attachments[0] is SheetMusic))
@@ -303,6 +308,11 @@ namespace HarpOfYobaRedux
         protected override string loadDescription()
         {
             return description;
+        }
+
+        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        {
+            return new Instrument(additionalSaveData["id"]);
         }
     }
 }

@@ -13,8 +13,6 @@ namespace PyTK.Types
             get { return toArray()[i]; }
         }
 
-        private int _index = 0;
-
         public Range(int from, int to)
         {
             X = from;
@@ -74,16 +72,6 @@ namespace PyTK.Types
         public bool contains(int i)
         {
             return i >= X && i < Y;
-        }
-
-        public void Reset()
-        {
-            _index = 0;
-        }
-
-        public void Dispose()
-        {
-
         }
 
         public static Range Zero

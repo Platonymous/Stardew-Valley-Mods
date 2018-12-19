@@ -31,7 +31,7 @@ namespace Visualize
             if (!VisualizeMod.callDrawHandlers(ref __instance, ref texture, ref destinationRectangle, ref scaleDestination, ref sourceRectangle, ref color, ref rotation, ref origin, ref effect, ref depth))
                 return false;
 
-            if (VisualizeMod._activeProfile.id == "Platonymous.Original" && VisualizeMod._config.saturation == 100 && VisualizeMod.palette.Count == 0)
+            if ((VisualizeMod._activeProfile.id == "Platonymous.Original" || VisualizeMod._activeProfile.id == "auto") && VisualizeMod._config.saturation == 100 && VisualizeMod.palette.Count == 0)
                 return true;
 
             return VisualizeMod._handler.Draw(ref __instance, ref texture, ref destinationRectangle, ref scaleDestination, ref sourceRectangle, ref color, ref rotation, ref origin, ref effect, ref depth);
@@ -62,7 +62,7 @@ namespace Visualize
             if (!VisualizeMod.callDrawHandlers(ref __instance, ref texture, ref destination, ref scaleDestination, ref sourceRectangle, ref color, ref rotation, ref origin, ref effects, ref depth))
                 return false;
 
-            if (VisualizeMod._activeProfile.id == "Platonymous.Original" && VisualizeMod._config.saturation == 100 && VisualizeMod.palette.Count == 0)
+            if ((VisualizeMod._activeProfile.id == "Platonymous.Original" || VisualizeMod._activeProfile.id == "auto") && VisualizeMod._config.saturation == 100 && VisualizeMod.palette.Count == 0)
                 return true;
 
             return VisualizeMod._handler.Draw(ref __instance, ref texture, ref destination, ref scaleDestination, ref sourceRectangle, ref color, ref rotation, ref origin, ref effects, ref depth);

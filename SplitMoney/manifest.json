@@ -1,7 +1,7 @@
 {
   "Name": "SplitMoney",
   "Author": "Platonymous",
-  "Version": "1.2.2",
+  "Version": "1.2.3",
   "Description": "Seperates the money in multiplayer",
   "UniqueID": "Platonymous.SplitMoney",
   "EntryDll": "SplitMoney.dll",

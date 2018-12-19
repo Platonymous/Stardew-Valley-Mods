@@ -41,7 +41,7 @@ namespace PyTK.Tiled
             Dictionary<TileSheet, Texture2D> tilesheets = Helper.Reflection.GetField<Dictionary<TileSheet, Texture2D>>(Game1.mapDisplayDevice, "m_tileSheetTextures").GetValue();
             Map map = tmx2map(Path.Combine(contentPack != null ? contentPack.DirectoryPath : helper.DirectoryPath,path));
             string fileName = new FileInfo(path).Name;
-            Monitor.Log(path);
+            
             foreach (TileSheet t in map.TileSheets)
             {
                 t.ImageSource = t.ImageSource.Replace(".png", "");
@@ -220,6 +220,7 @@ namespace PyTK.Tiled
 
         internal static Map tmx2map(string path)
         {
+            path = path.Replace(@"/[TMX Loader]", "");
             Map newMap = FormatManager.Instance.LoadMap(path);
 
             foreach (TileSheet t in newMap.TileSheets)

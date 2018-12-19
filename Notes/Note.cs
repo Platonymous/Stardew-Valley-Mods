@@ -36,6 +36,19 @@ namespace Notes
             }
         }
 
+        public override string DisplayName
+        {
+            get => netName.Value.Split('>')[0];
+
+            set
+            {
+                if (netName.Value.Split('>') is string[] split && split.Length > 1)
+                    netName.Value = value + ">" + split[1];
+                else
+                    netName.Value = value;
+            }
+        }
+
         public Note() : base() {
             
         }

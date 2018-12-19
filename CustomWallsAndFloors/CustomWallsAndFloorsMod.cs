@@ -126,7 +126,7 @@ namespace CustomWallsAndFloors
 
         private void loadContentPacks()
         {
-            foreach (StardewModdingAPI.IContentPack pack in Helper.ContentPacks.GetOwned())
+            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
             {
                 Animations animations = null;
 
