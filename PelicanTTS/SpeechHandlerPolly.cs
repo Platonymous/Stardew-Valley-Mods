@@ -1,15 +1,8 @@
-﻿using System.Speech.Synthesis;
-using System.Globalization;
-using System.Collections.Generic;
-using System.Threading;
-
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
 
 using StardewValley;
 using StardewValley.Menus;
-
-
 
 using Amazon.Polly;
 using Amazon.Polly.Model;
@@ -17,7 +10,16 @@ using Amazon.Polly.Model;
 using Microsoft.Xna.Framework.Media;
 using System.IO;
 
+using System.Globalization;
+using System.Collections.Generic;
+using System.Threading;
 using System;
+using System.Text;
+using Microsoft.Xna.Framework.Audio;
+using System.Linq;
+
+using OggSharp;
+
 
 namespace PelicanTTS
 {
@@ -31,9 +33,6 @@ namespace PelicanTTS
         private static Thread gThread;
         private static bool runSpeech;
         private static IModHelper Helper;
-        private static CultureInfo currentCulture;
-        public static string culturelang;
-        private static List<string> installedVoices;
 
 
         private static AmazonPollyClient pc;
@@ -41,6 +40,7 @@ namespace PelicanTTS
         private static string tmppath;
         public static bool speak;
         private static string speakerName;
+        private static SoundEffectInstance currentSpeech;
 
         public static IMonitor Monitor;
 
@@ -56,7 +56,9 @@ namespace PelicanTTS
             currentText = "";
             tmppath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "Content"), "TTS");
 
-            ensureFolderStructureExists(Path.Combine(tmppath, "speech.mp3"));
+            if (!Directory.Exists(tmppath))
+                Directory.CreateDirectory(tmppath);
+
             pc = AWSHandler.getPollyClient();
             currentVoice = VoiceId.Amy;
             lastText = "";
@@ -64,12 +66,7 @@ namespace PelicanTTS
             lastHud = "";
             speak = false;
             runSpeech = true;
-            currentCulture = CultureInfo.CreateSpecificCulture("en-us");
-            culturelang = "en";
-            installedVoices = new List<string>();
 
-
-            setupVoices();
             setVoice("default");
 
             speechThread = new Thread(t2sOut);
@@ -110,98 +107,26 @@ namespace PelicanTTS
             runSpeech = false;
         }
 
-
-
-
         public static void setVoice(string name)
         {
             speakerName = name;
-            NPC speaker = Game1.getCharacterFromName(name);
 
-            if (speaker != null && speaker.Gender == 0)
+            if (PelicanTTSMod.config.Voices.Find(v => v.name == name) is SpeechConfig sc1 && VoiceId.FindValue(sc1.voicename) is VoiceId vId1)
+                currentVoice = vId1;
+            else if (PelicanTTSMod.config.Voices.Find(v => v.name == "default") is SpeechConfig sc2 && VoiceId.FindValue(sc2.voicename) is VoiceId vId2)
+                currentVoice = vId2;
+            else
             {
-                if (speaker.Age == 0)
-                {
-                    currentVoice = VoiceId.Joey;
-                }
-                else
-                {
-                    currentVoice = VoiceId.Joey;
-                }
-
+                speakerName = "default";
+                currentVoice = VoiceId.Salli;
             }
-
-
-            if (speaker != null && speaker.Gender == 1)
-            {
-                if (speaker.Age == 0)
-                {
-                    currentVoice = VoiceId.Kendra;
-                }
-                else
-                {
-                    currentVoice = VoiceId.Salli;
-                }
-
-            }
-
-
-            switch (name)
-            {
-                case "Elliot": currentVoice = VoiceId.Geraint; break;
-                case "Sam": currentVoice = VoiceId.Russell; break;
-                case "Emily": currentVoice = VoiceId.Emma; break;
-                case "Haley": currentVoice = VoiceId.Emma; break;
-                case "Harvey": currentVoice = VoiceId.Matthew; break;
-                case "George": currentVoice = VoiceId.Brian; break;
-                case "Linus": currentVoice = VoiceId.Brian; break;
-                case "Lewis": currentVoice = VoiceId.Brian; break;
-                case "Governor": currentVoice = VoiceId.Brian; break;
-                case "Grandpa": currentVoice = VoiceId.Brian; break;
-                case "Clint": currentVoice = VoiceId.Brian; break;
-                case "Willy": currentVoice = VoiceId.Brian; break;
-                case "Wizard": currentVoice = VoiceId.Geraint; break;
-                case "Pierre": currentVoice = VoiceId.Matthew; break;
-                case "Gunther": currentVoice = VoiceId.Brian; break;
-                case "Govenor": currentVoice = VoiceId.Brian; break;
-                case "Marlon": currentVoice = VoiceId.Brian; break;
-                case "Morris": currentVoice = VoiceId.Geraint; break;
-                case "Mister Qi": currentVoice = VoiceId.Geraint; break;
-                case "Gil": currentVoice = VoiceId.Brian; break;
-                case "Penny": currentVoice = VoiceId.Amy; break;
-                case "Evelyn": currentVoice = VoiceId.Amy; break;
-                case "Jas": currentVoice = VoiceId.Ivy; break;
-                case "Jodi": currentVoice = VoiceId.Nicole; break;
-                case "Marnie": currentVoice = VoiceId.Kimberly; break;
-                case "Pam": currentVoice = VoiceId.Kimberly; break;
-                case "Sandy": currentVoice = VoiceId.Raveena; break;
-                case "Vincent": currentVoice = VoiceId.Justin; break;
-                case "default": currentVoice = VoiceId.Salli; break;
-
-
-                default: break;
-            }
-
-
         }
 
-
-        public static void setupVoices()
-        {
-            ModConfig config = Helper.ReadConfig<ModConfig>();
-            
-            currentCulture = CultureInfo.CreateSpecificCulture(config.lang);
-            culturelang = config.lang.Split('-')[0];
-
-
-        }
-
-        public static bool HasMethod(object objectToCheck, string methodName)
+          public static bool HasMethod(object objectToCheck, string methodName)
         {
             var type = objectToCheck.GetType();
             return type.GetMethod(methodName) != null;
         }
-
 
         private static void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
@@ -209,17 +134,12 @@ namespace PelicanTTS
             {
                 if (Game1.activeClickableMenu is DialogueBox)
                 {
-
                     DialogueBox dialogueBox = (DialogueBox)Game1.activeClickableMenu;
 
                     if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
-                    {
                         setVoice(Game1.currentSpeaker.Name);
-                    }
                     else
-                    {
                         setVoice("default");
-                    }
 
                     if (dialogueBox.getCurrentString() != lastDialog)
                     {
@@ -241,68 +161,112 @@ namespace PelicanTTS
             }
         }
 
-
-        private static FileInfo ensureFolderStructureExists(string path)
-        {
-
-            FileInfo fileInfo1 = new FileInfo(path);
-
-            if (!fileInfo1.Directory.Exists)
-                fileInfo1.Directory.Create();
-
-            return fileInfo1;
-        }
-
-
         private static void t2sOut()
         {
-            while (runSpeech )
+            while (runSpeech)
             {
                 if (currentText == lastText) { continue; }
-
 
                 if (currentText.StartsWith("+"))
                     continue;
 
-              
-                currentText = currentText.Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "");
-
-                /*
-                if (Game1.player.isMarried())
-                    currentText = currentText.Replace(" " + Game1.player.spouse + " ", " your spouse ").Replace(" " + Game1.player.spouse, " your spouse").Replace(Game1.player.spouse + " ", "Your spouse ");
-
-                currentText.Replace(" " + Game1.player.Name + " ", " Farmer ").Replace(" " + Game1.player.Name, " Farmer").Replace(Game1.player.Name + " ", "Farmer ");
-                */
-
+                currentText = currentText.Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
+                
+                currentText = @"<speak>" + currentText + @"</speak>";
                 int hash = currentText.GetHashCode();
-                ensureFolderStructureExists(Path.Combine(Path.Combine(tmppath, speakerName), "speech.mp3"));
-                string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".mp3");
-                FileInfo fileInfo = new FileInfo(file);
+                Monitor.Log(speakerName + " (" +currentVoice.Value +  ") :" + currentText);
+                if (!Directory.Exists(Path.Combine(tmppath, speakerName)))
+                    Directory.CreateDirectory(Path.Combine(tmppath, speakerName));
 
-                if (!fileInfo.Exists)
+                string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".wav");
+                SoundEffect nextSpeech = null;
+
+                if (!File.Exists(file))
                 {
-
                     SynthesizeSpeechRequest sreq = new SynthesizeSpeechRequest();
                     sreq.Text = currentText;
-                    sreq.OutputFormat = OutputFormat.Mp3;
+                    sreq.TextType = TextType.Ssml;
+                    sreq.OutputFormat = OutputFormat.Ogg_vorbis;
                     sreq.VoiceId = currentVoice;
                     SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
-
-                    using (var fileStream = File.Create(file))
+                    using (var memStream = new MemoryStream())
                     {
-                        sres.AudioStream.CopyTo(fileStream);
-                        fileStream.Flush();
-                        fileStream.Close();
+                        sres.AudioStream.CopyTo(memStream);
+                        nextSpeech = Convert(memStream, file);
                     }
                 }
-                MediaPlayer.Stop();
+                using (FileStream stream = new FileStream(file, FileMode.Open))
+                    nextSpeech = SoundEffect.FromStream(stream);
+
+                if (currentSpeech != null)
+                    currentSpeech.Stop();
+
+                currentSpeech = nextSpeech.CreateInstance();
+
                 if (Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
                 {
                     speak = false;
-                    MediaPlayer.Play(Song.FromUri("speech" + hash, new System.Uri(Path.Combine(Path.Combine(Path.Combine("Content", "TTS"), speakerName), "speech" + hash + ".mp3"), System.UriKind.Relative)));
+                    currentSpeech.Pitch = PelicanTTSMod.config.Pitch;
+                    currentSpeech.Volume = PelicanTTSMod.config.Volume;
+                    currentSpeech.Play();
                 }
                 lastText = currentText;
             }
+        }
+
+        public static SoundEffect Convert(Stream inputStream, string wavPath)
+        {
+            SoundEffect soundEffect = null;
+
+            using (FileStream stream = new FileStream(wavPath, FileMode.Create))
+            using (BinaryWriter writer = new BinaryWriter(stream))
+            {
+                OggDecoder decoder = new OggDecoder();
+                decoder.Initialize(inputStream);
+                byte[] data = decoder.SelectMany(chunk => chunk.Bytes.Take(chunk.Length)).ToArray();
+                WriteWave(writer, decoder.Stereo ? 2 : 1, decoder.SampleRate, data);
+            }
+
+            using (FileStream stream = new FileStream(wavPath, FileMode.Open))
+                soundEffect = SoundEffect.FromStream(stream);
+
+            return soundEffect;
+        }
+
+        private static void WriteWave(BinaryWriter writer, int channels, int rate, byte[] data)
+        {
+            writer.Write(new char[4] { 'R', 'I', 'F', 'F' });
+            writer.Write((36 + data.Length));
+            writer.Write(new char[4] { 'W', 'A', 'V', 'E' });
+            writer.Write(new char[4] { 'f', 'm', 't', ' ' });
+            writer.Write(16);
+            writer.Write((short)1);
+            writer.Write((short)channels);
+            writer.Write(rate);
+            writer.Write((rate * ((16 * channels) / 8)));
+            writer.Write((short)((16 * channels) / 8));
+            writer.Write((short)16);
+            writer.Write(new char[4] { 'd', 'a', 't', 'a' });
+            writer.Write(data.Length);
+            writer.Write(data);
+        }
+
+        private void WriteWavHeader(MemoryStream stream, bool isFloatingPoint, ushort channelCount, ushort bitDepth, int sampleRate, int totalSampleCount)
+        {
+            stream.Position = 0;
+            stream.Write(Encoding.ASCII.GetBytes("RIFF"), 0, 4);
+            stream.Write(BitConverter.GetBytes(((bitDepth / 8) * totalSampleCount) + 36), 0, 4);
+            stream.Write(Encoding.ASCII.GetBytes("WAVE"), 0, 4);
+            stream.Write(Encoding.ASCII.GetBytes("fmt "), 0, 4);
+            stream.Write(BitConverter.GetBytes(16), 0, 4);
+            stream.Write(BitConverter.GetBytes((ushort)(isFloatingPoint ? 3 : 1)), 0, 2);
+            stream.Write(BitConverter.GetBytes(channelCount), 0, 2);
+            stream.Write(BitConverter.GetBytes(sampleRate), 0, 4);
+            stream.Write(BitConverter.GetBytes(sampleRate * channelCount * (bitDepth / 8)), 0, 4);
+            stream.Write(BitConverter.GetBytes((ushort)channelCount * (bitDepth / 8)), 0, 2);
+            stream.Write(BitConverter.GetBytes(bitDepth), 0, 2);
+            stream.Write(Encoding.ASCII.GetBytes("data"), 0, 4);
+            stream.Write(BitConverter.GetBytes((bitDepth / 8) * totalSampleCount), 0, 4);
         }
 
         public static void demoVoices()
@@ -336,7 +300,7 @@ namespace PelicanTTS
                            
                             int hash = nextText.GetHashCode();
                     
-                            string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".mp3");
+                            string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".wav");
                             FileInfo fileInfo = new FileInfo(file);
 
 
@@ -345,7 +309,7 @@ namespace PelicanTTS
 
                                 SynthesizeSpeechRequest sreq = new SynthesizeSpeechRequest();
                                 sreq.Text = nextText;
-                                sreq.OutputFormat = OutputFormat.Mp3;
+                                sreq.OutputFormat = OutputFormat.Pcm;
                                 sreq.VoiceId = currentVoice;
                                 SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
 

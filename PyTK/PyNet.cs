@@ -98,30 +98,47 @@ namespace PyTK
                 Task.Run(() => sendRequestToFarmer(address, request, farmer, callback, serializationType, timeout, xmlSerializer));
         }
 
+        public static void sendDataToFarmer(string address, object data, Farmer farmer, SerializationType serializationType = SerializationType.PLAIN, XmlSerializer xmlSerializer = null)
+        {
+            Task.Run(() => sendRequestToFarmer<object>(address, data, farmer.UniqueMultiplayerID, null, serializationType, -1, xmlSerializer));
+        }
+
+        public static void sendDataToFarmer(string address, object data, long uniqueMultiplayerId, SerializationType serializationType = SerializationType.PLAIN, XmlSerializer xmlSerializer = null)
+        {
+            Task.Run(() => sendRequestToFarmer<object>(address, data, uniqueMultiplayerId, null, serializationType, -1, xmlSerializer));
+        }
+
         public static async Task<T> sendRequestToFarmer<T>(string address, object request, Farmer farmer, Action<T> callback = null, SerializationType serializationType = SerializationType.PLAIN, int timeout = 500, XmlSerializer xmlSerializer = null)
         {
-                long fromFarmer = farmer.UniqueMultiplayerID;
+           return await sendRequestToFarmer(address, request, farmer.UniqueMultiplayerID, callback, serializationType, timeout, xmlSerializer);
+        }
 
-                if (xmlSerializer == null)
-                    xmlSerializer = new XmlSerializer(typeof(T));
+        public static async Task<T> sendRequestToFarmer<T>(string address, object request, long uniqueMultiplayerId, Action<T> callback = null, SerializationType serializationType = SerializationType.PLAIN, int timeout = 500, XmlSerializer xmlSerializer = null)
+        {
+            long fromFarmer = uniqueMultiplayerId;
 
-                object objectData = request;
+            if (xmlSerializer == null)
+                xmlSerializer = new XmlSerializer(typeof(T));
 
-                if (serializationType == SerializationType.XML)
-                {
-                    StringWriter writer = new StringWriter();
-                    xmlSerializer.Serialize(writer, request);
-                    objectData = writer.ToString();
-                }
-                else if (serializationType == SerializationType.JSON)
-                    objectData = JsonConvert.SerializeObject(request);
+            object objectData = request;
 
-                Int16 id = (Int16)random.Next(Int16.MinValue, Int16.MaxValue);
-                string returnAddress = address + "." + id;
-                PyMessenger<T> messenger = new PyMessenger<T>(returnAddress);
-                sendMessage(new MPMessage(address, Game1.player, objectData, id, fromFarmer));
+            if (serializationType == SerializationType.XML)
+            {
+                StringWriter writer = new StringWriter();
+                xmlSerializer.Serialize(writer, request);
+                objectData = writer.ToString();
+            }
+            else if (serializationType == SerializationType.JSON)
+                objectData = JsonConvert.SerializeObject(request);
 
-                object result = await Task.Run(() =>
+            Int16 id = (Int16)random.Next(Int16.MinValue, Int16.MaxValue);
+            string returnAddress = address + "." + id;
+            PyMessenger<T> messenger = new PyMessenger<T>(returnAddress);
+            sendMessage(new MPMessage(address, Game1.player, objectData, id, fromFarmer));
+            object result = null;
+            if (callback != null)
+            {
+                result = await Task.Run(() =>
                 {
                     while (true)
                     {
@@ -140,7 +157,8 @@ namespace PyTK
                     }
                 });
                 callback?.Invoke((T)result);
-                return (T)result;
+            }
+            return (T)result;
         }
 
 

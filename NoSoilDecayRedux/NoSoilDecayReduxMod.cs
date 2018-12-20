@@ -6,9 +6,8 @@ using StardewModdingAPI.Events;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using PyTK;
-using PyTK.Events;
 using StardewValley.Locations;
+using StardewValley.Buildings;
 
 namespace NoSoilDecayRedux
 {
@@ -27,7 +26,7 @@ namespace NoSoilDecayRedux
 
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
-            if (!Game1.IsMultiplayer || Game1.IsMasterGame)
+            if (Game1.IsMasterGame)
             {
                 savedata = Helper.Data.ReadSaveData<SaveData>("nsd.save");
                 if (savedata == null)
@@ -38,10 +37,10 @@ namespace NoSoilDecayRedux
 
         private void restoreHoeDirt()
         {
-            if (!Game1.IsMultiplayer || Game1.IsMasterGame)
+            if (Game1.IsMasterGame)
             {
                 foreach (SaveTiles st in savedata.data)
-                    foreach (GameLocation l in PyUtils.getAllLocationsAndBuidlings().Where(lb => lb.name == st.location))
+                    foreach (GameLocation l in getAllLocationsAndBuidlings().Where(lb => lb.name == st.location))
                     {
                         if (config.farmonly && !(l is Farm || l.IsGreenhouse || l is BuildableGameLocation))
                             continue;
@@ -62,15 +61,30 @@ namespace NoSoilDecayRedux
             }
         }
 
+        private IEnumerable<GameLocation> getAllLocationsAndBuidlings()
+        {
+            foreach (GameLocation location in Game1.locations)
+            {
+                yield return location;
+                if (location is BuildableGameLocation bgl)
+                    foreach (Building building in bgl.buildings)
+                        if (building.indoors.Value != null)
+                            yield return building.indoors.Value;
+            }
+        }
+
         private void saveHoeDirt()
         {
-            if (!Game1.IsMultiplayer || Game1.IsMasterGame)
+            if (Game1.IsMasterGame)
             {
                 var hoeDirtChache = new Dictionary<GameLocation, List<Vector2>>();
-                foreach (GameLocation location in PyUtils.getAllLocationsAndBuidlings())
+                foreach (GameLocation location in getAllLocationsAndBuidlings())
                 {
-                    if (location is GameLocation)
+                    if (location is GameLocation l)
                     {
+                        if (config.farmonly && !(l is Farm || l.IsGreenhouse || l is BuildableGameLocation))
+                            continue;
+
                         if (!hoeDirtChache.ContainsKey(location))
                             hoeDirtChache.Add(location, new List<Vector2>());
 

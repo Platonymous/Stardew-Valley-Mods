@@ -52,6 +52,8 @@
     <Compile Include="ContentSync\ContentType.cs" />
     <Compile Include="ContentSync\SerializationColor.cs" />
     <Compile Include="ContentSync\SerializationTexture2D.cs" />
+    <Compile Include="CustomElementHandler\CODSync.cs" />
+    <Compile Include="CustomElementHandler\CODSyncMessage.cs" />
     <Compile Include="CustomElementHandler\CraftingData.cs" />
     <Compile Include="CustomElementHandler\CustomObjectData.cs" />
     <Compile Include="CustomElementHandler\IDrawFromCustomObjectData.cs" />
@@ -59,6 +61,7 @@
     <Compile Include="CustomElementHandler\ISyncableElement.cs" />
     <Compile Include="CustomElementHandler\PySObject.cs" />
     <Compile Include="CustomElementHandler\SaveHandler.cs" />
+    <Compile Include="CustomElementHandler\Replacer.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
     <Compile Include="Events\PyTimeEvents.cs" />
     <Compile Include="Extensions\PyAssets.cs" />
@@ -119,6 +122,7 @@
     <Compile Include="Types\PyNetMap.cs" />
     <Compile Include="Types\PyNetField.cs" />
     <Compile Include="Types\PyNetTexture.cs" />
+    <Compile Include="Types\PyReceiver.cs" />
     <Compile Include="Types\PyResponder.cs" />
     <Compile Include="Types\PyMessenger.cs" />
     <Compile Include="Types\Range.cs" />

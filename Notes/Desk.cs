@@ -1,30 +1,41 @@
 ﻿using Microsoft.Xna.Framework;
 using PyTK.CustomElementHandler;
-using PyTK.Extensions;
 using StardewValley;
 using StardewValley.Menus;
-using System;
+using StardewValley.Objects;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Notes
 {
     class Desk : PySObject
     {
-        public Desk() : base() { }
-        public Desk(CustomObjectData data) : base(data) { }
-        public Desk(CustomObjectData data, Vector2 tileLocation) : base(data, tileLocation) { }
+        public Desk()
+        {
+
+        }
+
+        public Desk(CustomObjectData data)
+            : base(data, Vector2.Zero)
+        {
+        }
+
+        public Desk(CustomObjectData data, Vector2 tileLocation)
+            : base(data, tileLocation)
+        {
+        }
 
         public override Item getOne()
         {
-            return new Desk(data, Vector2.Zero) { name = name, Price = price, Quality = quality };
+            return new Desk(data) { TileLocation = Vector2.Zero };
         }
 
         public override ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
         {
-            return new Desk(NotesMod.Desk, additionalSaveData["tileLocation"].Split(',').toList(i => i.toInt()).toVector<Vector2>());
+            if (additionalSaveData["id"] == "na")
+                additionalSaveData["id"] = "Notes.Desk";
+
+            CustomObjectData data = CustomObjectData.collection[additionalSaveData["id"]];
+            return new Desk(CustomObjectData.collection[additionalSaveData["id"]], (replacement as Chest).TileLocation);
         }
 
         public override bool checkForAction(Farmer who, bool justCheckingForActivity = false)
@@ -45,7 +56,7 @@ namespace Notes
                 }
 
             }), NotesMod.NoteInfo, "");
-            return false;
+            return true;
         }
     }
 }

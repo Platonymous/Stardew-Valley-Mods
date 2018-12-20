@@ -1,7 +1,7 @@
 ﻿{
   "Name": "CustomWallsAndFloors",
   "Author": "Platonymous",
-  "Version": "1.1.4",
+  "Version": "1.1.5",
   "Description": "Add custom Walls and Floors to SDV",
   "UniqueID": "Platonymous.CustomWallsAndFloors",
   "EntryDll": "CustomWallsAndFloors.dll",
@@ -10,7 +10,7 @@
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.4.8"
+      "MinimumVersion": "1.5.1"
     }
   ]
 }

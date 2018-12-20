@@ -62,9 +62,22 @@ namespace PyTK
             CustomTVMod.load();
             PyLua.init();
             SaveHandler.setUpEventHandlers();
+            CustomObjectData.CODSyncer.start();
             ContentSync.ContentSyncHandler.initialize();
             this.Helper.Events.Player.Warped += Player_Warped;
             this.Helper.Events.GameLoop.DayStarted += OnDayStarted;
+            this.Helper.Events.Multiplayer.PeerContextReceived += (s, e) =>
+            {
+                if (Game1.IsMasterGame && CustomObjectData.collection.Values.Count > 0)
+                {
+                    List<CODSync> list = new List<CODSync>();
+                    foreach (CustomObjectData data in CustomObjectData.collection.Values)
+                        list.Add(new CODSync(data.id, data.sdvId));
+
+                    PyNet.sendDataToFarmer(CustomObjectData.CODSyncerName, new CODSyncMessage(list), e.Peer.PlayerID, SerializationType.JSON);
+                }
+               
+            };
         }
 
         private void Player_Warped(object sender, WarpedEventArgs e)

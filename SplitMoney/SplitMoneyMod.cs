@@ -12,7 +12,6 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
-using StardewModdingAPI.Events;
 
 namespace SplitMoney
 {
@@ -47,8 +46,6 @@ namespace SplitMoney
             }, 30);
             moneyPoolReceiver.start();
 
-            SaveHandler.promiseType(typeof(GoldItem));
-
             helper.Events.GameLoop.ReturnedToTitle += (s, e) => { myMoney = -1; lockMoney = true; };
             helper.Events.GameLoop.Saving += (s, e) =>
             {
@@ -61,7 +58,7 @@ namespace SplitMoney
                 }
             };
 
-            PyTK.Events.PyTimeEvents.BeforeSleepEvents += (s, e) =>
+            Helper.Events.GameLoop.DayEnding += (s, e) =>
             {
                 if (!Game1.IsMasterGame)
                 {

@@ -2,7 +2,7 @@
   "lang": "en-us",
   "rate": 0,
   "volume" : 100,  
-  "polly": "off",
+  "polly": "on",
   "voices": [
     {
       "name": "default",

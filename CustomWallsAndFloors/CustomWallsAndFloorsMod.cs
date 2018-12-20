@@ -35,11 +35,15 @@ namespace CustomWallsAndFloors
 
         private void OnSaving(object sender, SavingEventArgs e)
         {
-            saveRoomData();
+            if(Game1.IsMasterGame)
+                saveRoomData();
         }
 
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
+            if (!Game1.IsMasterGame)
+                return;
+
             CustomWallpaper.savFile = helper.Data.ReadSaveData<SaveFile>("Platonymous.CustomWallsAndFloors.Data");
 
             if (CustomWallpaper.savFile == null)
@@ -84,7 +88,7 @@ namespace CustomWallsAndFloors
 
         public static void Prefix_setMapTile(ref GameLocation __instance, int tileX, int tileY, ref int index, string layer, int whichTileSheet = 0)
         {
-            if (skip)
+            if (skip || !Game1.IsMasterGame)
                 return;
 
             try
@@ -99,7 +103,7 @@ namespace CustomWallsAndFloors
 
         public static void Prefix_placement(Wallpaper __instance, GameLocation location, int x, int y, Farmer who = null)
         {
-            if (skip || __instance is CustomWallpaper)
+            if (skip || __instance is CustomWallpaper || !Game1.IsMasterGame)
                 return;
 
             skip = true;

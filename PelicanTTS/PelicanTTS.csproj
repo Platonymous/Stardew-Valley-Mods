@@ -34,6 +34,9 @@
     <PackageReference Include="AWSSDK.Core" Version="3.3.18.2" />
     <PackageReference Include="AWSSDK.Polly" Version="3.3.3.1" />
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="2.2.0" />
+    <PackageReference Include="Platonymous.Ogg2XNA">
+      <Version>1.0.0</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -52,9 +55,7 @@
     <Compile Include="VoiceControl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="config.json" />
     <None Include="manifest.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

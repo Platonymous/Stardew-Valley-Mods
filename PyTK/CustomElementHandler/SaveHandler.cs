@@ -3,13 +3,10 @@ using Netcode;
 using PyTK.Extensions;
 using PyTK.Types;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Buildings;
-using StardewValley.Locations;
 using StardewValley.Network;
 using StardewValley.Objects;
-using StardewValley.Projectiles;
 using StardewValley.TerrainFeatures;
 using System;
 using System.Collections;
@@ -27,25 +24,22 @@ namespace PyTK.CustomElementHandler
         public static event EventHandler BeforeRebuilding;
         public static event EventHandler BeforeRemoving;
         public static event EventHandler FinishedRemoving;
-        internal static IPyResponder TypeChecker;
         internal static Dictionary<Type, FieldInfo[]> fieldInfoChache;
         internal static Dictionary<Type, PropertyInfo[]> propInfoChache;
         public static bool inSync = false;
 
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
-        internal static bool inSaveMode { get; set; } = false;
 
         public static char seperator = '|';
         public static char valueSeperator = '=';
         public static string newPrefix = "PyTK";
-        internal static string typeCheckerName = "PyTK.TypeChecker";
 
         private static List<Func<string, string>> preProcessors = new List<Func<string, string>>();
         private static List<Func<object, object>> objectPreProcessors = new List<Func<object, object>>();
 
-        internal static List<string> typeCheckCache = new List<string>();
-        internal static List<string> promisedTypes = new List<string>();
+        internal static List<Action> rebuildActions = new List<Action>();
+
 
         public static bool hasSaveType(object o)
         {
@@ -62,89 +56,31 @@ namespace PyTK.CustomElementHandler
             objectPreProcessors.AddOrReplace(pp);
         }
 
-        internal static void rebuildIfAvailable(bool all = true)
-        {
-            Task.Run(() =>
-            {
-                OnBeforeRebuilding(EventArgs.Empty);
-
-                ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1, all), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
-                if(Game1.currentLocation is GameLocation gl)
-                    ReplaceAllObjects<object>(FindAllObjects(gl, Game1.locations, all), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
-                ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1, all), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
-                foreach (Farmer farmer in Game1.otherFarmers.Values)
-                    ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1, all), (o) => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
-
-                OnFinishedRebuilding(EventArgs.Empty);
-
-                if (!all)
-                {
-                    aRebuild = Task.Run(() =>
-                    {
-                        rebuildIfAvailable();
-                    });
-                }
-
-            });
-        }
-
-        public static void promiseType(Type type)
-        {
-            promisedTypes.AddOrReplace(getAssemblyTypeName(type));
-        }
-
-        internal static bool canBeRebuildInMultiplayer(object obj)
-        {
-            if (!PyTKMod.config.multiplayerSafety)
-                return true;
-
-            if (!(getDataString(obj).StartsWith(newPrefix)))
-                return false;
-
-            string dataString = getDataString(obj);
-            preProcessors.useAll(p => dataString = p.Invoke(dataString));
-
-            dataString = dataString.Replace(" " + valueSeperator.ToString() + " ", valueSeperator.ToString());
-            string[] data = splitElemets(dataString);
-
-            bool result = true;
-
-            if (typeCheckCache.Contains(data[2]) || promisedTypes.Contains(data[2]))
-                return true;
-
-            foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive() && f != Game1.player))
-            {
-                Task<bool> fResult = PyNet.sendRequestToFarmer<bool>(typeCheckerName, data[2], farmer,timeout:5000);
-                fResult.Wait();
-                result = result && fResult.Result;
-            }
-
-            if (result)
-                typeCheckCache.Add(data[2]);
-
-            return result;
-        }
-
         internal static void setUpEventHandlers()
         {
             fieldInfoChache = new Dictionary<Type, FieldInfo[]>();
             propInfoChache = new Dictionary<Type, PropertyInfo[]>();
 
-            Helper.Events.GameLoop.Saving += (s, e) => Replace();
-            Helper.Events.GameLoop.Saved += (s, e) => Rebuild(false);
-            Helper.Events.GameLoop.SaveLoaded += (s, e) => Rebuild(false);
-            Events.PyTimeEvents.BeforeSleepEvents += (s, e) => { if (Game1.IsClient) { Replace(); } };
+            Helper.Events.GameLoop.Saving += (s, e) =>
+            {
+                if (Game1.IsMasterGame)
+                    Replace();
+            };
+
+            Helper.Events.GameLoop.Saved += (s, e) =>
+            {
+                if (Game1.IsMasterGame)
+                    RebuildFromActions();
+            };
+
+            Helper.Events.GameLoop.SaveLoaded += (s, e) => {
+                    Rebuild();
+            };
 
             Helper.Events.GameLoop.DayStarted += (s, e) => {
                 Game1.objectSpriteSheet.Tag = "cod_objects";
-                    Game1.bigCraftableSpriteSheet.Tag = "cod_bigobject";
+                Game1.bigCraftableSpriteSheet.Tag = "cod_objects";
             };
-
-            TypeChecker = new PyResponder<bool, string>(typeCheckerName, (s) =>
-              {
-                  return Type.GetType(s) != null;
-              },16);
-            TypeChecker.start();
         }
 
         private static bool isRebuildable(object o)
@@ -181,21 +117,7 @@ namespace PyTK.CustomElementHandler
 
         public static void RebuildAll(object obj, object parent)
         {
-            if (Game1.IsMultiplayer && PyTKMod.config.multiplayerSafety)
-            {
-                rebuildAllIfAvailable(obj,parent);
-                return;
-            }
-
-            ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
-        }
-
-        internal static void rebuildAllIfAvailable(object obj, object parent)
-        {
-            Task.Run(() =>
-            {
-                ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => canBeRebuildInMultiplayer(o), o => rebuildElement(getDataString(o), o));
-            });
+            ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => getDataString(o).StartsWith(newPrefix), o => RebuildObject(o), setReverseAction: false);
         }
 
         public static void ReplaceAll(object obj, object parent)
@@ -203,56 +125,41 @@ namespace PyTK.CustomElementHandler
             ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => hasSaveType(o), o => getReplacement(o), true);
         }
 
+        internal static void RebuildFromActions()
+        {
+            Monitor.Log("Rebuilding Custom Objects");
+            rebuildActions.ForEach(a => a.Invoke());
+            rebuildActions.Clear();
+        }
+
         internal static void Replace()
         {
-            while (aRebuild != null && !aRebuild.IsCompleted)
-            {   
-            }
+            Monitor.Log("Replacing Custom Objects");
 
-            aRebuild = null;
+            rebuildActions.Clear();
             OnBeforeRemoving(EventArgs.Empty);
+
             ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
             ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
             foreach (Farmer farmer in Game1.otherFarmers.Values)
                 ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
+
             OnFinishedRemoving(EventArgs.Empty);
         }
 
-        internal static Task aRebuild = null;
 
-        internal static void Rebuild(bool all = true)
+        internal static void Rebuild()
         {
-            if (Game1.IsMultiplayer && PyTKMod.config.multiplayerSafety)
-            {
-                rebuildIfAvailable(all);
-                return;
-            }
-
+            Monitor.Log("Rebuilding Custom Objects from Save");
+            rebuildActions.Clear();
             OnBeforeRebuilding(EventArgs.Empty);
 
-
-            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1, all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
-            if (Game1.currentLocation is GameLocation gl)
-                ReplaceAllObjects<object>(FindAllObjects(gl, Game1.locations, all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
-
-            if (all)
-                ReplaceAllObjects<object>(FindAllObjects(Game1.getFarm().terrainFeatures, Game1.getFarm(), all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
-            else
-                ReplaceAllObjects<object>(FindAllObjects(Game1.getFarm().buildings, Game1.getFarm(), true), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
-               
-            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1, all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
-            
+            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o),setReverseAction:false);
+            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o), setReverseAction: false);
             foreach (Farmer farmer in Game1.otherFarmers.Values)
-                ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1, all), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o));
-            OnFinishedRebuilding(EventArgs.Empty);
+                ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o), setReverseAction: false);
 
-            if (!all)
-            {
-                aRebuild = Task.Run(() =>
-                {
-                    Rebuild();
-                });
-            }
+            OnFinishedRebuilding(EventArgs.Empty);
         }       
 
         internal static void Cleanup()
@@ -483,7 +390,7 @@ namespace PyTK.CustomElementHandler
             return aqn[0] + ", " + aqn[1];
         }
 
-        private static string getReplacementName(ISaveElement element, string cat = "Item")
+        internal static string getReplacementName(ISaveElement element, string cat = "Item")
         {
             string additionalSaveData = string.Join(seperator.ToString(), element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
             string type = getTypeName(element);
@@ -491,7 +398,7 @@ namespace PyTK.CustomElementHandler
             return name;
         }
 
-        private static string getReplacementName(object element, string cat = "Item")
+        internal static string getReplacementName(object element, string cat = "Item")
         {
             if (element is ISaveElement ise)
                 return getReplacementName(ise, cat);
@@ -516,14 +423,10 @@ namespace PyTK.CustomElementHandler
             if (element is ISaveElement ise)
                 replacement = getReplacement(ise);
 
-            if (element is TerrainFeature && !(replacement is FruitTree))
-                replacement = new FruitTree(628, 1);
-
-            setDataString(replacement, getReplacementName(element));
             return replacement;
         }
 
-        private static void setDataString(object o, string dataString)
+        internal static void setDataString(object o, string dataString)
         {
             if (o is SObject obj)
                 obj.name = dataString;
@@ -584,12 +487,12 @@ namespace PyTK.CustomElementHandler
 
         }
 
-        private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent, bool all = true)
+        private static Dictionary<object, List<object>> FindAllObjects(object obj, object parent)
         {
-            return FindAllInstances(obj, parent, new List<string>() {"displayItem","netObjects","overlayObjects", "farmhand","owner", "elements", "parent","value", "array", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", all ? "terrainFeatures" : "skipterrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
+            return FindAllInstances(obj, parent, new List<string>() {"displayItem","netObjects","overlayObjects", "farmhand","owner", "elements", "parent","value", "array", "FieldDict", "boots", "leftRing", "rightRing", "hat", "objects", "item", "debris", "attachments", "heldObject", "terrainFeatures", "largeTerrainFeatures", "items", "Items", "buildings", "indoors", "resourceClumps", "animals", "characters", "furniture", "input", "output", "storage", "itemsToStartSellingTomorrow", "itemsFromPlayerToSell", "fridge" });
         }
 
-        private static void ReplaceAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate, Func<TIn, object> replacer, bool reverse = false)
+        private static void ReplaceAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate, Func<TIn, object> replacer, bool reverse = false, bool setReverseAction = true)
         {
             List<object> objs = new List<object>(found.Keys.ToArray());
 
@@ -597,38 +500,65 @@ namespace PyTK.CustomElementHandler
                 objs.Reverse();
 
             foreach (object key in objs)
-            {
                 foreach (object obj in found[key])
-                {
-                    if (obj is TIn item && predicate(item))
-                    {
-                        var r = replacer(item);
-
+                    if (obj is TIn item && predicate(item) && replacer(item) is object r)
                         if (key is IDictionary<Vector2, SObject> dict)
                         {
                             foreach (Vector2 k in dict.Keys.Where(v => dict[v] == obj))
+                            {
+                                if (setReverseAction)
+                                {
+                                    var value = dict[k];
+                                    rebuildActions.AddOrReplace(() => dict.AddOrReplace(k, value));
+                                }
                                 dict[k] = (SObject)r;
+                            }
                         }
                         else if (key is OverlaidDictionary ovdict)
                         {
                             foreach (Vector2 k in ovdict.Keys.Where(v => ovdict[v] == obj))
+                            {
+                                if (setReverseAction)
+                                {
+                                    var value = ovdict[k];
+                                    rebuildActions.AddOrReplace(() => ovdict[k] = value);
+                                }
                                 ovdict[k] = (SObject)r;
+                            }
                         }
                         else if (key is SerializableDictionary<Vector2, TerrainFeature> sdictT)
                         {
                             foreach (Vector2 k in sdictT.Keys.Where(v => sdictT[v] == obj))
+                            {
+                                if (setReverseAction)
+                                {
+                                    var value = sdictT[k];
+                                    rebuildActions.AddOrReplace(() => sdictT.AddOrReplace(k, value));
+                                }
                                 sdictT[k] = (TerrainFeature)r;
+                            }
                         }
                         else if (key is IDictionary<Vector2, TerrainFeature> dictT)
                         {
                             foreach (Vector2 k in dictT.Keys.Where(v => dictT[v] == obj))
+                            {
+                                if (setReverseAction)
+                                {
+                                    var value = dictT[k];
+                                    rebuildActions.AddOrReplace(() => dictT.AddOrReplace(k, value));
+                                }
                                 dictT[k] = (TerrainFeature)r;
+                            }
                         }
                         else if (key is IList list)
                         {
                             object[] lobj = new object[list.Count];
                             list.CopyTo(lobj, 0);
-                            int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
+                            int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj); if (setReverseAction)
+                            {
+                                var value = list[index];
+                                rebuildActions.AddOrReplace(() => list[index] = value);
+                            }
                             list[index] = r;
                         }
                         else if (key is NetObjectList<Item> noli)
@@ -636,6 +566,11 @@ namespace PyTK.CustomElementHandler
                             Item[] lobj = new Item[noli.Count];
                             noli.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
+                            if (setReverseAction)
+                            {
+                                var value = noli[index];
+                                rebuildActions.AddOrReplace(() => noli[index] = value);
+                            }
                             noli[index] = (Item)r;
                         }
                         else if (key is NetCollection<Building> ncbld)
@@ -643,6 +578,11 @@ namespace PyTK.CustomElementHandler
                             Building[] lobj = new Building[ncbld.Count];
                             ncbld.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
+                            if (setReverseAction)
+                            {
+                                var value = ncbld[index];
+                                rebuildActions.AddOrReplace(() => ncbld[index] = value);
+                            }
                             ncbld[index] = (Building)r;
                         }
                         else if (key is NetCollection<Furniture> ncfur)
@@ -650,6 +590,11 @@ namespace PyTK.CustomElementHandler
                             Furniture[] lobj = new Furniture[ncfur.Count];
                             ncfur.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
+                            if (setReverseAction)
+                            {
+                                var value = ncfur[index];
+                                rebuildActions.AddOrReplace(() => ncfur[index] = value);
+                            }
                             ncfur[index] = (Furniture)r;
                         }
                         else if (key is Array arr)
@@ -657,14 +602,29 @@ namespace PyTK.CustomElementHandler
                             object[] lobj = new object[arr.Length];
                             arr.CopyTo(lobj, 0);
                             int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
+                            if (setReverseAction)
+                            {
+                                var value = arr.GetValue(index);
+                                rebuildActions.AddOrReplace(() => arr.SetValue(value, index));
+                            }
                             arr.SetValue(r, index);
                         }
                         else if (key is KeyValuePair<FieldInfo, object> kpv)
                         {
+                            if (setReverseAction)
+                            {
+                                var value = kpv.Key.GetValue(kpv.Value);
+                                rebuildActions.AddOrReplace(() => kpv.Key.SetValue(kpv.Value, value));
+                            }
                             kpv.Key.SetValue(kpv.Value, r);
                         }
                         else if (key is KeyValuePair<PropertyInfo, object> kppv)
                         {
+                            if (setReverseAction)
+                            {
+                                var value = kppv.Key.GetValue(kppv.Value);
+                                rebuildActions.AddOrReplace(() => kppv.Key.SetValue(kppv.Value, value));
+                            }
                             kppv.Key.SetValue(kppv.Value, r);
                         }
                         else if (key is NetArray<SObject, NetRef<SObject>> naso)
@@ -672,101 +632,79 @@ namespace PyTK.CustomElementHandler
                             List<SObject> slist = naso.ToList();
                             int idx = slist.ToList().FindIndex(s => s == (SObject)(object)item);
                             if (idx >= 0)
+                            {
+                                if (setReverseAction)
+                                {
+                                    var value = naso[idx];
+                                    rebuildActions.AddOrReplace(() => naso[idx] = value);
+                                }
                                 naso[idx] = (SObject)r;
+                            }
                         }
                         else if (key is KeyValuePair<IDictionary, object> idict)
+                        {
+                            if (setReverseAction)
+                            {
+                                var value = idict.Key[idict.Value];
+                                rebuildActions.AddOrReplace(() => idict.Key[idict.Value] = value);
+                            }
                             idict.Key[idict.Value] = r;
+                        }
                         else if (key is KeyValuePair<OverlaidDictionary, object> odict)
-                            odict.Key[(Vector2)odict.Value] = (SObject)r;                       
-                    }
-                }
-            }
+                        {
+                            if (setReverseAction)
+                            {
+                                var value = odict.Key[(Vector2)odict.Value];
+                                rebuildActions.AddOrReplace(() => odict.Key[(Vector2)odict.Value] = value);
+                            }
+                            odict.Key[(Vector2)odict.Value] = (SObject)r;
+                        }
         }
 
         private static void RemoveAllObjects<TIn>(Dictionary<object, List<object>> found, Func<TIn, bool> predicate)
         {
+            List<object> objs = new List<object>(found.Keys.ToArray());
 
-            foreach (object key in found.Keys)
-            {
+            foreach (object key in objs)
                 foreach (object obj in found[key])
                     if (obj is TIn item && predicate(item))
-                    {
-
-                        if (key is Dictionary<Vector2, SObject> dict)
-                        {
-                            foreach (Vector2 k in dict.Keys)
-                                if (dict[k] == obj)
-                                {
-                                    dict.Remove(k);
-                                    break;
-                                }
-                        }
+                        if (key is IDictionary<Vector2, SObject> dict)
+                            foreach (Vector2 k in dict.Keys.Where(v => dict[v] == obj))
+                                dict.Remove(k);
                         else if (key is OverlaidDictionary ovdict)
-                        {
-                            foreach (Vector2 k in ovdict.Keys)
-                                if (ovdict[k] == obj)
-                                {
-                                    ovdict.Remove(k);
-                                    break;
-                                }
-                        }
-                        else if (key is SerializableDictionary<Vector2, TerrainFeature> sdict)
-                        {
-                            foreach (Vector2 k in sdict.Keys)
-                                if (sdict[k] == obj)
-                                {
-                                    sdict.Remove(k);
-                                    break;
-                                }
-                        }
-                        else if (key is List<Item> list)
-                        {
-                            int index = list.FindIndex(p => p is TIn && p == obj);
-                            list.RemoveAt(index);
-                        }
+                            foreach (Vector2 k in ovdict.Keys.Where(v => ovdict[v] == obj))
+                                ovdict.Remove(k);
+                        else if (key is SerializableDictionary<Vector2, TerrainFeature> sdictT)
+                            foreach (Vector2 k in sdictT.Keys.Where(v => sdictT[v] == obj))
+                                sdictT.Remove(k);
+                        else if (key is IDictionary<Vector2, TerrainFeature> dictT)
+                            foreach (Vector2 k in dictT.Keys.Where(v => dictT[v] == obj))
+                                dictT.Remove(k);
+                        else if (key is IList list)
+                            list.Remove(obj);
                         else if (key is NetObjectList<Item> noli)
-                        {
-                            int index = noli.ToList<Item>().FindIndex(p => p is TIn && p == obj);
-                            noli.RemoveAt(index);
-                        }
+                            noli.Remove((Item)obj);
                         else if (key is NetCollection<Building> ncbld)
-                        {
-                            int index = ncbld.ToList<Building>().FindIndex(p => p is TIn && p == obj);
-                            ncbld.RemoveAt(index);
-                        }
+                            ncbld.Remove((Building)obj);
                         else if (key is NetCollection<Furniture> ncfur)
+                            ncfur.Remove((Furniture)obj);
+                        else if (key is Array arr)
                         {
-                            int index = ncfur.ToList<Furniture>().FindIndex(p => p is TIn && p == obj);
-                            ncfur.RemoveAt(index);
-                        }
-                        else if (key is List<Furniture> furniture)
-                        {
-                            int index = furniture.FindIndex(p => p is TIn && p == obj);
-                            furniture.RemoveAt(index);
+                            object[] lobj = new object[arr.Length];
+                            arr.CopyTo(lobj, 0);
+                            int index = new List<object>(lobj).FindIndex(p => p is TIn && p == obj);
+                            arr.SetValue(null, index);
                         }
                         else if (key is KeyValuePair<FieldInfo, object> kpv)
-                        {
                             kpv.Key.SetValue(kpv.Value, null);
-                        }
                         else if (key is KeyValuePair<PropertyInfo, object> kppv)
-                        {
                             kppv.Key.SetValue(kppv.Value, null);
-                        }
                         else if (key is NetArray<SObject, NetRef<SObject>> naso)
-                        {
-                            List<SObject> slist = naso.ToList();
-                            int idx = slist.ToList().FindIndex(s => s == (SObject)(object)item);
-                            if (idx >= 0)
-                                naso[idx] = null;
-                        }
+                            naso.Remove((SObject)obj);
                         else if (key is KeyValuePair<IDictionary, object> idict)
                             idict.Key.Remove(idict.Value);
                         else if (key is KeyValuePair<OverlaidDictionary, object> odict)
-                            odict.Key.Remove((Vector2) odict.Value);
-
-
-                    }
-            }
+                            odict.Key.Remove((Vector2)odict.Value);
         }
     }
 }

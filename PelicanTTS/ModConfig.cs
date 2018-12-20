@@ -7,36 +7,59 @@ namespace PelicanTTS
 {
     class ModConfig
     {
-        public string lang { get; set; }
-        public int rate { get; set; }
-        public int volume { get; set; }
-        public string polly { get; set; }
-        public SpeechConfig[] voices { get; set; }
+        public float Pitch { get; set; }
+        public float Volume { get; set; }
+        public string Greeting { get; set; } = "Good Morning {Player}. It is {DayName} the {Day} day of {Season}.";
+        public List<SpeechConfig> Voices { get; set; }
 
         public ModConfig()
         {
             List<SpeechConfig> villagers = new List<SpeechConfig>();
-            lang = "en-us";
-            polly = "off";
-            rate = 0;
-            volume = 100;
-            villagers.Add(new SpeechConfig("default", "Microsoft Zira Desktop", 1, 0));
-            foreach(NPC npc in Utility.getAllCharacters())
+            Pitch = 0;
+            Volume = 1;
+            villagers.Add(new SpeechConfig("default", "Salli"));
+            foreach (NPC npc in Utility.getAllCharacters())
             {
                 if (npc.isVillager())
                 {
                     int useAge = npc.age;
+                    string voice = "Brian";
+                    if (npc.gender == 1)
+                        voice = npc.Age == 0 ? "Kendra" : "Salli";
 
-                    if (npc.name == "Evelyn" || npc.name == "George" || npc.name == "Lewis")
+                    switch (npc.name)
                     {
-                        useAge = 3;
+                        case "Elliot": voice = "Geraint"; break;
+                        case "Alex": voice = "Joey"; break;
+                        case "Sam": voice = "Russell"; break;
+                        case "Emily": voice = "Emma"; break;
+                        case "Haley": voice = "Emma"; break;
+                        case "Harvey": voice = "Matthew"; break;
+                        case "Wizard": voice = "Geraint"; break;
+                        case "Pierre": voice = "Matthew"; break;
+                        case "Morris": voice = "Geraint"; break;
+                        case "Mister Qi": voice = "Geraint"; break;
+                        case "Penny": voice = "Amy"; break;
+                        case "Evelyn": voice = "Amy"; break;
+                        case "Jas": voice = "Ivy"; break;
+                        case "Jodi": voice = "Nicole"; break;
+                        case "Marnie": voice = "Kimberly"; break;
+                        case "Pam": voice = "Kimberly"; break;
+                        case "Sandy": voice = "Raveena"; break;
+                        case "Vincent": voice = "Justin"; break;
+                        case "default": voice = "Salli"; break;
+                        default: break;
                     }
 
-                    SpeechConfig next = new SpeechConfig(npc.name, "any", npc.gender, useAge);
+                    SpeechConfig next = new SpeechConfig(npc.name, voice);
                     villagers.Add(next);
                 }
             }
-            voices = villagers.ToArray();
+
+            if(!villagers.Exists(v => v.name == "Morris"))
+                villagers.Add(new SpeechConfig("Morris", "Geraint"));
+
+            Voices = villagers;
         }
     }
 }

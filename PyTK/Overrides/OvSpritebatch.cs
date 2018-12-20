@@ -4,11 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 using PyTK.CustomElementHandler;
 using PyTK.Extensions;
 using StardewModdingAPI;
-using SObject = StardewValley.Object;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
 using StardewValley;
 using PyTK.Types;
 using StardewValley.Menus;
@@ -26,11 +24,13 @@ namespace PyTK.Overrides
 
         internal static CustomObjectData getDataFromSourceRectangle(Rectangle source)
         {
+            CustomObjectData data = null;
             if (recCache.ContainsKey(source))
                 return recCache[source];
 
-            CustomObjectData data = CustomObjectData.collection.Find(o => o.Value.sdvSourceRectangle == source) is KeyValuePair<string, CustomObjectData> d ? d.Value : null;
+            data = CustomObjectData.collection.Find(o => o.Value.sdvSourceRectangle == source) is KeyValuePair<string, CustomObjectData> d ? d.Value : null;
             recCache.Add(source, data);
+
             return data;
         }
 
@@ -49,10 +49,10 @@ namespace PyTK.Overrides
 
             internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth, ref bool autoFlush)
             {
-                if (skip)
+                if (skip || !sourceRectangle.HasValue || Game1.activeClickableMenu is TitleMenu)
                     return true;
 
-                if (!skip && texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
+                if (!skip && texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.Value is Rectangle r)
                 {
                     var newDestination = new Vector4(destinationRectangle.X, destinationRectangle.Y, destinationRectangle.Z, destinationRectangle.W);
                     var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
@@ -66,12 +66,15 @@ namespace PyTK.Overrides
                     skip = false;
                     return false;
                 }
-
-                if (!(Game1.activeClickableMenu is TitleMenu) && texture.Tag is String && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle sr)
+                else if (texture.Tag is String tag)
                 {
-                    CustomObjectData data = getDataFromSourceRectangle(sr);
+                    CustomObjectData data = CustomObjectData.collection.ContainsKey(tag) ? CustomObjectData.collection[tag] : getDataFromSourceRectangle(sourceRectangle.Value);
 
-                    if(data != null)
+                    texture.Tag = "cod_object";
+                    Game1.bigCraftableSpriteSheet.Tag = "cod_object";
+                    Game1.objectSpriteSheet.Tag = "cod_object";
+
+                    if (data != null)
                     {
                         skip = true;
                         drawMethodMono.Invoke(__instance, new object[] { data.texture, destinationRectangle, data.sourceRectangle, data.color != Color.White ? data.color : color, rotation, origin, effect, depth, autoFlush });
@@ -101,10 +104,10 @@ namespace PyTK.Overrides
 
             internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
             {
-                if (skip)
+                if (skip || !sourceRectangle.HasValue)
                     return true;
 
-                if (!skip && texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle r)
+                if (!skip && texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.Value is Rectangle r)
                 {
                     var newDestination = new Vector4(destination.X, destination.Y, destination.Z / s.Scale, destination.W / s.Scale);
                     var newSR = new Rectangle?(new Rectangle((int) (r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
@@ -117,11 +120,12 @@ namespace PyTK.Overrides
                     drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, scaleDestination, newSR, color, rotation, newOrigin, effects, depth });
                     skip = false;
                     return false;
-                }
-                
-                if (!(Game1.activeClickableMenu is TitleMenu) && texture.Tag is String && sourceRectangle.HasValue && sourceRectangle.Value is Rectangle sr)
+                }else if (!(Game1.activeClickableMenu is TitleMenu) && texture.Tag is String tag)
                 {
-                    CustomObjectData data = getDataFromSourceRectangle(sr);
+                    CustomObjectData data = CustomObjectData.collection.ContainsKey(tag) ? CustomObjectData.collection[tag] : getDataFromSourceRectangle(sourceRectangle.Value);
+                    texture.Tag = "cod_object";
+                    Game1.bigCraftableSpriteSheet.Tag = "cod_object";
+                    Game1.objectSpriteSheet.Tag = "cod_object";
 
                     if (data != null)
                     {

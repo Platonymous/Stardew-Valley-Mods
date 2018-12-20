@@ -65,25 +65,31 @@ namespace PyTK.CustomElementHandler
 
         public override void updateWhenCurrentLocation(GameTime time, GameLocation environment)
         {
-            checkData();
             base.updateWhenCurrentLocation(time, environment);
+        }
+
+        private void setTags()
+        {
+            checkData();
+            Game1.bigCraftableSpriteSheet.Tag = data.id;
+            Game1.objectSpriteSheet.Tag = data.id;
         }
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
-            checkData();
+            setTags();
             base.draw(spriteBatch, x, y, alpha);
         }
 
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
-            checkData();
+            setTags();
             base.drawInMenu(spriteBatch, location, scaleSize, transparency, layerDepth, drawStackNumber, color, drawShadow);
         }
 
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, Farmer f)
         {
-            checkData();
+            setTags();
             base.drawWhenHeld(spriteBatch, objectPosition, f);
         }
 
@@ -114,12 +120,12 @@ namespace PyTK.CustomElementHandler
                 return new PySObject(CustomObjectData.collection[additionalSaveData["id"]]);
         }
 
-        public Dictionary<string, string> getSyncData()
+        public virtual Dictionary<string, string> getSyncData()
         {
             return null;
         }
 
-        public void sync(Dictionary<string, string> syncData)
+        public virtual void sync(Dictionary<string, string> syncData)
         {
             
         }

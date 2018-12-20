@@ -10,7 +10,7 @@ using StardewValley;
 using StardewValley.Menus;
 
 
-
+/*
 namespace PelicanTTS
 {
     internal class SpeechHandler
@@ -235,3 +235,4 @@ namespace PelicanTTS
 
     }
 }
+*/

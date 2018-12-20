@@ -32,15 +32,15 @@ namespace SeedBag
         public dynamic getReplacement()
         {
             Chest replacement = new Chest(true);
-            if(attachments.Count() > 0)
+            if (attachments.Count() > 0)
             {
-                if(attachments[0] != null)
+                if (attachments[0] != null)
                     replacement.addItem(attachments[0]);
 
                 if (attachments[1] != null)
                     replacement.addItem(attachments[1]);
             }
-            
+
             return replacement;
         }
 
@@ -50,7 +50,7 @@ namespace SeedBag
             Chest chest = (Chest)replacement;
             if (!chest.isEmpty())
             {
-                if(new List<Item>(chest.items)[0].Category == -19)
+                if (new List<Item>(chest.items)[0].Category == -19)
                     attachments[1] = (SObject)chest.items[0];
                 else
                     attachments[0] = (SObject)chest.items[0];
@@ -58,7 +58,7 @@ namespace SeedBag
                 if (chest.items.Count > 1)
                     attachments[1] = (SObject)chest.items[1];
             }
-            
+
         }
 
         public SeedBagTool(CustomObjectData data)
@@ -67,7 +67,7 @@ namespace SeedBag
         }
 
         public SeedBagTool()
-            :base()
+            : base()
         {
             build();
         }
@@ -115,7 +115,7 @@ namespace SeedBag
             CurrentParentTileIndex = 77;
             IndexOfMenuItemView = 0;
             UpgradeLevel = 4;
-           
+
             InstantUse = false;
             inUse = false;
         }
@@ -128,7 +128,7 @@ namespace SeedBag
         {
             return numAttachmentSlots.Value;
         }
-        
+
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
             spriteBatch.Draw(texture, location + new Vector2(32f, 32f), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(texture, 16, 16, this.IndexOfMenuItemView)), color * transparency, 0.0f, new Vector2(8f, 8f), 4f * scaleSize, SpriteEffects.None, layerDepth);
@@ -137,10 +137,10 @@ namespace SeedBag
             {
                 StardewValley.Farmer f = Game1.player;
                 Vector2 vector = f.getLocalPosition(Game1.viewport) + f.jitter + f.armOffset;
-                int num = (int)vector.Y - ((Game1.tileSize * 5)/2);
+                int num = (int)vector.Y - ((Game1.tileSize * 5) / 2);
                 spriteBatch.Draw(texture, new Vector2(vector.X, (float)num), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(Game1.toolSpriteSheet, 16, 16, this.IndexOfMenuItemView)), color * transparency, 0.0f, new Vector2(8f, 8f), 4f * scaleSize, SpriteEffects.None, Math.Max(0f, (float)(f.getStandingY() + Game1.tileSize / 2) / 10000f));
             }
-            
+
         }
 
         public override void drawAttachments(SpriteBatch b, int x, int y)
@@ -154,13 +154,13 @@ namespace SeedBag
 
             if (attachments.Count() > 0)
             {
-                if(attachments[0] is SObject)
+                if (attachments[0] is SObject)
                     attachments[0].drawInMenu(b, new Vector2(x, y), 1f);
 
                 if (attachments[1] is SObject)
                     attachments[1].drawInMenu(b, new Vector2(x, y + offset), 1f);
             }
-            
+
         }
 
         public override bool onRelease(GameLocation location, int x, int y, StardewValley.Farmer who)
@@ -186,18 +186,19 @@ namespace SeedBag
             SObject priorAttachement = null;
 
             if (o != null && o.Category == -74 && attachments[0] != null)
-                priorAttachement = new SObject(Vector2.Zero,attachments[0].ParentSheetIndex,attachments[0].Stack);
+                priorAttachement = new SObject(Vector2.Zero, attachments[0].ParentSheetIndex, attachments[0].Stack);
 
             if (o != null && o.Category == -19 && attachments[1] != null)
                 priorAttachement = new SObject(Vector2.Zero, attachments[1].ParentSheetIndex, attachments[1].Stack);
 
             if (o == null)
             {
-                if(attachments[0] != null)
+                if (attachments[0] != null)
                 {
                     priorAttachement = new SObject(Vector2.Zero, attachments[0].ParentSheetIndex, attachments[0].Stack);
                     attachments[0] = null;
-                }else if (attachments[1] != null)
+                }
+                else if (attachments[1] != null)
                 {
                     priorAttachement = new SObject(Vector2.Zero, attachments[1].ParentSheetIndex, attachments[1].Stack);
                     attachments[1] = null;
@@ -209,7 +210,7 @@ namespace SeedBag
 
             if (canThisBeAttached(o))
             {
-                if(o.Category == -74)
+                if (o.Category == -74)
                     attachments[0] = o;
 
                 if (o.Category == -19)
@@ -218,7 +219,7 @@ namespace SeedBag
                 Game1.playSound("button1");
                 return priorAttachement;
             }
- 
+
             return null;
         }
 
@@ -248,7 +249,7 @@ namespace SeedBag
                 {
                     if (attachments[1] != null && hd.fertilizer.Value <= 0)
                     {
-                        if (hd.plant(attachments[1].ParentSheetIndex, (int)current.X, (int)current.Y, who, true,location))
+                        if (hd.plant(attachments[1].ParentSheetIndex, (int)current.X, (int)current.Y, who, true, location))
                         {
                             attachments[1].Stack--;
                             if (attachments[1].Stack == 0)
@@ -259,10 +260,10 @@ namespace SeedBag
                             }
                         }
                     }
-                    
+
                     if (attachments[0] != null)
                     {
-                        if (hd.plant(attachments[0].ParentSheetIndex, (int)current.X, (int)current.Y, who, false,location))
+                        if (hd.plant(attachments[0].ParentSheetIndex, (int)current.X, (int)current.Y, who, false, location))
                         {
                             attachments[0].Stack--;
                             if (attachments[0].Stack == 0)
@@ -276,12 +277,12 @@ namespace SeedBag
                 }
             }
         }
-       
+
         public override string getDescription()
         {
             if (attachments.Count > 0)
             {
-                if(attachments[0] != null)
+                if (attachments[0] != null)
                 {
                     return attachments[0].name;
                 }
