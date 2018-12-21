@@ -165,52 +165,58 @@ namespace PelicanTTS
         {
             while (runSpeech)
             {
-                if (currentText == lastText) { continue; }
-
-                if (currentText.StartsWith("+"))
-                    continue;
-
-                currentText = currentText.Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
-                
-                currentText = @"<speak>" + currentText + @"</speak>";
-                int hash = currentText.GetHashCode();
-                Monitor.Log(speakerName + " (" +currentVoice.Value +  ") :" + currentText);
-                if (!Directory.Exists(Path.Combine(tmppath, speakerName)))
-                    Directory.CreateDirectory(Path.Combine(tmppath, speakerName));
-
-                string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".wav");
-                SoundEffect nextSpeech = null;
-
-                if (!File.Exists(file))
+                try
                 {
-                    SynthesizeSpeechRequest sreq = new SynthesizeSpeechRequest();
-                    sreq.Text = currentText;
-                    sreq.TextType = TextType.Ssml;
-                    sreq.OutputFormat = OutputFormat.Ogg_vorbis;
-                    sreq.VoiceId = currentVoice;
-                    SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
-                    using (var memStream = new MemoryStream())
+                    if (currentText == lastText) { continue; }
+
+                    if (currentText.StartsWith("+"))
+                        continue;
+
+                    currentText = currentText.Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
+
+                    currentText = @"<speak>" + currentText + @"</speak>";
+                    int hash = currentText.GetHashCode();
+                    if (!Directory.Exists(Path.Combine(tmppath, speakerName)))
+                        Directory.CreateDirectory(Path.Combine(tmppath, speakerName));
+
+                    string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".wav");
+                    SoundEffect nextSpeech = null;
+
+                    if (!File.Exists(file))
                     {
-                        sres.AudioStream.CopyTo(memStream);
-                        nextSpeech = Convert(memStream, file);
+                        SynthesizeSpeechRequest sreq = new SynthesizeSpeechRequest();
+                        sreq.Text = currentText;
+                        sreq.TextType = TextType.Ssml;
+                        sreq.OutputFormat = OutputFormat.Ogg_vorbis;
+                        sreq.VoiceId = currentVoice;
+                        SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
+                        using (var memStream = new MemoryStream())
+                        {
+                            sres.AudioStream.CopyTo(memStream);
+                            nextSpeech = Convert(memStream, file);
+                        }
                     }
+                    using (FileStream stream = new FileStream(file, FileMode.Open))
+                        nextSpeech = SoundEffect.FromStream(stream);
+
+                    if (currentSpeech != null)
+                        currentSpeech.Stop();
+
+                    currentSpeech = nextSpeech.CreateInstance();
+
+                    if (Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
+                    {
+                        speak = false;
+                        currentSpeech.Pitch = PelicanTTSMod.config.Pitch;
+                        currentSpeech.Volume = PelicanTTSMod.config.Volume;
+                        currentSpeech.Play();
+                    }
+                    lastText = currentText;
                 }
-                using (FileStream stream = new FileStream(file, FileMode.Open))
-                    nextSpeech = SoundEffect.FromStream(stream);
-
-                if (currentSpeech != null)
-                    currentSpeech.Stop();
-
-                currentSpeech = nextSpeech.CreateInstance();
-
-                if (Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
+                catch
                 {
-                    speak = false;
-                    currentSpeech.Pitch = PelicanTTSMod.config.Pitch;
-                    currentSpeech.Volume = PelicanTTSMod.config.Volume;
-                    currentSpeech.Play();
+                    lastText = currentText;
                 }
-                lastText = currentText;
             }
         }
 

@@ -1,4 +1,6 @@
-﻿using System.Speech.Synthesis;
+﻿/*
+
+using System.Speech.Synthesis;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,7 +12,6 @@ using StardewValley;
 using StardewValley.Menus;
 
 
-/*
 namespace PelicanTTS
 {
     internal class SpeechHandler

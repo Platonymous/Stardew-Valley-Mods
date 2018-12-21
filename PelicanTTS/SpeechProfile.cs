@@ -1,4 +1,5 @@
-﻿using System.Speech.Synthesis;
+﻿/*
+using System.Speech.Synthesis;
 using System.Globalization;
 
 namespace PelicanTTS
@@ -23,3 +24,4 @@ namespace PelicanTTS
 
     }
 }
+*/
