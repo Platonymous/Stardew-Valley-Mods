@@ -111,9 +111,13 @@ namespace PelicanTTS
         {
             speakerName = name;
 
-            if (PelicanTTSMod.config.Voices.Find(v => v.name == name) is SpeechConfig sc1 && VoiceId.FindValue(sc1.voicename) is VoiceId vId1)
+            string t = PelicanTTSMod.i18n.Get(name);
+            if (t.ToString() == "")
+                t = PelicanTTSMod.i18n.Get("default");
+
+            if (VoiceId.FindValue(t) is VoiceId vId1)
                 currentVoice = vId1;
-            else if (PelicanTTSMod.config.Voices.Find(v => v.name == "default") is SpeechConfig sc2 && VoiceId.FindValue(sc2.voicename) is VoiceId vId2)
+            else if (VoiceId.FindValue(PelicanTTSMod.i18n.Get("default")) is VoiceId vId2)
                 currentVoice = vId2;
             else
             {

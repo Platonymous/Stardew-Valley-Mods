@@ -11,9 +11,12 @@ namespace PelicanTTS
     {
         private bool greeted;
         internal static ModConfig config;
+        internal static IModHelper _helper;
+        internal static ITranslationHelper i18n => _helper.Translation;
 
         public override void Entry(IModHelper helper)
         {
+            _helper = helper;
             string tmppath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "Content"), "TTS");
 
             if (Directory.Exists(Path.Combine(Helper.DirectoryPath, "TTS")))
@@ -44,19 +47,19 @@ namespace PelicanTTS
             switch (dayOfSeason % 7)
             {
                 case 0:
-                    return "Sunday";
+                    return i18n.Get("Sunday");
                 case 1:
-                    return "Monday";
+                    return i18n.Get("Monday");
                 case 2:
-                    return "Tuesday";
+                    return i18n.Get("Tuesday");
                 case 3:
-                    return "Wednesday";
+                    return i18n.Get("Wednesday");
                 case 4:
-                    return "Thursday";
+                    return i18n.Get("Thursday");
                 case 5:
-                    return "Friday";
+                    return i18n.Get("Friday");
                 case 6:
-                    return "Saturday";
+                    return i18n.Get("Saturday");
                 default:
                     return "";
             }
@@ -67,17 +70,17 @@ namespace PelicanTTS
             NPC birthday = Utility.getTodaysBirthdayNPC(Game1.currentSeason, Game1.dayOfMonth);
             string day = Game1.dayOfMonth.ToString();
 
-            string greeting = config.Greeting.Replace("{Player}", Game1.player.Name).Replace("{DayName}", dayNameFromDayOfSeason(Game1.dayOfMonth)).Replace("{Day}", @"[say-as interpret-as='date']??????" + (day.Length < 2 ? "0"+day : day) + @"[/say-as]").Replace("{Season}", Game1.currentSeason) + " ";
+            string greeting = i18n.Get("Greeting").ToString().Replace("{Player}", Game1.player.Name).Replace("{DayName}", dayNameFromDayOfSeason(Game1.dayOfMonth)).Replace("{Day}", @"[say-as interpret-as='date']??????" + (day.Length < 2 ? "0"+day : day) + @"[/say-as]").Replace("{Season}", i18n.Get(Game1.currentSeason)) + " ";
             if (birthday != null)
             {
                 string person = birthday.Name;
                 if (birthday == Game1.player.getSpouse())
                     if (birthday.Gender == 0)
-                        person = "Your husband";
+                        person = i18n.Get("Your husband");
                     else
-                        person = "Your wife";
+                        person = i18n.Get("Your wife");
 
-                greeting += "Today is " + person + "'s birthday.";
+                greeting += i18n.Get("BirthdayGreeting").ToString().Replace("{ NPC}",person);
             }
 
             if (Utility.isFestivalDay(Game1.dayOfMonth, Game1.currentSeason))
@@ -85,14 +88,14 @@ namespace PelicanTTS
                 int festivalTime = Utility.getStartTimeOfFestival();
                 int ftHours = (int)Math.Floor((double)festivalTime / 100);
                 int ftMinutes = festivalTime - (ftHours * 100);
-                string timeInfo = "a.m.";
+                string timeInfo = i18n.Get("a.m.");
                 if (ftHours > 12)
                 {
                     ftHours -= 12;
-                    timeInfo = "p.m.";
+                    timeInfo = i18n.Get("p.m.");
                 }
 
-                greeting += "Today's festival starts at " + ftHours + " " + timeInfo + ".";
+                greeting += i18n.Get("FestivalGreeting") + " " + ftHours + " " + timeInfo + ".";
             }
 
 
@@ -118,7 +121,6 @@ namespace PelicanTTS
         {
             Helper.Events.GameLoop.DayStarted += OnDayStarted;
             config = Helper.ReadConfig<ModConfig>();
-            Monitor.Log(config.Greeting);
             SpeechHandlerPolly.Monitor = Monitor;
             SpeechHandlerPolly.start(Helper);
 
