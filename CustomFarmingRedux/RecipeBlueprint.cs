@@ -225,7 +225,7 @@ namespace CustomFarmingRedux
             return p is SObject o && (exclude == null || !exclude.Contains(o.ParentSheetIndex)) && (o.ParentSheetIndex == i.index || o.Category == i.index || (include != null && (include.Contains(o.ParentSheetIndex) || include.Contains(o.Category)))) && (i.exactquality == -1 || o.Quality == i.exactquality) && o.Quality >= i.quality && (i.quality >= 0 || o.Quality < (i.quality * -1));
         }
 
-        internal bool fitsIngredient(Item p, List<IngredientBlueprint> l)
+        public bool fitsIngredient(Item p, List<IngredientBlueprint> l)
         {
             foreach (IngredientBlueprint i in l)
             {
