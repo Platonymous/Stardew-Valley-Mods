@@ -3,6 +3,7 @@ using Netcode;
 using PyTK.Extensions;
 using PyTK.Types;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Network;
@@ -81,6 +82,22 @@ namespace PyTK.CustomElementHandler
                 Game1.objectSpriteSheet.Tag = "cod_objects";
                 Game1.bigCraftableSpriteSheet.Tag = "cod_objects";
             };
+
+            Helper.Events.GameLoop.ReturnedToTitle += GameLoop_ReturnedToTitle;
+
+            Helper.Events.GameLoop.DayStarted += RebuildFirstDay;
+        }
+
+        private static void GameLoop_ReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
+        {
+            Helper.Events.GameLoop.DayStarted += RebuildFirstDay;
+        }
+
+        private static void RebuildFirstDay(object s, DayStartedEventArgs e)
+        {
+            if(Game1.IsMasterGame)
+                Task.Run(() => Rebuild());
+            Helper.Events.GameLoop.DayStarted -= RebuildFirstDay;
         }
 
         private static bool isRebuildable(object o)

@@ -158,7 +158,7 @@ namespace CustomShirts
 
         private void loadContentPacks()
         {
-            foreach (StardewModdingAPI.IContentPack pack in Helper.ContentPacks.GetOwned())
+            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
             {
                 ShirtPack shirtPack = pack.ReadJsonFile<ShirtPack>("content.json");
 

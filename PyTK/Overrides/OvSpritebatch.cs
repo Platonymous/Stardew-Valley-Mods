@@ -45,14 +45,15 @@ namespace PyTK.Overrides
                     return AccessTools.Method(typeof(FakeSpriteBatch), "DrawInternal");
             }
 
-            static bool skip = false;
+            static bool skip1 = false;
+            static bool skip2 = false;
 
             internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destinationRectangle, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effect, ref float depth, ref bool autoFlush)
             {
-                if (skip || !sourceRectangle.HasValue || Game1.activeClickableMenu is TitleMenu)
+                if (skip1 || !sourceRectangle.HasValue || Game1.activeClickableMenu is TitleMenu)
                     return true;
 
-                if (!skip && texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.Value is Rectangle r)
+                if (texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.Value is Rectangle r)
                 {
                     var newDestination = new Vector4(destinationRectangle.X, destinationRectangle.Y, destinationRectangle.Z, destinationRectangle.W);
                     var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
@@ -61,12 +62,12 @@ namespace PyTK.Overrides
                     if (s.ForcedSourceRectangle.HasValue)
                         newSR = s.ForcedSourceRectangle.Value;
 
-                    skip = true;
+                    skip1 = true;
                     drawMethodMono.Invoke(__instance, new object[] { s.STexture, newDestination, newSR, color, rotation, newOrigin, effect, depth, autoFlush });
-                    skip = false;
+                    skip1 = false;
                     return false;
                 }
-                else if (texture.Tag is String tag)
+                else if (!skip2 && texture.Tag is String tag)
                 {
                     CustomObjectData data = CustomObjectData.collection.ContainsKey(tag) ? CustomObjectData.collection[tag] : getDataFromSourceRectangle(sourceRectangle.Value);
 
@@ -76,9 +77,9 @@ namespace PyTK.Overrides
 
                     if (data != null)
                     {
-                        skip = true;
+                        skip2 = true;
                         drawMethodMono.Invoke(__instance, new object[] { data.texture, destinationRectangle, data.sourceRectangle, data.color != Color.White ? data.color : color, rotation, origin, effect, depth, autoFlush });
-                        skip = false;
+                        skip2 = false;
                         return false;
                     }
                 }
@@ -100,14 +101,15 @@ namespace PyTK.Overrides
                     return AccessTools.Method(typeof(FakeSpriteBatch), "InternalDraw");
             }
 
-            static bool skip = false;
+            static bool skip1 = false;
+            static bool skip2 = false;
 
             internal static bool Prefix(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
             {
-                if (skip || !sourceRectangle.HasValue)
+                if (skip1 || !sourceRectangle.HasValue || Game1.activeClickableMenu is TitleMenu)
                     return true;
 
-                if (!skip && texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.Value is Rectangle r)
+                if (texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.Value is Rectangle r)
                 {
                     var newDestination = new Vector4(destination.X, destination.Y, destination.Z / s.Scale, destination.W / s.Scale);
                     var newSR = new Rectangle?(new Rectangle((int) (r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
@@ -116,11 +118,11 @@ namespace PyTK.Overrides
                     if (s.ForcedSourceRectangle.HasValue)
                         newSR = s.ForcedSourceRectangle.Value;
 
-                    skip = true;
+                    skip1 = true;
                     drawMethod.Invoke(__instance, new object[] { s.STexture, newDestination, scaleDestination, newSR, color, rotation, newOrigin, effects, depth });
-                    skip = false;
+                    skip1 = false;
                     return false;
-                }else if (!(Game1.activeClickableMenu is TitleMenu) && texture.Tag is String tag)
+                }else if (!skip2 && texture.Tag is String tag)
                 {
                     CustomObjectData data = CustomObjectData.collection.ContainsKey(tag) ? CustomObjectData.collection[tag] : getDataFromSourceRectangle(sourceRectangle.Value);
                     texture.Tag = "cod_object";
@@ -129,9 +131,9 @@ namespace PyTK.Overrides
 
                     if (data != null)
                     {
-                        skip = true;
+                        skip2 = true;
                         drawMethod.Invoke(__instance, new object[] { data.texture, destination, scaleDestination, data.sourceRectangle, data.color != Color.White ? data.color : color, rotation, origin, effects, depth });
-                        skip = false;
+                        skip2 = false;
                         return false;
                     }
                 }

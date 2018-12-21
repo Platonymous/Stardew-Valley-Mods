@@ -1,7 +1,7 @@
 {
   "Name": "Custom Furniture",
   "Author": "Platonymous",
-  "Version": "0.8.10",
+  "Version": "0.9.0",
   "Description": "Helper Mod for Custom Furniture creation.",
   "UniqueID": "Platonymous.CustomFurniture",
   "EntryDll": "CustomFurniture.dll",
@@ -10,7 +10,7 @@
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.4.5"
+      "MinimumVersion": "1.5.1"
     }
   ]
 }

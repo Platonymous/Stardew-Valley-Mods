@@ -121,7 +121,6 @@ namespace CustomFurniture
             int countObjects = 0;
 
             var contentPacks = Helper.GetContentPacks();
-            var usedids = new List<string>();
 
             foreach (IContentPack cpack in contentPacks)
             {
@@ -135,9 +134,6 @@ namespace CustomFurniture
                         continue;
 
                     CustomFurniturePack pack = cpack.ReadJsonFile<CustomFurniturePack>(Path.GetFileName(file));
-
-                    if (pack.useid != "none")
-                        usedids.AddOrReplace(pack.useid);
 
                     pack.author = cpack.Manifest.Author;
                     pack.version = cpack.Manifest.Version.ToString();
@@ -161,40 +157,6 @@ namespace CustomFurniture
 
             }
 
-            string[] files = parseDir(Path.Combine(Helper.DirectoryPath, "Furniture"), "*.json");
-
-            countPacks += files.Length;
-
-            foreach (string file in files)
-            {
-                Monitor.Log(Path.Combine("Furniture", new FileInfo(file).Directory.Name, Path.GetFileName(file)));
-                CustomFurniturePack pack = Helper.Data.ReadJsonFile<CustomFurniturePack>(Path.Combine("Furniture", new FileInfo(file).Directory.Name, Path.GetFileName(file)));
-
-                string packid = new DirectoryInfo(Path.GetDirectoryName(file)).Name;
-
-                if (usedids.Contains(packid))
-                    continue;
-
-                countPacks++;
-
-                string author = pack.author == "none" ? "" : " by " + pack.author;
-                Monitor.Log(pack.name + " " + pack.version + author, LogLevel.Info);
-                foreach (CustomFurnitureData data in pack.furniture)
-                {
-                    countObjects++;
-                    data.folderName = new FileInfo(file).Directory.Name;
-                    string pileID = new DirectoryInfo(data.folderName).Name + "." + new FileInfo(file).Name+ "." + data.id;
-                    string objectID = pileID;
-                    CustomFurnitureMod.log("Load:" + objectID);
-                    string tkey = $"{data.folderName}/{ data.texture}";
-                    if (!CustomFurniture.Textures.ContainsKey(tkey))
-                        CustomFurniture.Textures.Add(tkey, Helper.Content.Load<Texture2D>($"Furniture/{data.folderName}/{data.texture}"));
-                    CustomFurniture f = new CustomFurniture(data, objectID, Vector2.Zero);
-                    furniturePile.Add(pileID, f);
-                    furniture.Add(objectID, f);
-                }
-            }
-           
             Monitor.Log(countPacks + " Content Packs with " + countObjects + " Objects found.");
         }
 

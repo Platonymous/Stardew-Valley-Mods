@@ -23,6 +23,7 @@ using PyTK.Tiled;
 using PyTK.Lua;
 using static PyTK.Overrides.OvSpritebatch;
 using xTile;
+using xTile.Dimensions;
 
 namespace PyTK
 {
@@ -61,6 +62,7 @@ namespace PyTK
             registerConsoleCommands();
             CustomTVMod.load();
             PyLua.init();
+            registerTileActions();
             SaveHandler.setUpEventHandlers();
             CustomObjectData.CODSyncer.start();
             ContentSync.ContentSyncHandler.initialize();
@@ -147,6 +149,55 @@ namespace PyTK
                      return false;
                  }
              },16,SerializationType.PLAIN,SerializationType.JSON));
+        }
+
+        private void registerTileActions()
+        {
+            TileAction Game = new TileAction("Game", (action, location, tile, layer) =>
+            {
+                List<string> text = action.Split(' ').ToList();
+                text.RemoveAt(0);
+                action = String.Join(" ", text);
+                return location.performAction(action, Game1.player, new Location((int)tile.X, (int)tile.Y));
+            }).register();
+
+            TileAction Lua = new TileAction("Lua", (action, location, tile, layer) =>
+            {
+                string[] a = action.Split(' ');
+                if (a.Length > 2)
+                    if (a[1] == "this")
+                    {
+                        string id = location.Name + "." + layer + "." + tile.Y + tile.Y;
+                        if (!PyLua.hasScript(id))
+                        {
+                            if (layer == "Map")
+                            {
+                                if (location.map.Properties.ContainsKey("Lua"))
+                                    PyLua.loadScriptFromString(@"
+                                function callthis(location,tile,layer)
+                                " + location.map.Properties["Lua"].ToString() + @"
+                                end", id);
+                                else
+                                    PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Map.\")", id);
+                            }
+                            else
+                            {
+                                if (location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Lua", layer) is string lua)
+                                    PyLua.loadScriptFromString(@"
+                                function callthis(location,tile,layer)
+                                " + lua + @"
+                                end", id);
+                                else
+                                    PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Tile.\")", id);
+                            }
+                        }
+                        PyLua.callFunction(id, "callthis", new object[] { location, tile, layer });
+                    }
+                    else
+                        PyLua.callFunction(a[1], a[2], new object[] { location, tile, layer });
+                return true;
+            }).register();
+
         }
 
         private void registerConsoleCommands()
@@ -267,54 +318,6 @@ namespace PyTK
 
                 PyNet.syncLocationMapToAll(p[0]);
             }).register();
-
-            
-        }
-
-        private void messageTest()
-        {
-            PyNet.sendMessage("Platonymous.PyTK.Test", "TestMessage");
-            Helper.Events.GameLoop.TimeChanged += (s, e) => 
-            {
-                foreach(MPMessage msg in PyNet.getNewMessages("Platonymous.PyTK.Test"))
-                {
-                    string message = (string) msg.message;
-                    string sender = msg.sender.Name;
-                    //Do Something;
-                } 
-            };
-        }
-
-        private void testing()
-        {
-            CustomObjectData.newBigObject("Platonymous.BigTest", Game1.bigCraftableSpriteSheet.clone().setSaturation(0), Color.Aquamarine, "Test Machine", "Test Description", 24, craftingData: new CraftingData("Test Machine"));
-            CustomObjectData.newObject("Platonymous.Rubici", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Yellow, "Rubici", "Rubici Test", 16, "Rubici", "Minerals -2", 50, -300);
-            new CustomObjectData("Platonymous.Rubico" + Color.Red.ToString(), "Rubico/250/-300/Minerals -2/Rubico/A precious stone that is sought after for its rich color and beautiful fluster.", Game1.objectSpriteSheet.clone().setSaturation(0), Color.Red, 16);
-
-            SButton.K.onPressed(() => Monitor.Log($"Played: {Game1.currentGameTime.TotalGameTime.Minutes} min"));
-            ButtonClick.UseToolButton.onTerrainClick<Grass>(o => Monitor.Log($"Number of Weeds: {o.numberOfWeeds}", LogLevel.Info));
-            new InventoryItem(new Chest(true), 100).addToNPCShop("Pierre");
-            new ItemSelector<SObject>(p => p.name == "Chest").whenAddedToInventory(l => l.useAll(i => i.name = "Test"));
-            Helper.Content.Load<Texture2D>($"Maps/MenuTiles", ContentSource.GameContent).setSaturation(0).injectAs($"Maps/MenuTiles");
-            Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", 74);
-            Game1.objectSpriteSheet.clone().setSaturation(0).injectTileInto($"Maps/springobjects", new Range(129, 166), new Range(129, 166));
-
-            Func<string, GameLocation, Vector2, string, bool> tileActionTest = (s, l, t, ly) =>
-             {
-                 List<string> strings = s.Split(' ').ToList();
-                 strings.Remove(strings[0]);
-                 Game1.activeClickableMenu = new DialogueBox(String.Join(" ", s));
-                 return true;
-             };
-
-            Action mapMergeTest = delegate ()
-            {
-                "Beach".toLocation().Map.mergeInto("Town".toLocation().Map, new Vector2(60, 30), new Rectangle(15, 15, 20, 20)).injectAs(@"Maps/Town");
-                "Town".toLocation().clearArea(new Rectangle(60, 30, 20, 20));
-                "Town".toLocation().Map.addAction(new Vector2(18, 60), new TileAction("testaction", tileActionTest).register(),"Smells interesting");
-            };
-
-            Helper.Events.GameLoop.SaveLoaded += (s, e) => mapMergeTest();
         }
     }
 }

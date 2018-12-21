@@ -39,14 +39,6 @@ namespace TMXLoader
             Game1.drawDialogueNoTyping(action); return true;
         }
 
-        public static bool gameAction(string action, GameLocation location, Vector2 tile, string layer)
-        {
-            List<string> text = action.Split(' ').ToList();
-            text.RemoveAt(0);
-            action = String.Join(" ", text);
-            return location.performAction(action, Game1.player, new Location((int)tile.X, (int)tile.Y));
-        }
-
         public static bool confirmAction(string action, GameLocation location, Vector2 tile, string layer)
         {
             List<string> text = action.Split(' ').ToList();
@@ -66,37 +58,6 @@ namespace TMXLoader
         public static bool sayAction(string action)
         {
             return sayAction(action, Game1.currentLocation, Vector2.Zero, "Map");
-        }
-
-        public static bool luaAction(string action, GameLocation location, Vector2 tile, string layer)
-        {
-            string[] a = action.Split(' ');
-            if (a.Length > 2)
-                if (a[2] == "this")
-                {
-                    string id = location.Name + "." + layer + "." + tile.Y + tile.Y;
-                    if (!PyLua.hasScript(id))
-                    {
-                        if (layer == "Map")
-                        {
-                            if (location.map.Properties.ContainsKey("Lua"))
-                                PyLua.loadScriptFromString(location.map.Properties["Lua"].ToString(), id);
-                            else
-                                PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Map.\")", id);
-                        }
-                        else
-                        {
-                            if (location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Lua", layer) is string lua)
-                                PyLua.loadScriptFromString(lua, id);
-                            else
-                                PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Tile.\")", id);
-                        }
-                    }
-                    PyLua.callFunction(id, a[2], new object[] { location, tile, layer });
-                }
-                else
-                    PyLua.callFunction(a[1], a[2], new object[] { location, tile, layer });
-            return true;
         }
 
         public static bool switchLayersAction(string action, GameLocation location, Vector2 tile, string layer)
