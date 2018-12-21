@@ -54,7 +54,7 @@ namespace PelicanTTS
            
             Helper = h;
             currentText = "";
-            tmppath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "Content"), "TTS");
+            tmppath = Path.Combine(Helper.DirectoryPath,"TTS");
 
             if (!Directory.Exists(tmppath))
                 Directory.CreateDirectory(tmppath);
@@ -179,7 +179,7 @@ namespace PelicanTTS
                     if (!Directory.Exists(Path.Combine(tmppath, speakerName)))
                         Directory.CreateDirectory(Path.Combine(tmppath, speakerName));
 
-                    string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".wav");
+                    string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech_" + PelicanTTSMod.config.Pitch + "_" + PelicanTTSMod.config.Volume + "_" + currentVoice.Value + "_" + hash + ".wav");
                     SoundEffect nextSpeech = null;
 
                     if (!File.Exists(file))
