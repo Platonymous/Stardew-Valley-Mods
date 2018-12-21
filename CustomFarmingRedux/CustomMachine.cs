@@ -657,10 +657,22 @@ namespace CustomFarmingRedux
 
         public void removeLightSource()
         {
-            if (location != null)
+            try
             {
-                location.sharedLights.Filter((Func<LightSource, bool>)(l => l.Identifier != identifier));
-                lightSource = null;
+                if (location != null)
+                {
+                    //location.sharedLights.Filter((Func<LightSource, bool>)(l => l.Identifier != identifier));
+
+                    var f = (Func<LightSource, bool>)(l => l.Identifier != identifier);
+                    object sl = location.GetType().GetField("sharedLights").GetValue(location);
+                    sl.GetType().GetMethod("Filter").Invoke(sl, new[] { f });
+
+                    lightSource = null;
+                }
+            }
+            catch
+            {
+
             }
         }
 
@@ -668,11 +680,25 @@ namespace CustomFarmingRedux
         {
             if (location != null)
             {
-                initializeLightSource(tileLocation, false);
-                location.sharedLights.Filter((Func<LightSource, bool>)(l => l.Identifier != identifier));
+                try
+                {
+                    initializeLightSource(tileLocation, false);
+                    //location.sharedLights.Filter((Func<LightSource, bool>)(l => l.Identifier != identifier));
 
-                if (lightSource != null)
-                    location.sharedLights.Add(lightSource.Clone());
+                    var f = (Func<LightSource, bool>)(l => l.Identifier != identifier);
+                    object sl = location.GetType().GetField("sharedLights").GetValue(location);
+                    sl.GetType().GetMethod("Filter").Invoke(sl, new[] { f });
+
+                    if (lightSource != null)
+                    {
+                        //location.sharedLights.Add(lightSource.Clone());
+                        sl.GetType().GetMethod("Add").Invoke(sl, new[] { lightSource.Clone() });
+                    }
+                }
+                catch
+                {
+
+                }
             }
         }
 
