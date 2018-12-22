@@ -28,6 +28,7 @@ namespace PyTK.CustomElementHandler
         {
             sObject = new SObject(data.sdvId, 1);
             this.data = data;
+            checkData();
         }
 
         public PySObject(CustomObjectData data, Vector2 tileLocation)
@@ -35,6 +36,7 @@ namespace PyTK.CustomElementHandler
         {
             sObject = new SObject(tileLocation, data.sdvId);
             this.data = data;
+            checkData();
         }
 
         public virtual void rebuildData()
@@ -108,6 +110,7 @@ namespace PyTK.CustomElementHandler
             Name = additionalSaveData["name"];
             Stack = additionalSaveData["stack"].toInt();
             Quality = additionalSaveData["quality"].toInt();
+            checkData();
         }
 
         public virtual ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)

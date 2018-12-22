@@ -17,8 +17,8 @@ namespace PyTK.CustomElementHandler
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
-        internal static int minIndex = 20000;
-        internal static int minIndexBig = 60000;
+        internal static int minIndex = 3000;
+        internal static int minIndexBig = 4000;
         internal static string CODSyncerName = "Plytonymous.PyTK.CODSync";
         internal static PyReceiver<CODSyncMessage> CODSyncer = new PyReceiver<CODSyncMessage>(CODSyncerName, (cm) =>
           {
@@ -138,7 +138,7 @@ namespace PyTK.CustomElementHandler
                 OvSpritebatch.recCache.Remove(sdvSourceRectangle);
 
             if(inventoryCheck == null)
-                inventoryCheck = new ItemSelector<Item>(i => collection.Exists(c => c.Value.sdvId == i.ParentSheetIndex && (!(i is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable))).whenAddedToInventory(l => l.useAll(x => Game1.player.Items[new List<Item>(Game1.player.Items).FindIndex(o => o == x)] = collection.Find(c => c.Value.sdvId == x.ParentSheetIndex && (!(x is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable)).Value.getObject(x)));
+                inventoryCheck = new ItemSelector<Item>(i => !(i is ISaveElement) && collection.Exists(c => c.Value.sdvId == i.ParentSheetIndex && (!(i is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable))).whenAddedToInventory(l => l.useAll(x => Game1.player.Items[new List<Item>(Game1.player.Items).FindIndex(o => o == x)] = collection.Find(c => c.Value.sdvId == x.ParentSheetIndex && (!(x is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable)).Value.getObject(x)));
         }
 
         public static int getIndexForId(string id)
