@@ -1,7 +1,7 @@
 {
   "Name": "PelicanTTS",
   "Author": "Platonymous",
-  "Version": "1.6.5",
+  "Version": "1.6.6",
   "Description": "Text-To-Speech Mod",
   "UniqueID": "Platonymous.PelicanTTS",
   "EntryDll": "PelicanTTS.dll",

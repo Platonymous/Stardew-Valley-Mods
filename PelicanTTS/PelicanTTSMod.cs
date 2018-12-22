@@ -80,7 +80,7 @@ namespace PelicanTTS
                     else
                         person = i18n.Get("Your wife");
 
-                greeting += i18n.Get("BirthdayGreeting").ToString().Replace("{ NPC}",person);
+                greeting += i18n.Get("BirthdayGreeting").ToString().Replace("{NPC}",person);
             }
 
             if (Utility.isFestivalDay(Game1.dayOfMonth, Game1.currentSeason))
