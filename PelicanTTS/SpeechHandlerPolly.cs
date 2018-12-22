@@ -19,7 +19,7 @@ using Microsoft.Xna.Framework.Audio;
 using System.Linq;
 
 using OggSharp;
-
+using System.Threading.Tasks;
 
 namespace PelicanTTS
 {
@@ -27,6 +27,7 @@ namespace PelicanTTS
     {
         private static string lastText;
         private static string lastDialog;
+        private static string lastLetter;
         private static string lastHud;
         public static string currentText;
         private static Thread speechThread;
@@ -51,7 +52,6 @@ namespace PelicanTTS
 
         public static void start(IModHelper h)
         {
-           
             Helper = h;
             currentText = "";
             tmppath = Path.Combine(Helper.DirectoryPath,"TTS");
@@ -60,7 +60,7 @@ namespace PelicanTTS
                 Directory.CreateDirectory(tmppath);
 
             pc = AWSHandler.getPollyClient();
-            currentVoice = VoiceId.Amy;
+            currentVoice = VoiceId.Salli;
             lastText = "";
             lastDialog = "";
             lastHud = "";
@@ -73,19 +73,6 @@ namespace PelicanTTS
             speechThread.Start();
             h.Events.GameLoop.UpdateTicked += OnUpdateTicked;
             h.Events.Display.MenuChanged += OnMenuChanged;
-
-            //h.Events.Input.ButtonPressed += OnButtonPressed;
-        }
-
-        private static void OnButtonPressed(object sender, ButtonPressedEventArgs e)
-        {
-            if (e.Button == SButton.K)
-            {
-                gThread = new Thread(generateAllDialogs);
-                gThread.Start();
-            }
-            
-
         }
 
         private static void OnMenuChanged(object sender, MenuChangedEventArgs e)
@@ -94,8 +81,9 @@ namespace PelicanTTS
             {
                 lastText = "";
                 lastDialog = "";
+                lastLetter = "";
                 currentText = "";
-                MediaPlayer.Stop();
+                currentSpeech.Stop();
                 setVoice("default");
             }
         }
@@ -134,7 +122,7 @@ namespace PelicanTTS
 
         private static void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (e.IsMultipleOf(15)) // quarter second
+            if (e.IsMultipleOf(30))
             {
                 if (Game1.activeClickableMenu is DialogueBox)
                 {
@@ -149,9 +137,19 @@ namespace PelicanTTS
                     {
                         currentText = dialogueBox.getCurrentString();
                         lastDialog = dialogueBox.getCurrentString();
-
                     }
 
+                }
+                else if (Game1.activeClickableMenu is LetterViewerMenu lvm)
+                {
+                    setVoice("default");
+                    List<string> mailMessage = Helper.Reflection.GetField<List<string>>(lvm, "mailMessage").GetValue();
+                    string letter = mailMessage[Helper.Reflection.GetField<int>(lvm, "page").GetValue()];
+                    if (letter != lastLetter)
+                    {
+                        currentText = letter;
+                        lastLetter = letter;
+                    }
                 }
                 else if (Game1.hudMessages.Count > 0)
                 {
@@ -208,7 +206,7 @@ namespace PelicanTTS
 
                     currentSpeech = nextSpeech.CreateInstance();
 
-                    if (Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
+                    if (Game1.activeClickableMenu is LetterViewerMenu || Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
                     {
                         speak = false;
                         currentSpeech.Pitch = PelicanTTSMod.config.Pitch;
@@ -221,6 +219,8 @@ namespace PelicanTTS
                 {
                     lastText = currentText;
                 }
+
+                Thread.Sleep(500);
             }
         }
 
@@ -260,200 +260,5 @@ namespace PelicanTTS
             writer.Write(data.Length);
             writer.Write(data);
         }
-
-        private void WriteWavHeader(MemoryStream stream, bool isFloatingPoint, ushort channelCount, ushort bitDepth, int sampleRate, int totalSampleCount)
-        {
-            stream.Position = 0;
-            stream.Write(Encoding.ASCII.GetBytes("RIFF"), 0, 4);
-            stream.Write(BitConverter.GetBytes(((bitDepth / 8) * totalSampleCount) + 36), 0, 4);
-            stream.Write(Encoding.ASCII.GetBytes("WAVE"), 0, 4);
-            stream.Write(Encoding.ASCII.GetBytes("fmt "), 0, 4);
-            stream.Write(BitConverter.GetBytes(16), 0, 4);
-            stream.Write(BitConverter.GetBytes((ushort)(isFloatingPoint ? 3 : 1)), 0, 2);
-            stream.Write(BitConverter.GetBytes(channelCount), 0, 2);
-            stream.Write(BitConverter.GetBytes(sampleRate), 0, 4);
-            stream.Write(BitConverter.GetBytes(sampleRate * channelCount * (bitDepth / 8)), 0, 4);
-            stream.Write(BitConverter.GetBytes((ushort)channelCount * (bitDepth / 8)), 0, 2);
-            stream.Write(BitConverter.GetBytes(bitDepth), 0, 2);
-            stream.Write(Encoding.ASCII.GetBytes("data"), 0, 4);
-            stream.Write(BitConverter.GetBytes((bitDepth / 8) * totalSampleCount), 0, 4);
-        }
-
-        public static void demoVoices()
-        {
-        }
-
-        public static void showInstalledVoices()
-        {
-
-        }
-
-        
-        public static void generateAllDialogs()
-        {
-            Monitor.Log("Generating Dialog");
-
-                Dictionary<string, string> data = new Dictionary<string, string>();
-                data = Game1.content.Load<Dictionary<string, string>>("Data\\TV\\TipChannel");
-                
-                List<string> dialogs = new List<string>(data.Values);
-                Monitor.Log(dialogs.Count + " Entries found. ");
-                setVoice("default");
-
-                foreach (string text in dialogs)
-                {
-                Monitor.Log("next:"+text);
-                string nextText = text;
-            
-                            nextText = nextText.Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "");
-
-                           
-                            int hash = nextText.GetHashCode();
-                    
-                            string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".wav");
-                            FileInfo fileInfo = new FileInfo(file);
-
-
-                            if (!fileInfo.Exists)
-                            {
-
-                                SynthesizeSpeechRequest sreq = new SynthesizeSpeechRequest();
-                                sreq.Text = nextText;
-                                sreq.OutputFormat = OutputFormat.Pcm;
-                                sreq.VoiceId = currentVoice;
-                                SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
-
-                                using (var fileStream = File.Create(file))
-                                {
-                                    sres.AudioStream.CopyTo(fileStream);
-                                    fileStream.Flush();
-                                    fileStream.Close();
-                                }
-                            }
-                            Monitor.Log(nextText);
-                           
-                        
-                    
-                }
-
-            foreach (NPC npc in Utility.getAllCharacters())
-            {
-
-                /*for (int sp = 0; sp < 2; sp++) {
-                    string name = npc.name;
-                    string plus = "";
-                    Dictionary<string, string> data = new Dictionary<string, string>();
-                    if (sp == 1)
-                    {
-                        plus = "MarriageDialogue";
-                    }
-                    try
-                    {
-                        data = Game1.content.Load<Dictionary<string, string>>("Characters\\Dialogue\\"+ plus + name);
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-                    List<string> dialogs = new List<string>(data.Values);
-                    Monitor.Log(dialogs.Count + " Entries found for " + name);
-                    setVoice(name);
-                    Game1.player.name = "Farmer";
-
-                    for (int s = 0; s < 4; s++)
-                    {
-                        if (s == 0)
-                        {
-                            Game1.currentSeason = "spring";
-                        }
-
-                        if (s == 1)
-                        {
-                            Game1.currentSeason = "summer";
-                        }
-
-                        if (s == 2)
-                        {
-                            Game1.currentSeason = "fall";
-                        }
-
-                        if (s == 3)
-                        {
-                            Game1.currentSeason = "winter";
-                        }
-
-                        for (int day = 1; day < 1; day++)
-                        {
-                            Game1.dayOfMonth = day;
-                            try
-                            {
-
-                                foreach (string text in dialogs)
-                                {
-                                    try { 
-                                    Dialogue d = new Dialogue(text, Game1.getCharacterFromName(name));
-                                    DialogueBox db = new DialogueBox(d);
-                                    List<string> dl = Helper.Reflection.GetField<List<string>>(d, "dialogues").GetValue();
-                                    Monitor.Log("Dialog Length:" + dl.Count);
-
-                                    while (dl.Count > 0)
-                                    {
-                                        db = new DialogueBox(d);
-                                        string nextText = db.getCurrentString();
-                                        nextText = nextText.Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "");
-
-                                        if (Game1.player.isMarried())
-                                        {
-                                            nextText = nextText.Replace(" " + Game1.player.spouse + " ", " your spouse ").Replace(" " + Game1.player.spouse, " your spouse").Replace(Game1.player.spouse + " ", "Your spouse ");
-                                        }
-                                        nextText.Replace(" " + Game1.player.name + " ", " Farmer ").Replace(" " + Game1.player.name, " Farmer").Replace(Game1.player.name + " ", "Farmer ");
-
-                                        int hash = nextText.GetHashCode();
-                                        ensureFolderStructureExists(Path.Combine(Path.Combine(tmppath, speakerName), "speech.mp3"));
-                                        string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech" + hash + ".mp3");
-                                        FileInfo fileInfo = new FileInfo(file);
-
-
-                                        if (!fileInfo.Exists)
-                                        {
-
-                                            SynthesizeSpeechRequest sreq = new SynthesizeSpeechRequest();
-                                            sreq.Text = nextText;
-                                            sreq.OutputFormat = OutputFormat.Mp3;
-                                            sreq.VoiceId = currentVoice;
-                                            SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
-
-                                            using (var fileStream = File.Create(file))
-                                            {
-                                                sres.AudioStream.CopyTo(fileStream);
-                                                fileStream.Flush();
-                                                fileStream.Close();
-                                            }
-                                        }
-                                        Monitor.Log(nextText);
-                                        dl.RemoveAt(0);
-                                        Helper.Reflection.GetField<List<string>>(d, "dialogues").SetValue(dl);
-                                    }
-                                    }catch
-                                    {
-                                        continue;
-                                    }
-                                    }
-                            }
-                            catch
-                            {
-                                continue;
-                            }
-                        }
-                    }
-                }*/
-            }
-        } 
-    
-
-
-
-
-
     }
 }
