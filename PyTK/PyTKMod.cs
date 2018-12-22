@@ -28,12 +28,6 @@ using xTile.Dimensions;
 namespace PyTK
 {
 
-    internal class Config
-    {
-        public bool multiplayerSafety { get; set; } = true;
-        public bool rebuildInBackground { get; set; } = true;
-    }
-
     public class PyTKMod : Mod
     {
         internal static IModHelper _helper;
@@ -42,16 +36,11 @@ namespace PyTK
         internal static bool _activeSpriteBatchFix = true;
         internal static string sdvContentFolder => PyUtils.getContentFolder();
         internal static List<IPyResponder> responders;
-        internal static Config config;
 
         public override void Entry(IModHelper helper)
         {
             _helper = helper;
             _monitor = Monitor;
-            config = Helper.ReadConfig<Config>();
-           
-            //testing();
-            //messageTest()
 
             harmonyFix();
             FormatManager.Instance.RegisterMapFormat(new NewTiledTmxFormat());
