@@ -28,6 +28,7 @@ namespace CustomFarmingRedux
         public static bool hasKisekae = false;
         public static IMod kisekae = null;
         internal static Dictionary<string, int> craftingrecipes = new Dictionary<string, int>();
+        internal static Dictionary<string, MachineHandler> machineHandlers = new Dictionary<string, MachineHandler>();
 
 
         public override void Entry(IModHelper helper)

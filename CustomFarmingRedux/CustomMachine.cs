@@ -31,6 +31,7 @@ namespace CustomFarmingRedux
         internal static List<CustomMachine> activeMachines = new List<CustomMachine>();
         internal Texture2D texture { get; private set; }
         internal Rectangle sourceRectangle => Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex + frame, tilesize.Width, tilesize.Height);
+        internal MachineHandler machineHandler = null;
 
         public CustomMachineBlueprint blueprint;
 
@@ -93,7 +94,9 @@ namespace CustomFarmingRedux
 
         private void build(CustomMachineBlueprint blueprint)
         {
-            CustomFarmingReduxMod._helper.Events.GameLoop.DayStarted += (s,e) => checkedToday = false; 
+            CustomFarmingReduxMod._helper.Events.GameLoop.DayStarted += (s,e) => checkedToday = false;
+            CustomFarmingReduxMod.machineHandlers.TryGetValue(blueprint.fullid,out machineHandler);
+
 
             if (syncObject == null)
             {
@@ -245,24 +248,6 @@ namespace CustomFarmingRedux
             syncObject.MarkDirty();
         }
 
-        /*private void startAutomation()
-        {
-            List<IList<Item>> items = getItemLists(null);
-            RecipeBlueprint recipe = findRecipe(items);
-            bool hasRecipe = recipe != null;
-            bool hasStarter = hasStarterMaterials(items);
-            if (hasRecipe && hasStarter && recipe.materials != null)
-            {
-                foreach (List<Item> list in items)
-                    foreach (Item item in list)
-                        if (recipe.materials.Find(m => m.index == item.ParentSheetIndex || m.index == item.Category) != null) {
-                            startProduction((SObject)item, recipe, items);
-                            return;
-                        }
-            }
-        }
-        */
-
         public void startProduction(SObject obj, RecipeBlueprint recipe, List<IList<Item>> items)
         {
             activeRecipe = recipe;
@@ -304,7 +289,13 @@ namespace CustomFarmingRedux
         private SObject createProduce()
         {
             if (!(heldObject.Value is Chest))
+            {
+                CustomFarmingReduxMod.machineHandlers.TryGetValue(blueprint.fullid, out machineHandler);
+                if (machineHandler is MachineHandler handler && handler.GetOutput != null && handler.GetOutput(heldObject.Value, blueprint.fullid, activeRecipe.name) is SObject output)
+                    return output;
+
                 return activeRecipe.createObject(heldObject.Value);
+            }
             else
                 return (SObject)SaveHandler.rebuildElement(heldObject.Value.name, heldObject.Value);
         }
@@ -573,6 +564,13 @@ namespace CustomFarmingRedux
                 Game1.activeClickableMenu = (IClickableMenu)new ItemGrabMenu((IList<Item>)(heldObject.Value as Chest).items, false, true, new InventoryMenu.highlightThisItem(InventoryMenu.highlightAllItems), new ItemGrabMenu.behaviorOnItemSelect((heldObject.Value as Chest).grabItemFromInventory), (string)null, new ItemGrabMenu.behaviorOnItemSelect((heldObject.Value as Chest).grabItemFromChest), false, true, true, true, true, 1, null, -1, (object)null);
             }
 
+            if (machineHandler is MachineHandler handler && handler.ClickAction != null)
+            {
+                if (justCheckingForActivity)
+                    return true;
+                handler.ClickAction();
+            }
+
             if (blueprint.category == "Dresser")
             {
                 if (justCheckingForActivity)
@@ -719,10 +717,10 @@ namespace CustomFarmingRedux
 
         public bool performAutomatedDropInAction(Item dropInItem, List<Item> itemlist, bool probe)
         {
-            var items = new List<IList<Item>>() { itemlist };
-
             if (!(dropInItem is SObject))
                 return false;
+
+            var items = new List<IList<Item>>() { itemlist };            
 
             if (heldObject.Value != null)
                 return false;
@@ -785,6 +783,10 @@ namespace CustomFarmingRedux
 
         public RecipeBlueprint findRecipeForItemType(SObject item)
         {
+            CustomFarmingReduxMod.machineHandlers.TryGetValue(blueprint.fullid, out machineHandler);
+            if (machineHandler is MachineHandler handler && handler.CheckInput != null && !handler.CheckInput(item, blueprint.fullid))
+                return null;
+
             return findRecipeFor(maxed((SObject)item));
         }
 

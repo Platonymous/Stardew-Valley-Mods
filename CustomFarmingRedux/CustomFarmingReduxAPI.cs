@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace CustomFarmingRedux
 {
-    public class CustomFarmingReduxAPI : ICustomContentAPI
+    public class CustomFarmingReduxAPI : ICustomFarmingReduxAPI
     {
         internal IModHelper Helper = CustomFarmingReduxMod._helper;
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
@@ -29,7 +29,7 @@ namespace CustomFarmingRedux
             return machine;
         }
 
-        private RecipeBlueprint findRecipe(CustomMachineBlueprint blueprint, List<Item> items)
+        public RecipeBlueprint findRecipe(CustomMachineBlueprint blueprint, List<Item> items)
         {
             RecipeBlueprint result = null;
             if (blueprint.production != null)
@@ -40,7 +40,7 @@ namespace CustomFarmingRedux
             return result;
         }
 
-        private Item maxed(Item obj)
+        public Item maxed(Item obj)
         {
             Item o = obj.getOne();
             o.Stack = int.MaxValue;
@@ -115,6 +115,48 @@ namespace CustomFarmingRedux
 
                 default:
                     return null;
+            }
+        }
+
+        /// <summary>Add an Output Handler to a machine</summary>
+        /// <param name="machineId">Id of the machine that this should handle</param>
+        /// <param name="outputHandler">The Output Handler that returns the output Func(StardewValley.Object dropIn, string machineid, string recipeName)</param>
+        public void setOutputHandler(string machineId, Func<StardewValley.Object, string, string, StardewValley.Object> outputHandler)
+        {
+            if (CustomFarmingReduxMod.machineHandlers.ContainsKey(machineId))
+                CustomFarmingReduxMod.machineHandlers[machineId].GetOutput = outputHandler;
+            else
+            {
+                MachineHandler handler = new MachineHandler(outputHandler,null,null);
+                CustomFarmingReduxMod.machineHandlers.AddOrReplace(machineId, handler);
+            }
+        }
+
+        /// <summary>Add a Check Input Handler to a machine</summary>
+        /// <param name="machineId">Id of the machine that this should handle</param>
+        /// <param name="inputHandler">The Input Handler that returns whether or not to accept an input Func(StardewValley.Object dropIn, string machineid)</param>
+        public void setInputHandler(string machineId, Func<StardewValley.Object, string, bool> inputHandler)
+        {
+            if (CustomFarmingReduxMod.machineHandlers.ContainsKey(machineId))
+                CustomFarmingReduxMod.machineHandlers[machineId].CheckInput = inputHandler;
+            else
+            {
+                MachineHandler handler = new MachineHandler(null, inputHandler, null);
+                CustomFarmingReduxMod.machineHandlers.AddOrReplace(machineId, handler);
+            }
+        }
+
+        /// <summary>Add Click Action Handler to a machine</summary>
+        /// <param name="machineId">Id of the machine that this should handle</param>
+        /// <param name="clickHandler">The Action invoked when clicking the machine</param>
+        public void setClickHandler(string machineId, Action clickHandler)
+        {
+            if (CustomFarmingReduxMod.machineHandlers.ContainsKey(machineId))
+                CustomFarmingReduxMod.machineHandlers[machineId].ClickAction = clickHandler;
+            else
+            {
+                MachineHandler handler = new MachineHandler(null, null, clickHandler);
+                CustomFarmingReduxMod.machineHandlers.AddOrReplace(machineId, handler);
             }
         }
     }

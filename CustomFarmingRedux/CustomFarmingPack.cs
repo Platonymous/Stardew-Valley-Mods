@@ -13,6 +13,6 @@ namespace CustomFarmingRedux
         public string author { get; set; } = "none";
         public string version { get; set; } = "1.0.0";
         public string name { get; set; } = "Custom Farming Pack";
-        public List<CustomMachineBlueprint> machines { get; set; }
+        public List<CustomMachineBlueprint> machines { get; set; } = new List<CustomMachineBlueprint>();
     }
 }
