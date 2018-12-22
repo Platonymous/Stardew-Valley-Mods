@@ -26,6 +26,7 @@ namespace PelicanTTS
     internal class SpeechHandlerPolly
     {
         private static string lastText;
+        internal static string lastSay;
         private static string lastDialog;
         private static string lastLetter;
         private static string lastHud;
@@ -83,7 +84,7 @@ namespace PelicanTTS
                 lastDialog = "";
                 lastLetter = "";
                 currentText = "";
-                currentSpeech.Stop();
+                currentSpeech?.Stop();
                 setVoice("default");
             }
         }
@@ -140,7 +141,7 @@ namespace PelicanTTS
                     }
 
                 }
-                else if (Game1.activeClickableMenu is LetterViewerMenu lvm)
+                else if (Game1.activeClickableMenu is LetterViewerMenu lvm && !PelicanTTSMod.config.MumbleDialogues)
                 {
                     setVoice("default");
                     List<string> mailMessage = Helper.Reflection.GetField<List<string>>(lvm, "mailMessage").GetValue();
@@ -151,7 +152,7 @@ namespace PelicanTTS
                         lastLetter = letter;
                     }
                 }
-                else if (Game1.hudMessages.Count > 0)
+                else if (Game1.hudMessages.Count > 0 && !PelicanTTSMod.config.MumbleDialogues)
                 {
                     if (Game1.hudMessages[Game1.hudMessages.Count - 1].Message != lastHud)
                     {
@@ -171,17 +172,24 @@ namespace PelicanTTS
                 {
                     if (currentText == lastText) { continue; }
 
+                    bool mumbling = PelicanTTSMod.config.MumbleDialogues && (currentText != lastSay);
+
                     if (currentText.StartsWith("+"))
                         continue;
 
                     currentText = currentText.Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
 
-                    currentText = @"<speak>" + currentText + @"</speak>";
+                    if(mumbling)
+                        currentText = @"<speak><amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" + Dialogue.convertToDwarvish(currentText) + @"</amazon:effect></amazon:effect></speak>";
+                    else
+                        currentText = @"<speak><amazon:auto-breaths><amazon:effect phonation='soft'>" + currentText + @"</amazon:effect></amazon:auto-breaths></speak>";
+
+
                     int hash = currentText.GetHashCode();
                     if (!Directory.Exists(Path.Combine(tmppath, speakerName)))
                         Directory.CreateDirectory(Path.Combine(tmppath, speakerName));
 
-                    string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech_" + PelicanTTSMod.config.Pitch + "_" + PelicanTTSMod.config.Volume + "_" + currentVoice.Value + "_" + hash + ".wav");
+                    string file = Path.Combine(Path.Combine(tmppath, speakerName), "speech_" + PelicanTTSMod.config.Pitch + "_" + PelicanTTSMod.config.Volume + "_" + currentVoice.Value + (mumbling ? "_mumble_" : "_") + hash + ".wav");
                     SoundEffect nextSpeech = null;
 
                     if (!File.Exists(file))
@@ -209,7 +217,7 @@ namespace PelicanTTS
                     if (Game1.activeClickableMenu is LetterViewerMenu || Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
                     {
                         speak = false;
-                        currentSpeech.Pitch = PelicanTTSMod.config.Pitch;
+                        currentSpeech.Pitch = mumbling ? 0.5f : PelicanTTSMod.config.Pitch;
                         currentSpeech.Volume = PelicanTTSMod.config.Volume;
                         currentSpeech.Play();
                     }

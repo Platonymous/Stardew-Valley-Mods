@@ -9,7 +9,7 @@ namespace PelicanTTS
 {
     public class PelicanTTSMod : Mod
     {
-        private bool greeted;
+        internal static bool greeted;
         internal static ModConfig config;
         internal static IModHelper _helper;
         internal static ITranslationHelper i18n => _helper.Translation;
@@ -17,6 +17,8 @@ namespace PelicanTTS
         public override void Entry(IModHelper helper)
         {
             _helper = helper;
+            config = Helper.ReadConfig<ModConfig>();
+            Helper.WriteConfig<ModConfig>(config);
             string tmppath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "Content"), "TTS");
 
             if (Directory.Exists(Path.Combine(Helper.DirectoryPath, "TTS")))
@@ -120,7 +122,6 @@ namespace PelicanTTS
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             Helper.Events.GameLoop.DayStarted += OnDayStarted;
-            config = Helper.ReadConfig<ModConfig>();
             SpeechHandlerPolly.Monitor = Monitor;
             SpeechHandlerPolly.start(Helper);
 
@@ -131,6 +132,7 @@ namespace PelicanTTS
 
         public static void say(string text)
         {
+            SpeechHandlerPolly.lastSay = text;
             SpeechHandlerPolly.currentText = text;
             SpeechHandlerPolly.speak = true;
         }
