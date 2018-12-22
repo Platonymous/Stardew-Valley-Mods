@@ -1,0 +1,15 @@
+﻿{
+  "Name": "MachineHandlerTest",
+  "Author": "ModAuthor",
+  "Version": "1.0.0",
+  "Description": "Mod Template",
+  "UniqueID": "ModAuthor.MachineHandlerTest",
+  "EntryDll": "MachineHandlerTest.dll",
+  "MinimumApiVersion": "2.9",
+  "UpdateKeys": [ "Nexus:" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomFarming"
+    }
+  ]
+}
