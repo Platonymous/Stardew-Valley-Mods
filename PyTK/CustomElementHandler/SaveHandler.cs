@@ -64,40 +64,24 @@ namespace PyTK.CustomElementHandler
 
             Helper.Events.GameLoop.Saving += (s, e) =>
             {
-                if (Game1.IsMasterGame)
-                    Replace();
+                Replace();
             };
 
             Helper.Events.GameLoop.Saved += (s, e) =>
             {
-                if (Game1.IsMasterGame)
-                    RebuildFromActions();
+                RebuildFromActions();
             };
 
-            Helper.Events.GameLoop.SaveLoaded += (s, e) => {
-                    Rebuild();
+            Helper.Events.GameLoop.SaveLoaded += (s, e) =>
+            {
+                Rebuild();
             };
 
-            Helper.Events.GameLoop.DayStarted += (s, e) => {
+            Helper.Events.GameLoop.SaveLoaded += (s, e) =>
+            {
                 Game1.objectSpriteSheet.Tag = "cod_objects";
                 Game1.bigCraftableSpriteSheet.Tag = "cod_objects";
             };
-
-            Helper.Events.GameLoop.ReturnedToTitle += GameLoop_ReturnedToTitle;
-
-            Helper.Events.GameLoop.DayStarted += RebuildFirstDay;
-        }
-
-        private static void GameLoop_ReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
-        {
-            Helper.Events.GameLoop.DayStarted += RebuildFirstDay;
-        }
-
-        private static void RebuildFirstDay(object s, DayStartedEventArgs e)
-        {
-            if(Game1.IsMasterGame)
-                Task.Run(() => Rebuild());
-            Helper.Events.GameLoop.DayStarted -= RebuildFirstDay;
         }
 
         private static bool isRebuildable(object o)
@@ -387,6 +371,9 @@ namespace PyTK.CustomElementHandler
                 if (o is ISaveElement ise)
                     ise.rebuild(additionalSaveData, replacement);
 
+                if(o is ISaveElement)
+                    RebuildAll(o, o);
+
                 return o;
             }
             catch (Exception e)
@@ -524,10 +511,8 @@ namespace PyTK.CustomElementHandler
                             foreach (Vector2 k in dict.Keys.Where(v => dict[v] == obj))
                             {
                                 if (setReverseAction)
-                                {
-                                    var value = dict[k];
-                                    rebuildActions.AddOrReplace(() => dict.AddOrReplace(k, value));
-                                }
+                                    rebuildActions.AddOrReplace(() => RebuildAll(key, r));
+
                                 dict[k] = (SObject)r;
                             }
                         }
@@ -536,10 +521,7 @@ namespace PyTK.CustomElementHandler
                             foreach (Vector2 k in ovdict.Keys.Where(v => ovdict[v] == obj))
                             {
                                 if (setReverseAction)
-                                {
-                                    var value = ovdict[k];
-                                    rebuildActions.AddOrReplace(() => ovdict[k] = value);
-                                }
+                                    rebuildActions.AddOrReplace(() => RebuildAll(key, r));
                                 ovdict[k] = (SObject)r;
                             }
                         }
