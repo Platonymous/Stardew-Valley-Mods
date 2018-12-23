@@ -10,9 +10,9 @@ namespace MachineHandlerTest
 {
     public interface IHandlerAPI
     {
-        void setOutputHandler(string machineId, Func<StardewValley.Object, string, string, StardewValley.Object> outputHandler);
-        void setInputHandler(string machineId, Func<StardewValley.Object, string, bool> inputHandler);
-        void setClickHandler(string machineId, Action clickHandler);
+        void setOutputHandler(string machineId, Func<StardewValley.Object, StardewValley.Object, string, string, StardewValley.Object> outputHandler);
+        void setInputHandler(string machineId, Func<StardewValley.Object, StardewValley.Object, string, bool> inputHandler);
+        void setClickHandler(string machineId, Action<StardewValley.Object> clickHandler);
     }
 
     public class MachineHandlerTestMod : Mod
@@ -27,20 +27,20 @@ namespace MachineHandlerTest
             IHandlerAPI api = this.Helper.ModRegistry.GetApi<IHandlerAPI>("Platonymous.CustomFarming");
 
             //Change all outputs to Crab Pot
-            api.setOutputHandler("Platonymous.NewMachines.NewMachines.json.0", (o, m, r) =>
+            api.setOutputHandler("Platonymous.NewMachines.NewMachines.json.0", (obj, o, m, r) =>
             {
                 Monitor.Log("Serving Cran Pot");
                 return new CrabPot(Vector2.Zero, 1);
             });
 
             //Prevent the machine from accepting regular milk
-            api.setInputHandler("Platonymous.NewMachines.NewMachines.json.0", (o, m) =>
+            api.setInputHandler("Platonymous.NewMachines.NewMachines.json.0", (obj, o, m) =>
             {
                 return o.ParentSheetIndex != 184;
             });
 
             //Post log when clicked
-            api.setClickHandler("Platonymous.NewMachines.NewMachines.json.0", () => Monitor.Log("Clicked Butter Churn",LogLevel.Info));
+            api.setClickHandler("Platonymous.NewMachines.NewMachines.json.0", (obj) => Monitor.Log("Clicked " + obj.Name,LogLevel.Info));
         }
     }
 }
