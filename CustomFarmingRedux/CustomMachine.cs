@@ -14,40 +14,36 @@ using StardewValley.Tools;
 using PyTK;
 using System.Reflection;
 using StardewValley.Menus;
-using Netcode;
 
 namespace CustomFarmingRedux
 {
     public class CustomMachine : SObject, ICustomObject, ISyncableElement
     {
-
-        public PySync syncObject { get; set; }
-
         internal IModHelper Helper = CustomFarmingReduxMod._helper;
         internal IMonitor Monitor = CustomFarmingReduxMod._monitor;
         internal Config config = CustomFarmingReduxMod._config;
-        internal string folder => blueprint.pack.baseFolder;
+        public virtual string folder => blueprint.pack.baseFolder;
         internal List<CustomMachineBlueprint> machines = CustomFarmingReduxMod.machines;
         internal static List<CustomMachine> activeMachines = new List<CustomMachine>();
-        internal Texture2D texture { get; private set; }
-        internal Rectangle sourceRectangle => Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex + frame, tilesize.Width, tilesize.Height);
+        public virtual Texture2D texture { get; private set; }
+        public virtual Rectangle sourceRectangle => Game1.getSourceRectForStandardTileSheet(texture, blueprint.tileindex + frame, tilesize.Width, tilesize.Height);
         internal MachineHandler machineHandler = null;
 
         public CustomMachineBlueprint blueprint;
 
         private bool active = true;
         private bool wasBuild = false;
-        private bool isWorking { get => active && !readyForHarvest && ((completionTime != null && activeRecipe != null) || blueprint.production == null); }
+        public virtual bool isWorking { get => active && !readyForHarvest && ((completionTime != null && activeRecipe != null) || blueprint.production == null); }
         private string id;
         public string conditions = null;
-        private STime completionTime;
+        public virtual STime completionTime { get; set; }
         private int tileindex;
         private Rectangle tilesize = new Rectangle(0, 0, 16, 32);
         private int _frame = 0;
         private int skipFrame = 10;
         private int animationFrames = 0;
         private int counter = 0;
-        private RecipeBlueprint activeRecipe;
+        public virtual RecipeBlueprint activeRecipe { get; set; }
         public RecipeBlueprint starterRecipe;
         public GameLocation location;
         private CustomObjectData data;
@@ -55,8 +51,10 @@ namespace CustomFarmingRedux
         public bool checkedToday = false;
         private bool skipDrop = false;
         private int identifier => (int)((double)tileLocation.X * 2000.0 + (double)tileLocation.Y);
+        public PySync syncObject { get; set; }
 
-        private int frame {
+
+        public virtual int frame {
             get
             {
                 if (!isWorking)
@@ -92,17 +90,15 @@ namespace CustomFarmingRedux
             wasBuild = true;
         }
 
-        private void build(CustomMachineBlueprint blueprint)
+        public virtual void build(CustomMachineBlueprint blueprint)
         {
-            CustomFarmingReduxMod._helper.Events.GameLoop.DayStarted += (s,e) => checkedToday = false;
-            CustomFarmingReduxMod.machineHandlers.TryGetValue(blueprint.fullid,out machineHandler);
-
-
             if (syncObject == null)
             {
                 syncObject = new PySync(this);
                 syncObject.init();
             }
+            CustomFarmingReduxMod._helper.Events.GameLoop.DayStarted += (s, e) => checkedToday = false;
+            CustomFarmingReduxMod.machineHandlers.TryGetValue(blueprint.fullid, out machineHandler);
 
             if (blueprint.worklight)
                 this.IsOn = false;
@@ -139,7 +135,7 @@ namespace CustomFarmingRedux
                 starterRecipe.stack = blueprint.starter.stack;
                 starterRecipe.materials = new List<IngredientBlueprint>();
                 starterRecipe.materials.Add(blueprint.starter);
-            }                
+            }
         }
 
         public override string getCategoryName()
@@ -167,7 +163,7 @@ namespace CustomFarmingRedux
                 this.lightSource = null;
         }
         
-        private RecipeBlueprint findRecipe(List<IList<Item>> items)
+        public virtual RecipeBlueprint findRecipe(List<IList<Item>> items)
         {
             RecipeBlueprint result = null;
             if (blueprint.production != null)
@@ -178,7 +174,7 @@ namespace CustomFarmingRedux
             return result;
         }
 
-        public RecipeBlueprint findRecipeFor(Item item)
+        public virtual RecipeBlueprint findRecipeFor(Item item)
         {
             if (blueprint.production == null)
                 return null;
@@ -186,17 +182,17 @@ namespace CustomFarmingRedux
             return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials));
         }
 
-        private RecipeBlueprint findRecipe(List<Item> items)
+        public virtual RecipeBlueprint findRecipe(List<Item> items)
         {
             return findRecipe(new List<IList<Item>>() { items });
         }
 
-        private RecipeBlueprint findRecipe(Item item)
+        public virtual RecipeBlueprint findRecipe(Item item)
         {
             return findRecipe(new List<IList<Item>>() { new List<Item>() { item } });
         }
 
-        private bool hasStarterMaterials(List<IList<Item>> items)
+        public virtual bool hasStarterMaterials(List<IList<Item>> items)
         {
             if (starterRecipe == null)
                 return true;
@@ -207,12 +203,12 @@ namespace CustomFarmingRedux
             return false;
         }
 
-        private bool hasStarterMaterials(List<Item> items)
+        public virtual bool hasStarterMaterials(List<Item> items)
         {
             return hasStarterMaterials(new List<IList<Item>>() { items });
         }
 
-        private List<IList<Item>> getItemLists(SFarmer player = null)
+        public virtual List<IList<Item>> getItemLists(SFarmer player = null)
         {
             List<IList<Item>> items = new List<IList<Item>>();
 
@@ -222,7 +218,7 @@ namespace CustomFarmingRedux
             return items;
         }
 
-        private void getReadyForHarvest()
+        public virtual void getReadyForHarvest()
         {
             if (blueprint.worklight)
                 removeLightSource();
@@ -238,17 +234,17 @@ namespace CustomFarmingRedux
             syncObject.MarkDirty();
         }
 
-        private void setReadyForHarvest()
+        public virtual void setReadyForHarvest()
         {
             minutesUntilReady.Set(-1);
             completionTime = null;
             readyForHarvest.Value = true;
             activeRecipe = null;
-
             syncObject.MarkDirty();
+
         }
 
-        public void startProduction(SObject obj, RecipeBlueprint recipe, List<IList<Item>> items)
+        public virtual void startProduction(SObject obj, RecipeBlueprint recipe, List<IList<Item>> items)
         {
             activeRecipe = recipe;
             if (completionTime == null)
@@ -270,7 +266,7 @@ namespace CustomFarmingRedux
                 completionTime += recipe.time;
             }
 
-            minutesUntilReady.Set((completionTime - STime.CURRENT).timestamp);
+            minutesUntilReady.Set((completionTime + 1 - STime.CURRENT).timestamp);
             
             if (starterRecipe != null)
                 starterRecipe.consumeIngredients(items);
@@ -285,13 +281,14 @@ namespace CustomFarmingRedux
             }
 
             syncObject.MarkDirty();
+
         }
-        private SObject createProduce()
+        public virtual SObject createProduce()
         {
             if (!(heldObject.Value is Chest))
             {
                 CustomFarmingReduxMod.machineHandlers.TryGetValue(blueprint.fullid, out machineHandler);
-                if (machineHandler is MachineHandler handler && handler.GetOutput != null && handler.GetOutput(heldObject.Value, blueprint.fullid, activeRecipe.name) is SObject output)
+                if (machineHandler is MachineHandler handler && handler.GetOutput != null && handler.GetOutput(heldObject.Value, this, blueprint.fullid, activeRecipe.name) is SObject output)
                     return output;
 
                 return activeRecipe.createObject(heldObject.Value);
@@ -307,9 +304,9 @@ namespace CustomFarmingRedux
 
         public override void updateWhenCurrentLocation(GameTime time, GameLocation environment)
         {
-            if(tileLocation == Vector2.Zero)
+            if (tileLocation == Vector2.Zero)
                 if (!Game1.currentLocation.objects.ContainsKey(tileLocation) || Game1.currentLocation.objects[tileLocation] != this)
-                    if(new List<SObject>(Game1.currentLocation.objects.Values).Contains(this))
+                    if (new List<SObject>(Game1.currentLocation.objects.Values).Contains(this))
                         tileLocation.Value = new List<Vector2>(Game1.currentLocation.objects.Keys).Find(k => Game1.currentLocation.objects[k] == this);
 
             if (blueprint.worklight)
@@ -338,10 +335,10 @@ namespace CustomFarmingRedux
             if (!(isWorking && completionTime != null))
                 startAutoProduction();
 
-           base.updateWhenCurrentLocation(time, environment);
+            base.updateWhenCurrentLocation(time, environment);
 
             if (completionTime != null)
-                minutesUntilReady.Set(Math.Max((completionTime - STime.CURRENT).timestamp,0));
+                minutesUntilReady.Set((completionTime + 1 - STime.CURRENT).timestamp);
         }
 
         public override string DisplayName { get => name; set => base.DisplayName = value; }
@@ -440,7 +437,7 @@ namespace CustomFarmingRedux
             return new CustomMachine(blueprint);
         }
 
-        public Dictionary<string, string> getAdditionalSaveData()
+        public virtual Dictionary<string, string> getAdditionalSaveData()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("id", id);
@@ -462,13 +459,11 @@ namespace CustomFarmingRedux
             return data;
         }
 
-        public object getReplacement()
+        public virtual object getReplacement()
         {
             Chest replacement = new Chest(true);
             if (heldObject.Value != null)
                 replacement.items.Add(heldObject);
-
-            activeMachines.Remove(this);
 
             replacement.TileLocation = tileLocation;
 
@@ -480,9 +475,9 @@ namespace CustomFarmingRedux
             return blueprint.water;
         }
 
-        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
+        public virtual void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
-            var machine = machines.Find(cmb => additionalSaveData["id"] == cmb.fullid);
+            blueprint = machines.Find(cmb => additionalSaveData["id"] == cmb.fullid);
 
             if (additionalSaveData.ContainsKey("completionTime"))
                 completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
@@ -513,6 +508,7 @@ namespace CustomFarmingRedux
                 completionTime.hour = 6;
                 completionTime.minute = 0;
                 completionTime += minutesToCompletion < 0 ? 0 : minutesToCompletion;
+                minutesUntilReady.Set((completionTime + 1 - STime.CURRENT).timestamp);
             }
 
             Chest c = (Chest)replacement;
@@ -568,7 +564,7 @@ namespace CustomFarmingRedux
             {
                 if (justCheckingForActivity)
                     return true;
-                handler.ClickAction();
+                handler.ClickAction(this);
             }
 
             if (blueprint.category == "Dresser")
@@ -616,7 +612,7 @@ namespace CustomFarmingRedux
             return deliverProduce(who);
         }
 
-        public bool deliverProduce(SFarmer who, bool toInventory = true)
+        public virtual bool deliverProduce(SFarmer who, bool toInventory = true)
         {
             skipDrop = true;
 
@@ -639,13 +635,13 @@ namespace CustomFarmingRedux
             return false;
         }
 
-        private void startAutoProduction()
+        public virtual void startAutoProduction()
         {
             if (!isWorking && blueprint.production != null && blueprint.production[0].materials == null)
                 startProduction(null, blueprint.production[0], null);
         }
 
-        public void clear()
+        public virtual void clear()
         {
             heldObject.Value = null;
             readyForHarvest.Value = false;
@@ -653,7 +649,7 @@ namespace CustomFarmingRedux
             completionTime = null;
         }
 
-        public void removeLightSource()
+        public virtual void removeLightSource()
         {
             try
             {
@@ -674,7 +670,7 @@ namespace CustomFarmingRedux
             }
         }
 
-        public void addLightSource()
+        public virtual void addLightSource()
         {
             if (location != null)
             {
@@ -708,7 +704,7 @@ namespace CustomFarmingRedux
             return false;
         }
 
-        private string getCatName(int cat)
+        public virtual string getCatName(int cat)
         {
             SObject s = new SObject(Vector2.Zero, 399);
             s.Category = cat;
@@ -781,10 +777,10 @@ namespace CustomFarmingRedux
             return performDropInAction(dropInItem, probe, getItemLists(who));
         }
 
-        public RecipeBlueprint findRecipeForItemType(SObject item)
+        public virtual RecipeBlueprint findRecipeForItemType(SObject item)
         {
             CustomFarmingReduxMod.machineHandlers.TryGetValue(blueprint.fullid, out machineHandler);
-            if (machineHandler is MachineHandler handler && handler.CheckInput != null && !handler.CheckInput(item, blueprint.fullid))
+            if (machineHandler is MachineHandler handler && handler.CheckInput != null && !handler.CheckInput(item, this, blueprint.fullid))
                 return null;
 
             return findRecipeFor(maxed((SObject)item));
@@ -894,7 +890,6 @@ namespace CustomFarmingRedux
             if (!Game1.currentLocation.objects.ContainsKey(tileLocation) || Game1.currentLocation.objects[tileLocation] != this)
                 tileLocation.Value = new List<Vector2>(Game1.currentLocation.objects.Keys).Find(k => Game1.currentLocation.objects[k] == this);
 
-
             removeLightSource();
             Game1.createItemDebris(getOne(), tileLocation.Value * Game1.tileSize, -1, null);
             Game1.currentLocation.objects.Remove(tileLocation);
@@ -902,14 +897,14 @@ namespace CustomFarmingRedux
             return false;
         }
 
-        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        public virtual ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
         {
             return new CustomMachine();
         }
 
         public Dictionary<string, string> getSyncData()
         {
-            var data = new Dictionary<string, string>() { {"completionTime", completionTime != null ? completionTime.timestamp.ToString() : "-1" } };
+            var data = new Dictionary<string, string>() { { "completionTime", completionTime != null ? completionTime.timestamp.ToString() : "-1" } };
 
             if (activeRecipe != null && !blueprint.asdisplay)
                 data.Add("recipe", activeRecipe.id.ToString());

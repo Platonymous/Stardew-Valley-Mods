@@ -2,13 +2,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using PyTK.CustomElementHandler;
 using PyTK.Extensions;
-using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace CustomFarmingRedux
 {
@@ -120,8 +117,8 @@ namespace CustomFarmingRedux
 
         /// <summary>Add an Output Handler to a machine</summary>
         /// <param name="machineId">Id of the machine that this should handle</param>
-        /// <param name="outputHandler">The Output Handler that returns the output Func(StardewValley.Object dropIn, string machineid, string recipeName)</param>
-        public void setOutputHandler(string machineId, Func<StardewValley.Object, string, string, StardewValley.Object> outputHandler)
+        /// <param name="outputHandler">The Output Handler that returns the output Func(StardewValley.Object dropIn, StardewValley.Object machine, string machineid, string recipeName)</param>
+        public void setOutputHandler(string machineId, Func<StardewValley.Object, StardewValley.Object, string, string, StardewValley.Object> outputHandler)
         {
             if (CustomFarmingReduxMod.machineHandlers.ContainsKey(machineId))
                 CustomFarmingReduxMod.machineHandlers[machineId].GetOutput = outputHandler;
@@ -134,8 +131,8 @@ namespace CustomFarmingRedux
 
         /// <summary>Add a Check Input Handler to a machine</summary>
         /// <param name="machineId">Id of the machine that this should handle</param>
-        /// <param name="inputHandler">The Input Handler that returns whether or not to accept an input Func(StardewValley.Object dropIn, string machineid)</param>
-        public void setInputHandler(string machineId, Func<StardewValley.Object, string, bool> inputHandler)
+        /// <param name="inputHandler">The Input Handler that returns whether or not to accept an input Func(StardewValley.Object dropIn, StardewValley.Object machine, string machineid)</param>
+        public void setInputHandler(string machineId, Func<StardewValley.Object, StardewValley.Object, string, bool> inputHandler)
         {
             if (CustomFarmingReduxMod.machineHandlers.ContainsKey(machineId))
                 CustomFarmingReduxMod.machineHandlers[machineId].CheckInput = inputHandler;
@@ -148,8 +145,8 @@ namespace CustomFarmingRedux
 
         /// <summary>Add Click Action Handler to a machine</summary>
         /// <param name="machineId">Id of the machine that this should handle</param>
-        /// <param name="clickHandler">The Action invoked when clicking the machine</param>
-        public void setClickHandler(string machineId, Action clickHandler)
+        /// <param name="clickHandler">The Action invoked when clicking the machine Action(StardewValley.Object machine)</param>
+        public void setClickHandler(string machineId, Action<StardewValley.Object> clickHandler)
         {
             if (CustomFarmingReduxMod.machineHandlers.ContainsKey(machineId))
                 CustomFarmingReduxMod.machineHandlers[machineId].ClickAction = clickHandler;

@@ -39,17 +39,17 @@ namespace CustomFarmingRedux
 
         /// <summary>Add an Output Handler to a machine</summary>
         /// <param name="machineId">Id of the machine that this should handle</param>
-        /// <param name="outputHandler">The Output Handler that returns the output Func(StardewValley.Object dropIn, string machineid, string recipeName)</param>
-        void setOutputHandler(string machineId, Func<StardewValley.Object, string, string, StardewValley.Object> outputHandler);
+        /// <param name="outputHandler">The Output Handler that returns the output Func(StardewValley.Object dropIn, StardewValley.Object machine, string machineid, string recipeName)</param>
+        void setOutputHandler(string machineId, Func<StardewValley.Object, StardewValley.Object, string, string, StardewValley.Object> outputHandler);
 
-        /// <summary>Check Input Handler to a machine</summary>
+        /// <summary>Add a Check Input Handler to a machine</summary>
         /// <param name="machineId">Id of the machine that this should handle</param>
-        /// <param name="inputHandler">The Input Handler that returns whether or not to accept an input Func(StardewValley.Object dropIn, string machineid)</param>
-        void setInputHandler(string machineId, Func<StardewValley.Object, string, bool> inputHandler);
+        /// <param name="inputHandler">The Input Handler that returns whether or not to accept an input Func(StardewValley.Object dropIn, StardewValley.Object machine, string machineid)</param>
+        void setInputHandler(string machineId, Func<StardewValley.Object, StardewValley.Object, string, bool> inputHandler);
 
         /// <summary>Add Click Action Handler to a machine</summary>
         /// <param name="machineId">Id of the machine that this should handle</param>
-        /// <param name="clickHandler">The Action invoked when clicking the machine</param>
-        void setClickHandler(string machineId, Action clickHandler);
+        /// <param name="clickHandler">The Action invoked when clicking the machine Action(StardewValley.Object machine)</param>
+        void setClickHandler(string machineId, Action<StardewValley.Object> clickHandler);
     }
 }
