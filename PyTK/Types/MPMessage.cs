@@ -20,6 +20,11 @@ namespace PyTK.Types
         public object message { get; set; }
         public int type { get; set; }
         public long receiver { get; set; }
+        
+        public MPMessage()
+        {
+
+        }
 
         public MPMessage(string address, Farmer sender, object message, int type = 0, long toFarmer = -1)
         {

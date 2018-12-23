@@ -73,6 +73,11 @@ namespace PyTK.Types
         private const int sSeason = sDay * 28; // 40320
         private const int sYear = sSeason * 4; // 161280
 
+        public STime()
+        {
+
+        }
+
         public STime (int year, int season, int day, int timeOfDay)
             :this(year,season,day, (int)Math.Floor((decimal)timeOfDay / 100), timeOfDay - ((int)Math.Floor((decimal)timeOfDay / 100) * 100))
         {
