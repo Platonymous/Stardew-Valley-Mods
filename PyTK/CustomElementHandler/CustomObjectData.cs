@@ -19,15 +19,15 @@ namespace PyTK.CustomElementHandler
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
         internal static int minIndex = 3000;
         internal static int minIndexBig = 4000;
-        internal static string CODSyncerName = "Plytonymous.PyTK.CODSync";
+        internal static string CODSyncerName = "Platonymous.PyTK.CODSync";
         internal static PyReceiver<CODSyncMessage> CODSyncer = new PyReceiver<CODSyncMessage>(CODSyncerName, (cm) =>
           {
-              foreach(CODSync c in cm.Syncs)
-                  if (collection.ContainsKey(c.Id))
-                      collection[c.Id].forceNewSDVId(c.Index);
+                  foreach (CODSync c in cm.Syncs)
+                      if (collection.ContainsKey(c.Id))
+                          collection[c.Id].forceNewSDVId(c.Index);
 
-              foreach (var c in collection.Values)
-                  c.getNewSDVId();
+                  foreach (var c in collection.Values)
+                      c.getNewSDVId();
           }, 60, SerializationType.JSON);
 
         public static Dictionary<string,CustomObjectData> collection = new Dictionary<string, CustomObjectData>();
