@@ -16,7 +16,7 @@ namespace Notes
         internal static CustomObjectData Note;
         internal static CustomObjectData Desk;
         internal static string NoteInfo;
-        internal static string displayNote = ""; 
+        internal static string displayNote = "";
 
         public override void Entry(IModHelper helper)
         {
