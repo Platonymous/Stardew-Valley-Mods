@@ -6,7 +6,6 @@ using PyTK.Types;
 using StardewModdingAPI;
 using System.Threading;
 using StardewValley;
-using StardewValley.Network;
 using System.Xml.Serialization;
 using System.IO;
 using Newtonsoft.Json;
@@ -14,7 +13,6 @@ using PyTK.ContentSync;
 using xTile.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using xTile;
-using Netcode;
 
 namespace PyTK
 {
@@ -25,7 +23,7 @@ namespace PyTK
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
         internal static Dictionary<string, List<MPMessage>> messages = new Dictionary<string, List<MPMessage>>();
         internal static Random random { get; } = new Random();
-
+        
         public static void sendMessage(string address, object message)
         {
             sendMessage(new MPMessage(address, Game1.player, message));
@@ -33,46 +31,27 @@ namespace PyTK
 
         public static void sendMessage(MPMessage msg)
         {
-            if (Game1.IsServer)
-                foreach (long key in Game1.otherFarmers.Keys)
-                {
-                    if (key != msg.sender.UniqueMultiplayerID)
-                        if (msg.receiver == -1 || msg.receiver == key)
-                            Game1.server.sendMessage(key, 99, msg.sender, (Int64)msg.receiver, (Int16)msg.type, msg.address, (Int16)msg.dataType, msg.message);
-                }
-            else
-                Game1.client.sendMessage(new OutgoingMessage(99, msg.sender, (Int64)msg.receiver, (Int16)msg.type, msg.address, (Int16)msg.dataType, msg.message));
+            Helper.Multiplayer.SendMessage<MPMessageSMAPI>(new MPMessageSMAPI((int) msg.dataType, msg.type, msg.message), msg.address, new[] { Helper.Multiplayer.ModID }, msg.receiver != -1 ? new[] { msg.receiver } : null);
         }
-
-        public static void receiveMessage(IncomingMessage inc)
+       
+        internal static void Multiplayer_ModMessageReceived(object sender, StardewModdingAPI.Events.ModMessageReceivedEventArgs e)
         {
-            long receiver = inc.Reader.ReadInt64();
-            int type = inc.Reader.ReadInt16();
-            string address = inc.Reader.ReadString();
-            MPDataType dataType = (MPDataType)inc.Reader.ReadInt16();
+            MPMessageSMAPI message = e.ReadAs<MPMessageSMAPI>();
+
+            if (!messages.ContainsKey(e.Type))
+                messages.Add(e.Type, new List<MPMessage>());
+
             object data = null;
-            switch (dataType)
+            switch (message.DataType)
             {
-                case MPDataType.STRING: data = inc.Reader.ReadString(); break;
-                case MPDataType.INT: data = inc.Reader.ReadInt32(); break;
-                case MPDataType.BOOL: data = inc.Reader.ReadBoolean(); break;
-                case MPDataType.DOUBLE: data = inc.Reader.ReadDouble(); break;
-                case MPDataType.LONG: data = inc.Reader.ReadInt64(); break;
-                default: data = inc.Reader.ReadString(); break;
+                case 0: data = message.AsInt; break;
+                case 1: data = message.AsString; break;
+                case 2: data = message.AsBool; break;
+                case 3: data = message.AsLong; break;
+                case 4: data = message.AsDouble; break;
+                default: data = message.AsString; break;
             }
-
-            MPMessage message = new MPMessage(address, inc.SourceFarmer, data, type, receiver);
-
-            if (Game1.IsServer && receiver != Game1.player.UniqueMultiplayerID)
-                sendMessage(message);
-
-            if (receiver == -1 || receiver == Game1.player.UniqueMultiplayerID)
-            {
-                if (!messages.ContainsKey(address))
-                    messages.Add(address, new List<MPMessage>());
-
-                messages[address].Add(message);
-            }
+            messages[e.Type].Add(new MPMessage(e.Type, Game1.getFarmer(e.FromPlayerID), data, message.MessageType, Game1.player.UniqueMultiplayerID));
         }
 
         public static IEnumerable<MPMessage> getNewMessages(string address, int type = -1, long fromFarmer = -1)
@@ -92,75 +71,86 @@ namespace PyTK
             }
         }
 
-        public static void sendRequestToAllFarmers<T>(string address, object request, Action<T> callback, SerializationType serializationType = SerializationType.PLAIN, int timeout = 1000, XmlSerializer xmlSerializer = null)
+        public static void sendRequestToAllFarmers<T>(string address, object request, Action<T> callback, SerializationType serializationType = SerializationType.PLAIN, int timeout = 500, XmlSerializer xmlSerializer = null)
         {
-            foreach (Farmer farmer in Game1.otherFarmers.Values.Where(f => f.isActive() &&  f != Game1.player))
-                Task.Run(() => sendRequestToFarmer(address, request, farmer, callback, serializationType, timeout, xmlSerializer));
+            sendRequestToFarmer(address, request, -1, callback, serializationType, timeout, xmlSerializer);
         }
 
         public static void sendDataToFarmer(string address, object data, Farmer farmer, SerializationType serializationType = SerializationType.PLAIN, XmlSerializer xmlSerializer = null)
         {
-            Task.Run(() => sendRequestToFarmer<object>(address, data, farmer.UniqueMultiplayerID, null, serializationType, -1, xmlSerializer));
+            sendRequestToFarmer<bool>(address, data, farmer.UniqueMultiplayerID, null, serializationType, -1, xmlSerializer);
         }
 
         public static void sendDataToFarmer(string address, object data, long uniqueMultiplayerId, SerializationType serializationType = SerializationType.PLAIN, XmlSerializer xmlSerializer = null)
         {
-            Task.Run(() => sendRequestToFarmer<object>(address, data, uniqueMultiplayerId, null, serializationType, -1, xmlSerializer));
+            sendRequestToFarmer<bool>(address, data, uniqueMultiplayerId, null, serializationType, -1, xmlSerializer);
         }
 
-        public static async Task<T> sendRequestToFarmer<T>(string address, object request, Farmer farmer, Action<T> callback = null, SerializationType serializationType = SerializationType.PLAIN, int timeout = 500, XmlSerializer xmlSerializer = null)
+        public static Task<T> sendRequestToFarmer<T>(string address, object request, Farmer farmer, Action<T> callback = null, SerializationType serializationType = SerializationType.PLAIN, int timeout = 500, XmlSerializer xmlSerializer = null)
         {
-           return await sendRequestToFarmer(address, request, farmer.UniqueMultiplayerID, callback, serializationType, timeout, xmlSerializer);
+            return sendRequestToFarmer(address, request, farmer.UniqueMultiplayerID, callback, serializationType, timeout, xmlSerializer);
         }
 
-        public static async Task<T> sendRequestToFarmer<T>(string address, object request, long uniqueMultiplayerId, Action<T> callback = null, SerializationType serializationType = SerializationType.PLAIN, int timeout = 500, XmlSerializer xmlSerializer = null)
+        public static Task<T> sendRequestToFarmer<T>(string address, object request, long uniqueMultiplayerId, Action<T> callback = null, SerializationType serializationType = SerializationType.PLAIN, int timeout = 500, XmlSerializer xmlSerializer = null)
         {
-            long fromFarmer = uniqueMultiplayerId;
+           return Task.Run(() =>
+           {
+               long toFarmer = uniqueMultiplayerId;
 
-            if (xmlSerializer == null)
-                xmlSerializer = new XmlSerializer(typeof(T));
+               if (xmlSerializer == null)
+                   xmlSerializer = new XmlSerializer(typeof(T));
 
-            object objectData = request;
+               object objectData = request;
 
-            if (serializationType == SerializationType.XML)
-            {
-                StringWriter writer = new StringWriter();
-                xmlSerializer.Serialize(writer, request);
-                objectData = writer.ToString();
-            }
-            else if (serializationType == SerializationType.JSON)
-                objectData = JsonConvert.SerializeObject(request);
+               if (serializationType == SerializationType.XML)
+               {
+                   StringWriter writer = new StringWriter();
+                   xmlSerializer.Serialize(writer, request);
+                   objectData = writer.ToString();
+               }
+               else if (serializationType == SerializationType.JSON)
+                   objectData = JsonConvert.SerializeObject(request);
+               int id = Guid.NewGuid().GetHashCode();
+               string returnAddress = address + "." + id;
+               PyMessenger<T> messenger = new PyMessenger<T>(returnAddress, null);
 
-            Int16 id = (Int16)random.Next(Int16.MinValue, Int16.MaxValue);
-            string returnAddress = address + "." + id;
-            PyMessenger<T> messenger = new PyMessenger<T>(returnAddress);
-            sendMessage(new MPMessage(address, Game1.player, objectData, id, fromFarmer));
-            object result = null;
-            if (callback != null)
-            {
-                result = await Task.Run(() =>
-                {
-                    while (true)
-                    {
-                        List<T> msgs = new List<T>(messenger.receive());
-                        if (msgs.Count() > 0)
-                        {
-                            messages.Remove(returnAddress);
-                            return msgs[0];
-                        }
+               int run = 0;
+               bool received = false;
+               T result = default(T);
 
-                        timeout--;
+               EventHandler<StardewModdingAPI.Events.ModMessageReceivedEventArgs> handler = (s, e) => checkForMessage(messenger, ref result, ref received, ref run);
+               Helper.Events.Multiplayer.ModMessageReceived += handler;
 
-                        if (timeout < 0)
-                            return default(T);
-                        Thread.Sleep(1);
-                    }
-                });
-                callback?.Invoke((T)result);
-            }
-            return (T)result;
+               sendMessage(new MPMessage(address, Game1.player, objectData, id, toFarmer));
+               if (timeout > 0)
+                   while (!received && run < 100 && timeout > 0)
+                   {
+                       timeout--;
+                       Thread.Sleep(10);
+                   }
+
+               Helper.Events.Multiplayer.ModMessageReceived -= handler;
+
+               callback?.Invoke((T)result);
+
+               return((T)result);
+           });
         }
 
+        private static void checkForMessage<T>(PyMessenger<T> messenger, ref T result, ref bool received, ref int run)
+        {
+           foreach(T msg in messenger.receive())
+            {
+                result = msg;
+                received = true;
+                break;
+            }
+
+            if (received)
+                messages.Remove(messenger.address);
+
+            run++;
+        }
 
         public static void requestContent<T>(string assetName, Farmer fromFarmer, Action<T> callback, int timeout = 1000)
         {
@@ -202,8 +192,7 @@ namespace PyTK
         {
             Dictionary<TileSheet, Texture2D> tilesheets = Helper.Reflection.GetField<Dictionary<TileSheet, Texture2D>>(Game1.mapDisplayDevice, "m_tileSheetTextures").GetValue();
             string[] seasons = new[] { "spring", "summer", "fall", "winter" };
-            Monitor.Log("Syncing Map " + mapName + " with " + farmer.Name, LogLevel.Info);
-            PyNet.sendGameContent<Map>(Path.Combine("Maps", mapName), map, farmer, (b) => Monitor.Log("Syncing " + mapName + " to " + farmer.Name + ": " + (b ? "successful" : "failed"), b ? LogLevel.Info : LogLevel.Warn));
+            PyNet.sendGameContent<Map>(Path.Combine("Maps", mapName), map, farmer,null);
 
             foreach (TileSheet t in map.TileSheets)
                 {
@@ -227,13 +216,7 @@ namespace PyTK
                             }
                         }
 
-                        if (texture == null)
-                        {
-                            Monitor.Log("Syncing Texture " + t.ImageSource + " failed. Could not load file.", LogLevel.Error);
-                        }
-
                         string filename = Path.GetFileName(t.ImageSource);
-                        Monitor.Log("Syncing Texture " + filename + " with " + farmer.Name, LogLevel.Info);
                         PyNet.sendGameContent(new[] { filename, Path.Combine("Maps", filename) }, texture, farmer, (b) => Monitor.Log("Syncing " + t.ImageSource + " to " + farmer.Name + ": " + (b ? "successful" : "failed"), b ? LogLevel.Info : LogLevel.Warn));
 
                         foreach (string season in seasons)
@@ -309,9 +292,9 @@ namespace PyTK
 
         public void WarpFarmer(Farmer farmer, string location, int x, int y, bool isStructure = false, int facingAfterWarp = -1)
         {
-            Task.Run(async () =>
+            Task.Run(() =>
            {
-               await sendRequestToFarmer<bool>("PyTK.WarpFarmer", new WarpRequest(farmer, location, x, y, isStructure, facingAfterWarp), farmer, (b) => Monitor.Log("Warping " + farmer.Name + " " + (b ? "was successful" : "failed"), b ? LogLevel.Info : LogLevel.Error), SerializationType.JSON);
+               sendRequestToFarmer<bool>("PyTK.WarpFarmer", new WarpRequest(farmer, location, x, y, isStructure, facingAfterWarp), farmer, (b) => Monitor.Log("Warping " + farmer.Name + " " + (b ? "was successful" : "failed"), b ? LogLevel.Info : LogLevel.Error), SerializationType.JSON);
            });
         }
     }

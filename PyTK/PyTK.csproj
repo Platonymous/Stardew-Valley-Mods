@@ -60,6 +60,7 @@
     <Compile Include="CustomElementHandler\ICustomObject.cs" />
     <Compile Include="CustomElementHandler\ISyncableElement.cs" />
     <Compile Include="CustomElementHandler\PySObject.cs" />
+    <Compile Include="CustomElementHandler\PySyncHandler.cs" />
     <Compile Include="CustomElementHandler\SaveHandler.cs" />
     <Compile Include="CustomElementHandler\Replacer.cs" />
     <Compile Include="CustomTV\CustomTVMod.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Types\ICustomContentAPI.cs" />
     <Compile Include="Types\InventoryItem.cs" />
     <Compile Include="Types\Mail.cs" />
+    <Compile Include="Types\MPMessageSMAPI.cs" />
     <Compile Include="Types\MPMessage.cs" />
     <Compile Include="Types\PyNetMap.cs" />
     <Compile Include="Types\PyNetField.cs" />

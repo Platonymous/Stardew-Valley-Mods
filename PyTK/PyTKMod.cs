@@ -59,7 +59,7 @@ namespace PyTK
             this.Helper.Events.GameLoop.DayStarted += OnDayStarted;
             this.Helper.Events.Multiplayer.PeerContextReceived += (s, e) =>
             {
-                if (Game1.IsMasterGame && CustomObjectData.collection.Values.Count > 0)
+                if (Game1.IsMasterGame && Game1.IsServer && CustomObjectData.collection.Values.Count > 0)
                 {
                     List<CODSync> list = new List<CODSync>();
                     foreach (CustomObjectData data in CustomObjectData.collection.Values)
@@ -69,6 +69,9 @@ namespace PyTK
                 }
                
             };
+
+            Helper.Events.Multiplayer.ModMessageReceived += PyNet.Multiplayer_ModMessageReceived;
+
         }
 
         private void Player_Warped(object sender, WarpedEventArgs e)
@@ -246,11 +249,7 @@ namespace PyTK
             {
                 Monitor.Log(Game1.player.Name + ": " + Game1.player.Stamina, LogLevel.Info);
                 foreach (Farmer farmer in Game1.otherFarmers.Values)
-                {
-                    var getStamina = PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", -1, farmer);
-                    getStamina.Wait();
-                    Monitor.Log(farmer.Name + ": " + getStamina.Result, LogLevel.Info);
-                }
+                    PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", -1, farmer, (getStamina) => Monitor.Log(farmer.Name + ": " + getStamina, LogLevel.Info));
             }).register();
 
             new ConsoleCommand("setstamina", "changes the stamina of all or a specific player. use: setstamina [playername or all] [stamina]", (s, p) =>
@@ -260,14 +259,9 @@ namespace PyTK
 
                 Monitor.Log(Game1.player.Name + ": " + Game1.player.Stamina, LogLevel.Info);
                 Farmer farmer = null;
-                try
-                {
+
                     farmer = Game1.otherFarmers.Find(k => k.Value.Name.Equals(p[0])).Value;
-                }
-                catch
-                {
-                    
-                }
+
 
                 if(farmer == null)
                 {
@@ -278,9 +272,8 @@ namespace PyTK
                 int i = -1;
                 int.TryParse(p[1], out i);
 
-                var setStamina = PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", i, farmer);
-                setStamina.Wait();
-                Monitor.Log(farmer.Name + ": " + setStamina.Result, LogLevel.Info);
+                PyNet.sendRequestToFarmer<int>("PytK.StaminaRequest", i, farmer, (setStamina) => Monitor.Log(farmer.Name + ": " + setStamina, LogLevel.Info));
+                
             }).register();
 
 
@@ -289,14 +282,14 @@ namespace PyTK
                 foreach (Farmer farmer in Game1.otherFarmers.Values)
                 {
                     long t = Game1.currentGameTime.TotalGameTime.Milliseconds;
-                    var ping = PyNet.sendRequestToFarmer<bool>("PytK.Ping", t, farmer);
-                    ping.Wait();
-
-                    long r = Game1.currentGameTime.TotalGameTime.Milliseconds;
-                    if (ping.Result)
-                        Monitor.Log(farmer.Name + ": " + (r - t) + "ms", LogLevel.Info);
-                    else
-                        Monitor.Log(farmer.Name + ": No Answer", LogLevel.Error);
+                    PyNet.sendRequestToFarmer<bool>("PytK.Ping", t, farmer, (ping) =>
+                    {
+                        long r = Game1.currentGameTime.TotalGameTime.Milliseconds;
+                        if (ping)
+                            Monitor.Log(farmer.Name + ": " + (r - t) + "ms", LogLevel.Info);
+                        else
+                            Monitor.Log(farmer.Name + ": No Answer", LogLevel.Error);
+                    });
                 }
             }).register();
 

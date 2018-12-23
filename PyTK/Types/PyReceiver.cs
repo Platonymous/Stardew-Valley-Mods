@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 using Newtonsoft.Json;
 using StardewModdingAPI.Events;
 using System.Threading.Tasks;
-using System.Linq;
+using StardewValley;
 
 namespace PyTK.Types
 {
@@ -18,7 +18,6 @@ namespace PyTK.Types
         public Action<TIn> requestHandler;
         public SerializationType serializationType;
         public SerializationType requestSerialization;
-        private int tick;
 
         public PyReceiver(string address, Action<TIn> requestHandler, int interval = 1, SerializationType requestSerialization = SerializationType.PLAIN, XmlSerializer xmlSerializer = null)
         {
@@ -31,7 +30,6 @@ namespace PyTK.Types
 
         public void start()
         {
-            tick = 0;
             PyTKMod._events.GameLoop.UpdateTicked += checkForRequests;
         }
 
@@ -42,17 +40,16 @@ namespace PyTK.Types
 
         private void checkForRequests(object sender, UpdateTickedEventArgs e)
         {
-            tick++;
-            if (tick != interval)
+            if (!Game1.IsMultiplayer)
                 return;
 
-            List<MPMessage> messages = receive().ToList();
+            if (!e.IsMultipleOf((uint)interval))
+                return;
 
-            if (messages.Count > 0)
-                foreach (MPMessage request in messages)
-                    Task.Run(() => { requestHandler(deserialize(requestSerialization, request.message)); ; });
+            var messages = receive();
 
-            tick = 0;
+            foreach (MPMessage request in messages)
+                Task.Run(() => { requestHandler(deserialize(requestSerialization, request.message)); ; });
         }
 
         private TIn deserialize(SerializationType type, object data)
