@@ -1,0 +1,14 @@
+﻿{
+  "Content": [
+    {
+      "Id": "LegoScarecrow.1",
+      "Texture": "Assets/lego_scarecrow.png",
+      "TileIndex": 0,
+      "ScaleUp": true,
+      "OriginalWidth": 16,
+      "DataString": "Lego Scarecrow/50/-300/Crafting -9/{Description}/true/true/0/{Name}",
+      "BigCraftable": true,
+      "CraftingRecipe": "388 10"
+    }
+  ]
+}
