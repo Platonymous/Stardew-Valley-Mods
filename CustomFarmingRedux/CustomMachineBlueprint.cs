@@ -1,6 +1,10 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using PyTK.Extensions;
+using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
+using System;
 using System.Collections.Generic;
 
 
@@ -58,6 +62,8 @@ namespace CustomFarmingRedux
         public int[] lightcolor { get; set; } = new int[] { 0, 139, 139, 255 };
         public bool worklight { get; set; } = true;
         public float lightradius { get; set; } = 1.5f;
+        public bool scaleup { get; set; } = false;
+        public int originalwidth { get; set; } = 16;
 
         public Texture2D getTexture(IModHelper helper = null)
         {
@@ -77,6 +83,13 @@ namespace CustomFarmingRedux
                     else
                         texture2d = pack.contentPack.LoadAsset<Texture2D>(texture);
                 }
+
+            if (scaleup)
+            {
+                float scale = (float)(Convert.ToDouble(texture2d.Width) / Convert.ToDouble(originalwidth));
+                int height = (int)(texture2d.Height / scale);
+                texture2d = ScaledTexture2D.FromTexture(texture2d.getArea(new Rectangle(0, 0, originalwidth, height)), texture2d, scale);
+            }
             return texture2d;
         }
 
