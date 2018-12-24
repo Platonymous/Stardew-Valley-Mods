@@ -1,7 +1,7 @@
 {
   "Name": "Custom Farming Automate Bridge",
   "Author": "Platonymous",
-  "Version": "2.10.5",
+  "Version": "2.10.6",
   "Description": "Allows Custom Farming to work with Automate",
   "UniqueID": "Platonymous.CFAutomate",
   "EntryDll": "CFAutomate.dll",

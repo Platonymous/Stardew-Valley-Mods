@@ -299,6 +299,9 @@ namespace CustomFarmingRedux
 
         public override bool minutesElapsed(int minutes, GameLocation environment)
         {
+            if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
+                getReadyForHarvest();
+
             return false;
         }
 
