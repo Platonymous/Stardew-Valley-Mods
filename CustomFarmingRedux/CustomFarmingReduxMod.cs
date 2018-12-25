@@ -203,7 +203,7 @@ namespace CustomFarmingRedux
         {
             List<CustomFarmingPack> packs = new List<CustomFarmingPack>();
 
-            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
+            foreach (StardewModdingAPI.IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 List<CustomFarmingPack> cpPacks = loadCP(pack);
                 packs.AddRange(cpPacks);
