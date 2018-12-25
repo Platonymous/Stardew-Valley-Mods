@@ -63,7 +63,10 @@ namespace CustomFarmingRedux
                         Game1.player.craftingRecipes[c.Key] = c.Value;
                     else
                         Game1.player.craftingRecipes.Add(c.Key, c.Value);
-            };
+
+                CustomObject.betterArtisanGoods = System.Type.GetType("BetterArtisanGoodIcons.ArtisanGoodsManager, BetterArtisanGoodIcons");
+                CustomObject.hasBetterArtisanGoods = CustomObject.betterArtisanGoods != null;
+    };
 
             harmonyFix();
             helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);

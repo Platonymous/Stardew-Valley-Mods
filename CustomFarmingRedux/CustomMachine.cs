@@ -307,6 +307,9 @@ namespace CustomFarmingRedux
 
         public override void updateWhenCurrentLocation(GameTime time, GameLocation environment)
         {
+            location = environment;
+            bool isWorking = this.isWorking;
+
             if (tileLocation == Vector2.Zero)
                 if (!Game1.currentLocation.objects.ContainsKey(tileLocation) || Game1.currentLocation.objects[tileLocation] != this)
                     if (new List<SObject>(Game1.currentLocation.objects.Values).Contains(this))
