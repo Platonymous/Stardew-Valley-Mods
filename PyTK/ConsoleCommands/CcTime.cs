@@ -26,7 +26,7 @@ namespace PyTK.ConsoleCommands
 
         public static void TimeSkip(string p, bool showTextInConsole = false)
         {
-            Overrides.OvGame.skipping = true;
+            Overrides.OvSmapi.skipping = true;
             Program.gamePtr.IsFixedTimeStep = false;
 
             try
@@ -62,7 +62,7 @@ namespace PyTK.ConsoleCommands
 
             }
             Program.gamePtr.IsFixedTimeStep = true;
-            Overrides.OvGame.skipping = false;
+            Overrides.OvSmapi.skipping = false;
 
         }
     }

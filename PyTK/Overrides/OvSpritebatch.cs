@@ -69,7 +69,7 @@ namespace PyTK.Overrides
                 }
                 else if (!skip2 && texture.Tag is String tag)
                 {
-                    CustomObjectData data = CustomObjectData.collection.ContainsKey(tag) ? CustomObjectData.collection[tag] : getDataFromSourceRectangle(sourceRectangle.Value);
+                    CustomObjectData data = tag != "cod_objects" && CustomObjectData.collection.ContainsKey(tag) ? CustomObjectData.collection[tag] : getDataFromSourceRectangle(sourceRectangle.Value);
 
                     texture.Tag = "cod_object";
                     Game1.bigCraftableSpriteSheet.Tag = "cod_object";

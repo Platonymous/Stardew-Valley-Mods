@@ -7,8 +7,11 @@ using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Locations;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Linq;
+using PyTK.Extensions;
 
 namespace PyTK.Overrides
 {
@@ -16,6 +19,7 @@ namespace PyTK.Overrides
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
+        internal static Dictionary<int, Rectangle> rectangleCache = new Dictionary<int, Rectangle>();
 
         [HarmonyPatch]
         internal class GLBugFix
@@ -159,6 +163,35 @@ namespace PyTK.Overrides
                     else
                         Game1.locations.Add(new GameLocation(locationMap, locationName));
                 }
+            }
+        }
+
+        [HarmonyPatch]
+        internal class GetRectangleFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "getSourceRectForObject", new[] { typeof(int) });
+            }
+
+            internal static bool Prefix(GameLocation __instance, int tileIndex, Rectangle __result, ref bool __state)
+            {
+                Rectangle tileRectangle;
+                __state = true;
+
+                if (rectangleCache.TryGetValue(tileIndex,out tileRectangle))
+                {
+                    __result = tileRectangle;
+                    __state = false;
+                }
+                
+                return __state;
+            }
+
+            internal static void Postfix(GameLocation __instance, int tileIndex, Rectangle __result, ref bool __state)
+            {
+                if(!__state)
+                    rectangleCache.AddOrReplace(tileIndex, __result);
             }
         }
 

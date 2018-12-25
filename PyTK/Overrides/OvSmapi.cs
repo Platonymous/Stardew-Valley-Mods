@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace PyTK.Overrides
 {
-    internal class OvGame
+    internal class OvSmapi
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;

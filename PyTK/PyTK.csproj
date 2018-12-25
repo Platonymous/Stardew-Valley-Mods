@@ -73,7 +73,7 @@
     <Compile Include="CustomElementHandler\ISaveElement.cs" />
     <Compile Include="Lua\LuaUtils.cs" />
     <Compile Include="Lua\PyLua.cs" />
-    <Compile Include="Overrides\OvReadyCheck.cs" />
+    <Compile Include="Overrides\OvSmapi.cs" />
     <Compile Include="Overrides\OvGame.cs" />
     <Compile Include="Overrides\OvLocations.cs" />
     <Compile Include="Overrides\OvLongevity.cs" />

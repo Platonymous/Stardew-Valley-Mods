@@ -1,9 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Objects;
-using SObject = StardewValley.Object;
-using StardewValley.TerrainFeatures;
 using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
@@ -16,14 +12,13 @@ using Harmony;
 using System.Reflection;
 using StardewValley.Menus;
 using System.Collections.Generic;
-using PyTK.Overrides;
 using xTile.Format;
 using System.Linq;
 using PyTK.Tiled;
 using PyTK.Lua;
-using static PyTK.Overrides.OvSpritebatch;
 using xTile;
 using xTile.Dimensions;
+using PyTK.Overrides;
 
 namespace PyTK
 {
@@ -211,7 +206,7 @@ namespace PyTK
                 if (!(Game1.activeClickableMenu is ReadyCheckDialog))
                     Monitor.Log("No open ready check.", LogLevel.Alert);
                 else
-                    OvReadyCheck.allready = true;
+                    OvGame.allready = true;
             }).register();
 
             new ConsoleCommand("send", "sends a message to all players: send [address] [message]", (s, p) =>
