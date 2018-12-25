@@ -5,7 +5,7 @@
   "Description": "Helper Mod for Custom Furniture creation.",
   "UniqueID": "Platonymous.CustomFurniture",
   "EntryDll": "CustomFurniture.dll",
-  "MinimumApiVersion": "2.9.0",
+  "MinimumApiVersion": "2.9.3",
   "UpdateKeys": [ "Nexus:1254" ],
   "Dependencies": [
     {

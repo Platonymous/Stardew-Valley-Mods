@@ -5,6 +5,6 @@
   "Description": "Changes the games music",
   "UniqueID": "Platonymous.CustomMusic",
   "EntryDll": "CustomMusic.dll",
-  "MinimumApiVersion": "2.9.0",
+  "MinimumApiVersion": "2.9.3",
   "UpdateKeys": [ "Nexus:3043" ]
 }

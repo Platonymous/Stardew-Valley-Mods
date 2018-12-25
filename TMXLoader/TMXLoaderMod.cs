@@ -99,7 +99,7 @@ namespace TMXLoader
 
         private void loadContentPacks()
         {
-            foreach (StardewModdingAPI.IContentPack pack in Helper.GetContentPacks())
+            foreach (StardewModdingAPI.IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 TMXContentPack tmxPack = pack.ReadJsonFile<TMXContentPack>("content.json");
 
