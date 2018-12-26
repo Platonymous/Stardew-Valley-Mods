@@ -1,7 +1,7 @@
 {
   "Name": "TMXLoader",
   "Author": "Platonymous",
-  "Version": "1.6.1",
+  "Version": "1.6.3",
   "Description": "Load TMX Maps into the Game",
   "UniqueID": "Platonymous.TMXLoader",
   "EntryDll": "TMXLoader.dll",

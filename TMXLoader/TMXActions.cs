@@ -3,6 +3,7 @@ using PyTK;
 using PyTK.Extensions;
 using PyTK.Lua;
 using PyTK.Types;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -55,13 +56,33 @@ namespace TMXLoader
                             item = new StardewValley.Object(Vector2.Zero, Game1.bigCraftablesInformation.getIndexByName(inventory.name));
                     }
                     else if (inventory.type == "Ring")
-                        item = new Ring(inventory.index);
+                    {
+                        if (inventory.index != -1)
+                            item = new Ring(inventory.index);
+                        else if (inventory.name != "none")
+                            item = new Ring(Game1.objectInformation.getIndexByName(inventory.name));
+                    }
                     else if (inventory.type == "Hat")
-                        item = new Hat(inventory.index);
+                    {
+                        if (inventory.index != -1)
+                            item = new Hat(inventory.index);
+                        else if (inventory.name != "none")
+                            item = new Hat(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/hats", ContentSource.GameContent).getIndexByName(inventory.name));
+                    }
                     else if (inventory.type == "Boots")
-                        item = new StardewValley.Objects.Boots(inventory.index);
+                    {
+                        if (inventory.index != -1)
+                            item = new Boots(inventory.index);
+                        else if (inventory.name != "none")
+                            item = new Boots(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Boots", ContentSource.GameContent).getIndexByName(inventory.name));
+                    }
                     else if (inventory.type == "TV")
-                        item = new StardewValley.Objects.TV(inventory.index, Vector2.Zero);
+                    {
+                        if (inventory.index != -1)
+                            item = new StardewValley.Objects.TV(inventory.index, Vector2.Zero);
+                        else if (inventory.name != "none")
+                            item = new TV(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(inventory.name), Vector2.Zero);
+                    }
                     else if (inventory.type == "IndoorPot")
                         item = new StardewValley.Objects.IndoorPot(Vector2.Zero);
                     else if (inventory.type == "CrabPot")
@@ -73,7 +94,12 @@ namespace TMXLoader
                     else if (inventory.type == "Cask")
                         item = new StardewValley.Objects.Cask(Vector2.Zero);
                     else if (inventory.type == "Furniture")
-                        item = new StardewValley.Objects.Furniture(inventory.index, Vector2.Zero);
+                    {
+                        if (inventory.index != -1)
+                            item = new StardewValley.Objects.Furniture(inventory.index, Vector2.Zero);
+                        else if (inventory.name != "none")
+                            item = new Furniture(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(inventory.name), Vector2.Zero);
+                    }
                     else if (inventory.type == "Sign")
                         item = new StardewValley.Objects.Sign(Vector2.Zero, inventory.index);
                     else if (inventory.type == "Wallpaper")
@@ -81,7 +107,14 @@ namespace TMXLoader
                     else if (inventory.type == "Floors")
                         item = new StardewValley.Objects.Wallpaper(Math.Abs(inventory.index), true);
                     else if (inventory.type == "MeleeWeapon")
-                        item = new MeleeWeapon(inventory.index);
+                    {
+                        if (inventory.index != -1)
+                            item = new MeleeWeapon(inventory.index);
+                        else if (inventory.name != "none")
+                            item = new MeleeWeapon(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/weapons", ContentSource.GameContent).getIndexByName(inventory.name));
+
+                    }
+                    
                     else if (inventory.type == "CustomObject" && PyTK.CustomElementHandler.CustomObjectData.collection.ContainsKey(inventory.name))
                         item = PyTK.CustomElementHandler.CustomObjectData.collection[inventory.name].getObject();
                     else if (inventory.type == "SDVType")
@@ -115,12 +148,15 @@ namespace TMXLoader
                     int price = 100;
                     try
                     {
-                        price = inventory.price > 0 ? inventory.price : item is StardewValley.Object o ? o.sellToStorePrice() : 100;
+                        price = inventory.price > 0 ? inventory.price : item.salePrice();
                     }
                     catch
                     {
 
                     }
+
+                    if (price < 0)
+                        price = 100;
 
                     if (item != null)
                         priceAndStock.AddOrReplace(item, new int[] { price, inventory.stock });
