@@ -44,6 +44,8 @@
     <Compile Include="Overrides.cs" />
     <Compile Include="SpouseRoom.cs" />
     <Compile Include="MapEdit.cs" />
+    <Compile Include="TileShop.cs" />
+    <Compile Include="TileShopItem.cs" />
     <Compile Include="TMXActions.cs" />
     <Compile Include="TMXContentPack.cs" />
     <Compile Include="TMXLoaderMod.cs" />

@@ -28,6 +28,7 @@ namespace TMXLoader
         internal static IModHelper helper;
         internal static Dictionary<string, Map> mapsToSync = new Dictionary<string, Map>();
         internal static List<SFarmer> syncedFarmers = new List<SFarmer>();
+        internal static Dictionary<string, List<TileShopItem>> tileShops = new Dictionary<string, List<TileShopItem>>();
         internal static Config config;
 
         public override void Entry(IModHelper helper)
@@ -47,9 +48,22 @@ namespace TMXLoader
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
             new ConsoleCommand("loadmap", "Teleport to a map", (s, st) => {
-
                 Game1.player.warpFarmer(new Warp(int.Parse(st[1]), int.Parse(st[2]), st[0], int.Parse(st[1]), int.Parse(st[2]), false));
-            });
+            }).register();
+
+            new ConsoleCommand("removeNPC", "Removes an NPC", (s, st) => {
+                if (Game1.getCharacterFromName(st.Last()) == null)
+                    Monitor.Log("Couldn't find NPC with that name!", LogLevel.Alert);
+                else
+                {
+                    Game1.removeThisCharacterFromAllLocations(Game1.getCharacterFromName(st.Last()));
+                    if (Game1.player.friendshipData.ContainsKey(st.Last()))
+                        Game1.player.friendshipData.Remove(st.Last());
+                    Monitor.Log(st.Last() + " was removed!", LogLevel.Info);
+                }
+
+            }).register();
+
             fixCompatibilities();
             harmonyFix();
 
@@ -58,6 +72,7 @@ namespace TMXLoader
                     if (e.IsOneSecond && Context.IsWorldReady && Game1.IsMasterGame && Game1.IsMultiplayer && Game1.otherFarmers.Values.Where(f => f.isActive() && f != Game1.player && !syncedFarmers.Contains(f)) is IEnumerable<SFarmer> ef && ef.Count() is int i && i > 0)
                         syncMaps(ef);
             };
+
         }
 
         private void syncMaps(IEnumerable<SFarmer> farmers)
@@ -95,6 +110,7 @@ namespace TMXLoader
             TileAction Say = new TileAction("Say", TMXActions.sayAction).register();
             TileAction SwitchLayers = new TileAction("SwitchLayers", TMXActions.switchLayersAction).register();
             TileAction Confirm = new TileAction("Confirm", TMXActions.confirmAction).register();
+            TileAction OpenShop = new TileAction("OpenShop", TMXActions.shopAction).register();
         }
 
         private void loadContentPacks()
@@ -138,6 +154,9 @@ namespace TMXLoader
                     mapsToSync.AddOrReplace(edit.name, map);
                 }
 
+                foreach (TileShop shop in tmxPack.shops)
+                    tileShops.AddOrReplace(shop.id, shop.inventory);
+
                 foreach (NPCPlacement edit in tmxPack.festivalSpots)
                 {
                     Map reference = Helper.Content.Load<Map>("Maps/Town", ContentSource.GameContent);
@@ -153,6 +172,15 @@ namespace TMXLoader
                     original.GetLayer("Set-Up").Tiles[edit.position[0], edit.position[1]] = new StaticTile(original.GetLayer("Set-Up"), spring, BlendMode.Alpha, (index * 4) + edit.direction);
                     original.injectAs("Maps/" + edit.map);
                     mapsToSync.AddOrReplace(edit.map, original);
+                }
+
+                foreach (NPCPlacement edit in tmxPack.placeNPCs)
+                {
+                    helper.Events.GameLoop.SaveLoaded += (s, e) =>
+                    {
+                        if (Game1.getCharacterFromName(edit.name) == null)
+                            Game1.locations.Where(gl => gl.Name == edit.map).First().addCharacter(new NPC(new AnimatedSprite("Characters\\" + edit.name, 0, 16, 32), new Vector2(edit.position[0], edit.position[1]), edit.map, 0, edit.name, false, (Dictionary<int, int[]>)null, Helper.Content.Load<Texture2D>("Portraits\\" + edit.name, ContentSource.GameContent)));
+                    };
                 }
 
                 foreach (MapEdit edit in tmxPack.addMaps)

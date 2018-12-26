@@ -4,6 +4,9 @@ using PyTK.Extensions;
 using PyTK.Lua;
 using PyTK.Types;
 using StardewValley;
+using StardewValley.Menus;
+using StardewValley.Objects;
+using StardewValley.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +22,117 @@ namespace TMXLoader
         public TMXActions()
         {
 
+        }
+
+        public static bool shopAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            List<string> text = action.Split(' ').ToList();
+
+            if (text.Count < 2)
+                return false;
+
+            List<TileShopItem> items = new List<TileShopItem>();
+
+            if (TMXLoaderMod.tileShops.TryGetValue(text[1], out items))
+            {
+                Dictionary<Item, int[]> priceAndStock = new Dictionary<Item, int[]>();
+                foreach (TileShopItem inventory in items)
+                {
+                    Item item = null;
+
+                    if (inventory.type == "Object")
+                    {
+                        if (inventory.index != -1)
+                            item = new StardewValley.Object(inventory.index, 1);
+                        else if (inventory.name != "none")
+                            item = new StardewValley.Object(Game1.objectInformation.getIndexByName(inventory.name), 1);
+                    }
+                    else if (inventory.type == "BigObject")
+                    {
+                        if (inventory.index != -1)
+                            item = new StardewValley.Object(Vector2.Zero, inventory.index);
+                        else if (inventory.name != "none")
+                            item = new StardewValley.Object(Vector2.Zero, Game1.bigCraftablesInformation.getIndexByName(inventory.name));
+                    }
+                    else if (inventory.type == "Ring")
+                        item = new Ring(inventory.index);
+                    else if (inventory.type == "Hat")
+                        item = new Hat(inventory.index);
+                    else if (inventory.type == "Boots")
+                        item = new StardewValley.Objects.Boots(inventory.index);
+                    else if (inventory.type == "TV")
+                        item = new StardewValley.Objects.TV(inventory.index, Vector2.Zero);
+                    else if (inventory.type == "IndoorPot")
+                        item = new StardewValley.Objects.IndoorPot(Vector2.Zero);
+                    else if (inventory.type == "CrabPot")
+                        item = new StardewValley.Objects.CrabPot(Vector2.Zero);
+                    else if (inventory.type == "Chest")
+                        item = new StardewValley.Objects.Chest(true);
+                    else if (inventory.type == "Cask")
+                        item = new StardewValley.Objects.Cask(Vector2.Zero);
+                    else if (inventory.type == "Cask")
+                        item = new StardewValley.Objects.Cask(Vector2.Zero);
+                    else if (inventory.type == "Furniture")
+                        item = new StardewValley.Objects.Furniture(inventory.index, Vector2.Zero);
+                    else if (inventory.type == "Sign")
+                        item = new StardewValley.Objects.Sign(Vector2.Zero, inventory.index);
+                    else if (inventory.type == "Wallpaper")
+                        item = new StardewValley.Objects.Wallpaper(Math.Abs(inventory.index), false);
+                    else if (inventory.type == "Floors")
+                        item = new StardewValley.Objects.Wallpaper(Math.Abs(inventory.index), true);
+                    else if (inventory.type == "MeleeWeapon")
+                        item = new MeleeWeapon(inventory.index);
+                    else if (inventory.type == "CustomObject" && PyTK.CustomElementHandler.CustomObjectData.collection.ContainsKey(inventory.name))
+                        item = PyTK.CustomElementHandler.CustomObjectData.collection[inventory.name].getObject();
+                    else if (inventory.type == "SDVType")
+                    {
+                        try
+                        {
+                            if (inventory.index == -1)
+                                item = Activator.CreateInstance(PyUtils.getTypeSDV(inventory.name)) is Item i ? i : null;
+                            else
+                                item = Activator.CreateInstance(PyUtils.getTypeSDV(inventory.name), inventory.index) is Item i ? i : null;
+                        }
+                        catch
+                        {
+                            TMXLoaderMod.monitor.Log("Couldn't load to shop SDVType: " + inventory.name);
+                        }
+                    }
+                    else if (inventory.type == "ByType")
+                    {
+                        try
+                        {
+                            if (inventory.index == -1)
+                                item = Activator.CreateInstance(Type.GetType(inventory.name)) is Item i ? i : null;
+                            else
+                                item = Activator.CreateInstance(Type.GetType(inventory.name), inventory.index) is Item i ? i : null;
+                        }
+                        catch
+                        {
+                            TMXLoaderMod.monitor.Log("Couldn't load to shop ByType: " + inventory.name);
+                        }
+                    }
+                    int price = 100;
+                    try
+                    {
+                        price = inventory.price > 0 ? inventory.price : item is StardewValley.Object o ? o.sellToStorePrice() : 100;
+                    }
+                    catch
+                    {
+
+                    }
+
+                    if (item != null)
+                        priceAndStock.AddOrReplace(item, new int[] { price, inventory.stock });
+                }
+                var shop = new ShopMenu(priceAndStock, 0,  null);
+                if (text.Count > 2)
+                    shop.portraitPerson = Game1.getCharacterFromName(text[2]);
+                Game1.activeClickableMenu = shop;
+                return true;
+            }
+
+            return false;
         }
 
         public static bool sayAction(string action, GameLocation location, Vector2 tile, string layer)
