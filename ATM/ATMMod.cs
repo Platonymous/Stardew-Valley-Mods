@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using PyTK.Tiled;
 using System.IO;
 using StardewValley.Menus;
+using System.Linq;
 
 namespace ATM
 {
@@ -22,6 +23,7 @@ namespace ATM
         public override void Entry(IModHelper helper)
         {
             config = helper.ReadConfig<Config>();
+            helper.WriteConfig(config);
 
             helper.Events.GameLoop.Saving += OnSaving;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
@@ -115,7 +117,7 @@ namespace ATM
 
                 if (Game1.dayOfMonth == 1)
                 {
-                    if (Game1.currentSeason.ToLower() == "spring")
+                    if (config.CreditAdjustment.ToList().Contains(Game1.currentSeason.ToLower()))
                         setCreditLine();
 
                     payInterest();
@@ -144,7 +146,14 @@ namespace ATM
 
         private void setCreditLine()
         {
-            int line = (int)(Math.Floor(Math.Floor(PyTK.PyUtils.calc(config.CreditLine, new KeyValuePair<string, object>("value", (Math.Max(0, bankAccount.Balance) + Game1.player.Money)))) / 1000) * 1000);
+            int value = (int)(Math.Max(0, Game1.player.money + bankAccount.Balance) / 28);
+            if (config.CreditInterest > 0)
+                value = (int)(value / config.CreditInterest) * 2;
+            else
+                value = value * 10;
+
+            int line = (int)(Math.Floor(PyTK.PyUtils.calc(config.CreditLine, new KeyValuePair<string, object>("value", Game1.player.totalMoneyEarned))));
+            line = Math.Max(line, 0);
             if (line > bankAccount.CreditLine)
             {
                 bankAccount.CreditLine = line;
