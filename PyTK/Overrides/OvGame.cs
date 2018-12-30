@@ -44,7 +44,7 @@ namespace PyTK.Overrides
                     return AccessTools.Method(PyUtils.getTypeSDV("Game1"), "getSourceRectForStandardTileSheet");
                 }
 
-                internal static bool Prefix(ref Texture2D tileSheet, ref int tilePosition, ref int width, ref int height, ref Rectangle __result, ref bool __state)
+                internal static bool Prefix(Texture2D tileSheet, int tilePosition, int width, int height, ref Rectangle __result, ref bool __state)
                 {
                     string id = tileSheet.Width + "." + tileSheet.Height + "." + width + "." + height;
                     __state = true;
@@ -58,7 +58,7 @@ namespace PyTK.Overrides
                     return __state;
                 }
 
-                internal static void Postfix(ref Texture2D tileSheet, ref int tilePosition, ref int width, ref int height, ref Rectangle __result, ref bool __state)
+                internal static void Postfix(Texture2D tileSheet, int tilePosition, int width, int height, ref Rectangle __result, ref bool __state)
                 {
                     if (!__state)
                     {
@@ -71,39 +71,6 @@ namespace PyTK.Overrides
                     }
                 }
             }
-
-            [HarmonyPatch]
-            internal class GameGetRectangleFix2
-            {
-                internal static MethodInfo TargetMethod()
-                {
-                    return AccessTools.Method(PyUtils.getTypeSDV("Game1"), "getSquareSourceRectForNonStandardTileSheet");
-                }
-
-                internal static bool Prefix(ref Game1 __instance, ref Texture2D tileSheet, ref int tileWidth, ref int tileHeight, ref int tilePosition, ref Rectangle __result)
-                {
-                    __result = Game1.getSourceRectForStandardTileSheet(tileSheet, tilePosition, tileWidth, tileHeight);
-                    return false;
-                }
-            }
-
-            [HarmonyPatch]
-            internal class GameGetRectangleFix3
-            {
-                internal static MethodInfo TargetMethod()
-                {
-                    return AccessTools.Method(PyUtils.getTypeSDV("Game1"), "getArbitrarySourceRect");
-                }
-
-                internal static bool Prefix(ref Game1 __instance, ref Texture2D tileSheet, ref int tileWidth, ref int tileHeight, ref int tilePosition, ref Rectangle __result)
-                {
-                    if (tileSheet == null)
-                        return true;
-
-                    __result = Game1.getSourceRectForStandardTileSheet(tileSheet, tilePosition, tileWidth, tileHeight);
-                    return false;
-                }
-            }
-
+        
         }
 }
