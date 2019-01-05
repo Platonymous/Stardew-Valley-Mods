@@ -1,0 +1,10 @@
+﻿{
+  "Name": "CropExtension",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Allows for more detailed crop seasons",
+  "UniqueID": "Platonymous.CropExtension",
+  "EntryDll": "CropExtensions.dll",
+  "MinimumApiVersion": "2.9",
+  "UpdateKeys": [ "Nexus:3208" ]
+}
