@@ -1,0 +1,15 @@
+﻿{
+  "Name": "GeodeCrusherExtension",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Makes MousePounds GeodeCrusher mimic the vanilla output",
+  "UniqueID": "Platonymous.GeodeCrusherExtension",
+  "EntryDll": "GeodeCrusherExtension.dll",
+  "MinimumApiVersion": "2.9",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomFarming",
+      "MinimumVersion": "2.10.10"
+    }
+  ]
+}
