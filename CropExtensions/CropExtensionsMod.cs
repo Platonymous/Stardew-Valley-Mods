@@ -16,9 +16,6 @@ namespace CropExtensions
         internal static Config config;
         const char seperator1 = '|';
         const char seperator2 = '-';
-        public static bool skip = false;
-        public static bool active = true;
-        public static bool working = false;
 
         public override void Entry(IModHelper helper)
         {
@@ -26,122 +23,8 @@ namespace CropExtensions
             var instance = HarmonyInstance.Create("Platonymous.CropExtension");
             instance.Patch(typeof(HoeDirt).GetMethod("plant"), null, new HarmonyMethod(this.GetType().GetMethod("plant")));
             instance.Patch(typeof(HoeDirt).GetMethod("canPlantThisSeedHere"), null, new HarmonyMethod(this.GetType().GetMethod("canPlantThisSeedHere")));
-            instance.Patch(typeof(Crop).GetMethod("newDay"), new HarmonyMethod(this.GetType().GetMethod("newDay")));
-            instance.Patch(typeof(GameLocation).GetMethod("UpdateWhenCurrentLocation"), new HarmonyMethod(this.GetType().GetMethod("UpdateWhenCurrentLocation")));
-            instance.Patch(typeof(Game1).GetMethod("UpdateLocations", System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance), new HarmonyMethod(this.GetType().GetMethod("UpdateLocations")));
-            instance.Patch(typeof(Game1).GetMethod("UpdateCharacters", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance), new HarmonyMethod(this.GetType().GetMethod("UpdateCharacters")));
-            instance.Patch(typeof(GameLocation).GetMethod("updateCharacters", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance), new HarmonyMethod(this.GetType().GetMethod("updateCharacters")));
-
-            
-            helper.Events.Input.ButtonPressed += Input_ButtonPressed;
+            instance.Patch(typeof(Crop).GetMethod("newDay"), new HarmonyMethod(this.GetType().GetMethod("newDay")));            
         }
-
-        private void Input_ButtonPressed(object sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
-        {
-            if(e.Button == SButton.K)
-            {
-                active = !active;
-                Monitor.Log("Active:" + active);
-            }
-        }
-
-        public static bool UpdateWhenCurrentLocation(GameLocation __instance, GameTime time)
-        {
-            if (!active || skip)
-            {
-                skip = false;
-                return true;
-            }
-
-            skip = true;
-            Task.Run(() =>
-            {
-                try
-                {
-                    typeof(GameLocation).GetMethod("UpdateWhenCurrentLocation").Invoke(__instance, new[] { time });
-                }
-                catch
-                {
-
-                }
-            });
-
-            return false;
-        }
-
-        public static bool UpdateLocations(Game1 __instance, GameTime time)
-        {
-            if (!active || skip)
-            {
-                skip = false;
-                return true;
-            }
-
-            skip = true;
-            Task.Run(() =>
-            {
-                try
-                {
-                    typeof(Game1).GetMethod("UpdateLocations", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(__instance, new[] { time });
-                }
-                catch
-                {
-
-                }
-            });
-
-            return false;
-        }
-
-        public static bool UpdateCharacters(Game1 __instance, GameTime time)
-        {
-            if (!active || skip)
-            {
-                skip = false;
-                return true;
-            }
-
-            skip = true;
-            Task.Run(() =>
-            {
-                try
-                {
-                    typeof(Game1).GetMethod("UpdateCharacters", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(__instance, new[] { time });
-                }
-                catch
-                {
-
-                }
-            });
-
-            return false;
-        }
-
-        public static bool updateCharacters(GameLocation __instance, GameTime time)
-        {
-            if (!active || skip)
-            {
-                skip = false;
-                return true;
-            }
-
-            skip = true;
-            Task.Run(() =>
-            {
-                try
-                {
-                    typeof(GameLocation).GetMethod("updateCharacters", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(__instance, new[] { time });
-                }
-                catch
-                {
-
-                }
-            });
-
-            return false;
-        }
-
-
 
         public static void plant(ref HoeDirt __instance, ref bool __result, int index, int tileX, int tileY, Farmer who, bool isFertilizer, GameLocation location)
         {
