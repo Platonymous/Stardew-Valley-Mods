@@ -4,10 +4,6 @@ using StardewValley;
 using StardewValley.TerrainFeatures;
 using System.Linq;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using System.Threading.Tasks;
-using System.Threading;
-using System;
 
 namespace CropExtensions
 {
@@ -23,7 +19,7 @@ namespace CropExtensions
             var instance = HarmonyInstance.Create("Platonymous.CropExtension");
             instance.Patch(typeof(HoeDirt).GetMethod("plant"), null, new HarmonyMethod(this.GetType().GetMethod("plant")));
             instance.Patch(typeof(HoeDirt).GetMethod("canPlantThisSeedHere"), null, new HarmonyMethod(this.GetType().GetMethod("canPlantThisSeedHere")));
-            instance.Patch(typeof(Crop).GetMethod("newDay"), new HarmonyMethod(this.GetType().GetMethod("newDay")));            
+            instance.Patch(typeof(Crop).GetMethod("newDay"), new HarmonyMethod(this.GetType().GetMethod("newDay")));
         }
 
         public static void plant(ref HoeDirt __instance, ref bool __result, int index, int tileX, int tileY, Farmer who, bool isFertilizer, GameLocation location)
