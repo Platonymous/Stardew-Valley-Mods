@@ -98,7 +98,10 @@ namespace CustomFarmingRedux
                         if (item.StartsWith("random:"))
                         {
                             string[] items = item.Split(':')[1].Split(',');
-                            return Game1.objectInformation.getIndexByName(items[rnd.Next(0, items.Length)]);
+                            string name = items[rnd.Next(0, items.Length)];
+                            if (name.ToLower() == "stone")
+                                return 390;
+                            return Game1.objectInformation.getIndexByName(name);
                         }
                         else
                             _index = Game1.objectInformation.getIndexByName(item);
@@ -307,8 +310,8 @@ namespace CustomFarmingRedux
         {
             string oName = s.name;
             s.Quality = quality == -1 ? input.Quality : quality;
-            s.name = (prefix) ? input.name + " " + name : name;
-            s.name = (suffix) ? s.name + " " + input.name : s.name;
+            s.name = (prefix) && name != input.name + " " + name ? input.name + " " + name : name;
+            s.name = (suffix) && name != s.name + " " + input.name ? s.name + " " + input.name : s.name;
             if (insert)
             {
                 string[] namesplit = s.name.Split(' ');
