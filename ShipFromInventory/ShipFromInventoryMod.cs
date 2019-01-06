@@ -31,7 +31,7 @@ namespace ShipFromInventory
             config = helper.ReadConfig<Config>();
             shippingBinTexture = helper.Content.Load<Texture2D>(@"Buildings/Shipping Bin", ContentSource.GameContent);
             shippingBinLidRectangle = new Rectangle(134, 226, 30, 25);
-            var instance = HarmonyInstance.Create("Platonymous.CropExtension");
+            var instance = HarmonyInstance.Create("Platonymous.ShipFromInventory");
             instance.Patch(typeof(InventoryPage).GetConstructor(new[] { typeof(int), typeof(int), typeof(int), typeof(int) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageCon")));
             instance.Patch(typeof(InventoryPage).GetMethod("draw",new[] { typeof(SpriteBatch) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageDraw")));
 
