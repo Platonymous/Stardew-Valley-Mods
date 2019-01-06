@@ -34,8 +34,11 @@ namespace ShipFromInventory
             var instance = HarmonyInstance.Create("Platonymous.ShipFromInventory");
             instance.Patch(typeof(InventoryPage).GetConstructor(new[] { typeof(int), typeof(int), typeof(int), typeof(int) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageCon")));
             instance.Patch(typeof(InventoryPage).GetMethod("draw",new[] { typeof(SpriteBatch) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageDraw")));
+            if(Type.GetType("BiggerBackpack.NewInventoryPage, BiggerBackpack") is Type bbpType)
+                instance.Patch(bbpType.GetMethod("draw", new[] { typeof(SpriteBatch) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageDraw")));
 
-            if(config.LidAnimation)
+
+            if (config.LidAnimation)
                 instance.Patch(typeof(InventoryPage).GetMethod("performHoverAction"), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageHover")));
 
             instance.Patch(typeof(InventoryPage).GetMethod("receiveLeftClick"), new HarmonyMethod(this.GetType().GetMethod("InventoryPageLeftClick")));
