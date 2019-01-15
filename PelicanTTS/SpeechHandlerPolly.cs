@@ -32,7 +32,6 @@ namespace PelicanTTS
         private static string lastHud;
         public static string currentText;
         private static Thread speechThread;
-        private static Thread gThread;
         private static bool runSpeech;
         private static IModHelper Helper;
 
@@ -96,13 +95,13 @@ namespace PelicanTTS
             runSpeech = false;
         }
 
-        public static void setVoice(string name)
+        public static void setVoice(string name, bool female = true)
         {
             speakerName = name;
 
             string t = PelicanTTSMod.i18n.Get(name);
             if (t.ToString() == "")
-                t = PelicanTTSMod.i18n.Get("default");
+                t = PelicanTTSMod.i18n.Get("default_" + (female ? "female" : "male"));
 
             if (VoiceId.FindValue(t) is VoiceId vId1)
                 currentVoice = vId1;
@@ -130,7 +129,7 @@ namespace PelicanTTS
                     DialogueBox dialogueBox = (DialogueBox)Game1.activeClickableMenu;
 
                     if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
-                        setVoice(Game1.currentSpeaker.Name);
+                        setVoice(Game1.currentSpeaker.Name, Game1.currentSpeaker.Gender != 0);
                     else
                         setVoice("default");
 

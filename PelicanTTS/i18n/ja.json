@@ -1,0 +1,23 @@
+﻿{
+  "Greeting": "おはようございます、 {Player}。{DayName} です, {Season} {Day} 日目です",
+  "Your husband": "あなたの夫",
+  "Your wife": "あなたの妻",
+  "spring": "春",
+  "summer": "夏",
+  "fall": "秋",
+  "winter": "冬",
+  "BirthdayGreeting": "今日は{NPC}誕生日です。",
+  "FestivalGreeting": "今日はお祭り。",
+  "a.m.": "時",
+  "p.m.": "時",
+  "Sunday": "日曜日",
+  "Monday": "月曜日",
+  "Tuesday": "火曜日",
+  "Wednesday": "水曜日",
+  "Thursday": "木曜日",
+  "Friday": "金曜日",
+  "Saturday": "土曜日",
+  "default": "Mizuki",
+  "default_male": "Takumi",
+  "default_female": "Mizuki"
+}

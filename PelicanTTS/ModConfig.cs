@@ -2,15 +2,9 @@
 {
     class ModConfig
     {
-        public float Pitch { get; set; }
-        public float Volume { get; set; }
-        public bool MumbleDialogues { get; set; }
-
-        public ModConfig()
-        {
-            Pitch = 0;
-            Volume = 1;
-            MumbleDialogues = false;
-        }
+        public float Pitch { get; set; } = 0;
+        public float Volume { get; set; } = 1;
+        public bool MumbleDialogues { get; set; } = false;
+        public bool Greeting { get; set; } = true;
     }
 }

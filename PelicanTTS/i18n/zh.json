@@ -1,0 +1,23 @@
+﻿{
+  "Greeting": "早上好 {Player}。 这是 {DayName}，{Season} 中的 {Day} 标记。",
+  "Your husband": "你的丈夫",
+  "Your wife": "你的妻子",
+  "spring": "春天",
+  "summer": "夏天",
+  "fall": "秋",
+  "winter": "冬季",
+  "BirthdayGreeting": "今天是 {NPC} 生日。",
+  "FestivalGreeting": "今天的节日开始了",
+  "a.m.": "点",
+  "p.m.": "点",
+  "Sunday": "星期天",
+  "Monday": "星期一",
+  "Tuesday": "星期二",
+  "Wednesday": "星期三",
+  "Thursday": "星期四",
+  "Friday": "星期五",
+  "Saturday": "星期六",
+  "default": "Zhiyu",
+  "default_male": "Zhiyu",
+  "default_female": "Zhiyu"
+}

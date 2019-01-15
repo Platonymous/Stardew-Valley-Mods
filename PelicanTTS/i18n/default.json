@@ -1,5 +1,5 @@
 ﻿{
-  "Greeting": "Good Morning {Player}. It is {DayName} the {Day} day of {Season}.",
+  "Greeting": "Good morning {Player}. It is {DayName} the {Day} day of {Season}.",
   "Your husband": "your husband",
   "Your wife": "your wife",
   "spring": "spring",
@@ -18,6 +18,8 @@
   "Friday": "Friday",
   "Saturday": "Saturday",
   "default": "Salli",
+  "default_male": "Brian",
+  "default_female": "Emma",
   "George": "Brian",
   "Evelyn": "Amy",
   "Alex": "Joey",

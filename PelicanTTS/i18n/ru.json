@@ -1,0 +1,23 @@
+﻿{
+  "Greeting": "Доброе утро {Player}. Это {DayName}, {Day} день {Season}.",
+  "Your husband": "твой муж",
+  "Your wife": "твоя жена",
+  "spring": "весна",
+  "summer": "лето",
+  "fall": "осень",
+  "winter": "зима",
+  "BirthdayGreeting": "Сегодня день рождения  {NPC}.",
+  "FestivalGreeting": "Сегодняшний фестиваль начинается в",
+  "a.m.": "часов утра",
+  "p.m.": "часов дня",
+  "Sunday": "воскресенье",
+  "Monday": "понедельник",
+  "Tuesday": "вторник",
+  "Wednesday": "среда",
+  "Thursday": "четверг",
+  "Friday": "пятница",
+  "Saturday": "суббота",
+  "default": "Tatyana",
+  "default_male": "Maxim",
+  "default_female": "Tatyana"
+}

@@ -2,7 +2,6 @@
 using StardewModdingAPI.Events;
 using System;
 using StardewValley;
-
 using System.IO;
 
 namespace PelicanTTS
@@ -69,6 +68,9 @@ namespace PelicanTTS
 
         private void performGreeting()
         {
+            if (!config.Greeting)
+                return;
+
             NPC birthday = Utility.getTodaysBirthdayNPC(Game1.currentSeason, Game1.dayOfMonth);
             string day = Game1.dayOfMonth.ToString();
 
