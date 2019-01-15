@@ -96,6 +96,7 @@ namespace ATM
             else if (key == "ATM_Withdraw")
             {
                 Game1.player.Money += number;
+                Game1.player.totalMoneyEarned -= (uint) number;
                 bankAccount.ActualBalance -= number;
             }
 
@@ -185,6 +186,7 @@ namespace ATM
             {
                 Game1.addHUDMessage(new HUDMessage(i18n.Get("Interest") + ": " + value + "g", 2));
                 bankAccount.ActualBalance += bankAccount.UnpaidInterest;
+                Game1.player.totalMoneyEarned += (uint) bankAccount.UnpaidInterest;
                 bankAccount.UnpaidInterest = 0;
             }
             else
