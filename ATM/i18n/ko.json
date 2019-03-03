@@ -1,0 +1,12 @@
+{
+  "ATM_Deposit": "예금",
+  "ATM_Daily_Deposit": "일일 예금 하기",
+  "ATM_Withdraw": "출금",
+  "ATM_Close": "떠나기",
+  "Fail_Main": "메인 플레이어만이 ATM기를 이용하실 수 있습니다.",
+  "Line_Credit": "신용한도",
+  "Account_Ballance": "예금 잔액조회",
+  "Daily_Deposite": "일일 예금",
+  "New_Credit": "갱신된 신용한도",
+  "Interest": "이자"
+}
