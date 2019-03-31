@@ -66,15 +66,18 @@ namespace CustomFarmingRedux
 
                 CustomObject.betterArtisanGoods = System.Type.GetType("BetterArtisanGoodIcons.ArtisanGoodsManager, BetterArtisanGoodIcons");
                 CustomObject.hasBetterArtisanGoods = CustomObject.betterArtisanGoods != null;
-    };
+            };
 
             harmonyFix();
             helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
 
-            if(_config.water)
+            if (_config.water)
             {
-                new CustomObjectData("Platonymous.Water", "Water/1/2/Cooking -7/Water/Plain drinking water./drink/0 0 0 0 0 0 0 0 0 0 0/0", Game1.objectSpriteSheet.getTile(247).setSaturation(0), Color.Aqua, type: typeof(WaterItem));
-                ButtonClick.ActionButton.onClick((pos) => clickedOnWateringCan(pos), (p) => convertWater());
+                helper.Events.GameLoop.GameLaunched += (s, e) =>
+                {
+                    new CustomObjectData("Platonymous.Water", "Water/1/2/Cooking -7/Water/Plain drinking water./drink/0 0 0 0 0 0 0 0 0 0 0/0", Game1.objectSpriteSheet.getTile(247).setSaturation(0), Color.Aqua, type: typeof(WaterItem));
+                    ButtonClick.ActionButton.onClick((pos) => clickedOnWateringCan(pos), (p) => convertWater());
+                };
             }
 
             PyLua.registerType(typeof(CustomMachine),registerAssembly:true);

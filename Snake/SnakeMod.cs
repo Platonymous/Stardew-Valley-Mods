@@ -24,7 +24,10 @@ namespace Snake
         {
             monitor = Monitor;
             SnakeMod.helper = helper;
-            sdata = new CustomObjectData("Snake", "Snake/0/-300/Crafting -9/Play 'Snake by Platonymous' at home!/true/true/0/Snake", helper.Content.Load<Texture2D>(@"Assets/arcade.png"), Color.White, bigCraftable: true, type: typeof(SnakeMachine));
+            helper.Events.GameLoop.GameLaunched += (o, e) =>
+            {
+                sdata = new CustomObjectData("Snake", "Snake/0/-300/Crafting -9/Play 'Snake by Platonymous' at home!/true/true/0/Snake", helper.Content.Load<Texture2D>(@"Assets/arcade.png"), Color.White, bigCraftable: true, type: typeof(SnakeMachine));
+            };
             helper.Events.GameLoop.SaveLoaded += (o, e) =>
             {
                 if (Game1.IsMasterGame)

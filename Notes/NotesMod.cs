@@ -22,8 +22,8 @@ namespace Notes
         {
             Logger = Monitor;
             NoteInfo = i18n.Get("notes.note.info");
-            initNotes();
 
+            helper.Events.GameLoop.GameLaunched += (s, e) => initNotes();
             helper.Events.Input.CursorMoved += (s,e) => checkForSigns(e.NewPosition);
             helper.Events.Display.Rendered += OnRendered;
         }

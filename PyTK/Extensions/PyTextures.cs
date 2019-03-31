@@ -85,6 +85,9 @@ namespace PyTK.Extensions
 
         public static Texture2D getTile(this Texture2D t, int index, int tileWidth = 16, int tileHeight = 16)
         {
+            if (t == null)
+                return null;
+
             Rectangle sourceRectangle = Game1.getSourceRectForStandardTileSheet(t, index, tileWidth, tileHeight);
             return t.getArea(sourceRectangle);
         }
