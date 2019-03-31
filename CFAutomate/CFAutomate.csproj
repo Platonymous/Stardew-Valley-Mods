@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Automate">
-      <HintPath>C:\Program Files (x86)\GOG Galaxy\Games\Stardew Valley\Mods\Automate\Automate.dll</HintPath>
+      <HintPath>$(GamePath)\Mods\Automate\Automate.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
