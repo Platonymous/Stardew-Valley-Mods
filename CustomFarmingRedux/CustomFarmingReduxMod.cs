@@ -36,13 +36,22 @@ namespace CustomFarmingRedux
             _helper = Helper;
             _monitor = Monitor;
             _config = Helper.ReadConfig<Config>();
-
             hasKisekae = helper.ModRegistry.IsLoaded("Kabigon.kisekae");
 
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.Display.MenuChanged += OnMenuChanged;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+
+            harmonyFix();
+            helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
+        }
+
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
             if (hasKisekae)
             {
-                var registry = helper.ModRegistry.GetType().GetField("Registry", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(helper.ModRegistry);
-                System.Collections.IList list = (System.Collections.IList) registry.GetType().GetField("Mods", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(registry);
+                var registry = Helper.ModRegistry.GetType().GetField("Registry", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Helper.ModRegistry);
+                System.Collections.IList list = (System.Collections.IList)registry.GetType().GetField("Mods", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(registry);
                 foreach (var m in list)
                 {
                     IManifest mmanifest = (IManifest)m.GetType().GetProperty("Manifest").GetValue(m);
@@ -55,32 +64,26 @@ namespace CustomFarmingRedux
             }
 
             loadPacks();
-            helper.Events.Display.MenuChanged += OnMenuChanged;
-            helper.Events.GameLoop.SaveLoaded += (s, e) =>
-            {
-                foreach (var c in craftingrecipes)
-                    if (Game1.player.craftingRecipes.ContainsKey(c.Key))
-                        Game1.player.craftingRecipes[c.Key] = c.Value;
-                    else
-                        Game1.player.craftingRecipes.Add(c.Key, c.Value);
-
-                CustomObject.betterArtisanGoods = System.Type.GetType("BetterArtisanGoodIcons.ArtisanGoodsManager, BetterArtisanGoodIcons");
-                CustomObject.hasBetterArtisanGoods = CustomObject.betterArtisanGoods != null;
-            };
-
-            harmonyFix();
-            helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
 
             if (_config.water)
             {
-                helper.Events.GameLoop.GameLaunched += (s, e) =>
-                {
-                    new CustomObjectData("Platonymous.Water", "Water/1/2/Cooking -7/Water/Plain drinking water./drink/0 0 0 0 0 0 0 0 0 0 0/0", Game1.objectSpriteSheet.getTile(247).setSaturation(0), Color.Aqua, type: typeof(WaterItem));
-                    ButtonClick.ActionButton.onClick((pos) => clickedOnWateringCan(pos), (p) => convertWater());
-                };
+                new CustomObjectData("Platonymous.Water", "Water/1/2/Cooking -7/Water/Plain drinking water./drink/0 0 0 0 0 0 0 0 0 0 0/0", Game1.objectSpriteSheet.getTile(247).setSaturation(0), Color.Aqua, type: typeof(WaterItem));
+                ButtonClick.ActionButton.onClick((pos) => clickedOnWateringCan(pos), (p) => convertWater());
             }
 
-            PyLua.registerType(typeof(CustomMachine),registerAssembly:true);
+            PyLua.registerType(typeof(CustomMachine), registerAssembly: true);
+        }
+
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        {
+            foreach (var c in craftingrecipes)
+                if (Game1.player.craftingRecipes.ContainsKey(c.Key))
+                    Game1.player.craftingRecipes[c.Key] = c.Value;
+                else
+                    Game1.player.craftingRecipes.Add(c.Key, c.Value);
+
+            CustomObject.betterArtisanGoods = System.Type.GetType("BetterArtisanGoodIcons.ArtisanGoodsManager, BetterArtisanGoodIcons");
+            CustomObject.hasBetterArtisanGoods = CustomObject.betterArtisanGoods != null;
         }
 
         private bool clickedOnWateringCan(Point pos)
