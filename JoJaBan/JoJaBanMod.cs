@@ -38,11 +38,14 @@ namespace JoJaBan
             TileAction startAction = new TileAction("JoJaBan.Start", startGame);
             startAction.register();
 
-            arcadeTexture = helper.Content.Load<Texture2D>(@"Assets/arcade.png");
-            arcadeData = new CustomObjectData("JoJaBan", "JoJaBan/0/-300/Crafting -9/Play 'JoJaBan by Platonymous' at home!/true/true/0/JoJaBan", arcadeTexture, Color.White, bigCraftable: true, type: typeof(JoJaBanMachine));
-            Texture2D townInterior = Helper.Content.Load<Texture2D>(@"Maps/townInterior", ContentSource.GameContent);
-            boxTexture = townInterior.getArea(new Rectangle(304, 1024, 16, 32));
-            boxData = new CustomObjectData("JoJa Box", "JoJa Box/0/-300/Crafting -9/JoJa Box/true/true/0/JoJa Box", boxTexture, Color.White, bigCraftable: true, type:typeof(JoJaBox));
+            helper.Events.GameLoop.GameLaunched += (o, e) =>
+            {
+                arcadeTexture = helper.Content.Load<Texture2D>(@"Assets/arcade.png");
+                arcadeData = new CustomObjectData("JoJaBan", "JoJaBan/0/-300/Crafting -9/Play 'JoJaBan by Platonymous' at home!/true/true/0/JoJaBan", arcadeTexture, Color.White, bigCraftable: true, type: typeof(JoJaBanMachine));
+                Texture2D townInterior = Helper.Content.Load<Texture2D>(@"Maps/townInterior", ContentSource.GameContent);
+                boxTexture = townInterior.getArea(new Rectangle(304, 1024, 16, 32));
+                boxData = new CustomObjectData("JoJa Box", "JoJa Box/0/-300/Crafting -9/JoJa Box/true/true/0/JoJa Box", boxTexture, Color.White, bigCraftable: true, type: typeof(JoJaBox));
+            };
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.SaveLoaded += (o, e) => addToCatalogue();
         }

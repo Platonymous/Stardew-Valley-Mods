@@ -18,6 +18,12 @@ namespace SeedBag
         {
             _monitor = Monitor;
             _helper = helper;
+
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+        }
+
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
             SeedBagTool seedbag = new SeedBagTool();
             addtoshop = new InventoryItem(seedbag, 30000, 1).addToNPCShop("Pierre");
             CustomObjectData.newObject("Platonymous.SeedBag.Tool", SeedBagTool.texture, Color.White, "Seed Bag", "Empty", 0, customType: typeof(SeedBagTool));

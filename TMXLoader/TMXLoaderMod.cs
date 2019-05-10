@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using xTile;
 using xTile.Layers;
-using SFarmer = StardewValley.Farmer;
 using Harmony;
 using System.Reflection;
 using System.Linq;
@@ -27,7 +26,7 @@ namespace TMXLoader
         internal static IMonitor monitor;
         internal static IModHelper helper;
         internal static Dictionary<string, Map> mapsToSync = new Dictionary<string, Map>();
-        internal static List<SFarmer> syncedFarmers = new List<SFarmer>();
+        internal static List<Farmer> syncedFarmers = new List<Farmer>();
         internal static Dictionary<string, List<TileShopItem>> tileShops = new Dictionary<string, List<TileShopItem>>();
         internal static Config config;
 
@@ -36,6 +35,14 @@ namespace TMXLoader
             config = Helper.ReadConfig<Config>();
             TMXLoaderMod.helper = Helper;
             monitor = Monitor;
+
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+            helper.Events.Player.Warped += OnWarped;
+        }
+
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
             if (config.converter)
             {
                 exportAllMaps();
@@ -43,7 +50,7 @@ namespace TMXLoader
             }
             loadContentPacks();
             setTileActions();
-            helper.Events.Player.Warped += OnWarped;
+
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
@@ -66,18 +73,17 @@ namespace TMXLoader
 
             fixCompatibilities();
             harmonyFix();
-
-            helper.Events.GameLoop.UpdateTicked += (s, e) =>
-            {
-                    if (e.IsOneSecond && Context.IsWorldReady && Game1.IsMasterGame && Game1.IsMultiplayer && Game1.otherFarmers.Values.Where(f => f.isActive() && f != Game1.player && !syncedFarmers.Contains(f)) is IEnumerable<SFarmer> ef && ef.Count() is int i && i > 0)
-                        syncMaps(ef);
-            };
-
         }
 
-        private void syncMaps(IEnumerable<SFarmer> farmers)
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            foreach (SFarmer farmer in farmers)
+            if (e.IsOneSecond && Context.IsWorldReady && Game1.IsMasterGame && Game1.IsMultiplayer && Game1.otherFarmers.Values.Where(f => f.isActive() && f != Game1.player && !syncedFarmers.Contains(f)) is IEnumerable<Farmer> ef && ef.Count() is int i && i > 0)
+                syncMaps(ef);
+        }
+
+        private void syncMaps(IEnumerable<Farmer> farmers)
+        {
+            foreach (Farmer farmer in farmers)
             {
                 foreach (KeyValuePair<string, Map> map in mapsToSync)
                     PyNet.syncMap(map.Value, map.Key, farmer);

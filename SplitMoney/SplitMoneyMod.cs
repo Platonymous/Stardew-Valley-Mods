@@ -46,6 +46,14 @@ namespace SplitMoney
             }, 30);
             moneyPoolReceiver.start();
 
+            #region moneyItem
+            helper.Events.GameLoop.GameLaunched += (s, e) =>
+            {
+                new CustomObjectData("Platonymous.G", "G/1/-300/Basic/G/The common currency of Pelican Town.", Game1.mouseCursors.getArea(new Rectangle(280, 410, 16, 16)), Color.White, type: typeof(GoldItem));
+                ButtonClick.ActionButton.onClick((pos) => new List<IClickableMenu>(Game1.onScreenMenus).Exists(m => m is DayTimeMoneyBox && m.isWithinBounds(pos.X, pos.Y - 180) && m.isWithinBounds(pos.X, pos.Y) && m.isWithinBounds(pos.X, pos.Y + 50)), (p) => convertMoney());
+            };
+            #endregion
+
             helper.Events.GameLoop.ReturnedToTitle += (s, e) => { myMoney = -1; lockMoney = true; };
             helper.Events.GameLoop.Saving += (s, e) =>
             {
@@ -79,11 +87,6 @@ namespace SplitMoney
                 moneyPool = new Dictionary<string, int>();
                 lockMoney = false;
             };
-
-            #region moneyItem
-            new CustomObjectData("Platonymous.G", "G/1/-300/Basic/G/The common currency of Pelican Town.", Game1.mouseCursors.getArea(new Rectangle(280, 410, 16, 16)), Color.White, type: typeof(GoldItem));
-            ButtonClick.ActionButton.onClick((pos) => new List<IClickableMenu>(Game1.onScreenMenus).Exists(m => m is DayTimeMoneyBox && m.isWithinBounds(pos.X, pos.Y - 180) && m.isWithinBounds(pos.X, pos.Y) && m.isWithinBounds(pos.X, pos.Y + 50)), (p) => convertMoney());
-            #endregion
 
             #region harmony
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.SplitMoney");

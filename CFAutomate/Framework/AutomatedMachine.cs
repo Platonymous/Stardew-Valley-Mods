@@ -28,6 +28,10 @@ namespace CFAutomate.Framework
         /// <summary>The tile area covered by the machine.</summary>
         public Rectangle TileArea { get; }
 
+        /// <summary>A unique ID for the machine type.</summary>
+        /// <remarks>This value should be identical for two machines if they have the exact same behavior and input logic. For example, if one machine in a group can't process input due to missing items, Automate will skip any other empty machines of that type in the same group since it assumes they need the same inputs.</remarks>
+        public string MachineTypeID => this.Machine.id;
+
 
         /*********
         ** Public methods

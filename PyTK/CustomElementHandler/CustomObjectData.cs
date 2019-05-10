@@ -116,6 +116,9 @@ namespace PyTK.CustomElementHandler
 
         public CustomObjectData(string id, string data, Texture2D texture, Color color, int tileIndex = 0, bool bigCraftable = false, Type type = null, CraftingData craftingData = null)
         {
+            if (Game1.objectInformation == null)
+                throw new InvalidOperationException("Can't create a custom object before the game is initialised.");
+
             this.id = id;
             this.data = data;
             this.texture = texture;

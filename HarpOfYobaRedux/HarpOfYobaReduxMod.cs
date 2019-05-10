@@ -19,7 +19,7 @@ namespace HarpOfYobaRedux
             new ConsoleCommand("hoy_cheat", "Get all sheets without doing anything.", (c, p) => cheat(p)).register();
             helper.Events.Display.MenuChanged += OnMenuChanged;
             helper.Events.GameLoop.Saving += OnSaving;
-            DataLoader.load(Helper, Helper.ModRegistry.IsLoaded("Platonymous.CustomMusic"));
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
 
         private void cheat(string[] p)
@@ -46,6 +46,11 @@ namespace HarpOfYobaRedux
             }
             if(items.Count > 0)
                 Game1.activeClickableMenu = new ItemGrabMenu(items);
+        }
+
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            DataLoader.load(Helper, Helper.ModRegistry.IsLoaded("Platonymous.CustomMusic"));
         }
 
         private void OnSaving(object sender, SavingEventArgs e)

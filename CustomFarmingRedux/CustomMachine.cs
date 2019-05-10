@@ -34,7 +34,7 @@ namespace CustomFarmingRedux
         private bool active = true;
         private bool wasBuild = false;
         public virtual bool isWorking { get => active && !readyForHarvest && ((completionTime != null && activeRecipe != null) || blueprint.production == null); }
-        private string id;
+        public string id { get; private set; }
         public string conditions = null;
         public virtual STime completionTime { get; set; }
         private int tileindex;
