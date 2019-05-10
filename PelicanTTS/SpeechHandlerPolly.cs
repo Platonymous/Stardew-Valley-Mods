@@ -102,7 +102,7 @@ namespace PelicanTTS
             string t = PelicanTTSMod.i18n.Get(name);
             if (t.ToString() == "")
                 t = PelicanTTSMod.i18n.Get("default_" + (female ? "female" : "male"));
-
+            
             if (VoiceId.FindValue(t) is VoiceId vId1)
                 currentVoice = vId1;
             else if (VoiceId.FindValue(PelicanTTSMod.i18n.Get("default")) is VoiceId vId2)

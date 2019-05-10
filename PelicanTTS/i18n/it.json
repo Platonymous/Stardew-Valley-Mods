@@ -1,0 +1,23 @@
+﻿{
+  "Greeting": "Buon giorno {Player}. È {DayName} il giorno {Day} di {Season}.",
+  "Your husband": "tuo marito",
+  "Your wife": "tua moglie",
+  "spring": "primavera",
+  "summer": "estate",
+  "fall": "autunno",
+  "winter": "inverno",
+  "BirthdayGreeting": "Oggi è il compleanno di {NPC}.",
+  "FestivalGreeting": "Il festival di oggi inizia alle",
+  "a.m.": "del mattino",
+  "p.m.": "del pomeriggio",
+  "Sunday": "domenica",
+  "Monday": "lunedi",
+  "Tuesday": "martedì",
+  "Wednesday": "mercoledì",
+  "Thursday": "giovedi",
+  "Friday": "venerdì",
+  "Saturday": "sabato",
+  "default": "Carla",
+  "default_male": "Giorgio",
+  "default_female": "Bianca"
+}

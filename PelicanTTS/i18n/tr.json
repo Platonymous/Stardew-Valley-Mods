@@ -1,0 +1,23 @@
+﻿{
+  "Greeting": "Günaydın {Player}. {Day} adındaki {Day} etiketi {DayName}.",
+  "Your husband": "senin kocan",
+  "Your wife": "eşin",
+  "spring": "bahar",
+  "summer": "yaz",
+  "fall": "sonbahar",
+  "winter": "kış",
+  "BirthdayGreeting": "Bugün {NPC} doğum günü.",
+  "FestivalGreeting": "Bugünün festivali saat ",
+  "a.m.": "'de başlıyor",
+  "p.m.": "'de başlıyor",
+  "Sunday": "Pazar",
+  "Monday": "Pazartesi",
+  "Tuesday": "Salı",
+  "Wednesday": "Çarşamba",
+  "Thursday": "Perşembe",
+  "Friday": "Cuma",
+  "Saturday": "Cumartesi",
+  "default": "Filiz",
+  "default_male": "Filiz",
+  "default_female": "Filiz"
+}
