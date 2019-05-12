@@ -10,14 +10,16 @@ namespace SeedBag
 {
     public class SeedBagMod : Mod
     {
-        internal static IModHelper _helper;
-        internal static IMonitor _monitor;
-        internal static EventHandler<MenuChangedEventArgs> addtoshop;
+        internal static SeedBagMod _instance;
+        internal static IModHelper _helper => _instance.Helper;
+        internal static ITranslationHelper i18n => _helper.Translation;
+        internal static Config config;
+
 
         public override void Entry(IModHelper helper)
         {
-            _monitor = Monitor;
-            _helper = helper;
+            _instance = this;
+            config = helper.ReadConfig<Config>();
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
@@ -25,8 +27,9 @@ namespace SeedBag
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
             SeedBagTool seedbag = new SeedBagTool();
-            addtoshop = new InventoryItem(seedbag, 30000, 1).addToNPCShop("Pierre");
-            CustomObjectData.newObject("Platonymous.SeedBag.Tool", SeedBagTool.texture, Color.White, "Seed Bag", "Empty", 0, customType: typeof(SeedBagTool));
+            CustomObjectData.newObject("Platonymous.SeedBag.Tool", SeedBagTool.texture, Color.White, i18n.Get("Name"), i18n.Get("Empty"), 0, customType: typeof(SeedBagTool));
+            InventoryItem bag = new InventoryItem(seedbag, config.Price, 1);
+            bag.addToNPCShop(config.Shop);
         }
     }
 }

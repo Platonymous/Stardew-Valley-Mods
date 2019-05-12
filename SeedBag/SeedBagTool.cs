@@ -99,15 +99,15 @@ namespace SeedBag
         {
         }
 
-        public override string DisplayName { get => "Seed Bag"; set => base.DisplayName = "Seed Bag"; }
+        public override string DisplayName { get => SeedBagMod.i18n.Get("Name"); set => base.DisplayName = SeedBagMod.i18n.Get("Name"); }
 
         private void build()
         {
             if (texture == null)
                 loadTextures();
 
-            Name = "Seed Bag";
-            description = "Empty";
+            Name = SeedBagMod.i18n.Get("Name");
+            description = SeedBagMod.i18n.Get("Empty");
 
             numAttachmentSlots.Value = 2;
             attachments.SetCount(numAttachmentSlots);
@@ -232,7 +232,7 @@ namespace SeedBag
         {
             if (attachments.Count == 0 || (attachments[0] == null && attachments[1] == null))
             {
-                Game1.showRedMessage("Out of seeds");
+                Game1.showRedMessage(SeedBagMod.i18n.Get("Out_Of_Seeds"));
                 return;
             }
 
@@ -255,7 +255,7 @@ namespace SeedBag
                             if (attachments[1].Stack == 0)
                             {
                                 attachments[1] = null;
-                                Game1.showRedMessage("Out of fertilizer");
+                                Game1.showRedMessage(SeedBagMod.i18n.Get("Out_Of_Fertilizer"));
                                 break;
                             }
                         }
@@ -269,7 +269,7 @@ namespace SeedBag
                             if (attachments[0].Stack == 0)
                             {
                                 attachments[0] = null;
-                                Game1.showRedMessage("Out of seeds");
+                                Game1.showRedMessage(SeedBagMod.i18n.Get("Out_Of_Seeds"));
                                 break;
                             }
                         }
