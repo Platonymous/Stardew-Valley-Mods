@@ -24,7 +24,7 @@ namespace CustomFarmingRedux
         public int _index = -1;
         public int[] exclude;
         public int[] include;
-        public string id => name + "." + _index + "." + quality + "." + stack;
+        public string id => name + "." + index + "." + quality + "." + stack;
         public string price = "original";
         private int dropInQuality = -1;
         public string name

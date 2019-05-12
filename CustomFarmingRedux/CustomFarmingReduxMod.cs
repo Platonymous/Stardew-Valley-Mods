@@ -16,6 +16,8 @@ using Microsoft.Xna.Framework;
 using System;
 using StardewValley.Tools;
 using PyTK.Lua;
+using StardewValley.Locations;
+using StardewValley.Buildings;
 
 namespace CustomFarmingRedux
 {
@@ -44,6 +46,22 @@ namespace CustomFarmingRedux
 
             harmonyFix();
             helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
+            helper.ConsoleCommands.Add("cfclear", "Clears all machines", CFClear);
+        }
+
+        private void CFClear(string s, string[] p)
+        {
+            foreach(GameLocation gl in Game1.locations)
+            {
+                foreach(CustomMachine m in gl.objects.Values.Where(v => v is CustomMachine))
+                        m.clear();
+
+                if(gl is BuildableGameLocation bgl)
+                    foreach (Building b in bgl.buildings.Where(i => i.indoors.Value is GameLocation))
+                        foreach(CustomMachine m in b.indoors.Value.objects.Values.Where(v => v is CustomMachine))
+                            m.clear();
+
+            }
         }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)

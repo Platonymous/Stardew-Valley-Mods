@@ -37,7 +37,7 @@ namespace TMXLoader
             monitor = Monitor;
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+           // helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
             helper.Events.Player.Warped += OnWarped;
         }
 
@@ -157,7 +157,7 @@ namespace TMXLoader
                     Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
                     map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), null, true);
                     map.injectAs("Maps/" + edit.name);
-                    mapsToSync.AddOrReplace(edit.name, map);
+                  //  mapsToSync.AddOrReplace(edit.name, map);
                 }
 
                 foreach (TileShop shop in tmxPack.shops)
@@ -177,7 +177,7 @@ namespace TMXLoader
                     }
                     original.GetLayer("Set-Up").Tiles[edit.position[0], edit.position[1]] = new StaticTile(original.GetLayer("Set-Up"), spring, BlendMode.Alpha, (index * 4) + edit.direction);
                     original.injectAs("Maps/" + edit.map);
-                    mapsToSync.AddOrReplace(edit.map, original);
+                   // mapsToSync.AddOrReplace(edit.map, original);
                 }
 
                 foreach (NPCPlacement edit in tmxPack.placeNPCs)
@@ -206,7 +206,7 @@ namespace TMXLoader
                         location = new GameLocation(Path.Combine("Maps", edit.name), edit.name);
 
                     location.seasonUpdate(Game1.currentSeason);
-                    mapsToSync.AddOrReplace(edit.name, map);
+                    //mapsToSync.AddOrReplace(edit.name, map);
                     helper.Events.GameLoop.SaveLoaded += (s, e) => Game1.locations.Add(location);
                 }
 
@@ -217,7 +217,7 @@ namespace TMXLoader
                     Map original = edit.retainWarps ? Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent) : map;
                     editWarps(map, edit.addWarps, edit.removeWarps, original);
                     map.injectAs("Maps/" + edit.name);
-                    mapsToSync.AddOrReplace(edit.name, map);
+                   // mapsToSync.AddOrReplace(edit.name, map);
                 }
 
                 foreach (MapEdit edit in tmxPack.mergeMaps)
@@ -234,7 +234,7 @@ namespace TMXLoader
                     map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, edit.removeEmpty);
                     editWarps(map, edit.addWarps, edit.removeWarps, original);
                     map.injectAs("Maps/" + edit.name);
-                    mapsToSync.AddOrReplace(edit.name, map);
+                   // mapsToSync.AddOrReplace(edit.name, map);
                 }
 
                 foreach (MapEdit edit in tmxPack.onlyWarps)
@@ -242,7 +242,7 @@ namespace TMXLoader
                     Map map = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
                     map.injectAs("Maps/" + edit.name);
-                    mapsToSync.AddOrReplace(edit.name, map);
+                   // mapsToSync.AddOrReplace(edit.name, map);
                 }
             }
         }

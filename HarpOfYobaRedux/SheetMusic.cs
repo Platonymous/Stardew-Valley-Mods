@@ -16,7 +16,7 @@ namespace HarpOfYobaRedux
         private Texture2D texture;
         private Color color;
         private string music;
-        public int lenght;
+        public int length;
         public IMagic magic;
         public bool playedToday;
  
@@ -32,13 +32,13 @@ namespace HarpOfYobaRedux
 
         }
 
-        public SheetMusic(string id, Texture2D texture, string name, string description, Color color, string music, int lenght, IMagic magic)
+        public SheetMusic(string id, Texture2D texture, string name, string description, Color color, string music, int length, IMagic magic)
         {
             if (allSheets == null)
                 allSheets = new Dictionary<string, SheetMusic>();
 
             this.magic = magic;
-            this.lenght = lenght;
+            this.length = length;
             this.texture = texture;
             this.color = color;
             this.music = music;
@@ -65,7 +65,7 @@ namespace HarpOfYobaRedux
             color = allSheets[id].color;
             texture = allSheets[id].texture;
             music = allSheets[id].music;
-            lenght = allSheets[id].lenght;
+            length = allSheets[id].length;
             magic = allSheets[id].magic;
             sheetMusicID = id;
             playedToday = false;

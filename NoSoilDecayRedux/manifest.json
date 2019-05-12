@@ -1,7 +1,7 @@
 {
   "Name": "No Soil Decay Redux",
   "Author": "Platonymous",
-  "Version": "1.5.4",
+  "Version": "1.5.5",
   "Description": "Stops soil from decaying",
   "UniqueID": "Platonymous.NoSoilDecayRedux",
   "EntryDll": "NoSoilDecayRedux.dll",

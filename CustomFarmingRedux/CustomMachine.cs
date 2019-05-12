@@ -492,7 +492,7 @@ namespace CustomFarmingRedux
             if (additionalSaveData.ContainsKey("completionTime"))
                 completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
 
-            build(machines.Find(cmb => additionalSaveData["id"] == cmb.fullid));
+           build(blueprint);
 
             if (additionalSaveData.ContainsKey("location"))
             {

@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Netcode;
 using PyTK.Extensions;
-using PyTK.Types;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Network;
@@ -14,7 +12,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using SObject = StardewValley.Object;
 
 namespace PyTK.CustomElementHandler

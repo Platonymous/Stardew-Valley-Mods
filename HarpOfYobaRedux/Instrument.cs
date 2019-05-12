@@ -228,9 +228,9 @@ namespace HarpOfYobaRedux
             SheetMusic sheet = (SheetMusic)attachments[0];
 
             PyUtils.setDelayedAction(1000, animation.animate);
-            PyUtils.setDelayedAction(sheet.lenght / 2, doMagic);
-            PyUtils.setDelayedAction(sheet.lenght, resetMusic);
-            PyUtils.setDelayedAction(sheet.lenght + 1000, stop);
+            PyUtils.setDelayedAction(sheet.length / 2, doMagic);
+            PyUtils.setDelayedAction(sheet.length, resetMusic);
+            PyUtils.setDelayedAction(sheet.length + 1000, stop);
 
             animation.preAnimation();
             sheet.play();

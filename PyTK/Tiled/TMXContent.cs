@@ -17,6 +17,7 @@ namespace PyTK.Tiled
         public static IMapFormat TMXFormat = new NewTiledTmxFormat();
         internal static IModHelper Helper = PyTKMod._helper;
         internal static IMonitor Monitor = PyTKMod._monitor;
+        internal static List<string> Injected = new List<string>();
 
 
         public static Map Load(string path, IModHelper helper, IContentPack contentPack = null)
@@ -53,8 +54,17 @@ namespace PyTK.Tiled
                 if (tileSheetFile.Exists && !tileSheetFileVanilla.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource).Key == null)
                 {
                     Texture2D tilesheet = contentPack != null ? contentPack.LoadAsset<Texture2D>(tileSheetPath) : helper.Content.Load<Texture2D>(tileSheetPath);
-                    tilesheet.inject(t.ImageSource);
-                    tilesheet.inject("Maps/" + t.ImageSource);
+                    if (!Injected.Contains(t.ImageSource))
+                    {
+                        tilesheet.inject(t.ImageSource);
+                        Injected.Add(t.ImageSource);
+                    }
+
+                    if (!Injected.Contains("Maps/" + t.ImageSource))
+                    {
+                        tilesheet.inject("Maps/" + t.ImageSource);
+                        Injected.Add("Maps/" + t.ImageSource);
+                    }
 
                     if (syncTexturesToClients && Game1.IsMultiplayer && Game1.IsServer)
                         foreach (Farmer farmhand in Game1.otherFarmers.Values)
@@ -69,13 +79,23 @@ namespace PyTK.Tiled
                             {
                                 Texture2D seasonTilesheet = contentPack != null ? contentPack.LoadAsset<Texture2D>(seasonPath + ".png") : helper.Content.Load<Texture2D>(seasonPath + ".png");
                                 string seasonTextureName = t.ImageSource.Replace("spring_", season);
-                                seasonTilesheet.inject(seasonTextureName);
-                                seasonTilesheet.inject("Maps/" + seasonTextureName);
+                                if (!Injected.Contains(seasonTextureName))
+                                {
+                                    seasonTilesheet.inject(seasonTextureName);
+                                    Injected.Add(seasonTextureName);
+                                }
+
+                                if (!Injected.Contains("Maps/" + seasonTextureName))
+                                {
+                                    seasonTilesheet.inject("Maps/" + seasonTextureName);
+                                    Injected.Add("Maps/" + seasonTextureName);
+                                }
 
                                 if (syncTexturesToClients && Game1.IsMultiplayer && Game1.IsServer)
                                     foreach (Farmer farmhand in Game1.otherFarmers.Values)
                                         PyNet.sendGameContent(new string[] { seasonTextureName, "Maps/" + seasonTextureName }, seasonTilesheet, farmhand, (b) => Monitor.Log("Syncing " + seasonTextureName + " to " + farmhand.Name + ": " + (b ? "successful" : "failed"), b ? LogLevel.Info : LogLevel.Warn));
-                            }
+                                                       
+    }
                         }
                 }
             }
