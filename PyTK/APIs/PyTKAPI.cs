@@ -24,6 +24,12 @@ namespace PyTK.APIs
             return ScaledTexture2D.FromTexture(PyUtils.getRectangle(orgSize.Width,orgSize.Height,Color.White), scaledTexture, scale, forcedSourceRectangle); ;
         }
 
+        public Texture2D CreateScaledTexture2D(int orgWidth, Texture2D scaledTexture, Rectangle? forcedSourceRectangle = null)
+        {
+            float scale = (float)(Convert.ToDouble(scaledTexture.Width) / Convert.ToDouble(orgWidth));
+            return CreateScaledTexture2D(new Rectangle(0, 0, orgWidth, (int)(scaledTexture.Height / scale)), scaledTexture, scale, forcedSourceRectangle);
+        }
+
         public Texture2D CreateScaledTexture2D(Texture2D scaledTexture, float scale, Rectangle? forcedSourceRectangle = null)
         {
             return ScaledTexture2D.FromTexture(PyUtils.getRectangle((int)((float)scaledTexture.Width / scale), (int)((float)scaledTexture.Height/scale), Color.White), scaledTexture, scale, forcedSourceRectangle); ;

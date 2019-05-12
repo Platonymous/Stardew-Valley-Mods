@@ -9,6 +9,8 @@ namespace PyTK.APIs
 
         Texture2D CreateScaledTexture2D(Rectangle orgSize, Texture2D scaledTexture, float scale = -1, Rectangle? forcedSourceRectangle = null);
 
+        Texture2D CreateScaledTexture2D(int orgWidth, Texture2D scaledTexture, Rectangle? forcedSourceRectangle = null);
+
         Texture2D CreateScaledTexture2D(Texture2D scaledTexture, float scale, Rectangle? forcedSourceRectangle = null);
 
         bool IsScaledTexture2D(Texture2D texture);
