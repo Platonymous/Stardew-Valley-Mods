@@ -1,12 +1,12 @@
 ﻿{
-  "Greeting": "좋은 아침 {Player}. {DayName}, {Season} {Day} 일.",
-  "Your husband": "너 남편",
-  "Your wife": "너의 아내",
-  "spring": "봄의",
+  "Greeting": "좋은 아침이에요, {Player}. {Season}의 {Day}일, {DayName}.",
+  "Your husband": "당신의 남편",
+  "Your wife": "당신의 아내",
+  "spring": "봄",
   "summer": "여름",
-  "fall": "가을의",
+  "fall": "가을",
   "winter": "겨울",
-  "BirthdayGreeting": "오늘은 {NPC} 생일입니다.",
+  "BirthdayGreeting": "오늘은 {NPC}의 생일입니다.",
   "FestivalGreeting": "오늘의 축제는",
   "a.m.": "시에 시작됩니다.",
   "p.m.": "시에 시작됩니다.",
@@ -17,7 +17,7 @@
   "Thursday": "목요일",
   "Friday": "금요일",
   "Saturday": "토요일",
-  "default": "Seoyeon",
-  "default_male": "Seoyeon",
-  "default_female": "Seoyeon"
+  "default": "서연",
+  "default_male": "서연",
+  "default_female": "서연"
 }
