@@ -156,7 +156,6 @@ namespace CustomMusic
         {
             Monitor.Log("Loading " + music.File + " ...", LogLevel.Info);
             string oPath = path;
-            SoundEffect soundEffect = null;
 
             string orgPath = path;
             path = config.Convert ? path.Replace(".ogg", ".wav") : path;
@@ -198,8 +197,32 @@ namespace CustomMusic
                     done = true;
                 }
             }
+
+            SoundEffect soundEffect = LoadSoundEffect(path);
+
+            if (soundEffect != null)
+            {
+                Monitor.Log(music.File + " Loaded", LogLevel.Trace);
+                string[] ids = music.Id.Split(',').Select(p => p.Trim()).ToArray();
+                foreach (string id in ids)
+                    Music.Add(new StoredMusic(id,music.Preload ? soundEffect :null, music.Ambient, music.Loop, music.Conditions, path));
+            }
+            else
+            {
+                Monitor.Log(music.File + " failed to load", LogLevel.Warn);
+                //Monitor.Log(path + ":" +le.Message + ":" + le.StackTrace, LogLevel.Trace);
+            }
+
+            loads--;
+            simLoad--;
+            working.Remove(oPath);
+        }
+
+        public static SoundEffect LoadSoundEffect(string path)
+        {
             int c = 0;
             Exception le = null;
+            SoundEffect soundEffect = null;
 
 
             if (path.EndsWith(".wav"))
@@ -239,24 +262,8 @@ namespace CustomMusic
                 }
             }
 
-            if (soundEffect != null)
-            {
-                Monitor.Log(music.File + " Loaded", LogLevel.Trace);
-                string[] ids = music.Id.Split(',').Select(p => p.Trim()).ToArray();
-                foreach (string id in ids)
-                    Music.Add(new StoredMusic(id, soundEffect, music.Ambient, music.Loop, music.Conditions));
-            }
-            else
-            {
-                Monitor.Log(music.File + " failed to load", LogLevel.Warn);
-                //Monitor.Log(path + ":" +le.Message + ":" + le.StackTrace, LogLevel.Trace);
-            }
-
-            loads--;
-            simLoad--;
-            working.Remove(oPath);
+            return soundEffect;
         }
-
         public SoundEffect Convert(string path)
         {
             string wavPath = path.Replace(".ogg", ".wav");
