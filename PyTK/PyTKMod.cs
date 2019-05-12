@@ -19,6 +19,7 @@ using PyTK.Lua;
 using xTile;
 using xTile.Dimensions;
 using PyTK.Overrides;
+using PyTK.APIs;
 
 namespace PyTK
 {
@@ -67,6 +68,11 @@ namespace PyTK
 
             Helper.Events.Multiplayer.ModMessageReceived += PyNet.Multiplayer_ModMessageReceived;
 
+        }
+
+        public override object GetApi()
+        {
+            return new PyTKAPI();
         }
 
         private void Player_Warped(object sender, WarpedEventArgs e)

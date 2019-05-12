@@ -71,6 +71,7 @@
     <Compile Include="Extensions\PyTextures.cs" />
     <Compile Include="ConsoleCommands\CcLocations.cs" />
     <Compile Include="CustomElementHandler\ISaveElement.cs" />
+    <Compile Include="APIs\IScalerAPI.cs" />
     <Compile Include="Lua\LuaUtils.cs" />
     <Compile Include="Lua\PyLua.cs" />
     <Compile Include="Overrides\OvSmapi.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Overrides\OvSleep.cs" />
     <Compile Include="PyNet.cs" />
     <Compile Include="CustomElementHandler\PySync.cs" />
+    <Compile Include="APIs\PyTKAPI.cs" />
     <Compile Include="Tiled\EnumHelper.cs" />
     <Compile Include="Tiled\IXmlFormatable.cs" />
     <Compile Include="Tiled\NewTiledTmxFormat.cs" />
