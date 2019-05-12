@@ -23,7 +23,7 @@ namespace PyTK.APIs
 
         Texture2D GetScaledTexture(Texture2D scaledTexture);
 
-        Texture2D ScaleUpTexture(Texture2D texture, float scale, bool asScaledTexture2D = false, Rectangle? forcedSourceRectangle = null);
+        Texture2D ScaleUpTexture(Texture2D texture, float scale, bool asScaledTexture2D = true, Rectangle? forcedSourceRectangle = null);
 
 
     }
