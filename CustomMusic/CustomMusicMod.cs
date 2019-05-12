@@ -11,6 +11,7 @@ using System;
 using System.Reflection;
 using OggSharp;
 using StardewModdingAPI.Events;
+using System.Threading;
 
 namespace CustomMusic
 {
@@ -23,6 +24,12 @@ namespace CustomMusic
         internal static MethodInfo checkEventConditions = null;
         internal static Dictionary<string, string> locations = new Dictionary<string, string>();
         internal static Config config;
+        internal static int loads = 0;
+        internal static int simLoad = 0;
+        internal static List<string> working = new List<string>();
+        internal const int ti = 32;
+        internal const int simuMax = 8;
+        internal const int slp = 500;
 
         public override void Entry(IModHelper helper)
         {
@@ -101,21 +108,39 @@ namespace CustomMusic
 
         private void loadContentPacks()
         {
+            loads = 0;
+            simLoad = 0;
             foreach (IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
-
+                loads += content.Music.Count;
                 foreach (MusicItem music in content.Music)
                 {
-                    string path = Path.Combine(pack.DirectoryPath, music.File);   
+                    string path = Path.Combine(pack.DirectoryPath, music.File);
                     if (!music.Preload && !config.Convert)
                         Task.Run(() =>
                         {
                             addMusic(path, music);
                         });
-                    else
+                    else if (!config.Convert)
                         addMusic(path, music);
+                    else
+                    {
+                        while (simLoad > simuMax || working.Contains(path))
+                            Thread.Sleep(slp);
+
+                        simLoad++;
+                        working.Add(path);
+                        Task.Run(() =>
+                        {
+                            addMusic(path, music);
+                        });
+                    }
+
                 }
+                if (config.Convert)
+                    while(loads > 0)
+                        Thread.Sleep(slp);
 
                 foreach (LocationItem location in content.Locations)
                 {
@@ -130,41 +155,166 @@ namespace CustomMusic
         private void addMusic(string path, MusicItem music)
         {
             Monitor.Log("Loading " + music.File + " ...", LogLevel.Info);
-
+            string oPath = path;
             SoundEffect soundEffect = null;
 
             string orgPath = path;
             path = config.Convert ? path.Replace(".ogg", ".wav") : path;
+            bool done = false;
+            int cc = 0;
+            if (config.Convert)
+            {
+                while (!done && cc < ti)
+                {
 
-            if (config.Convert && !File.Exists(path))
-                Convert(orgPath);
+                    if (File.Exists(path))
+                    {
+                        FileStream file = File.Open(path, FileMode.Open);
+                        try
+                        {
+                            if (file.Length < 100)
+                            {
+                                file.Close();
+                                file.Dispose();
+                                File.Delete(path);
+                                Convert(orgPath);
+                            }
+                            else
+                            {
+                                file.Close();
+                                file.Dispose();
+                            }
+                        }
+                        catch
+                        {
+                            cc++;
+                            file.Close();
+                            file.Dispose();
+                            Thread.Sleep(slp);
+                        }
+                    }
+                    else
+                        Convert(orgPath);
+                    done = true;
+                }
+            }
+            int c = 0;
+            Exception le = null;
+
 
             if (path.EndsWith(".wav"))
-                soundEffect = SoundEffect.FromStream(new FileStream(path, FileMode.Open));
+            {
+                while (soundEffect == null && c < ti)
+                {
+                    FileStream stream = new FileStream(path, FileMode.Open);
+                    try
+                    {
+                        soundEffect = SoundEffect.FromStream(stream);
+                    }
+                    catch (Exception e)
+                    {
+                        stream.Close();
+                        c++;
+                        le = e;
+                        Thread.Sleep(slp);
+                    }
+                    stream.Close();
+                    stream.Dispose();
+                }
+            }
             else
-                soundEffect = OggLoader.Load(path);
+            {
+                while (soundEffect == null && c < ti)
+                {
+                    try
+                    {
+                        soundEffect = OggLoader.Load(path);
+                    }
+                    catch (Exception e)
+                    {
+                        c++;
+                        le = e;
+                        Thread.Sleep(slp);
+                    }
+                }
+            }
 
-            Monitor.Log(music.File + " Loaded", LogLevel.Trace);
-            string[] ids = music.Id.Split(',').Select(p => p.Trim()).ToArray();
-            foreach(string id in ids)
-                Music.Add(new StoredMusic(id, soundEffect, music.Ambient, music.Loop, music.Conditions));
+            if (soundEffect != null)
+            {
+                Monitor.Log(music.File + " Loaded", LogLevel.Trace);
+                string[] ids = music.Id.Split(',').Select(p => p.Trim()).ToArray();
+                foreach (string id in ids)
+                    Music.Add(new StoredMusic(id, soundEffect, music.Ambient, music.Loop, music.Conditions));
+            }
+            else
+            {
+                Monitor.Log(music.File + " failed to load", LogLevel.Warn);
+                //Monitor.Log(path + ":" +le.Message + ":" + le.StackTrace, LogLevel.Trace);
+            }
+
+            loads--;
+            simLoad--;
+            working.Remove(oPath);
         }
 
-        public static SoundEffect Convert(string path)
+        public SoundEffect Convert(string path)
         {
             string wavPath = path.Replace(".ogg", ".wav");
             SoundEffect soundEffect = null;
-            using (FileStream stream = new FileStream(wavPath,FileMode.Create))
-            using (BinaryWriter writer = new BinaryWriter(stream))
+            int c = 0;
+            Exception le = null;
+            bool done = false;
+            while (!done && c < ti)
             {
-                OggDecoder decoder = new OggDecoder();
-                decoder.Initialize(File.OpenRead(path));
-                byte[] data = decoder.SelectMany(chunk => chunk.Bytes.Take(chunk.Length)).ToArray();
-                WriteWave(writer, decoder.Stereo ? 2 : 1, decoder.SampleRate, data);
+                FileStream stream = new FileStream(wavPath, FileMode.Create);
+                try
+                {
+                    using (BinaryWriter writer = new BinaryWriter(stream))
+                    {
+                        OggDecoder decoder = new OggDecoder();
+                        decoder.Initialize(File.OpenRead(path));
+                        byte[] data = decoder.SelectMany(chunk => chunk.Bytes.Take(chunk.Length)).ToArray();
+                        WriteWave(writer, decoder.Stereo ? 2 : 1, decoder.SampleRate, data);
+                    }
+                }
+                catch (Exception e)
+                {
+                    le = e;
+                    c++;
+                    Thread.Sleep(slp);
+                }
+                done = true;
+                stream.Close();
+                stream.Dispose();
             }
 
-            using (FileStream stream = new FileStream(wavPath, FileMode.Open))
-                soundEffect = SoundEffect.FromStream(stream);
+
+            int d = 0;
+            while (soundEffect == null && d < ti)
+            {
+                FileStream stream = stream = new FileStream(wavPath, FileMode.Open);
+
+                try
+                {
+                        soundEffect = SoundEffect.FromStream(stream);
+                }
+                catch (Exception e)
+                {
+                    le = e;
+                    d++;
+                    Thread.Sleep(slp);
+                }
+
+                stream.Close();
+                stream.Dispose();
+            }
+
+
+
+
+            /*if(soundEffect == null)
+                Monitor.Log(path + ":" + le.Message + ":" + le.StackTrace, LogLevel.Trace);*/
+
 
             return soundEffect;
         }
