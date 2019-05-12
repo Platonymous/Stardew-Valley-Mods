@@ -1,5 +1,5 @@
 ﻿{
-  "Greeting": "좋은 아침 {Player}. {DayName}, {Season} 5 일.",
+  "Greeting": "좋은 아침 {Player}. {DayName}, {Season} {Day} 일.",
   "Your husband": "너 남편",
   "Your wife": "너의 아내",
   "spring": "봄의",
