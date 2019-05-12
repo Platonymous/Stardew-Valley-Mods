@@ -1,7 +1,7 @@
 ﻿{
   "Name": "GhostTown",
   "Author": "Platonyous",
-  "Version": "1.0.3",
+  "Version": "1.0.4",
   "Description": "Ghostify Stardew Valley",
   "UniqueID": "Platonymous.GhostTown",
   "EntryDll": "GhostTown.dll",
