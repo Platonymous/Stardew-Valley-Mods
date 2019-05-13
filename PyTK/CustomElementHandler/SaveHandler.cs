@@ -135,7 +135,7 @@ namespace PyTK.CustomElementHandler
         {
             Monitor.Log("Replacing Custom Objects");
 
-            rebuildActions.Clear();
+            //rebuildActions.Clear();
             OnBeforeRemoving(EventArgs.Empty);
 
             ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);

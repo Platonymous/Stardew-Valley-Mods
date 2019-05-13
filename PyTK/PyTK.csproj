@@ -90,6 +90,7 @@
     <Compile Include="Tiled\NewTiledTmxFormat.cs" />
     <Compile Include="Tiled\PathHelper.cs" />
     <Compile Include="Tiled\TiledAnimationFrame.cs" />
+    <Compile Include="Tiled\TiledImageLayer.cs" />
     <Compile Include="Tiled\TiledLayer.cs" />
     <Compile Include="Tiled\TiledLayerData.cs" />
     <Compile Include="Tiled\TiledMap.cs" />

@@ -17,6 +17,7 @@ namespace PyTK.Tiled
         public List<TiledProperty> Properties { get; set; }
         public List<TiledTileSet> TileSets { get; set; }
         public List<TiledLayer> Layers { get; set; }
+        public List<TiledImageLayer> ImageLayers { get; set; }
         public List<TiledObjectGroup> ObjectGroups { get; set; }
 
         public TiledMap()
@@ -39,6 +40,7 @@ namespace PyTK.Tiled
             Properties = (xelement = elem.Element("properties")) != null ? xelement.Elements("property").Select(prop => new TiledProperty(prop)).ToList() : null;
             TileSets = elem.Elements("tileset").Select(tileSet => new TiledTileSet(tileSet)).ToList();
             Layers = elem.Elements("layer").Select(layer => new TiledLayer(layer)).ToList();
+            ImageLayers = elem.Elements("imagelayer").Select(layer => new TiledImageLayer(layer)).ToList();
             ObjectGroups = elem.Elements("objectgroup").Select(objectGroup => new TiledObjectGroup(objectGroup)).ToList();
         }
 

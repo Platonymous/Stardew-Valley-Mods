@@ -42,6 +42,8 @@
     <Compile Include="Config.cs" />
     <Compile Include="NPCPlacement.cs" />
     <Compile Include="Overrides.cs" />
+    <Compile Include="SaveData.cs" />
+    <Compile Include="SaveLocation.cs" />
     <Compile Include="SpouseRoom.cs" />
     <Compile Include="MapEdit.cs" />
     <Compile Include="TileShop.cs" />

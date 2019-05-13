@@ -10,6 +10,8 @@ namespace PyTK.Tiled
         public int Width { get; set; }
         public int Height { get; set; }
         public bool Hidden { get; set; }
+        public float Horizontal { get; set; }
+        public float Vertical { get; set; }
 
         public List<TiledProperty> Properties { get; set; }
 
@@ -27,6 +29,8 @@ namespace PyTK.Tiled
             Width = elem.Value<int>("@width");
             Height = elem.Value<int>("@height");
             Hidden = (elem.Value<int?>("@visible") ?? 1) == 0;
+            Horizontal = elem.Value<float?>("@offsetx") ?? 0;
+            Vertical = elem.Value<float?>("@offsety") ?? 0;
             XElement xelement;
             Properties = (xelement = elem.Element("properties")) != null ? xelement.Elements("property").Select(prop => new TiledProperty(prop)).ToList() : null;
             Data = new TiledLayerData(elem.Element("data"));

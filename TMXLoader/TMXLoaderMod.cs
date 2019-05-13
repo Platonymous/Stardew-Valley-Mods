@@ -17,6 +17,9 @@ using System.Reflection;
 using System.Linq;
 using xTile.Tiles;
 using Microsoft.Xna.Framework.Graphics;
+using StardewValley.Locations;
+using System.Xml;
+using StardewValley.TerrainFeatures;
 
 namespace TMXLoader
 {
@@ -29,6 +32,9 @@ namespace TMXLoader
         internal static List<Farmer> syncedFarmers = new List<Farmer>();
         internal static Dictionary<string, List<TileShopItem>> tileShops = new Dictionary<string, List<TileShopItem>>();
         internal static Config config;
+        internal static SaveData saveData = new SaveData();
+        internal static List<GameLocation> addedLocations = new List<GameLocation>();
+
 
         public override void Entry(IModHelper helper)
         {
@@ -39,6 +45,75 @@ namespace TMXLoader
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
            // helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
             helper.Events.Player.Warped += OnWarped;
+
+            helper.Events.GameLoop.Saving += (s, e) =>
+            {
+                saveData = new SaveData();
+                saveData.Locations = new List<SaveLocation>();
+
+                foreach (var location in addedLocations)
+                {
+                    PyTK.CustomElementHandler.SaveHandler.ReplaceAll(location, Game1.locations);
+                    string objects = "";
+
+                    XmlWriterSettings settings = new XmlWriterSettings();
+                    settings.ConformanceLevel = ConformanceLevel.Auto;
+                    settings.CloseOutput = true;
+
+                    StringWriter objWriter = new StringWriter();
+                    using (var writer = XmlWriter.Create(objWriter, settings))
+                        SaveGame.locationSerializer.Serialize(writer, location);
+
+                    objects = objWriter.ToString();
+
+                    saveData.Locations.Add(new SaveLocation(location.Name, objects));
+                }
+
+                Helper.Data.WriteSaveData<SaveData>("Locations", saveData);
+            };
+
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
+            {
+                foreach(var location in addedLocations)
+                    Game1.locations.Add(location);
+
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.ConformanceLevel = ConformanceLevel.Auto;
+
+                saveData = Helper.Data.ReadSaveData<SaveData>("Locations");
+                if (saveData != null)
+                    foreach (SaveLocation loc in saveData.Locations)
+                    {
+                        var inGame = Game1.getLocationFromName(loc.Name);
+
+                        if (inGame == null)
+                            continue;
+
+                        StringReader objReader = new StringReader(loc.Objects);
+                        GameLocation saved;
+                        using (var reader = XmlReader.Create(objReader, settings))
+                            saved = (GameLocation) SaveGame.locationSerializer.Deserialize(reader);
+
+                        if(saved != null)
+                        {
+                            if (saved.Objects.Count() > 0) {
+                                inGame.Objects.Clear();
+                                foreach (var obj in saved.Objects.Keys)
+                                    inGame.Objects.Add(obj,saved.Objects[obj]);
+                            }
+
+                            if (saved.terrainFeatures.Count() > 0)
+                            {
+                                inGame.terrainFeatures.Clear();
+                                foreach (var obj in saved.terrainFeatures.Keys)
+                                    inGame.terrainFeatures.Add(obj, saved.terrainFeatures[obj]);
+                            }
+                        }
+
+                        PyTK.CustomElementHandler.SaveHandler.RebuildAll(inGame, Game1.locations);
+                        inGame.DayUpdate(Game1.dayOfMonth);
+                    }
+            };
         }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -196,18 +271,32 @@ namespace TMXLoader
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
                     map.inject("Maps/" + edit.name);
                     GameLocation location;
-                    if (map.Properties.ContainsKey("Outdoors") && map.Properties["Outdoors"] == "F")
-                    {
-                        location = new GameLocation(Path.Combine("Maps", edit.name), edit.name) { IsOutdoors = false };
-                        location.loadLights();
-                        location.IsOutdoors = false;
-                    }
+                    if (edit.type == "Deco")
+                        location = new DecoratableLocation(Path.Combine("Maps", edit.name), edit.name);
                     else
                         location = new GameLocation(Path.Combine("Maps", edit.name), edit.name);
 
+                    if (map.Properties.ContainsKey("Outdoors") && map.Properties["Outdoors"] == "F")
+                    {
+                        location.IsOutdoors = false;
+                        location.loadLights();
+                        location.IsOutdoors = false;
+                    }
+
+                    if (map.Properties.ContainsKey("IsGreenHouse"))
+                        location.IsGreenhouse = true;
+
+                    if (map.Properties.ContainsKey("IsStructure"))
+                        location.isStructure.Value = true;
+
+                    if (map.Properties.ContainsKey("IsFarm"))
+                        location.IsFarm = true;
+
+
+
+                    addedLocations.Add(location);
                     location.seasonUpdate(Game1.currentSeason);
                     //mapsToSync.AddOrReplace(edit.name, map);
-                    helper.Events.GameLoop.SaveLoaded += (s, e) => Game1.locations.Add(location);
                 }
 
                 foreach (MapEdit edit in tmxPack.replaceMaps)

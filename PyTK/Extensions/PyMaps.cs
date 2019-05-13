@@ -15,6 +15,9 @@ using xTile.Dimensions;
 using System;
 using Netcode;
 using xTile.ObjectModel;
+using PyTK.Tiled;
+using Newtonsoft.Json;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace PyTK.Extensions
 {
@@ -88,19 +91,131 @@ namespace PyTK.Extensions
         public static Map enableMoreMapLayers(this Map map)
         {
             foreach (Layer layer in map.Layers)
-                if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
+            {
+                if (layer.Properties.ContainsKey("OffestXReset"))
                 {
-                    maplayer.AfterDraw -= (s, e) => drawLayer(layer);
-                    maplayer.AfterDraw += (s, e) => drawLayer(layer);
+                    layer.Properties["offsetx"] = layer.Properties["OffestXReset"];
+                    layer.Properties["offsety"] = layer.Properties["OffestYReset"];
                 }
 
+                if (layer.Properties.Keys.Contains("DrawChecked"))
+                    continue;
+
+                if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
+                    maplayer.AfterDraw += (s, e) => drawLayer(layer, Location.Origin, layer.Properties.ContainsKey("WrapAround"));
+                else if (layer.Properties.ContainsKey("DrawBefore") && map.GetLayer(layer.Properties["DrawBefore"]) is Layer maplayerBefore)
+                    maplayerBefore.BeforeDraw += (s, e) => drawLayer(layer, Location.Origin, layer.Properties.ContainsKey("WrapAround"));
+
+                layer.Properties["DrawChecked"] = true;
+            }
             return map;
         }
 
-        private static void drawLayer(Layer layer)
+        private static void drawLayer(Layer layer, Location offset, bool wrap = false)
         {
-            layer.Draw(Game1.mapDisplayDevice, Game1.viewport, Location.Origin, false, Game1.pixelZoom);
+            if (layer.Properties.ContainsKey("offsetx") && layer.Properties.ContainsKey("offsety"))
+            {
+                offset = new Location(int.Parse(layer.Properties["offsetx"]), int.Parse(layer.Properties["offsety"]));
+                if (!layer.Properties.ContainsKey("OffestXReset"))
+                {
+                    layer.Properties["OffestXReset"] = offset.X;
+                    layer.Properties["OffestYReset"] = offset.Y;
+                }
+            }
+
+            if (!layer.Properties.ContainsKey("StartX"))
+            {
+                Vector2 local = Game1.GlobalToLocal(new Vector2(offset.X,offset.Y));
+                layer.Properties["StartX"] = local.X;
+                layer.Properties["StartY"] = local.Y;
+            }
+
+            if (layer.Properties.ContainsKey("AutoScrollX"))
+            {
+                offset.X += int.Parse(layer.Properties["AutoScrollX"]);
+                layer.Properties["offsetx"] = offset.X;
+            }
+
+            if (layer.Properties.ContainsKey("AutoScrollY"))
+            {
+                offset.Y += int.Parse(layer.Properties["AutoScrollY"]);
+                layer.Properties["offsety"] = offset.Y;
+            }
+
+
+            if (layer.Properties.ContainsKey("isImageLayer"))
+                drawImageLayer(layer, offset, wrap);
+            else
+                layer.Draw(Game1.mapDisplayDevice, Game1.viewport, offset, wrap, Game1.pixelZoom);
         }
+
+        private static void drawImageLayer(Layer layer, Location offset, bool wrap = false)
+        {
+            Texture2D texture = Helper.Content.Load<Texture2D>(layer.Map.GetTileSheet("zImageSheet_" + layer.Id).ImageSource, ContentSource.GameContent);
+            Vector2 pos = new Vector2(offset.X, offset.Y);
+
+
+            pos = Game1.GlobalToLocal(pos);
+
+            if (layer.Properties.ContainsKey("ParallaxX") || layer.Properties.ContainsKey("ParallaxY"))
+            {
+                Vector2 end = pos;
+                if (layer.Properties.ContainsKey("OffestXReset"))
+                {
+                    end.X = layer.Properties["OffestXReset"];
+                    end.Y = layer.Properties["OffestYReset"];
+                }
+                end = Game1.GlobalToLocal(end);
+
+                Vector2 start = new Vector2(layer.Properties["StartX"], layer.Properties["StartY"]);
+
+                Vector2 dif = start - end;
+
+                if (layer.Properties.ContainsKey("ParallaxX"))
+                    pos.X += ((float.Parse(layer.Properties["ParallaxX"]) * dif.X) / 100f) - dif.X;
+
+                if (layer.Properties.ContainsKey("ParallaxY"))
+                    pos.Y += ((float.Parse(layer.Properties["ParallaxY"]) * dif.Y) / 100f) - dif.Y;
+
+            }
+
+            Microsoft.Xna.Framework.Rectangle dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, texture.Width * Game1.pixelZoom, texture.Height * Game1.pixelZoom);
+            Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
+            Vector2 oPos = pos;
+            if (wrap)
+            {
+                if (layer.Properties["WrapAround"] != "Y")
+                    while (pos.X > 0)
+                    {
+                        pos.X -= dest.Width;
+                        dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, dest.Width, dest.Height);
+                        Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
+                    }
+                else
+                    while (pos.Y > 0)
+                    {
+                        pos.Y -= dest.Height;
+                        dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, dest.Width, dest.Height);
+                        Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
+                    }
+                pos = oPos;
+                if (layer.Properties["WrapAround"] != "Y")
+                    while (pos.X < Game1.viewport.X + Game1.viewport.Width)
+                    {
+                        pos.X += dest.Width;
+                        dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, dest.Width, dest.Height);
+                        Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
+                    }
+                else
+                    while (pos.Y < Game1.viewport.Y + Game1.viewport.Height)
+                    {
+                        pos.Y += dest.Height;
+                        dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, dest.Width, dest.Height);
+                        Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
+                    }
+            }
+        }
+
 
         public static Map switchLayers(this Map t, string layer1, string layer2)
         {
