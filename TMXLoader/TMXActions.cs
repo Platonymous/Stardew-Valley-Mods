@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using PyTK;
 using PyTK.Extensions;
 using PyTK.Lua;
@@ -163,7 +164,26 @@ namespace TMXLoader
                 }
                 var shop = new ShopMenu(priceAndStock, 0,  null);
                 if (text.Count > 2)
+                {
+                    shop.setUpShopOwner(text[2]);
                     shop.portraitPerson = Game1.getCharacterFromName(text[2]);
+                    if (shop.portraitPerson != null)
+                    {
+                        shop.setUpShopOwner(text[2]);
+                        shop.portraitPerson = Game1.getCharacterFromName(text[2]);
+                    }
+                    else
+                    {
+                        var npc = new NPC(null, Vector2.Zero, "Town", 0, text[2].Split('.')[0], false, null, TMXLoaderMod.helper.Content.Load<Texture2D>(@"Portraits/" + text[2], ContentSource.GameContent));
+                        shop.portraitPerson = npc;
+                        Game1.removeThisCharacterFromAllLocations(npc);
+                    }
+                }
+                if (text.Count > 3) {
+                    string prefix = text[0] + " " + text[1] + " " + text[2] + " ";
+                    string shopText = action.Replace(prefix, "");
+                    shop.potraitPersonDialogue = Game1.parseText(shopText, Game1.dialogueFont, 304);
+                }
                 Game1.activeClickableMenu = shop;
                 return true;
             }

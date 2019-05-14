@@ -96,18 +96,25 @@ namespace TMXLoader
 
                         if(saved != null)
                         {
-                            if (saved.Objects.Count() > 0) {
-                                inGame.Objects.Clear();
+                            inGame.Objects.Clear();
+                            if (saved.Objects.Count() > 0)
                                 foreach (var obj in saved.Objects.Keys)
                                     inGame.Objects.Add(obj,saved.Objects[obj]);
-                            }
 
+                            inGame.terrainFeatures.Clear();
                             if (saved.terrainFeatures.Count() > 0)
-                            {
-                                inGame.terrainFeatures.Clear();
                                 foreach (var obj in saved.terrainFeatures.Keys)
                                     inGame.terrainFeatures.Add(obj, saved.terrainFeatures[obj]);
-                            }
+
+                            inGame.debris.Clear();
+                            if (saved.debris.Count() > 0)
+                                foreach (var obj in saved.debris)
+                                    inGame.debris.Add(obj);
+
+                            inGame.largeTerrainFeatures.Clear();
+                            if (saved.largeTerrainFeatures.Count > 0)
+                                foreach (var obj in saved.largeTerrainFeatures)
+                                    inGame.largeTerrainFeatures.Add(obj);
                         }
 
                         PyTK.CustomElementHandler.SaveHandler.RebuildAll(inGame, Game1.locations);
@@ -236,7 +243,12 @@ namespace TMXLoader
                 }
 
                 foreach (TileShop shop in tmxPack.shops)
+                {
                     tileShops.AddOrReplace(shop.id, shop.inventory);
+                    foreach (string path in shop.portraits)
+                        pack.LoadAsset<Texture2D>(path).inject(@"Portraits/"+Path.GetFileNameWithoutExtension(path));
+
+                }
 
                 foreach (NPCPlacement edit in tmxPack.festivalSpots)
                 {
