@@ -2,6 +2,6 @@
 {
     public class Config
     {
-        public bool water { get; set; } = true;
+        public bool water { get; set; } = false;
     }
 }

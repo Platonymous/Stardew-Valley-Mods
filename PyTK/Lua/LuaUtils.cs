@@ -6,6 +6,8 @@ using StardewValley.Minigames;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using xTile;
+using xTile.ObjectModel;
 using SObject = StardewValley.Object;
 
 
@@ -19,6 +21,50 @@ namespace PyTK.Lua
         public static void log(string text)
         {
             Monitor.Log(text, LogLevel.Info);
+        }
+
+        public static bool setMapProperty(Map map, string property, string value)
+        {
+                map.Properties[property] = value;
+                return true;
+        }
+
+        public static bool setMapProperty(string locationName, string property, string value)
+        {
+            return setMapProperty(Game1.getLocationFromName(locationName).Map, property, value);
+        }
+
+        public static string getMapProperty(Map map, string property)
+        {
+            PropertyValue p = "";
+            if (map.Properties.TryGetValue(property, out p))
+            {
+                return p.ToString();
+            }
+            return "";
+        }
+
+        public static GameLocation getLocation(string locationName)
+        {
+            return Game1.getLocationFromName(locationName);
+        }
+
+        public static string getMapProperty(string locationName, string property)
+        {
+            return getMapProperty(Game1.getLocationFromName(locationName).Map, property);
+        }
+
+        public static void updateWarps(string locationName)
+        {
+            updateWarps(Game1.getLocationFromName(locationName));
+        }
+
+        public static void updateWarps(GameLocation location)
+        {
+            location.warps.Clear();
+            PropertyValue p = "";
+            if (location.Map.Properties.TryGetValue("Warp", out p) && p != "")
+                Helper.Reflection.GetMethod(location, "updateWarps").Invoke();
         }
 
         public static bool setGameValue(string field, object value, int delay = 0, object root = null)
