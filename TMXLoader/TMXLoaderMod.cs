@@ -33,7 +33,7 @@ namespace TMXLoader
         internal static Dictionary<string, List<TileShopItem>> tileShops = new Dictionary<string, List<TileShopItem>>();
         internal static Config config;
         internal static SaveData saveData = new SaveData();
-        internal static List<GameLocation> addedLocations = new List<GameLocation>();
+        internal static List<MapEdit> addedLocations = new List<MapEdit>();
 
 
         public override void Entry(IModHelper helper)
@@ -51,31 +51,47 @@ namespace TMXLoader
                 saveData = new SaveData();
                 saveData.Locations = new List<SaveLocation>();
 
-                foreach (var location in addedLocations)
+                foreach (var l in addedLocations)
                 {
-                    PyTK.CustomElementHandler.SaveHandler.ReplaceAll(location, Game1.locations);
-                    string objects = "";
+                    if (Game1.getLocationFromName(l.name) is GameLocation location)
+                    {
+                        PyTK.CustomElementHandler.SaveHandler.ReplaceAll(location, Game1.locations);
+                        string objects = "";
 
-                    XmlWriterSettings settings = new XmlWriterSettings();
-                    settings.ConformanceLevel = ConformanceLevel.Auto;
-                    settings.CloseOutput = true;
+                        XmlWriterSettings settings = new XmlWriterSettings();
+                        settings.ConformanceLevel = ConformanceLevel.Auto;
+                        settings.CloseOutput = true;
 
-                    StringWriter objWriter = new StringWriter();
-                    using (var writer = XmlWriter.Create(objWriter, settings))
-                        SaveGame.locationSerializer.Serialize(writer, location);
+                        StringWriter objWriter = new StringWriter();
+                        using (var writer = XmlWriter.Create(objWriter, settings))
+                            SaveGame.locationSerializer.Serialize(writer, location);
 
-                    objects = objWriter.ToString();
+                        objects = objWriter.ToString();
 
-                    saveData.Locations.Add(new SaveLocation(location.Name, objects));
+                        saveData.Locations.Add(new SaveLocation(location.Name, objects));
+                    }
                 }
 
                 Helper.Data.WriteSaveData<SaveData>("Locations", saveData);
             };
 
+            helper.Events.GameLoop.DayStarted += (s,e) =>
+            {
+                foreach (var location in addedLocations)
+                    if (Game1.getLocationFromName(location.name) is GameLocation l)
+                        l.updateSeasonalTileSheets();
+            };
+
             helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
-                foreach(var location in addedLocations)
-                    Game1.locations.Add(location);
+                foreach (var location in addedLocations)
+                {
+                    if (Game1.getLocationFromName(location.name) == null)
+                    {
+                        GameLocation l = addLocation(location);
+                        l.updateSeasonalTileSheets();
+                    }
+                }
 
                 XmlReaderSettings settings = new XmlReaderSettings();
                 settings.ConformanceLevel = ConformanceLevel.Auto;
@@ -201,6 +217,46 @@ namespace TMXLoader
             TileAction OpenShop = new TileAction("OpenShop", TMXActions.shopAction).register();
         }
 
+        private GameLocation addLocation(MapEdit edit)
+        {
+            GameLocation location;
+            if (edit.type == "Deco")
+                location = new DecoratableLocation(Path.Combine("Maps", edit.name), edit.name);
+            else
+                location = new GameLocation(Path.Combine("Maps", edit.name), edit.name);
+
+            if (edit._map.Properties.ContainsKey("Outdoors") && edit._map.Properties["Outdoors"] == "F")
+            {
+                location.IsOutdoors = false;
+                try
+                {
+                    location.loadLights();
+                }
+                catch
+                {
+
+                }
+                location.IsOutdoors = false;
+            }
+
+            if (edit._map.Properties.ContainsKey("IsGreenHouse"))
+                location.IsGreenhouse = true;
+
+            if (edit._map.Properties.ContainsKey("IsStructure"))
+                location.isStructure.Value = true;
+
+            if (edit._map.Properties.ContainsKey("IsFarm"))
+                location.IsFarm = true;
+
+            if (!Game1.locations.Contains(location))
+                Game1.locations.Add(location);
+
+            location.seasonUpdate(Game1.currentSeason);
+
+            return location;
+
+        }
+
         private void loadContentPacks()
         {
             foreach (StardewModdingAPI.IContentPack pack in Helper.ContentPacks.GetOwned())
@@ -282,32 +338,9 @@ namespace TMXLoader
                     Map map = TMXContent.Load(edit.file, Helper,pack);
                     editWarps(map, edit.addWarps, edit.removeWarps, map);
                     map.inject("Maps/" + edit.name);
-                    GameLocation location;
-                    if (edit.type == "Deco")
-                        location = new DecoratableLocation(Path.Combine("Maps", edit.name), edit.name);
-                    else
-                        location = new GameLocation(Path.Combine("Maps", edit.name), edit.name);
 
-                    if (map.Properties.ContainsKey("Outdoors") && map.Properties["Outdoors"] == "F")
-                    {
-                        location.IsOutdoors = false;
-                        location.loadLights();
-                        location.IsOutdoors = false;
-                    }
-
-                    if (map.Properties.ContainsKey("IsGreenHouse"))
-                        location.IsGreenhouse = true;
-
-                    if (map.Properties.ContainsKey("IsStructure"))
-                        location.isStructure.Value = true;
-
-                    if (map.Properties.ContainsKey("IsFarm"))
-                        location.IsFarm = true;
-
-
-
-                    addedLocations.Add(location);
-                    location.seasonUpdate(Game1.currentSeason);
+                    edit._map = map;
+                    addedLocations.Add(edit);
                     //mapsToSync.AddOrReplace(edit.name, map);
                 }
 

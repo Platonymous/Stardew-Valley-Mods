@@ -1,4 +1,6 @@
-﻿namespace TMXLoader
+﻿using xTile;
+
+namespace TMXLoader
 {
     internal class MapEdit
     {
@@ -14,5 +16,7 @@
 
         public bool isGreenhouse { get; set; } = false;
         public string type { get; set; } = "Location";
+
+        internal Map _map = null;
     }
 }
