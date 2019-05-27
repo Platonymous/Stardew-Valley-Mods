@@ -1,0 +1,20 @@
+﻿{
+  "leader": "Bestenliste",
+  "white": "Weiß",
+  "black": "Schwarz",
+  "spectator": "Zuschauer",
+  "waiting": "Warte auf Gegenspieler",
+  "win": "{Player} siegt",
+  "checkmateWin": "Schachmatt!",
+  "surrenderWin": "Aufgegeben!",
+  "castling": "Rochade",
+  "promotion": "Umwandlung",
+  "yes": "Ja",
+  "no": "Nein",
+  "queen": "Dame",
+  "knight": "Springer",
+  "close": "Schließen",
+  "reset": "Zurücksetzen",
+  "last": "Letzte Ergebnisse",
+  "surrender": "Aufgeben"
+}

@@ -1,0 +1,20 @@
+﻿{
+  "leader": "Leaderboard",
+  "white": "White",
+  "black": "Black",
+  "spectator": "Spectator",
+  "waiting": "Waiting for other player",
+  "win": "{Player} won",
+  "checkmateWin": "Checkmate!",
+  "surrenderWin": "Surrender!",
+  "castling": "Castling",
+  "promotion": "Promotion",
+  "yes": "Yes",
+  "no": "no",
+  "queen": "Queen",
+  "knight": "Knight",
+  "close": "Close",
+  "reset": "Reset",
+  "last": "Last Results",
+  "surrender": "Surrender"
+}

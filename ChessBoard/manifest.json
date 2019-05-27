@@ -1,0 +1,16 @@
+{
+  "Name": "Chess",
+  "Author": "Platonymous",
+  "Version": "0.9.0",
+  "Description": "Play Chess.",
+  "UniqueID": "Platonymous.Chess",
+  "EntryDll": "ChessBoard.dll",
+  "MinimumApiVersion": "2.11.2",
+  "UpdateKeys": [ "Nexus:3976" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit",
+      "MinimumVersion": "1.8.1"
+    }
+  ]
+}
