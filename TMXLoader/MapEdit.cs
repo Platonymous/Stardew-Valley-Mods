@@ -17,6 +17,8 @@ namespace TMXLoader
         public bool isGreenhouse { get; set; } = false;
         public string type { get; set; } = "Location";
 
+        public string conditions { get; set; } = "";
+
         internal Map _map = null;
     }
 }

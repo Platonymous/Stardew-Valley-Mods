@@ -7,19 +7,16 @@ using PyTK.Types;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using xTile;
-using xTile.Layers;
 using Harmony;
 using System.Reflection;
 using System.Linq;
-using xTile.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Locations;
 using System.Xml;
-using StardewValley.TerrainFeatures;
+using xTile.ObjectModel;
 
 namespace TMXLoader
 {
@@ -34,6 +31,8 @@ namespace TMXLoader
         internal static Config config;
         internal static SaveData saveData = new SaveData();
         internal static List<MapEdit> addedLocations = new List<MapEdit>();
+        internal static List<string> festivals = new List<string>();
+        internal static List<TMXAssetEditor> conditionals = new List<TMXAssetEditor>(); 
 
 
         public override void Entry(IModHelper helper)
@@ -42,12 +41,32 @@ namespace TMXLoader
             TMXLoaderMod.helper = Helper;
             monitor = Monitor;
 
+
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-           // helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
-            helper.Events.Player.Warped += OnWarped;
+            // helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+
+            helper.Events.Display.RenderingHud += (s, e) =>
+            {
+                PropertyValue rain = "";
+
+                if (!(Game1.currentLocation is GameLocation location) || !(location.Map is Map map) || !map.Properties.TryGetValue("Raining", out rain))
+                    return;
+
+                if (Game1.isRaining && Game1.currentLocation.IsOutdoors && (!Game1.currentLocation.Name.Equals("Desert") && !(Game1.currentLocation is Summit)) && (!Game1.eventUp || Game1.currentLocation.isTileOnMap(new Vector2((float)(Game1.viewport.X / 64), (float)(Game1.viewport.Y / 64)))))
+                    return;
+
+                if (Game1.isRaining || rain == "Always")
+                    for (int index = 0; index < Game1.rainDrops.Length; ++index)
+                        Game1.spriteBatch.Draw(Game1.rainTexture, Game1.rainDrops[index].position, new Microsoft.Xna.Framework.Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.rainTexture, Game1.rainDrops[index].frame, -1, -1)), Color.White);
+            };
+
+            helper.Events.Player.Warped += Player_Warped;
 
             helper.Events.GameLoop.Saving += (s, e) =>
             {
+                if (!Game1.IsMasterGame)
+                    return;
+
                 saveData = new SaveData();
                 saveData.Locations = new List<SaveLocation>();
 
@@ -75,13 +94,6 @@ namespace TMXLoader
                 Helper.Data.WriteSaveData<SaveData>("Locations", saveData);
             };
 
-            helper.Events.GameLoop.DayStarted += (s,e) =>
-            {
-                foreach (var location in addedLocations)
-                    if (Game1.getLocationFromName(location.name) is GameLocation l)
-                        l.updateSeasonalTileSheets();
-            };
-
             helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
                 foreach (var location in addedLocations)
@@ -92,6 +104,9 @@ namespace TMXLoader
                         l.updateSeasonalTileSheets();
                     }
                 }
+
+                if (!Game1.IsMasterGame)
+                    return;
 
                 XmlReaderSettings settings = new XmlReaderSettings();
                 settings.ConformanceLevel = ConformanceLevel.Auto;
@@ -137,6 +152,24 @@ namespace TMXLoader
                         inGame.DayUpdate(Game1.dayOfMonth);
                     }
             };
+        }
+
+        private void Player_Warped(object sender, WarpedEventArgs e)
+        {
+            foreach (TMXAssetEditor editor in conditionals)
+                if (e.NewLocation is GameLocation gl && gl.mapPath.Value is string mp && mp.Contains(editor.assetName))
+                {
+                    if (PyTK.PyUtils.checkEventConditions(editor.conditions) is bool c && c != editor.lastCheck)
+                    {
+                        editor.lastCheck = c;
+                        Helper.Content.InvalidateCache(e.NewLocation.mapPath.Value);
+                        e.NewLocation.updateSeasonalTileSheets();
+                    }
+                }
+
+            foreach (string map in festivals)
+                if(e.NewLocation is GameLocation gl && gl.mapPath.Value is string mp && mp.Contains(map))
+                    Helper.Content.InvalidateCache(e.NewLocation.mapPath.Value);
         }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -202,12 +235,6 @@ namespace TMXLoader
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 
-        private void OnWarped(object sender, WarpedEventArgs e)
-        {
-            if (e.IsLocalPlayer && e.NewLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
-                TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero,"Map");
-        }
-
         private void setTileActions()
         {
             TileAction Lock = new TileAction("Lock", TMXActions.lockAction).register();
@@ -220,6 +247,7 @@ namespace TMXLoader
         private GameLocation addLocation(MapEdit edit)
         {
             GameLocation location;
+            Monitor.Log("Adding:" + edit.name);
             if (edit.type == "Deco")
                 location = new DecoratableLocation(Path.Combine("Maps", edit.name), edit.name);
             else
@@ -287,14 +315,7 @@ namespace TMXLoader
                     string filePath = Path.Combine(pack.DirectoryPath, edit.file);
                     Map map = TMXContent.Load(edit.file, Helper, pack);
 
-                    if(edit.info != "none")
-                        foreach (Layer layer in map.Layers)
-                            layer.Id = layer.Id.Replace("Spouse", edit.info);
-
-                    map.Properties.Add("EntryAction", "Lua Platonymous.TMXLoader.SpouseRoom entry");
-                    Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
-                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), null, true);
-                    map.injectAs("Maps/" + edit.name);
+                    Helper.Content.AssetEditors.Add(new TMXAssetEditor(edit, map, EditType.SpouseRoom));
                   //  mapsToSync.AddOrReplace(edit.name, map);
                 }
 
@@ -303,23 +324,12 @@ namespace TMXLoader
                     tileShops.AddOrReplace(shop.id, shop.inventory);
                     foreach (string path in shop.portraits)
                         pack.LoadAsset<Texture2D>(path).inject(@"Portraits/"+Path.GetFileNameWithoutExtension(path));
-
                 }
 
                 foreach (NPCPlacement edit in tmxPack.festivalSpots)
                 {
-                    Map reference = Helper.Content.Load<Map>("Maps/Town", ContentSource.GameContent);
-                    Map original = Helper.Content.Load<Map>("Maps/" + edit.map, ContentSource.GameContent);
-                    Texture2D springTex = Helper.Content.Load<Texture2D>("Maps/spring_outdoorsTileSheet", ContentSource.GameContent);
-                    Dictionary<string, string> source = Helper.Content.Load<Dictionary<string, string>>("Data\\NPCDispositions",ContentSource.GameContent);
-                    int index = source.Keys.ToList().IndexOf(edit.name);
-                    TileSheet spring = original.GetTileSheet("ztemp");
-                    if (spring == null) {
-                        spring = new TileSheet("ztemp", original, "Maps/spring_outdoorsTileSheet", new xTile.Dimensions.Size(springTex.Width,springTex.Height), original.TileSheets[0].TileSize);
-                        original.AddTileSheet(spring);
-                    }
-                    original.GetLayer("Set-Up").Tiles[edit.position[0], edit.position[1]] = new StaticTile(original.GetLayer("Set-Up"), spring, BlendMode.Alpha, (index * 4) + edit.direction);
-                    original.injectAs("Maps/" + edit.map);
+                    festivals.AddOrReplace(edit.map);
+                    Helper.Content.AssetEditors.Add(new TMXAssetEditor(edit, EditType.Festival));
                    // mapsToSync.AddOrReplace(edit.map, original);
                 }
 
@@ -336,7 +346,7 @@ namespace TMXLoader
                 {
                     string filePath = Path.Combine(pack.DirectoryPath, edit.file);
                     Map map = TMXContent.Load(edit.file, Helper,pack);
-                    editWarps(map, edit.addWarps, edit.removeWarps, map);
+                    TMXAssetEditor.editWarps(map, edit.addWarps, edit.removeWarps, map);
                     map.inject("Maps/" + edit.name);
 
                     edit._map = map;
@@ -348,9 +358,7 @@ namespace TMXLoader
                 {
                     string filePath = Path.Combine(pack.DirectoryPath, edit.file);
                     Map map = TMXContent.Load(edit.file, Helper, pack);
-                    Map original = edit.retainWarps ? Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent) : map;
-                    editWarps(map, edit.addWarps, edit.removeWarps, original);
-                    map.injectAs("Maps/" + edit.name);
+                    addAssetEditor(new TMXAssetEditor(edit, map, EditType.Replace));
                    // mapsToSync.AddOrReplace(edit.name, map);
                 }
 
@@ -358,53 +366,24 @@ namespace TMXLoader
                 {
                     string filePath = Path.Combine(pack.DirectoryPath, edit.file);
                     Map map = TMXContent.Load(edit.file, Helper, pack);
-
-                    Map original = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
-                    Rectangle? sourceArea = null;
-
-                    if (edit.sourceArea.Length == 4)
-                        sourceArea = new Rectangle(edit.sourceArea[0], edit.sourceArea[1], edit.sourceArea[2], edit.sourceArea[3]);
-
-                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, edit.removeEmpty);
-                    editWarps(map, edit.addWarps, edit.removeWarps, original);
-                    map.injectAs("Maps/" + edit.name);
+                    addAssetEditor(new TMXAssetEditor(edit, map, EditType.Merge));
                    // mapsToSync.AddOrReplace(edit.name, map);
                 }
 
                 foreach (MapEdit edit in tmxPack.onlyWarps)
                 {
-                    Map map = Helper.Content.Load<Map>("Maps/" + edit.name, ContentSource.GameContent);
-                    editWarps(map, edit.addWarps, edit.removeWarps, map);
-                    map.injectAs("Maps/" + edit.name);
+                    addAssetEditor(new TMXAssetEditor(edit, null, EditType.Warps));
                    // mapsToSync.AddOrReplace(edit.name, map);
                 }
             }
         }
 
-        private void editWarps(Map map, string[] addWarps, string[] removeWarps, Map original = null)
+        private void addAssetEditor(TMXAssetEditor editor)
         {
-            if (!map.Properties.ContainsKey("Warp"))
-                map.Properties.Add("Warp", "");
+            if (editor.conditions != "")
+                conditionals.Add(editor);
 
-            string warps = "";
-
-            if (original != null && original.Properties.ContainsKey("Warp") && !(removeWarps.Length > 0 && removeWarps[0] == "all"))
-                warps = original.Properties["Warp"];
-
-            if(addWarps.Length > 0)
-                warps = ( warps.Length > 9 ? warps + " " : "") + String.Join(" ", addWarps);
-
-            if(removeWarps.Length > 0 && removeWarps[0] != "all")
-            {
-                foreach(string warp in removeWarps)
-                {
-                    warps = warps.Replace(warp + " ", "");
-                    warps = warps.Replace(" " + warp, "");
-                    warps = warps.Replace(warp, "");
-                }
-            }
-
-            map.Properties["Warp"] = warps;
+            Helper.Content.AssetEditors.Add(editor);
         }
 
         private void convert()
@@ -439,9 +418,9 @@ namespace TMXLoader
             string exportFolderPath = Path.Combine(Helper.DirectoryPath, "Converter", "FullMapExport");
             DirectoryInfo exportFolder = new DirectoryInfo(exportFolderPath);
             DirectoryInfo modFolder = new DirectoryInfo(Helper.DirectoryPath);
-            string contentPath = PyUtils.getContentFolder();
+            string contentPath = PyUtils.ContentPath;
 
-            if (!exportFolder.Exists && contentPath != null)
+            if (!exportFolder.Exists && contentPath != null && contentPath != "")
                 exportFolder.Create();
             else
                 return;

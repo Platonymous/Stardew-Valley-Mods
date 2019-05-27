@@ -38,6 +38,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TMXAssetEditor.cs" />
     <Compile Include="Compatibility\CustomFarmTypes.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="NPCPlacement.cs" />

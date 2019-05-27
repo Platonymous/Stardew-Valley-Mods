@@ -1,0 +1,137 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using PyTK.Extensions;
+using StardewModdingAPI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using xTile;
+using xTile.Layers;
+using xTile.Tiles;
+
+namespace TMXLoader
+{
+    public enum EditType
+    {
+        Merge,
+        Warps,
+        Replace,
+        Festival,
+        SpouseRoom
+    }
+    class TMXAssetEditor : IAssetEditor
+    {
+
+        private MapEdit edit;
+        private NPCPlacement npcedit;
+        private Map newMap;
+        private EditType type;
+        public string assetName;
+        public string conditions;
+
+        public bool lastCheck = true;
+
+        public TMXAssetEditor(MapEdit edit, Map map, EditType type)
+        {
+            this.edit = edit;
+            this.type = type;
+            this.newMap = map;
+            this.assetName = edit.name;
+            this.conditions = edit.conditions;
+            lastCheck = conditions == "";
+        }
+
+        public TMXAssetEditor(NPCPlacement npcedit, EditType type)
+        {
+            this.npcedit = npcedit;
+            this.type = type;
+            this.assetName = npcedit.map;
+            this.conditions = "";
+        }
+
+        public bool CanEdit<T>(IAssetInfo asset)
+        {
+            return asset.AssetNameEquals("Maps/" + assetName);
+        }
+
+        public void Edit<T>(IAssetData asset)
+        {
+            if (!lastCheck)
+                return;
+            Map map = newMap;
+            Map original = (Map) asset.Data ;
+
+
+            if (type == EditType.Merge)
+            {
+                Rectangle? sourceArea = null;
+
+                if (edit.sourceArea.Length == 4)
+                    sourceArea = new Rectangle(edit.sourceArea[0], edit.sourceArea[1], edit.sourceArea[2], edit.sourceArea[3]);
+
+                map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, edit.removeEmpty);
+                editWarps(map, edit.addWarps, edit.removeWarps, original);
+            }else if(type == EditType.Warps)
+                editWarps(original, edit.addWarps, edit.removeWarps, original);
+            else if(type == EditType.Replace)
+            {
+                original = edit.retainWarps ? original : map;
+                editWarps(map, edit.addWarps, edit.removeWarps, original);
+            }else if(type == EditType.Festival)
+            {
+                Texture2D springTex = TMXLoaderMod.helper.Content.Load<Texture2D>("Maps/spring_outdoorsTileSheet", ContentSource.GameContent);
+                Dictionary<string, string> source = TMXLoaderMod.helper.Content.Load<Dictionary<string, string>>("Data\\NPCDispositions", ContentSource.GameContent);
+                int index = source.Keys.ToList().IndexOf(npcedit.name);
+                TileSheet spring = original.GetTileSheet("ztemp");
+                if (spring == null)
+                {
+                    spring = new TileSheet("ztemp", original, "Maps/spring_outdoorsTileSheet", new xTile.Dimensions.Size(springTex.Width, springTex.Height), original.TileSheets[0].TileSize);
+                    original.AddTileSheet(spring);
+                }
+                if(index >= 0)
+                    original.GetLayer("Set-Up").Tiles[npcedit.position[0], npcedit.position[1]] = new StaticTile(original.GetLayer("Set-Up"), spring, BlendMode.Alpha, (index * 4) + npcedit.direction);
+            }else if(type == EditType.SpouseRoom)
+            {
+                if (edit.info != "none")
+                    foreach (Layer layer in map.Layers)
+                        layer.Id = layer.Id.Replace("Spouse", edit.info);
+
+                map.Properties.Add("EntryAction", "Lua Platonymous.TMXLoader.SpouseRoom entry");
+                map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), null, true);
+            }
+
+            if (map == null)
+                map = original;
+
+            asset.ReplaceWith(map);
+        }
+
+        public static void editWarps(Map map, string[] addWarps, string[] removeWarps, Map original = null)
+        {
+            if (!map.Properties.ContainsKey("Warp"))
+                map.Properties.Add("Warp", "");
+
+            string warps = "";
+
+            if (original != null && original.Properties.ContainsKey("Warp") && !(removeWarps.Length > 0 && removeWarps[0] == "all"))
+                warps = original.Properties["Warp"];
+
+            if (addWarps.Length > 0)
+                warps = (warps.Length > 9 ? warps + " " : "") + String.Join(" ", addWarps);
+
+            if (removeWarps.Length > 0 && removeWarps[0] != "all")
+            {
+                foreach (string warp in removeWarps)
+                {
+                    warps = warps.Replace(warp + " ", "");
+                    warps = warps.Replace(" " + warp, "");
+                    warps = warps.Replace(warp, "");
+                }
+            }
+
+            map.Properties["Warp"] = warps;
+        }
+    }
+
+
+}

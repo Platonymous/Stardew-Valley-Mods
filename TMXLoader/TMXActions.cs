@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using PyTK;
 using PyTK.Extensions;
-using PyTK.Lua;
 using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
@@ -40,6 +39,9 @@ namespace TMXLoader
                 Dictionary<Item, int[]> priceAndStock = new Dictionary<Item, int[]>();
                 foreach (TileShopItem inventory in items)
                 {
+                    if (!PyUtils.checkEventConditions(inventory.conditions, Game1.player))
+                        continue;
+
                     Item item = null;
 
                     if (inventory.type == "Object")
