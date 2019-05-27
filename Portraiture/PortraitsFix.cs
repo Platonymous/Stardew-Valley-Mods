@@ -34,7 +34,7 @@ namespace Portraiture
         internal static bool Prefix(DialogueBox __instance, SpriteBatch b)
         {
             Dialogue characterDialogue = PortraitureMod.helper.Reflection.GetField<Dialogue>(__instance, "characterDialogue").GetValue();
-            ScaledTexture2D texture = TextureLoader.getPortrait(characterDialogue.speaker.Name);
+            Texture2D texture = TextureLoader.getPortrait(characterDialogue.speaker.Name);
             characterDialogue.speaker.Portrait = texture;
             return true;
         }
@@ -55,7 +55,7 @@ namespace Portraiture
             if (__instance.portraitPerson == null || !(Game1.viewport.Width > 800 && Game1.options.showMerchantPortraits))
                 return;
 
-            ScaledTexture2D texture = TextureLoader.getPortrait(__instance.portraitPerson.Name);
+            Texture2D texture = TextureLoader.getPortrait(__instance.portraitPerson.Name);
             __instance.portraitPerson.Portrait = texture;
             return;
         }
