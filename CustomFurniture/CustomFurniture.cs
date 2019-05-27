@@ -51,10 +51,7 @@ namespace CustomFurniture
             rotatedBoxWidth *= Game1.tileSize;
             rotatedBoxHeight = data.rotatedBoxHeight == -1 ? data.boxWidth : data.rotatedBoxHeight;
             rotatedBoxHeight *= Game1.tileSize;
-            string folder = new DirectoryInfo(data.folderName).Name;
-            string tkey = $"{folder}/{data.texture}";
-            if(Textures.ContainsKey(tkey))
-                texture = Textures[($"{folder}/{data.texture}")];
+            setTexture();
             animationFrames = data.animationFrames;
             this.data = data;
             frameWidth = data.setWidth;
@@ -98,6 +95,14 @@ namespace CustomFurniture
             price.Value = data.price;
 
             fRotation = FurnitureRotation.horizontal;
+        }
+
+        private void setTexture()
+        {
+            string folder = new DirectoryInfo(data.folderName).Name;
+            string tkey = $"{folder}/{data.texture}";
+            if (Textures.ContainsKey(tkey))
+                texture = Textures[($"{folder}/{data.texture}")];
         }
 
         protected override string loadDisplayName()
@@ -201,11 +206,17 @@ namespace CustomFurniture
 
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
         {
+            if (texture == null)
+                setTexture();
+
             spriteBatch.Draw(texture, location + new Vector2((float)(Game1.tileSize / 2), (float)(Game1.tileSize / 2)), new Rectangle?(defaultSourceRect), color * transparency, 0.0f, new Vector2((float)(defaultSourceRect.Width / 2), (float)(defaultSourceRect.Height / 2)), 1f * getScaleSize() * scaleSize, SpriteEffects.None, layerDepth);
         }
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1f)
         {
+            if (texture == null)
+                setTexture();
+
             counter++;
             counter = counter > skipFrame ? 0 : counter;
             frame = counter == 0 ? frame + 1 : frame;
