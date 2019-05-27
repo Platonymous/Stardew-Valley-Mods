@@ -33,6 +33,7 @@ namespace ArcadePong
             zoom = Game1.options.zoomLevel;
             Game1.options.zoomLevel = 1.0f;
             Game1.currentMinigame = new PongMinigame();
+            ArcadePongMod.runPong = true;
             return true;
         }
 

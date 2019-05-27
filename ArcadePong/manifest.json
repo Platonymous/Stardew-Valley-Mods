@@ -1,7 +1,7 @@
 {
   "Name": "Arcade Pong",
   "Author": "Platonymous",
-  "Version": "1.0.4",
+  "Version": "1.1.1",
   "Description": "Takes Cat's Pong and puts it where it belongs.",
   "UniqueID": "Platonymous.ArcadePong",
   "EntryDll": "ArcadePong.dll",
@@ -9,7 +9,8 @@
   "UpdateKeys": [ "Nexus:2044" ],
   "Dependencies": [
     {
-      "UniqueID": "cat.Pong"
+      "UniqueID": "cat.Pong",
+      "MinimumVersion": "1.1.0"
     },
     {
       "UniqueID": "Platonymous.Toolkit"

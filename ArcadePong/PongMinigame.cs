@@ -5,19 +5,16 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Minigames;
 using System;
+using System.Reflection;
 
 namespace ArcadePong
 {
     public class PongMinigame : IMinigame
     {
-       internal static object game;
-        internal static IModHelper helper => ArcadePongMod.pongHelper;
-        internal static bool setEvents = false;
         internal static bool quit = false;
 
         public PongMinigame()
         {
-            
         }
 
         public void changeScreenSize()
@@ -27,7 +24,15 @@ namespace ArcadePong
         public void draw(SpriteBatch b)
         {
             b.Begin();
-            helper.Reflection.GetMethod(game, "Draw").Invoke(b);
+            if (ArcadePongMod.pong != null)
+            {
+                var cmenu = Type.GetType("Pong.ModEntry, Pong").GetField("currentMenu", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ArcadePongMod.pong);
+                if (cmenu != null)
+                {
+                    cmenu.GetType().GetMethod("Update").Invoke(cmenu,null);
+                    cmenu.GetType().GetMethod("Draw").Invoke(cmenu, new[] { Game1.spriteBatch });
+                }
+            }
             b.End();
         }
 
@@ -83,8 +88,6 @@ namespace ArcadePong
 
         public bool tick(GameTime time)
         {
-            Game1.activeClickableMenu = null;
-            helper.Reflection.GetMethod(game, "Update").Invoke();
             return quit;
         }
 
