@@ -197,6 +197,46 @@ namespace PyTK.Extensions
             return palette[index];
         }
 
+        public static float GetSquaredDistance(this Vector2 point1, Vector2 point2)
+        {
+            float a = (point1.X - point2.X);
+            float b = (point1.Y - point2.Y);
+            return (a * a) + (b * b);
+        }
+
+        public static float GetSquaredDistance(this Point point1, Point point2)
+        {
+            float a = (point1.X - point2.X);
+            float b = (point1.Y - point2.Y);
+            return (a * a) + (b * b);
+        }
+
+        public static Point GetPoint(this Vector2 vector)
+        {
+            return new Point((int)vector.X, (int)vector.Y);
+        }
+
+        public static Vector2 GetVector2(this Point point)
+        {
+            return new Vector2(point.X, point.Y);
+        }
+
+        public static Texture2D ScaleUpTexture(this Texture2D texture, float scale, bool asScaledTexture2D = true, Rectangle? forcedSourceRectangle = null)
+        {
+            Color[] orgColor = new Color[texture.Width * texture.Height];
+            Color[] scaledColor = new Color[(int)(orgColor.Length * scale)];
+            int sWidth = (int)(texture.Width * scale);
+            int sHeight = (int)(texture.Height * scale);
+            Texture2D sTexture;
+            using (MemoryStream mem = new MemoryStream())
+            {
+                texture.SaveAsPng(mem, sWidth, sHeight);
+                sTexture = Texture2D.FromStream(texture.GraphicsDevice, mem);
+            }
+
+                return sTexture;
+        }
+
     }
 }
 

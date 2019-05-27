@@ -14,6 +14,9 @@ using NCalc;
 using Harmony;
 using System.Reflection;
 using PyTK.Lua;
+using PyTK.Extensions;
+using xTile.Layers;
+using xTile;
 
 namespace PyTK
 {
@@ -21,6 +24,19 @@ namespace PyTK
     {
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
+        internal static string _contentPath = "";
+        public static string ContentPath
+        {
+            get
+            {
+                if (_contentPath == "")
+                {
+                    _contentPath = getContentFolder();
+                    Monitor.Log("ContentPath:" + _contentPath);
+                }
+                return _contentPath;
+            }
+        }
 
         public static bool CheckEventConditions(string conditions, object caller = null)
         {
@@ -32,9 +48,76 @@ namespace PyTK
 
         }
 
+        public static void checkDrawConditions(Map map)
+        {
+            foreach (Layer layer in map.Layers.Where(l => l.Properties.ContainsKey("DrawConditions")))
+                layer.Properties.AddOrReplace("DrawConditionsResult", PyUtils.CheckEventConditions(layer.Properties["DrawConditions"], layer) ? "T" : "F");
+        }
+
+        internal static List<GameLocation> getWarpLocations(GameLocation location)
+        {
+            List<GameLocation> locations = new List<GameLocation>();
+
+            foreach (Warp warp in location.warps)
+                if (Game1.getLocationFromName(warp.TargetName) is GameLocation l)
+                    locations.AddOrReplace(l);
+
+            return locations;
+        }
+
+        public static void adjustWarps(string name)
+        {
+            if (Game1.getLocationFromName(name) is GameLocation target)
+                foreach (var location in PyUtils.getWarpLocations(target))
+                    PyUtils.adjustInboundWarps(location, target);
+            else
+                Monitor.Log("Could not find Location: " + name);
+        }
+
+        internal static List<GameLocation> adjustInboundWarps(GameLocation location, GameLocation toLocation = null)
+        {
+            if (location == null)
+                return new List<GameLocation>();
+
+            List<GameLocation> locations = new List<GameLocation>();
+
+            foreach (Warp warp in location.warps)
+            {
+                Point move = Point.Zero;
+
+                if (warp.X >= location.map.DisplayWidth / Game1.tileSize)
+                    move.X++;
+                else if (warp.X <= 0)
+                    move.X--;
+                else if (warp.Y >= location.map.DisplayHeight / Game1.tileSize)
+                    move.Y++;
+                else
+                    move.Y--;
+
+                var target = Game1.getLocationFromName(warp.TargetName);
+                if (target == null)
+                    continue;
+
+                if (toLocation == null || target == toLocation)
+                {
+                    locations.AddOrReplace(target);
+                    Warp inbound = target.warps.Where(w => w.TargetName == location.Name).OrderBy(w => LuaUtils.getDistance(new Vector2(w.X + move.X, w.Y + move.Y), new Vector2(warp.TargetX, warp.TargetY))).First();
+                    if (inbound != null && !(inbound.X == 0 && inbound.Y == 0))
+                    {
+                        warp.TargetX = inbound.X + move.X;
+                        warp.TargetY = inbound.Y + move.Y;
+                    }
+                }
+            }
+
+            Monitor.Log("Adjusted Warps: "+location.Name,LogLevel.Trace);
+
+            return locations;
+        }
+
         public static string getContentFolder()
         {
-            string folder = Path.Combine(Environment.CurrentDirectory, Game1.content.RootDirectory);
+            string folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Game1.content.RootDirectory);
             DirectoryInfo directoryInfo = new DirectoryInfo(folder);
 
             if (directoryInfo.Exists)
@@ -45,8 +128,10 @@ namespace PyTK
             directoryInfo = new DirectoryInfo(folder);
             if (directoryInfo.Exists)
                 return folder;
+            else
+                Monitor.Log("DebugF:" + folder);
 
-            return null;
+            return @"C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content";
         }
 
         public static bool checkEventConditions(string conditions, object caller = null)
@@ -153,6 +238,8 @@ namespace PyTK
         {
             return getRectangle(1, 1, Color.White);
         }
+
+
 
         public static byte[] BitArrayToByteArray(BitArray bits)
         {

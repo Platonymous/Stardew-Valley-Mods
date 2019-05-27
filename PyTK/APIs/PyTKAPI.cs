@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using PyTK.Types;
 using System;
 using System.IO;
+using PyTK.Extensions;
 
 namespace PyTK.APIs
 {
@@ -91,16 +92,7 @@ namespace PyTK.APIs
 
         public Texture2D ScaleUpTexture(Texture2D texture, float scale, bool asScaledTexture2D = true, Rectangle? forcedSourceRectangle = null)
         {
-            Color[] orgColor = new Color[texture.Width * texture.Height];
-            Color[] scaledColor = new Color[(int)(orgColor.Length * scale)];
-            int sWidth = (int)(texture.Width * scale);
-            int sHeight = (int)(texture.Height * scale);
-            Texture2D sTexture;
-            using (MemoryStream mem = new MemoryStream())
-            {
-                texture.SaveAsPng(mem, sWidth, sHeight);
-                sTexture = Texture2D.FromStream(texture.GraphicsDevice, mem);
-            }
+            Texture2D sTexture = texture.ScaleUpTexture(scale, asScaledTexture2D, forcedSourceRectangle);
 
             if (!asScaledTexture2D)
                 return sTexture;

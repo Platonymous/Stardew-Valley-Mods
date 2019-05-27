@@ -79,6 +79,22 @@ namespace PyTK.Extensions
             return null;
         }
 
+        public static bool setMapProperty(this Map map, string property, string value)
+        {
+            map.Properties[property] = value;
+            return true;
+        }
+
+        public static string getMapProperty(this Map map, string property)
+        {
+            PropertyValue p = "";
+            if (map.Properties.TryGetValue(property, out p))
+            {
+                return p.ToString();
+            }
+            return "";
+        }
+
         public static bool hasTileSheet(this Map map, TileSheet tilesheet)
         {
             foreach (TileSheet ts in map.TileSheets)
@@ -113,6 +129,9 @@ namespace PyTK.Extensions
 
         private static void drawLayer(Layer layer, Location offset, bool wrap = false)
         {
+            if (layer.Properties.ContainsKey("DrawConditions") && (!layer.Properties.ContainsKey("DrawConditionsResult") || layer.Properties["DrawConditionsResult"] != "T"))
+                    return;
+
             if (layer.Properties.ContainsKey("offsetx") && layer.Properties.ContainsKey("offsety"))
             {
                 offset = new Location(int.Parse(layer.Properties["offsetx"]), int.Parse(layer.Properties["offsety"]));
@@ -125,22 +144,43 @@ namespace PyTK.Extensions
 
             if (!layer.Properties.ContainsKey("StartX"))
             {
-                Vector2 local = Game1.GlobalToLocal(new Vector2(offset.X,offset.Y));
+                Vector2 local = Game1.GlobalToLocal(new Vector2(offset.X, offset.Y));
                 layer.Properties["StartX"] = local.X;
                 layer.Properties["StartY"] = local.Y;
             }
 
-            if (layer.Properties.ContainsKey("AutoScrollX"))
-            {
-                offset.X += int.Parse(layer.Properties["AutoScrollX"]);
-                layer.Properties["offsetx"] = offset.X;
+            if (layer.Properties.ContainsKey("AutoScrollX")) {
+                string[] ax =layer.Properties["AutoScrollX"].ToString().Split(',');
+                int cx = int.Parse(ax[0]);
+                int mx = 1;
+                if (ax.Length > 1)
+                    mx = int.Parse(ax[1]);
+
+                if (cx < 0)
+                    mx *= -1;
+
+                if (Game1.currentGameTime.TotalGameTime.Ticks % cx == 0)
+                    offset.X += mx;
             }
 
             if (layer.Properties.ContainsKey("AutoScrollY"))
             {
-                offset.Y += int.Parse(layer.Properties["AutoScrollY"]);
-                layer.Properties["offsety"] = offset.Y;
+                string[] ay = layer.Properties["AutoScrollY"].ToString().Split(',');
+                int cy = int.Parse(ay[0]);
+                int my = 1;
+                if (ay.Length > 1)
+                    my = int.Parse(ay[1]);
+
+                if (cy < 0)
+                    my *= -1;
+
+                if (Game1.currentGameTime.TotalGameTime.Ticks % cy == 0)
+                    offset.Y += my;
             }
+
+            layer.Properties["offsetx"] = offset.X;
+            layer.Properties["offsety"] = offset.Y;
+
 
 
             if (layer.Properties.ContainsKey("isImageLayer"))
@@ -180,39 +220,26 @@ namespace PyTK.Extensions
             }
 
             Microsoft.Xna.Framework.Rectangle dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, texture.Width * Game1.pixelZoom, texture.Height * Game1.pixelZoom);
-            Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
-            Vector2 oPos = pos;
+            if (!wrap)
+                Game1.spriteBatch.Draw(texture, dest, Color.White * (float)float.Parse(layer.Properties["opacity"]));
+
+            var vp = new Microsoft.Xna.Framework.Rectangle(Game1.viewport.X, Game1.viewport.Y, Game1.viewport.Width, Game1.viewport.Height);
             if (wrap)
             {
-                if (layer.Properties["WrapAround"] != "Y")
-                    while (pos.X > 0)
-                    {
-                        pos.X -= dest.Width;
-                        dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, dest.Width, dest.Height);
-                        Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
-                    }
-                else
-                    while (pos.Y > 0)
-                    {
-                        pos.Y -= dest.Height;
-                        dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, dest.Width, dest.Height);
-                        Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
-                    }
-                pos = oPos;
-                if (layer.Properties["WrapAround"] != "Y")
-                    while (pos.X < Game1.viewport.X + Game1.viewport.Width)
-                    {
-                        pos.X += dest.Width;
-                        dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, dest.Width, dest.Height);
-                        Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
-                    }
-                else
-                    while (pos.Y < Game1.viewport.Y + Game1.viewport.Height)
-                    {
-                        pos.Y += dest.Height;
-                        dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, dest.Width, dest.Height);
-                        Game1.spriteBatch.Draw(texture, dest, Color.White * (float)layer.Properties["opacity"]);
-                    }
+                Vector2 s = pos;
+
+                while (s.X > (vp.X - (dest.Width * 2)) || s.Y > (vp.Y - (dest.Height * 2)))
+                {
+                    s.X -= dest.Width;
+                    s.Y -= dest.Height;
+                }
+
+                Vector2 e = new Vector2(vp.X + vp.Width + (dest.Width*2), vp.Height + vp.Y + (dest.Height * 2));
+
+                for (float x = s.X; x <= e.X; x += dest.Width)
+                    for (Microsoft.Xna.Framework.Rectangle n = new Microsoft.Xna.Framework.Rectangle((int)x, (int)s.Y, dest.Width, dest.Height); n.Y <= e.Y; n.Y += dest.Height)
+                        if ((layer.Properties["WrapAround"] != "Y" || n.X == dest.X) && (layer.Properties["WrapAround"] != "X" || n.Y == dest.Y))
+                            Game1.spriteBatch.Draw(texture, n, Color.White * (float)float.Parse(layer.Properties["opacity"]));
             }
         }
 
@@ -279,15 +306,17 @@ namespace PyTK.Extensions
                 else
                     map.Properties.Add(p);
 
-            for (Vector2 _x = new Vector2(sourceRectangle.X, position.X); _x.X < sourceRectangle.Width; _x += new Vector2(1, 1))
-            {
-                for (Vector2 _y = new Vector2(sourceRectangle.Y, position.Y); _y.X < sourceRectangle.Height; _y += new Vector2(1, 1))
-                {
-                    foreach (Layer layer in t.Layers)
+            for(int x = 0; x < sourceRectangle.Width; x++)
+                for(int y = 0; y < sourceRectangle.Height; y++)
+                    foreach(Layer layer in t.Layers)
                     {
-                        
+                        int px = (int)position.X + x;
+                        int py = (int)position.Y + y;
 
-                        Tile sourceTile = layer.Tiles[(int)_x.X, (int)_y.X];
+                        int sx = (int)sourceRectangle.X + x;
+                        int sy = (int)sourceRectangle.Y + y;
+
+                        Tile sourceTile = layer.Tiles[(int)sx, (int)sy];
                         Layer mapLayer = map.GetLayer(layer.Id);
 
                         if (mapLayer == null)
@@ -309,13 +338,13 @@ namespace PyTK.Extensions
                             {
                                 try
                                 {
-                                    mapLayer.Tiles[(int)_x.Y, (int)_y.Y] = null;
+                                    mapLayer.Tiles[(int)px, (int)py] = null;
                                 }
                                 catch { }
                             }
                             continue;
                         }
-
+                        
                         TileSheet tilesheet = map.GetTileSheet(sourceTile.TileSheet.Id);
                         Tile newTile = new StaticTile(mapLayer, tilesheet, BlendMode.Additive, sourceTile.TileIndex);
 
@@ -329,19 +358,19 @@ namespace PyTK.Extensions
                             newTile = new AnimatedTile(mapLayer, staticTiles.ToArray(), aniTile.FrameInterval);
                         }
 
-                        if(properties)
+                        if (properties)
                             foreach (var prop in sourceTile.Properties)
                                 newTile.Properties.Add(prop);
                         try
                         {
-                            mapLayer.Tiles[(int)_x.Y, (int)_y.Y] = newTile;
-                        }catch(Exception e){
-                            Monitor.Log($"{e.Message} ({map.DisplayWidth} -> {layer.Id} -> {_x.Y}:{_y.Y})");
+                            mapLayer.Tiles[(int)px, (int)py] = newTile;
+                        }
+                        catch (Exception e)
+                        {
+                            Monitor.Log($"{e.Message} ({map.DisplayWidth} -> {layer.Id} -> {px}:{py})");
                         }
                     }
-
-                }
-            }
+           
             return map;
         }
 

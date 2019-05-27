@@ -20,6 +20,7 @@ using xTile;
 using xTile.Dimensions;
 using PyTK.Overrides;
 using PyTK.APIs;
+using xTile.Layers;
 
 namespace PyTK
 {
@@ -30,8 +31,9 @@ namespace PyTK
         internal static IModEvents _events => _helper.Events;
         internal static IMonitor _monitor;
         internal static bool _activeSpriteBatchFix = true;
-        internal static string sdvContentFolder => PyUtils.getContentFolder();
+        internal static string sdvContentFolder => PyUtils.ContentPath;
         internal static List<IPyResponder> responders;
+        internal static PyTKSaveData saveData = new PyTKSaveData();
 
         public override void Entry(IModHelper helper)
         {
@@ -55,19 +57,67 @@ namespace PyTK
             this.Helper.Events.GameLoop.DayStarted += OnDayStarted;
             this.Helper.Events.Multiplayer.PeerContextReceived += (s, e) =>
             {
-                if (Game1.IsMasterGame && Game1.IsServer && CustomObjectData.collection.Values.Count > 0)
+                if (Game1.IsMasterGame && Game1.IsServer)
                 {
-                    List<CODSync> list = new List<CODSync>();
-                    foreach (CustomObjectData data in CustomObjectData.collection.Values)
-                        list.Add(new CODSync(data.id, data.sdvId));
+                    if (CustomObjectData.collection.Values.Count > 0)
+                    {
+                        List<CODSync> list = new List<CODSync>();
+                        foreach (CustomObjectData data in CustomObjectData.collection.Values)
+                            list.Add(new CODSync(data.id, data.sdvId));
 
-                    PyNet.sendDataToFarmer(CustomObjectData.CODSyncerName, new CODSyncMessage(list), e.Peer.PlayerID, SerializationType.JSON);
+                        PyNet.sendDataToFarmer(CustomObjectData.CODSyncerName, new CODSyncMessage(list), e.Peer.PlayerID, SerializationType.JSON);
+                    }
+
+                    PyNet.sendDataToFarmer("PyTK.ModSavdDataReceiver", saveData, e.Peer.PlayerID, SerializationType.JSON);
                 }
                
             };
 
             Helper.Events.Multiplayer.ModMessageReceived += PyNet.Multiplayer_ModMessageReceived;
+            helper.Events.GameLoop.Saving += (s, e) =>
+            {
+                if(Game1.IsMasterGame)
+                    try
+                {
+                    helper.Data.WriteSaveData<PyTKSaveData>("PyTK.ModSaveData",saveData);
+                }
+                catch
+                {
+                }
+            };
 
+            helper.Events.GameLoop.ReturnedToTitle += (s, e) =>
+            {
+                saveData = new PyTKSaveData();
+            };
+
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
+            {
+                if (Game1.IsMasterGame)
+                {
+                    try
+                    {
+                        saveData = helper.Data.ReadSaveData<PyTKSaveData>("PyTK.ModSaveData");
+                    }
+                    catch
+                    {
+                    }
+                    if (saveData == null)
+                        saveData = new PyTKSaveData();
+                }
+            };
+
+            helper.Events.GameLoop.OneSecondUpdateTicked += (s, e) =>
+            {
+                if (Context.IsWorldReady && Game1.currentLocation is GameLocation location && location.Map is Map map)
+                    PyUtils.checkDrawConditions(map);
+            };
+        }
+
+        public static void syncCounter(string id, int value)
+        {
+            if (Game1.IsMultiplayer)
+                PyNet.sendRequestToAllFarmers<bool>("PyTK.ModSavdDataCounterChangeReceiver", new ValueChangeRequest<string,int>(id,value,saveData.Counters[id]), null, SerializationType.JSON,-1);
         }
 
         public override object GetApi()
@@ -78,8 +128,14 @@ namespace PyTK
         private void Player_Warped(object sender, WarpedEventArgs e)
         {
             e.NewLocation?.Map.enableMoreMapLayers();
-            if (e.NewLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
-                TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
+
+            if (e.NewLocation is GameLocation g && g.map is Map m)
+            {
+                if (m.Properties.ContainsKey("EntryAction"))
+                    TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
+
+                PyUtils.checkDrawConditions(m);
+            }
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e)
@@ -108,7 +164,22 @@ namespace PyTK
 
         private void initializeResponders()
         {
-            responders = new List<IPyResponder>();
+
+        responders = new List<IPyResponder>();
+
+            responders.Add(new PyReceiver<PyTKSaveData>("PyTK.ModSavdDataReceiver", (sd) =>
+            {
+                saveData.Counters = sd.Counters;
+            }, 60, SerializationType.JSON));
+
+            responders.Add(new PyReceiver<ValueChangeRequest<string,int>>("PyTK.ModSavdDataCounterChangeReceiver", (cr) =>
+            {
+                if (!saveData.Counters.ContainsKey(cr.Key))
+                    saveData.Counters.Add(cr.Key, cr.Fallback);
+                else
+                    saveData.Counters[cr.Key] += cr.Value;
+            }, 60, SerializationType.JSON));
+
             responders.Add(new PyResponder<int, int>("PytK.StaminaRequest", (s) =>
             {
                 if (Game1.player == null)
@@ -165,17 +236,21 @@ namespace PyTK
                         {
                             if (layer == "Map")
                             {
-                                if (location.map.Properties.ContainsKey("Lua"))
-                                    PyLua.loadScriptFromString(@"
+                                if (location.map.Properties.ContainsKey("Lua_" + a[2]))
+                                {
+                                    string script = @"
                                 function callthis(location,tile,layer)
-                                " + location.map.Properties["Lua"].ToString() + @"
-                                end", id);
+                                " + location.map.Properties["Lua_" + a[2]].ToString() + @"
+                                end";
+
+                                    PyLua.loadScriptFromString(script, id);
+                                }
                                 else
                                     PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Map.\")", id);
                             }
                             else
                             {
-                                if (location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Lua", layer) is string lua)
+                                if (location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Lua_" + a[2], layer) is string lua)
                                     PyLua.loadScriptFromString(@"
                                 function callthis(location,tile,layer)
                                 " + lua + @"
@@ -200,6 +275,12 @@ namespace PyTK
             CcSaveHandler.savecheck().register();
             CcTime.skip().register();
             CcLua.runScript().register();
+
+            new ConsoleCommand("adjustWarps", "", (s, p) =>
+            {
+                PyUtils.adjustWarps(p[0]);
+
+            }).register();
 
             new ConsoleCommand("rebuild_objects", "", (s, e) =>
               {

@@ -50,7 +50,7 @@ namespace PyTK.Tiled
                 string tileSheetPath = path.Replace(fileName, t.ImageSource + ".png");
 
                 FileInfo tileSheetFile = new FileInfo(Path.Combine(contentPack != null ? contentPack.DirectoryPath : helper.DirectoryPath, tileSheetPath));
-                FileInfo tileSheetFileVanilla = new FileInfo(Path.Combine(PyUtils.getContentFolder(), "Content", t.ImageSource + ".xnb"));
+                FileInfo tileSheetFileVanilla = new FileInfo(Path.Combine(PyUtils.ContentPath, "Content", t.ImageSource + ".xnb"));
                 if (tileSheetFile.Exists && !tileSheetFileVanilla.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource).Key == null)
                 {
                     Texture2D tilesheet = contentPack != null ? contentPack.LoadAsset<Texture2D>(tileSheetPath) : helper.Content.Load<Texture2D>(tileSheetPath);

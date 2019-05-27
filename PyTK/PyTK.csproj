@@ -82,6 +82,7 @@
     <Compile Include="Overrides\OvSpritebatch.cs" />
     <Compile Include="Overrides\OvTV.cs" />
     <Compile Include="Overrides\OvSleep.cs" />
+    <Compile Include="PyDraw.cs" />
     <Compile Include="PyNet.cs" />
     <Compile Include="CustomElementHandler\PySync.cs" />
     <Compile Include="APIs\PyTKAPI.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="Tiled\XmlObject.cs" />
     <Compile Include="Tiled\XmlUtils.cs" />
     <Compile Include="Types\AltGameTime.cs" />
+    <Compile Include="Types\AnimatedTexture2D.cs" />
     <Compile Include="Types\AssetInjector.cs" />
     <Compile Include="Types\ButtonClick.cs" />
     <Compile Include="Extensions\PyCollections.cs" />
@@ -130,6 +132,7 @@
     <Compile Include="Types\PyReceiver.cs" />
     <Compile Include="Types\PyResponder.cs" />
     <Compile Include="Types\PyMessenger.cs" />
+    <Compile Include="Types\PyTKSaveData.cs" />
     <Compile Include="Types\Range.cs" />
     <Compile Include="Types\ScaledTexture2D.cs" />
     <Compile Include="Types\SerializationType.cs" />
@@ -139,6 +142,7 @@
     <Compile Include="Types\TileAction.cs" />
     <Compile Include="Types\TileLocationSelector.cs" />
     <Compile Include="Types\TVChannel.cs" />
+    <Compile Include="Types\ValueChangeRequest.cs" />
     <Compile Include="Types\WarpRequest.cs" />
   </ItemGroup>
   <ItemGroup>

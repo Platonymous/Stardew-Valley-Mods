@@ -12,6 +12,8 @@ using System.IO;
 using System.Reflection;
 using System.Linq;
 using PyTK.Extensions;
+using xTile;
+using xTile.ObjectModel;
 
 namespace PyTK.Overrides
 {
@@ -35,6 +37,38 @@ namespace PyTK.Overrides
                 return false;
             }
         }
+        [HarmonyPatch]
+        internal class EventConditionsFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "checkEventPrecondition");
+            }
+
+            internal static void Prefix(GameLocation __instance, ref string precondition,ref bool __result)
+            {
+                if (precondition.Contains("/LC "))
+                {
+                    string t = "M " + (Game1.player.money - 1);
+                    string f = "M " + (Game1.player.money + 1);
+
+                    string[] conditions = precondition.Split('/');
+
+                    for (int i = 0; i < conditions.Length; i++){
+                        if (conditions[i].StartsWith("LC"))
+                        {
+                            if (PyUtils.checkEventConditions(conditions[i], __instance))
+                                conditions[i] = t;
+                            else
+                                conditions[i] = f;
+                        }
+                    }
+
+                    precondition = string.Join("/", conditions);
+                }
+            }
+        }
+
 
         [HarmonyPatch]
         internal class BLoadBugFix

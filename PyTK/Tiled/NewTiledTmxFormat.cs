@@ -286,7 +286,10 @@ namespace PyTK.Tiled
                    properties.ForEach(action2);
                }
                if (!(layer.Data.EncodingType == "csv"))
+               {
+                   Monitor.Log("Error: Change your encoding setting from " + layer.Data.EncodingType + " to CSV");
                    throw new Exception(string.Format("Unknown encoding setting ({0})", layer.Data.EncodingType));
+               }
                LoadLayerDataCsv(mapLayer, layer);
                mapLayer.Properties["offsetx"] = (int) Math.Floor(layer.Horizontal * Game1.pixelZoom);
                mapLayer.Properties["offsety"] = (int)Math.Floor(layer.Vertical * Game1.pixelZoom);
