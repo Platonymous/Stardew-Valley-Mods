@@ -37,6 +37,32 @@ namespace PyTK.Tiled
             return map;
         }
 
+        public static bool doesExist(bool failed, TileSheet t, IContentPack contentPack, IModHelper helper, string tileSheetPath)
+        {
+            if (!failed)
+            {
+                FileInfo tileSheetFile = new FileInfo(Path.Combine(contentPack != null ? contentPack.DirectoryPath : helper.DirectoryPath, tileSheetPath));
+                FileInfo tileSheetFileVanilla = new FileInfo(Path.Combine(PyUtils.ContentPath, "Content", t.ImageSource + ".xnb"));
+
+                return tileSheetFile.Exists && !tileSheetFileVanilla.Exists;
+            }
+            else
+            {
+                Texture2D ts = null;
+                Texture2D tsv = null;
+                try
+                {
+                    ts = contentPack != null ? contentPack.LoadAsset<Texture2D>(tileSheetPath) : helper.Content.Load<Texture2D>(tileSheetPath);
+                    tsv = helper.Content.Load<Texture2D>(tileSheetPath,ContentSource.GameContent);
+                }
+                catch
+                {
+                }
+
+                return (ts != null && tsv == null);
+            }
+        }
+
         public static Map Load(string path, IModHelper helper, bool syncTexturesToClients, IContentPack contentPack)
         {
             Dictionary<TileSheet, Texture2D> tilesheets = Helper.Reflection.GetField<Dictionary<TileSheet, Texture2D>>(Game1.mapDisplayDevice, "m_tileSheetTextures").GetValue();
@@ -48,10 +74,10 @@ namespace PyTK.Tiled
                 t.ImageSource = t.ImageSource.Replace(".png", "");
                 string[] seasons = new string[] { "summer_", "fall_", "winter_" };
                 string tileSheetPath = path.Replace(fileName, t.ImageSource + ".png");
+                bool failed = PyUtils.ContentPath == "failed";
 
-                FileInfo tileSheetFile = new FileInfo(Path.Combine(contentPack != null ? contentPack.DirectoryPath : helper.DirectoryPath, tileSheetPath));
-                FileInfo tileSheetFileVanilla = new FileInfo(Path.Combine(PyUtils.ContentPath, "Content", t.ImageSource + ".xnb"));
-                if (tileSheetFile.Exists && !tileSheetFileVanilla.Exists && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource).Key == null)
+                
+                if ((doesExist(failed, t,contentPack,helper,tileSheetPath) && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource).Key == null))
                 {
                     Texture2D tilesheet = contentPack != null ? contentPack.LoadAsset<Texture2D>(tileSheetPath) : helper.Content.Load<Texture2D>(tileSheetPath);
                     if (!Injected.Contains(t.ImageSource))

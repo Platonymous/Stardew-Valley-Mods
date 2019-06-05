@@ -17,6 +17,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Locations;
 using System.Xml;
 using xTile.ObjectModel;
+using System;
 
 namespace TMXLoader
 {
@@ -154,11 +155,19 @@ namespace TMXLoader
             };
         }
 
+        private string getAssetNameWithoutFolder(string asset)
+        {
+            return Path.GetFileNameWithoutExtension(asset).Split('/').Last().Split('\\').Last();
+        }
+
         private void Player_Warped(object sender, WarpedEventArgs e)
         {
             foreach (TMXAssetEditor editor in conditionals)
-                if (e.NewLocation is GameLocation gl && gl.mapPath.Value is string mp && mp.Contains(editor.assetName))
+                if (e.NewLocation is GameLocation gl && gl.mapPath.Value is string mp)
                 {
+                    if (!getAssetNameWithoutFolder(mp).Equals(getAssetNameWithoutFolder(editor.assetName)))
+                        continue;
+
                     if (PyTK.PyUtils.checkEventConditions(editor.conditions) is bool c && c != editor.lastCheck)
                     {
                         editor.lastCheck = c;
@@ -186,7 +195,10 @@ namespace TMXLoader
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
             new ConsoleCommand("loadmap", "Teleport to a map", (s, st) => {
-                Game1.player.warpFarmer(new Warp(int.Parse(st[1]), int.Parse(st[2]), st[0], int.Parse(st[1]), int.Parse(st[2]), false));
+                if (st.Length < 3)
+                    monitor.Log("Mising Parameter. Use: loadmap {Map} {x} {y}");
+                else
+                    Game1.player.warpFarmer(new Warp(int.Parse(st[1]), int.Parse(st[2]), st[0], int.Parse(st[1]), int.Parse(st[2]), false));
             }).register();
 
             new ConsoleCommand("removeNPC", "Removes an NPC", (s, st) => {
@@ -350,7 +362,8 @@ namespace TMXLoader
                     map.inject("Maps/" + edit.name);
 
                     edit._map = map;
-                    addedLocations.Add(edit);
+                    if(edit.addLocation)
+                        addedLocations.Add(edit);
                     //mapsToSync.AddOrReplace(edit.name, map);
                 }
 

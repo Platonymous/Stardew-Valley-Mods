@@ -5,6 +5,8 @@ namespace TMXLoader
     internal class MapEdit
     {
         public string name { get; set; } = "none";
+
+        public bool addLocation { get; set; } = true;
         public string file { get; set; } = "none";
         public int[] sourceArea { get; set; } = new int[] { };
         public int[] position { get; set; } = new int[] { 0, 0 };
