@@ -437,7 +437,7 @@ namespace ChessBoard
 
             b.GraphicsDevice.Clear(Color.LightSkyBlue);
             b.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-
+            drawBackground(b);
             drawBoard(b);
             drawPieces(b, Open ? false : BlackPlayer == blackPlayerDefault);
             drawUI(b);
@@ -463,13 +463,18 @@ namespace ChessBoard
             }
         }
 
-        public void drawBoard(SpriteBatch b)
+        public void drawBackground(SpriteBatch b)
         {
             if (backgroundPos < 0 - BackgroundShade.Width)
                 backgroundPos = 0;
             for (int x = backgroundPos; x < Game1.viewport.Width + BackgroundShade.Width * 2; x += BackgroundShade.Width)
                 for (int y = backgroundPos; y < Game1.viewport.Height + BackgroundShade.Width * 2; y += BackgroundShade.Width)
                     b.Draw(BackgroundShade, new Vector2(x, y), Color.White * 0.2f);
+        }
+
+        public void drawBoard(SpriteBatch b)
+        {
+           
             b.Draw(BackgroundBorder, new Vector2(Position.X - 10, Position.Y - 10), Color.White);
             b.Draw(BoardImage, BoardBounds, Color.White);
             b.Draw(Structure, BoardBounds, Color.White * 0.6f);
