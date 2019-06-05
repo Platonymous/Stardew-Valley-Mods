@@ -63,7 +63,8 @@ namespace Portraiture
                              e.Select();
                  }
 
-                 setFolder(e.Id);
+                 if(s)
+                     setFolder(e.Id);
              }).WithInteractivity(hover:(point,hoverIn,e) =>
              {
                  if (e.IsSelected)
