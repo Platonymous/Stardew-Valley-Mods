@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PyTK.PlatoUI
 {
@@ -295,7 +296,10 @@ namespace PyTK.PlatoUI
             UpdateAction?.Invoke(time, this);
 
             foreach (UIElement child in Children)
-                child.PerformUpdate(time);
+                Task.Run(() =>
+                {
+                    child.PerformUpdate(time);
+                });
         }
 
         public virtual void PerformHover(Point point)
@@ -315,7 +319,10 @@ namespace PyTK.PlatoUI
             }
 
             foreach (UIElement child in Children.Where(c => c.Visible))
-                child.PerformHover(point);
+                Task.Run(() =>
+            {
+                    child.PerformHover(point);
+            });
         }
 
         public virtual void Deselect()
@@ -379,8 +386,11 @@ namespace PyTK.PlatoUI
                 ClickAction?.Invoke(point, right, release, hold, this);
             }
 
-            foreach (UIElement child in Children.Where(c => c.Visible))
-                child.PerformClick(point,right, release, hold);
+            Task.Run(() =>
+           {
+               foreach (UIElement child in Children.Where(c => c.Visible))
+                   child.PerformClick(point, right, release, hold);
+           });
         }
 
         public virtual void PerformMouseMove(Point point)
@@ -397,9 +407,11 @@ namespace PyTK.PlatoUI
             }
 
             foreach (UIElement child in Children)
-                child.PerformMouseMove(point);
-
-            UpdateBounds();
+                Task.Run(() =>
+            {
+                    child.PerformMouseMove(point);
+            });
+                UpdateBounds();
         }
 
         public virtual void PerformKey(Keys key, bool released)
@@ -407,10 +419,13 @@ namespace PyTK.PlatoUI
             if (Disabled)
                 return;
 
-                KeyAction?.Invoke(key, released, this);
+            KeyAction?.Invoke(key, released, this);
 
             foreach (UIElement child in Children)
+                Task.Run(() =>
+            {
                 child.PerformKey(key, released);
+            });
         }
 
         public virtual void PerformScroll(int direction)
@@ -473,7 +488,11 @@ namespace PyTK.PlatoUI
 
             if (children)
                 foreach (UIElement child in Children)
-                    child.UpdateBounds();
+                    Task.Run(() =>
+            {
+
+                child.UpdateBounds();
+            });
         }
 
         public virtual IEnumerable<UIElement> GetSelected(string selectionId = null)

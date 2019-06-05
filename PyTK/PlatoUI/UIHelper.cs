@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using PyTK.Extensions;
 using PyTK.Types;
 using StardewValley;
+using StardewValley.Menus;
 using System;
 using System.Linq;
 
@@ -69,9 +70,11 @@ namespace PyTK.PlatoUI
                 BaseHud.Remove(element);
         }
 
-        public static void OpenMenu(string id, UIElement element, bool clone = false, Texture2D background = null, Color? backgroundColor = null, bool movingBackground = false)
+        public static PlatoUIMenu OpenMenu(string id, UIElement element, bool clone = false, Texture2D background = null, Color? backgroundColor = null, bool movingBackground = false)
         {
-            Game1.activeClickableMenu = new PlatoUIMenu(id, element,clone,background,backgroundColor,movingBackground);
+            var m = new PlatoUIMenu(id, element, clone, background, backgroundColor, movingBackground);
+            Game1.activeClickableMenu = m;
+            return m;
         }
 
         public static void DrawHud(SpriteBatch b, bool before = false)
@@ -213,12 +216,44 @@ namespace PyTK.PlatoUI
             return GetAbs(new object[] { value },0, basevalue);
         }
 
+        internal static Point GetSize(UIElement t, UIElement p, params object[] rectangle)
+        {
+            int rwidth = t is UITextElement tx ? (int)(tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
+            int rheight = t is UITextElement ty ? (int)(ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+
+            if (t.Theme != null)
+            {
+                var w = t.SourceRectangle.HasValue ? t.SourceRectangle.Value.Width : t.Theme.Width;
+                var h = t.SourceRectangle.HasValue ? t.SourceRectangle.Value.Height : t.Theme.Height;
+
+                if (rwidth == 0 && rheight == 0)
+                {
+                    rwidth = w;
+                    rheight = h;
+                }
+
+                if (rheight == 0 && rwidth != 0)
+                {
+                    float s = (float)rwidth / (float)w;
+                    rheight = (int)(s * h);
+                }
+
+                if (rheight != 0 && rwidth == 0)
+                {
+                    float s = (float)rheight / (float)h;
+                    rwidth = (int)(s * w);
+                }
+            }
+            return new Point(rwidth, rheight);
+        }
+
         public static Func<UIElement, UIElement, Rectangle> GetFixed(params object[] rectangle)
         {
             return (t, p) =>
             {
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2,p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = GetAbs(rectangle, 1, p.Bounds.Height);
 
@@ -232,8 +267,9 @@ namespace PyTK.PlatoUI
             {
                 var rectangle = UIHelper.GetObjArray(positioner.Invoke(t, p));
                 t.AttachedToElement = t.AttachedToElement == null ? element : t.AttachedToElement;
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = GetAbs(rectangle, 1, p.Bounds.Height);
 
@@ -251,8 +287,9 @@ namespace PyTK.PlatoUI
             return (t, p) =>
             {
                 t.AttachedToElement = t.AttachedToElement == null ? element : t.AttachedToElement;
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = GetAbs(rectangle, 1, p.Bounds.Height);
 
@@ -268,8 +305,9 @@ namespace PyTK.PlatoUI
             return (t, p) =>
             {
                 t.AttachedToElement = t.AttachedToElement == null ? element : t.AttachedToElement;
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = GetAbs(rectangle, 1, p.Bounds.Height);
 
@@ -286,8 +324,9 @@ namespace PyTK.PlatoUI
             {
                 var rectangle = UIHelper.GetObjArray(positioner.Invoke(t, p));
                 t.AttachedToElement = t.AttachedToElement == null ? element : t.AttachedToElement;
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = GetAbs(rectangle, 1, p.Bounds.Height);
 
@@ -303,8 +342,9 @@ namespace PyTK.PlatoUI
             return (t, p) =>
             {
                 t.AttachedToElement = t.AttachedToElement == null ? element : t.AttachedToElement;
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = GetAbs(rectangle, 1, p.Bounds.Height);
 
@@ -332,8 +372,9 @@ namespace PyTK.PlatoUI
         {
             return (t, p) =>
             {
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int x = ((p.Bounds.Width - rwidth) / 2) + GetAbs(rectangle, 0, p.Bounds.Width);
                 int y = ((p.Bounds.Height - rheight) / 2) + GetAbs(rectangle, 1, p.Bounds.Height);
                 return new Rectangle(p.Bounds.X + x, p.Bounds.Y+ y, rwidth, rheight);
@@ -349,8 +390,9 @@ namespace PyTK.PlatoUI
         {
             return (t, p) =>
             {
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = ((p.Bounds.Width - rwidth) / 2) + GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = GetAbs(rectangle, 1, p.Bounds.Height);
                 return new Rectangle(p.Bounds.X + rx, p.Bounds.Y + ry, rwidth, rheight);
@@ -361,8 +403,9 @@ namespace PyTK.PlatoUI
         {
             return (t, p) =>
             {
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = (p.Bounds.Width - rwidth) + GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = GetAbs(rectangle, 1, p.Bounds.Height);
                 return new Rectangle(p.Bounds.X + rx , p.Bounds.Y + ry, rwidth, rheight);
@@ -373,8 +416,9 @@ namespace PyTK.PlatoUI
         {
             return (t, p) =>
             {
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = (p.Bounds.Height - rheight) + GetAbs(rectangle, 1, p.Bounds.Height);
                 return new Rectangle(p.Bounds.X + rx, p.Bounds.Y + ry, rwidth, rheight);
@@ -385,8 +429,9 @@ namespace PyTK.PlatoUI
         {
             return (t, p) =>
             {
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = ((p.Bounds.Width - rwidth)/2) + GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = (p.Bounds.Height - rheight) + GetAbs(rectangle, 1, p.Bounds.Height);
                 return new Rectangle(p.Bounds.X + rx, p.Bounds.Y + ry, rwidth, rheight);
@@ -398,8 +443,9 @@ namespace PyTK.PlatoUI
         {
             return (t, p) =>
             {
-                int rwidth = t is UITextElement tx ? (int) (tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-                int rheight = t is UITextElement ty ? (int) (ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+                var size = GetSize(t, p, rectangle);
+                int rwidth = size.X;
+                int rheight = size.Y;
                 int rx = (p.Bounds.Width - rwidth) + GetAbs(rectangle, 0, p.Bounds.Width);
                 int ry = (p.Bounds.Height - rheight) + GetAbs(rectangle, 1, p.Bounds.Height);
                 return new Rectangle(p.Bounds.X + rx, p.Bounds.Y + ry, rwidth, rheight);

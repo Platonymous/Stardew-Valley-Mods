@@ -131,5 +131,10 @@ namespace PyTK.PlatoUI
         {
             BaseMenu.PerformClick(new Point(x, y), false, false, true);
         }
+
+        public override bool readyToClose()
+        {
+            return base.readyToClose();
+        }
     }
 }

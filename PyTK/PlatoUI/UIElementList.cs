@@ -152,7 +152,7 @@ namespace PyTK.PlatoUI
                 else
                     child.OffsetX += steps * -1 * (first.Bounds.Width + Margin);
 
-            UpdateBounds();
+            Parent.UpdateBounds();
 
             return true;
         }

@@ -17,7 +17,7 @@ namespace Portraiture
         public static IModHelper helper;
         private static Mod instance;
         internal static PConfig config;
-        
+
         public override void Entry(IModHelper help)
         {
             helper = help;
@@ -35,11 +35,10 @@ namespace Portraiture
 
             Helper.ConsoleCommands.Add("pmenu", "", (s, p) =>
              {
-                 MenuLoader.OpenMenu();
+                 MenuLoader.OpenMenu(Game1.activeClickableMenu);
              });
         }
-
-        private void harmonyFix()
+          private void harmonyFix()
         {
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.Portraiture");
             instance.PatchAll(Assembly.GetExecutingAssembly());
@@ -96,13 +95,18 @@ namespace Portraiture
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            if (e.Button == config.changeKey && Game1.activeClickableMenu is DialogueBox d && d.isPortraitBox() && Game1.currentSpeaker is NPC cs)
+            if ((e.Button == config.changeKey || e.Button == config.menuKey) && Game1.activeClickableMenu is DialogueBox d && d.isPortraitBox() && Game1.currentSpeaker is NPC cs)
             {
-                if (d.width < 107 * Game1.pixelZoom * 3 / 2 || Helper.Reflection.GetField<bool>(d, "transitioning").GetValue() || Helper.Reflection.GetField<bool>(d, "isQuestion").GetValue())
-                    return;
+                if (e.Button == config.changeKey)
+                {
+                    if (d.width < 107 * Game1.pixelZoom * 3 / 2 || Helper.Reflection.GetField<bool>(d, "transitioning").GetValue() || Helper.Reflection.GetField<bool>(d, "isQuestion").GetValue())
+                        return;
 
-                TextureLoader.nextFolder();
-                displayAlpha = 2;
+                    TextureLoader.nextFolder();
+                    displayAlpha = 2;
+                }
+                else
+                    MenuLoader.OpenMenu(Game1.activeClickableMenu);
             }
 
         }
