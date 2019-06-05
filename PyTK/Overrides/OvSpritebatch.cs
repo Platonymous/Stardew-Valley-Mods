@@ -40,7 +40,12 @@ namespace PyTK.Overrides
             internal static MethodInfo TargetMethod()
             {
                 if (Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework") != null)
-                    return AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
+                {
+                    if (AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal") is MethodInfo mi)
+                        return mi;
+                    else
+                        return AccessTools.Method(typeof(FakeSpriteBatch), "DrawInternal");
+                }
                 else
                     return AccessTools.Method(typeof(FakeSpriteBatch), "DrawInternal");
             }
@@ -85,11 +90,10 @@ namespace PyTK.Overrides
                 }
                
                 return true;
-            }
-
- 
+            } 
         }
-        
+
+
         [HarmonyPatch]
         internal class SpriteBatchFix
         {

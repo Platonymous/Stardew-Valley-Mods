@@ -24,6 +24,25 @@ namespace Portraiture
     }
 
     [HarmonyPatch]
+    internal class PortraitFix
+    {
+        internal static MethodInfo TargetMethod()
+        {
+            return FixHelper.getTypeFullSDV("StardewValley.NPC").GetProperty("Portrait").GetMethod;
+        }
+
+        internal static bool Prefix(NPC __instance, ref Texture2D __result)
+        {
+            __result = TextureLoader.getPortrait(__instance.Name);
+
+            return __result == null;
+        }
+
+
+    }
+
+    /*
+    [HarmonyPatch]
     internal class DialogueBoxFix
     {
         internal static MethodInfo TargetMethod()
@@ -61,6 +80,6 @@ namespace Portraiture
         }
         
     }
-
+    */
 
 }

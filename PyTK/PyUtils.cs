@@ -32,7 +32,7 @@ namespace PyTK
                 if (_contentPath == "")
                 {
                     _contentPath = getContentFolder();
-                    Monitor.Log("ContentPath:" + _contentPath);
+                    Monitor.Log("ContentPath:" + _contentPath, LogLevel.Info);
                 }
                 return _contentPath;
             }
@@ -117,13 +117,13 @@ namespace PyTK
 
         public static string getContentFolder()
         {
-            string folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Game1.content.RootDirectory);
+            string folder = Path.Combine(Constants.ExecutionPath, Game1.content.RootDirectory);
             DirectoryInfo directoryInfo = new DirectoryInfo(folder);
 
             if (directoryInfo.Exists)
                 return folder;
 
-            folder = folder.Replace("MacOS", "Resources");
+            folder = folder.Replace("MacOS", "Resources").Replace("smapi-internal/","");
 
             directoryInfo = new DirectoryInfo(folder);
             if (directoryInfo.Exists)
@@ -131,7 +131,7 @@ namespace PyTK
             else
                 Monitor.Log("DebugF:" + folder);
 
-            return @"C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Content";
+            return @"failed";
         }
 
         public static bool checkEventConditions(string conditions, object caller = null)

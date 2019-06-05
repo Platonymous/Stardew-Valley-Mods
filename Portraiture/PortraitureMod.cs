@@ -32,6 +32,11 @@ namespace Portraiture
             help.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             help.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
             harmonyFix();
+
+            Helper.ConsoleCommands.Add("pmenu", "", (s, p) =>
+             {
+                 MenuLoader.OpenMenu();
+             });
         }
 
         private void harmonyFix()

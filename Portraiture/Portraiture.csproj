@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MenuLoader.cs" />
     <Compile Include="PConfig.cs" />
     <Compile Include="PortraitsFix.cs" />
     <Compile Include="PortraitureMod.cs" />

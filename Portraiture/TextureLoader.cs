@@ -14,8 +14,8 @@ namespace Portraiture
     {
         private static string contentFolder;
         internal static int activeFolder;
-        private static List<string> folders;
-        static Dictionary<string, Texture2D> pTextures;
+        internal static List<string> folders;
+        internal static Dictionary<string, Texture2D> pTextures;
 
         public static void loadTextures()
         {

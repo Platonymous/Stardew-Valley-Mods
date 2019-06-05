@@ -74,6 +74,7 @@
     <Compile Include="APIs\IScalerAPI.cs" />
     <Compile Include="Lua\LuaUtils.cs" />
     <Compile Include="Lua\PyLua.cs" />
+    <Compile Include="Overrides\OvAndroid.cs" />
     <Compile Include="Overrides\OvSmapi.cs" />
     <Compile Include="Overrides\OvGame.cs" />
     <Compile Include="Overrides\OvLocations.cs" />
@@ -82,6 +83,12 @@
     <Compile Include="Overrides\OvSpritebatch.cs" />
     <Compile Include="Overrides\OvTV.cs" />
     <Compile Include="Overrides\OvSleep.cs" />
+    <Compile Include="PlatoUI\PlatoUIGame.cs" />
+    <Compile Include="PlatoUI\PlatoUIMenu.cs" />
+    <Compile Include="PlatoUI\UIElement.cs" />
+    <Compile Include="PlatoUI\UIElementList.cs" />
+    <Compile Include="PlatoUI\UIHelper.cs" />
+    <Compile Include="PlatoUI\UITextElement.cs" />
     <Compile Include="PyDraw.cs" />
     <Compile Include="PyNet.cs" />
     <Compile Include="CustomElementHandler\PySync.cs" />

@@ -20,7 +20,6 @@ using xTile;
 using xTile.Dimensions;
 using PyTK.Overrides;
 using PyTK.APIs;
-using xTile.Layers;
 
 namespace PyTK
 {
@@ -40,7 +39,15 @@ namespace PyTK
             _helper = helper;
             _monitor = Monitor;
 
-            harmonyFix();
+            try
+            {
+                harmonyFix();
+            }
+            catch
+            {
+                Monitor.Log("Harmony Patching failed", LogLevel.Error);
+            }
+
             FormatManager.Instance.RegisterMapFormat(new NewTiledTmxFormat());
 
             SaveHandler.BeforeRebuilding += (a, b) => CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
@@ -71,6 +78,31 @@ namespace PyTK
                     PyNet.sendDataToFarmer("PyTK.ModSavdDataReceiver", saveData, e.Peer.PlayerID, SerializationType.JSON);
                 }
                
+            };
+
+            Helper.Events.Display.RenderingHud += (s, e) =>
+            {
+                if(Game1.displayHUD)
+                    PyTK.PlatoUI.UIHelper.DrawHud(e.SpriteBatch, true);
+            };
+
+            Helper.Events.Display.RenderedHud += (s, e) =>
+            {
+                if (Game1.displayHUD)
+                    PyTK.PlatoUI.UIHelper.DrawHud(e.SpriteBatch, false);
+            };
+
+            Helper.Events.Input.ButtonPressed += (s, e) =>
+            {
+                if (Game1.displayHUD)
+                    if (e.Button == SButton.MouseLeft || e.Button == SButton.MouseRight)
+                        PlatoUI.UIHelper.BaseHud.PerformClick(e.Cursor.ScreenPixels.toPoint(), e.Button == SButton.MouseRight, false, false);
+            };
+
+            Helper.Events.Display.WindowResized += (s, e) =>
+            {
+                PlatoUI.UIElement.Viewportbase.UpdateBounds();
+                PlatoUI.UIHelper.BaseHud.UpdateBounds();
             };
 
             Helper.Events.Multiplayer.ModMessageReceived += PyNet.Multiplayer_ModMessageReceived;
