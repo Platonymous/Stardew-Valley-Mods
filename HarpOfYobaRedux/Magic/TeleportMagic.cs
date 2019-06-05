@@ -41,7 +41,6 @@ namespace HarpOfYobaRedux
             Game1.player.freezePause = 1000;
             Game1.flashAlpha = 1f;
 
-            new System.Drawing.Rectangle(Game1.player.GetBoundingBox().X, Game1.player.GetBoundingBox().Y, Game1.tileSize, Game1.tileSize).Inflate(Game1.tileSize * 3, Game1.tileSize * 3);
             int num1 = 0;
 
             for (int index = Game1.player.getTileX() + 8; index >= Game1.player.getTileX() - 8; --index)
