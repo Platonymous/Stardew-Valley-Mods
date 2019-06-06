@@ -7,15 +7,16 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewValley.Menus;
 using PyTK.Types;
+using StardewModdingAPI;
 
 namespace Portraiture
 {
     class TextureLoader
     {
         private static string contentFolder;
-        internal static int activeFolder;
-        internal static List<string> folders;
-        internal static Dictionary<string, Texture2D> pTextures;
+        internal static int activeFolder = 0;
+        internal static List<string> folders = new List<string>();
+        internal static Dictionary<string, Texture2D> pTextures = new Dictionary<string, Texture2D>();
 
         public static void loadTextures()
         {
@@ -47,13 +48,22 @@ namespace Portraiture
 
         public static Texture2D getPortrait(string name)
         {
-            activeFolder = Math.Max(activeFolder, 0);
+            if (!Context.IsWorldReady || folders.Count == 0)
+                return null;
 
-            if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.Name))
-                return pTextures[folders[activeFolder] + ">" + name + "_" + Game1.currentLocation.Name];
-            else if (pTextures.ContainsKey(folders[activeFolder] + ">" + name))
-                return pTextures[folders[activeFolder] + ">" + name];
-            
+            try
+            {
+                activeFolder = Math.Max(activeFolder, 0);
+
+                if (Game1.currentLocation is GameLocation gl && pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + gl.Name))
+                    return pTextures[folders[activeFolder] + ">" + name + "_" + gl.Name];
+                else if (pTextures.ContainsKey(folders[activeFolder] + ">" + name))
+                    return pTextures[folders[activeFolder] + ">" + name];
+            }
+            catch
+            {
+
+            }
             return null;
         }
 
