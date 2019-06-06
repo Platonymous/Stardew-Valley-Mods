@@ -48,7 +48,6 @@ namespace CustomFarmingRedux
         public GameLocation location;
         private CustomObjectData data;
         public bool meetsConditions = true;
-        public bool checkedToday = false;
         private bool skipDrop = false;
         private int identifier => (int)((double)tileLocation.X * 2000.0 + (double)tileLocation.Y);
         public PySync syncObject { get; set; }
@@ -97,7 +96,6 @@ namespace CustomFarmingRedux
                 syncObject = new PySync(this);
                 syncObject.init();
             }
-            CustomFarmingReduxMod._helper.Events.GameLoop.DayStarted += (s, e) => checkedToday = false;
             CustomFarmingReduxMod.machineHandlers.TryGetValue(blueprint.fullid, out machineHandler);
 
             if (blueprint.worklight)
@@ -253,10 +251,9 @@ namespace CustomFarmingRedux
             if (location == null)
                 location = new List<GameLocation>(Game1.locations).Find(g => new List<SObject>(g.Objects.Values).Contains(this));
 
-            if (!checkedToday)
-                meetsConditions = PyUtils.CheckEventConditions(conditions, this);
+            if (location == null)
+                location = Game1.currentLocation;
 
-            checkedToday = true;
 
             if (!meetsConditions)
             {
@@ -299,6 +296,9 @@ namespace CustomFarmingRedux
 
         public override bool minutesElapsed(int minutes, GameLocation environment)
         {
+            meetsConditions = PyUtils.checkEventConditions(conditions, this, location);
+
+            location = environment;
             if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
                 getReadyForHarvest();
 
@@ -508,8 +508,7 @@ namespace CustomFarmingRedux
             else
                 completionTime = STime.CURRENT;
 
-            checkedToday = false;
-            meetsConditions = PyUtils.CheckEventConditions(conditions, this);
+            meetsConditions = PyUtils.checkEventConditions(conditions, this, location);
 
             if (completionTime != null && completionTime > STime.CURRENT && !meetsConditions)
             {
@@ -542,7 +541,8 @@ namespace CustomFarmingRedux
 
         public override void DayUpdate(GameLocation location)
         {
-            checkedToday = false;
+            this.location = location;
+           meetsConditions = PyUtils.checkEventConditions(conditions, this, location);
         }
 
         public override bool checkForAction(SFarmer who, bool justCheckingForActivity = false)
@@ -647,7 +647,7 @@ namespace CustomFarmingRedux
 
         public virtual void startAutoProduction()
         {
-            if (!isWorking && blueprint.production != null && blueprint.production[0].materials == null)
+            if (meetsConditions && !isWorking && blueprint.production != null && blueprint.production[0].materials == null)
                 startProduction(null, blueprint.production[0], null);
         }
 
@@ -709,6 +709,7 @@ namespace CustomFarmingRedux
         public override bool performDropDownAction(SFarmer who)
         {
             location = Game1.currentLocation;
+            meetsConditions = PyUtils.checkEventConditions(conditions, this, location);
             activeMachines.AddOrReplace(this);
             startAutoProduction();
             return false;
@@ -754,11 +755,6 @@ namespace CustomFarmingRedux
 
             if (canProduce && blueprint.conditionaldropin)
             {
-                if (!checkedToday)
-                    meetsConditions = PyUtils.CheckEventConditions(conditions, this);
-
-                checkedToday = true;
-
                 if (!meetsConditions)
                     return false;
             }
@@ -835,10 +831,7 @@ namespace CustomFarmingRedux
 
             if (canProduce && blueprint.conditionaldropin)
             {
-                if (!checkedToday)
-                    meetsConditions = PyUtils.CheckEventConditions(conditions, this);
-
-                checkedToday = true;
+                    meetsConditions = PyUtils.checkEventConditions(conditions, this, location);
 
                 if (!meetsConditions)
                 {
