@@ -14,6 +14,7 @@ using StardewValley.Tools;
 using PyTK;
 using System.Reflection;
 using StardewValley.Menus;
+using System.Threading.Tasks;
 
 namespace CustomFarmingRedux
 {
@@ -296,7 +297,7 @@ namespace CustomFarmingRedux
 
         public override bool minutesElapsed(int minutes, GameLocation environment)
         {
-            meetsConditions = PyUtils.checkEventConditions(conditions, this, location);
+            Task.Run(() => meetsConditions = PyUtils.checkEventConditions(conditions, this, location));
 
             location = environment;
             if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
@@ -307,44 +308,44 @@ namespace CustomFarmingRedux
 
         public override void updateWhenCurrentLocation(GameTime time, GameLocation environment)
         {
-            location = environment;
-            bool isWorking = this.isWorking;
-
             if (tileLocation == Vector2.Zero)
-                if (!Game1.currentLocation.objects.ContainsKey(tileLocation) || Game1.currentLocation.objects[tileLocation] != this)
-                    if (new List<SObject>(Game1.currentLocation.objects.Values).Contains(this))
-                        tileLocation.Value = new List<Vector2>(Game1.currentLocation.objects.Keys).Find(k => Game1.currentLocation.objects[k] == this);
+                if (!environment.objects.ContainsKey(tileLocation) || environment.objects[tileLocation] != this)
+                    if ((new List<SObject>(environment.objects.Values)).Contains(this))
+                        tileLocation.Value = new List<Vector2>(environment.objects.Keys).Find(k => environment.objects[k] == this);
 
-            if (blueprint.worklight)
-                this.IsOn = isWorking;
-            else
-                this.IsOn = true;
+               location = environment;
+               bool isWorking = this.isWorking;
 
-            if (!IsOn && lightSource != null)
-            {
-                removeLightSource();
-                this.IsOn = false;
-            }
+               if (blueprint.worklight)
+                   this.IsOn = isWorking;
+               else
+                   this.IsOn = true;
 
-            if (IsOn && lightSource == null)
-                addLightSource();
+               if (!IsOn && lightSource != null)
+               {
+                   removeLightSource();
+                   this.IsOn = false;
+               }
 
-            if (!wasBuild || blueprint.asdisplay)
-            {
-                shakeTimer = 0;
-                return;
-            }
+               if (IsOn && lightSource == null)
+                   addLightSource();
 
-            if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
-                getReadyForHarvest();
+               if (!wasBuild || blueprint.asdisplay)
+               {
+                   shakeTimer = 0;
+                   return;
+               }
 
-            if (!(isWorking && completionTime != null))
-                startAutoProduction();
+               if (isWorking && completionTime != null && STime.CURRENT >= completionTime && activeRecipe != null)
+                   getReadyForHarvest();
 
-            base.updateWhenCurrentLocation(time, environment);
+               if (!(isWorking && completionTime != null))
+                   startAutoProduction();
 
-            if (completionTime != null)
-                minutesUntilReady.Set((completionTime + 1 - STime.CURRENT).timestamp);
+               base.updateWhenCurrentLocation(time, environment);
+
+               if (completionTime != null)
+                   minutesUntilReady.Set((completionTime + 1 - STime.CURRENT).timestamp);
         }
 
         public override string DisplayName { get => name; set => base.DisplayName = value; }
