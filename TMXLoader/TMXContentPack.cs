@@ -7,6 +7,8 @@ namespace TMXLoader
         public List<MapEdit> addMaps { get; set; } = new List<MapEdit>();
         public List<MapEdit> replaceMaps { get; set; } = new List<MapEdit>();
         public List<MapEdit> mergeMaps { get; set; } = new List<MapEdit>();
+
+        public List<BuildableEdit> buildables { get; set; } = new List<BuildableEdit>();
         public List<MapEdit> onlyWarps { get; set; } = new List<MapEdit>();
         public List<TileShop> shops { get; set; } = new List<TileShop>();
         public List<SpouseRoom> spouseRooms { get; set; } = new List<SpouseRoom>();

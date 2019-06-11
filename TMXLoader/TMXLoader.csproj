@@ -38,6 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildableEdit.cs" />
+    <Compile Include="SaveBuildable.cs" />
     <Compile Include="TMXAssetEditor.cs" />
     <Compile Include="Compatibility\CustomFarmTypes.cs" />
     <Compile Include="Config.cs" />

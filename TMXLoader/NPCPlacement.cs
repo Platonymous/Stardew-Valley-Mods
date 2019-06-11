@@ -1,6 +1,6 @@
 ﻿namespace TMXLoader
 {
-    internal class NPCPlacement
+    public class NPCPlacement
     {
         public string name { get; set; } = "none";
         public string map { get; set; } = "none";

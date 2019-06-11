@@ -2,7 +2,7 @@
 
 namespace TMXLoader
 {
-    internal class MapEdit
+    public class MapEdit
     {
         public string name { get; set; } = "none";
 
@@ -15,8 +15,6 @@ namespace TMXLoader
         public bool retainWarps { get; set; } = false;
         public bool removeEmpty { get; set; } = true;
         public string info { get; set; } = "";
-
-        public bool isGreenhouse { get; set; } = false;
         public string type { get; set; } = "Location";
 
         public string conditions { get; set; } = "";

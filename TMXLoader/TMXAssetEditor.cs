@@ -19,7 +19,7 @@ namespace TMXLoader
         Festival,
         SpouseRoom
     }
-    class TMXAssetEditor : IAssetEditor
+    public class TMXAssetEditor : IAssetEditor
     {
 
         private MapEdit edit;
@@ -28,6 +28,7 @@ namespace TMXLoader
         private EditType type;
         public string assetName;
         public string conditions;
+        public string inLocation;
 
         public bool lastCheck = true;
 
@@ -36,7 +37,11 @@ namespace TMXLoader
             this.edit = edit;
             this.type = type;
             this.newMap = map;
-            this.assetName = edit.name;
+            this.assetName = edit is BuildableEdit be? be._mapName : edit.name;
+            this.inLocation = null;
+            if (edit is BuildableEdit b)
+                this.inLocation = b._location;
+
             this.conditions = edit.conditions;
             lastCheck = conditions == "";
         }
@@ -47,11 +52,11 @@ namespace TMXLoader
             this.type = type;
             this.assetName = npcedit.map;
             this.conditions = "";
+            this.inLocation = null;
         }
-
         public bool CanEdit<T>(IAssetInfo asset)
         {
-            return asset.AssetNameEquals("Maps/" + assetName);
+            return asset.AssetNameEquals(edit is BuildableEdit ? assetName : "Maps/" + assetName);
         }
 
         public void Edit<T>(IAssetData asset)

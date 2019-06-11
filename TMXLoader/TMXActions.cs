@@ -25,6 +25,152 @@ namespace TMXLoader
 
         }
 
+        public static bool spawnTreasureAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            List<string> text = action.Split(' ').ToList();
+
+            return spawnTreasureAction(location, int.Parse(text[1]), int.Parse(text[2]), text[3], int.Parse(text[4]), text.Count <= 5 ? "none" : text[5], text.Count <= 6 ? 1 : int.Parse(text[6]), text.Count <= 7 ? "crystal" : text[7]);
+        }
+
+        public static bool spawnTreasureAction(string location, int x, int y, string type, int index = -1, string name = "none", int stack = 1, string sound = "crystal")
+        {
+            return spawnTreasureAction(Game1.getLocationFromName(location), x, y, type, index, name, stack, sound);
+        }
+
+
+        public static bool spawnTreasureAction(GameLocation location, int x, int y, string type, int index = -1, string name = "none", int stack = 1, string sound = "crystal")
+        {
+            Vector2 position = new Vector2(x, y);
+            if (!location.Objects.ContainsKey(position))
+            {
+                Item chestItem = getItem(type, index, name);
+
+                if (chestItem == null)
+                    return false;
+
+                chestItem.Stack = stack;
+                Chest chest = new Chest(false);
+                chest.TileLocation = position;
+                chest.addItem(chestItem);
+                location.Objects.Add(position, chest);
+                if(sound != "" && sound != "none")
+                    Game1.playSound(sound);
+                return true;
+            }
+            return false;
+        }
+
+        public static Item getItem(string type, int index = -1, string name = "none")
+        {
+            Item item = null;
+
+            if (type == "Object")
+            {
+                if (index != -1)
+                    item = new StardewValley.Object(index, 1);
+                else if (name != "none")
+                    item = new StardewValley.Object(Game1.objectInformation.getIndexByName(name), 1);
+            }
+            else if (type == "BigObject")
+            {
+                if (index != -1)
+                    item = new StardewValley.Object(Vector2.Zero, index);
+                else if (name != "none")
+                    item = new StardewValley.Object(Vector2.Zero, Game1.bigCraftablesInformation.getIndexByName(name));
+            }
+            else if (type == "Ring")
+            {
+                if (index != -1)
+                    item = new Ring(index);
+                else if (name != "none")
+                    item = new Ring(Game1.objectInformation.getIndexByName(name));
+            }
+            else if (type == "Hat")
+            {
+                if (index != -1)
+                    item = new Hat(index);
+                else if (name != "none")
+                    item = new Hat(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/hats", ContentSource.GameContent).getIndexByName(name));
+            }
+            else if (type == "Boots")
+            {
+                if (index != -1)
+                    item = new Boots(index);
+                else if (name != "none")
+                    item = new Boots(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Boots", ContentSource.GameContent).getIndexByName(name));
+            }
+            else if (type == "TV")
+            {
+                if (index != -1)
+                    item = new StardewValley.Objects.TV(index, Vector2.Zero);
+                else if (name != "none")
+                    item = new TV(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(name), Vector2.Zero);
+            }
+            else if (type == "IndoorPot")
+                item = new StardewValley.Objects.IndoorPot(Vector2.Zero);
+            else if (type == "CrabPot")
+                item = new StardewValley.Objects.CrabPot(Vector2.Zero);
+            else if (type == "Chest")
+                item = new StardewValley.Objects.Chest(true);
+            else if (type == "Cask")
+                item = new StardewValley.Objects.Cask(Vector2.Zero);
+            else if (type == "Cask")
+                item = new StardewValley.Objects.Cask(Vector2.Zero);
+            else if (type == "Furniture")
+            {
+                if (index != -1)
+                    item = new StardewValley.Objects.Furniture(index, Vector2.Zero);
+                else if (name != "none")
+                    item = new Furniture(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(name), Vector2.Zero);
+            }
+            else if (type == "Sign")
+                item = new StardewValley.Objects.Sign(Vector2.Zero, index);
+            else if (type == "Wallpaper")
+                item = new StardewValley.Objects.Wallpaper(Math.Abs(index), false);
+            else if (type == "Floors")
+                item = new StardewValley.Objects.Wallpaper(Math.Abs(index), true);
+            else if (type == "MeleeWeapon")
+            {
+                if (index != -1)
+                    item = new MeleeWeapon(index);
+                else if (name != "none")
+                    item = new MeleeWeapon(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/weapons", ContentSource.GameContent).getIndexByName(name));
+
+            }
+            else if (type == "CustomObject" && PyTK.CustomElementHandler.CustomObjectData.collection.ContainsKey(name))
+                item = PyTK.CustomElementHandler.CustomObjectData.collection[name].getObject();
+            else if (type == "SDVType")
+            {
+                try
+                {
+                    if (index == -1)
+                        item = Activator.CreateInstance(PyUtils.getTypeSDV(name)) is Item i ? i : null;
+                    else
+                        item = Activator.CreateInstance(PyUtils.getTypeSDV(name), index) is Item i ? i : null;
+                }
+                catch
+                {
+                    TMXLoaderMod.monitor.Log("Couldn't load item SDVType: " + name);
+                }
+            }
+            else if (type == "ByType")
+            {
+                try
+                {
+                    if (index == -1)
+                        item = Activator.CreateInstance(Type.GetType(name)) is Item i ? i : null;
+                    else
+                        item = Activator.CreateInstance(Type.GetType(name), index) is Item i ? i : null;
+                }
+                catch
+                {
+                    TMXLoaderMod.monitor.Log("Couldn't load item ByType: " + name);
+                }
+            }
+
+            return item;
+        }
+
         public static bool shopAction(string action, GameLocation location, Vector2 tile, string layer)
         {
             List<string> text = action.Split(' ').ToList();
@@ -39,115 +185,15 @@ namespace TMXLoader
                 Dictionary<Item, int[]> priceAndStock = new Dictionary<Item, int[]>();
                 foreach (TileShopItem inventory in items)
                 {
+
                     if (!PyUtils.checkEventConditions(inventory.conditions, Game1.player))
                         continue;
 
-                    Item item = null;
+                    Item item = getItem(inventory.type,inventory.index, inventory.name);
 
-                    if (inventory.type == "Object")
-                    {
-                        if (inventory.index != -1)
-                            item = new StardewValley.Object(inventory.index, 1);
-                        else if (inventory.name != "none")
-                            item = new StardewValley.Object(Game1.objectInformation.getIndexByName(inventory.name), 1);
-                    }
-                    else if (inventory.type == "BigObject")
-                    {
-                        if (inventory.index != -1)
-                            item = new StardewValley.Object(Vector2.Zero, inventory.index);
-                        else if (inventory.name != "none")
-                            item = new StardewValley.Object(Vector2.Zero, Game1.bigCraftablesInformation.getIndexByName(inventory.name));
-                    }
-                    else if (inventory.type == "Ring")
-                    {
-                        if (inventory.index != -1)
-                            item = new Ring(inventory.index);
-                        else if (inventory.name != "none")
-                            item = new Ring(Game1.objectInformation.getIndexByName(inventory.name));
-                    }
-                    else if (inventory.type == "Hat")
-                    {
-                        if (inventory.index != -1)
-                            item = new Hat(inventory.index);
-                        else if (inventory.name != "none")
-                            item = new Hat(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/hats", ContentSource.GameContent).getIndexByName(inventory.name));
-                    }
-                    else if (inventory.type == "Boots")
-                    {
-                        if (inventory.index != -1)
-                            item = new Boots(inventory.index);
-                        else if (inventory.name != "none")
-                            item = new Boots(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Boots", ContentSource.GameContent).getIndexByName(inventory.name));
-                    }
-                    else if (inventory.type == "TV")
-                    {
-                        if (inventory.index != -1)
-                            item = new StardewValley.Objects.TV(inventory.index, Vector2.Zero);
-                        else if (inventory.name != "none")
-                            item = new TV(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(inventory.name), Vector2.Zero);
-                    }
-                    else if (inventory.type == "IndoorPot")
-                        item = new StardewValley.Objects.IndoorPot(Vector2.Zero);
-                    else if (inventory.type == "CrabPot")
-                        item = new StardewValley.Objects.CrabPot(Vector2.Zero);
-                    else if (inventory.type == "Chest")
-                        item = new StardewValley.Objects.Chest(true);
-                    else if (inventory.type == "Cask")
-                        item = new StardewValley.Objects.Cask(Vector2.Zero);
-                    else if (inventory.type == "Cask")
-                        item = new StardewValley.Objects.Cask(Vector2.Zero);
-                    else if (inventory.type == "Furniture")
-                    {
-                        if (inventory.index != -1)
-                            item = new StardewValley.Objects.Furniture(inventory.index, Vector2.Zero);
-                        else if (inventory.name != "none")
-                            item = new Furniture(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(inventory.name), Vector2.Zero);
-                    }
-                    else if (inventory.type == "Sign")
-                        item = new StardewValley.Objects.Sign(Vector2.Zero, inventory.index);
-                    else if (inventory.type == "Wallpaper")
-                        item = new StardewValley.Objects.Wallpaper(Math.Abs(inventory.index), false);
-                    else if (inventory.type == "Floors")
-                        item = new StardewValley.Objects.Wallpaper(Math.Abs(inventory.index), true);
-                    else if (inventory.type == "MeleeWeapon")
-                    {
-                        if (inventory.index != -1)
-                            item = new MeleeWeapon(inventory.index);
-                        else if (inventory.name != "none")
-                            item = new MeleeWeapon(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/weapons", ContentSource.GameContent).getIndexByName(inventory.name));
+                    if (item == null)
+                        continue;
 
-                    }
-                    
-                    else if (inventory.type == "CustomObject" && PyTK.CustomElementHandler.CustomObjectData.collection.ContainsKey(inventory.name))
-                        item = PyTK.CustomElementHandler.CustomObjectData.collection[inventory.name].getObject();
-                    else if (inventory.type == "SDVType")
-                    {
-                        try
-                        {
-                            if (inventory.index == -1)
-                                item = Activator.CreateInstance(PyUtils.getTypeSDV(inventory.name)) is Item i ? i : null;
-                            else
-                                item = Activator.CreateInstance(PyUtils.getTypeSDV(inventory.name), inventory.index) is Item i ? i : null;
-                        }
-                        catch
-                        {
-                            TMXLoaderMod.monitor.Log("Couldn't load to shop SDVType: " + inventory.name);
-                        }
-                    }
-                    else if (inventory.type == "ByType")
-                    {
-                        try
-                        {
-                            if (inventory.index == -1)
-                                item = Activator.CreateInstance(Type.GetType(inventory.name)) is Item i ? i : null;
-                            else
-                                item = Activator.CreateInstance(Type.GetType(inventory.name), inventory.index) is Item i ? i : null;
-                        }
-                        catch
-                        {
-                            TMXLoaderMod.monitor.Log("Couldn't load to shop ByType: " + inventory.name);
-                        }
-                    }
                     int price = 100;
                     try
                     {
@@ -167,18 +213,25 @@ namespace TMXLoader
                 var shop = new ShopMenu(priceAndStock, 0,  null);
                 if (text.Count > 2)
                 {
-                    shop.setUpShopOwner(text[2]);
-                    shop.portraitPerson = Game1.getCharacterFromName(text[2]);
-                    if (shop.portraitPerson != null)
+                    try
                     {
                         shop.setUpShopOwner(text[2]);
                         shop.portraitPerson = Game1.getCharacterFromName(text[2]);
+                        if (shop.portraitPerson != null)
+                        {
+                            shop.setUpShopOwner(text[2]);
+                            shop.portraitPerson = Game1.getCharacterFromName(text[2]);
+                        }
+                        else
+                        {
+                            var npc = new NPC(null, Vector2.Zero, "Town", 0, text[2].Split('.')[0], false, null, TMXLoaderMod.helper.Content.Load<Texture2D>(@"Portraits/" + text[2], ContentSource.GameContent));
+                            shop.portraitPerson = npc;
+                            Game1.removeThisCharacterFromAllLocations(npc);
+                        }
                     }
-                    else
+                    catch
                     {
-                        var npc = new NPC(null, Vector2.Zero, "Town", 0, text[2].Split('.')[0], false, null, TMXLoaderMod.helper.Content.Load<Texture2D>(@"Portraits/" + text[2], ContentSource.GameContent));
-                        shop.portraitPerson = npc;
-                        Game1.removeThisCharacterFromAllLocations(npc);
+
                     }
                 }
                 if (text.Count > 3) {
@@ -271,7 +324,16 @@ namespace TMXLoader
                 if (layers.Length > 1)
                 {
                     if (layers.Length < 4)
-                        copyLayers(location.map, layers[0], layers[1]);
+                    {
+                        Layer l = location.map.GetLayer(layers[0]);
+                        if (l != null) {
+                            var size = new Microsoft.Xna.Framework.Rectangle(0, 0, l.DisplayWidth / Game1.tileSize, l.DisplayHeight / Game1.tileSize);
+
+                            for (int x = 0; x < size.Width; x++)
+                                for (int y = 0; y < size.Height; y++)
+                                    copyTileBetweenLayers(location.map, layers[0], layers[1], x, y);
+                        }
+                    }
                     else
                     {
                         string[] xStrings = layers[2].Split('-');
@@ -289,7 +351,7 @@ namespace TMXLoader
 
             return true;
         }
-
+        /*
         public static Map copyLayers(Map t, string layer1, string layer2)
         {
             Layer newLayer2 = t.GetLayer(layer1);
@@ -300,13 +362,12 @@ namespace TMXLoader
 
             return t;
         }
-
+        */
         public static Map copyTileBetweenLayers(Map t, string layer1, string layer2, int x, int y)
         {
             Location tileLocation = new Location(x, y);
 
             Tile tile1 = t.GetLayer(layer1).Tiles[tileLocation];
-            Tile tile2 = t.GetLayer(layer2).Tiles[tileLocation];
 
             t.GetLayer(layer2).Tiles[tileLocation] = tile1;
             return t;
