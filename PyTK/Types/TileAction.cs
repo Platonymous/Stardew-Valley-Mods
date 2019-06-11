@@ -12,12 +12,21 @@ namespace PyTK.Types
 {
     public class TileAction
     {
-        public Func<string, GameLocation, Vector2, string, bool> action;
+        public Func<string, string, GameLocation, Vector2, string, bool> action;
         internal static Dictionary<string, TileAction> actions = new Dictionary<string, TileAction>();
         public string trigger;
         public string currentAction = "";
 
         public TileAction(string trigger, Func<string, GameLocation, Vector2, string, bool> action)
+        {
+            this.trigger = trigger;
+            this.action = (key, values, location, tile, layer) =>
+            {
+                return action.Invoke(key + " " + values, location, tile, layer);
+            };
+        }
+
+        public TileAction(string trigger, Func<string, string, GameLocation, Vector2, string, bool> action)
         {
             this.trigger = trigger;
             this.action = action;
@@ -72,7 +81,13 @@ namespace PyTK.Types
                 }
 
                 if (getCustomAction(nextAction, conditions, fallback) is TileAction customAction)
-                    result = customAction.action(customAction.currentAction, location, tile, layer) && result;
+                {
+                    List<string> text = new List<string>(customAction.currentAction.Split(' '));
+                    string key = text[0];
+                    text.RemoveAt(0);
+
+                    result = customAction.action(key, String.Join(" ", text), location, tile, layer) && result;
+                }
             }
             return result;
         }

@@ -17,6 +17,7 @@ using PyTK.Lua;
 using PyTK.Extensions;
 using xTile.Layers;
 using xTile;
+using PyTK.Types;
 
 namespace PyTK
 {
@@ -38,6 +39,16 @@ namespace PyTK
             }
         }
 
+        public static TileAction addTileAction(string key, Func<string, string, GameLocation, Vector2, string, bool> handler)
+        {
+            return new TileAction(key, handler).register();
+        }
+
+        public static void addEventPrecondition(string key, Func<string, string, GameLocation, bool> handler)
+        {
+            Overrides.OvLocations.eventConditions.AddOrReplace(key, handler);
+        }
+
         public static bool CheckEventConditions(string conditions, object caller = null)
         {
             return checkEventConditions(conditions, caller);
@@ -51,13 +62,13 @@ namespace PyTK
         public static void checkDrawConditions(Map map)
         {
             foreach (Layer layer in map.Layers.Where(l => l.Properties.ContainsKey("DrawConditions")))
-                layer.Properties.AddOrReplace("DrawConditionsResult", PyUtils.CheckEventConditions(layer.Properties["DrawConditions"], layer) ? "T" : "F");
+                layer.Properties.AddOrReplace("DrawConditionsResult", PyUtils.checkEventConditions(layer.Properties["DrawConditions"], layer,Game1.currentLocation) ? "T" : "F");
         }
 
         internal static List<GameLocation> getWarpLocations(GameLocation location)
         {
             List<GameLocation> locations = new List<GameLocation>();
-
+            
             foreach (Warp warp in location.warps)
                 if (Game1.getLocationFromName(warp.TargetName) is GameLocation l)
                     locations.AddOrReplace(l);
@@ -147,7 +158,15 @@ namespace PyTK
         public static bool checkEventConditions(string conditions, object caller, GameLocation location)
         {
             if (!Context.IsWorldReady)
+            {
+                if (conditions.StartsWith("r "))
+                {
+                    string[] cond = conditions.Split(' ');
+                    return Game1.random.NextDouble() <= double.Parse(cond[1]);
+                }
+
                 return false;
+            }
 
             if (conditions == null || conditions == "")
                 return true;
@@ -159,13 +178,12 @@ namespace PyTK
             {
                 conditions = conditions.Replace("NOT ", "");
                 comparer = false;
-
             }
 
             if (conditions.StartsWith("PC "))
                 result = checkPlayerConditions(conditions.Replace("PC ", ""));
-            else if (conditions.StartsWith("LC "))
-                result = checkLuaConditions(conditions.Replace("LC ", ""), caller);
+            else if (conditions.StartsWith("LC ") || conditions.StartsWith("!LC "))
+                result = checkLuaConditions(conditions.StartsWith("!LC "), conditions.Replace("LC ", "").Replace("!LC ", ""), caller);
             else
             {
                 if(location == null)
@@ -213,7 +231,12 @@ namespace PyTK
             return Helper.Reflection.GetField<bool>(Game1.player, conditions).GetValue();
         }
 
-        public static bool checkLuaConditions(string conditions, object caller = null)
+        public static bool checkLuaConditions(bool negated, string conditions, object caller = null)
+        {
+            return checkLuaConditions(conditions, caller) == !negated;
+        }
+
+            public static bool checkLuaConditions(string conditions, object caller = null)
         {
             var script = PyLua.getNewScript();
             script.Globals["result"] = false;
@@ -310,6 +333,16 @@ namespace PyTK
                 e.Parameters.Add(p.Key, p.Value);
 
             return float.Parse(e.Evaluate().ToString());
+        }
+
+        public static bool calcBoolean(string expression, params KeyValuePair<string, object>[] paramters)
+        {
+            Expression e = new Expression(expression);
+
+            foreach (KeyValuePair<string, object> p in paramters)
+                e.Parameters.Add(p.Key, p.Value);
+
+            return bool.Parse(e.Evaluate().ToString());
         }
 
         public static void initOverride(IModHelper helper, Type type, Type patch, List<string> toPatch)

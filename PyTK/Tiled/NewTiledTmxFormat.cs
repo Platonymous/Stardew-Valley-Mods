@@ -293,6 +293,7 @@ namespace PyTK.Tiled
                LoadLayerDataCsv(mapLayer, layer);
                mapLayer.Properties["offsetx"] = (int) Math.Floor(layer.Horizontal * Game1.pixelZoom);
                mapLayer.Properties["offsety"] = (int)Math.Floor(layer.Vertical * Game1.pixelZoom);
+               mapLayer.Properties["opacity"] = layer.Transparency;
                map.AddLayer(mapLayer);
            };
             layers.ForEach(action1);

@@ -23,6 +23,15 @@ namespace PyTK.Lua
             Monitor.Log(text, LogLevel.Info);
         }
 
+        public static bool hasMod(string mod)
+        {
+            foreach (var m in Helper.ModRegistry.GetAll())
+                if (m.Manifest.UniqueID.Equals(mod))
+                    return true;
+
+            return false;
+        }
+
         public static int setCounter(string id, int value)
         {
             return counters(id, value, true);
@@ -75,14 +84,44 @@ namespace PyTK.Lua
             return setMapProperty(Game1.getLocationFromName(locationName).Map, property, value);
         }
 
+        public static bool setLayerProperty(string locationName, string layer, string property, string value)
+        {
+            return setLayerProperty(Game1.getLocationFromName(locationName).Map, layer, property, value);
+        }
+
         public static string getMapProperty(Map map, string property)
         {
             PropertyValue p = "";
             if (map.Properties.TryGetValue(property, out p))
-            {
                 return p.ToString();
-            }
+
             return "";
+        }
+
+        public static string getLayerProperty(Map map, string layer, string property)
+        {
+            PropertyValue p = "";
+            var mapLayer = map.GetLayer(layer);
+            if (mapLayer != null && mapLayer.Properties.TryGetValue(property, out p))
+                return p.ToString();
+
+            return "";
+        }
+
+        public static bool setLayerProperty(Map map, string layer, string property, string value)
+        {
+            var mapLayer = map.GetLayer(layer);
+            if (mapLayer != null)
+            {
+                mapLayer.Properties[property] = value;
+                return true;
+            }
+            return false;
+        }
+
+        public static string getMapProperty(string locationName, string layer, string property)
+        {
+            return getLayerProperty(Game1.getLocationFromName(locationName).Map, layer, property);
         }
 
         public static GameLocation getLocation(string locationName)

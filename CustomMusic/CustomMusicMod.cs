@@ -44,9 +44,17 @@ namespace CustomMusic
             harmony.Patch(typeof(Cue).GetMethod("SetVariable"), new HarmonyMethod(typeof(Overrides), "SetVariable"));
             harmony.Patch(typeof(Cue).GetProperty("IsPlaying").GetGetMethod(false), new HarmonyMethod(typeof(Overrides), "IsPlaying"));
             harmony.Patch(typeof(SoundBank).GetMethod("GetCue"), new HarmonyMethod(typeof(Overrides), "GetCue"));
-            var PyUtils = Type.GetType("PyTK.PyUtils, PyTK");
-            if (PyUtils != null)
-                checkEventConditions = PyUtils.GetMethod("checkEventConditions");
+
+            try
+            {
+                var PyUtils = Type.GetType("PyTK.PyUtils, PyTK");
+                if (PyUtils != null)
+                    checkEventConditions = PyUtils.GetMethod("CheckEventConditions");
+            }
+            catch
+            {
+
+            }
 
             helper.Events.Player.Warped += OnWarped;
             helper.Events.GameLoop.DayStarted += OnDayStarted;

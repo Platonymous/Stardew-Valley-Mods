@@ -22,6 +22,7 @@ namespace PyTK.Overrides
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
         internal static Dictionary<int, Rectangle> rectangleCache = new Dictionary<int, Rectangle>();
+        internal static Dictionary<string, Func<string, string, GameLocation, bool>> eventConditions = new Dictionary<string, Func<string,string, GameLocation, bool>>();
 
         [HarmonyPatch]
         internal class GLBugFix
@@ -45,27 +46,45 @@ namespace PyTK.Overrides
                 return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "checkEventPrecondition");
             }
 
-            internal static void Prefix(GameLocation __instance, ref string precondition,ref bool __result)
+            internal static bool Prefix(GameLocation __instance, ref string precondition,ref bool __result)
             {
-                if (precondition.Contains("/LC "))
+                string t = "M " + (Game1.player.money - 1);
+                string f = "M " + (Game1.player.money + 1);
+
+                foreach(var entry in eventConditions)
                 {
-                    string t = "M " + (Game1.player.money - 1);
-                    string f = "M " + (Game1.player.money + 1);
-
-                    string[] conditions = precondition.Split('/');
-
-                    for (int i = 0; i < conditions.Length; i++){
-                        if (conditions[i].StartsWith("LC"))
+                    if(precondition.Contains("/!" + entry.Key + " ") || precondition.StartsWith("!" + entry.Key + " ") || precondition.Contains("/" + entry.Key + " ") || precondition.StartsWith(entry.Key + " "))
+                    {
+                        string[] conditions = precondition.Split('/');
+                        for (int i = 0; i < conditions.Length; i++)
                         {
-                            if (PyUtils.checkEventConditions(conditions[i], __instance))
-                                conditions[i] = t;
-                            else
-                                conditions[i] = f;
-                        }
-                    }
+                            if (conditions[i].StartsWith(entry.Key) || conditions[i].StartsWith("!"+entry.Key))
+                            {
+                                bool comp = true;
 
-                    precondition = string.Join("/", conditions);
+                                if (conditions[i].StartsWith("!" + entry.Key))
+                                {
+                                    conditions[i] = conditions[i].Substring(1);
+                                    comp = false;
+                                }
+
+                                if (entry.Value.Invoke(entry.Key, conditions[i], __instance) == comp)
+                                    conditions[i] = t;
+                                else
+                                {
+                                    conditions[i] = f;
+                                    __result = false;
+                                    return false;
+                                }
+
+                            }
+                        }
+
+                        precondition = string.Join("/", conditions);
+                    }
                 }
+
+                return true;
             }
         }
 

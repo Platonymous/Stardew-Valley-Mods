@@ -85,9 +85,11 @@
     <Compile Include="Overrides\OvSleep.cs" />
     <Compile Include="PlatoUI\PlatoUIGame.cs" />
     <Compile Include="PlatoUI\PlatoUIMenu.cs" />
+    <Compile Include="PlatoUI\Presets\PlatoUIColorPicker.cs" />
     <Compile Include="PlatoUI\UIElement.cs" />
     <Compile Include="PlatoUI\UIElementList.cs" />
     <Compile Include="PlatoUI\UIHelper.cs" />
+    <Compile Include="PlatoUI\UIPresets.cs" />
     <Compile Include="PlatoUI\UITextElement.cs" />
     <Compile Include="PyDraw.cs" />
     <Compile Include="PyNet.cs" />
@@ -131,6 +133,7 @@
     <Compile Include="Types\ICustomContentAPI.cs" />
     <Compile Include="Types\InventoryItem.cs" />
     <Compile Include="Types\Mail.cs" />
+    <Compile Include="Types\MappedTexture2D.cs" />
     <Compile Include="Types\MPMessageSMAPI.cs" />
     <Compile Include="Types\MPMessage.cs" />
     <Compile Include="Types\PyNetMap.cs" />

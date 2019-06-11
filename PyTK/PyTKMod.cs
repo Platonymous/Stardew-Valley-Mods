@@ -38,7 +38,6 @@ namespace PyTK
         {
             _helper = helper;
             _monitor = Monitor;
-
             try
             {
                 harmonyFix();
@@ -57,6 +56,7 @@ namespace PyTK
             CustomTVMod.load();
             PyLua.init();
             registerTileActions();
+            registerEventPreconditions();
             SaveHandler.setUpEventHandlers();
             CustomObjectData.CODSyncer.start();
             ContentSync.ContentSyncHandler.initialize();
@@ -245,6 +245,78 @@ namespace PyTK
                      return false;
                  }
              },16,SerializationType.PLAIN,SerializationType.JSON));
+        }
+
+        private void registerEventPreconditions()
+        {
+            PyUtils.addEventPrecondition("hasmod", (key, values, location) =>
+             {
+                 return LuaUtils.hasMod(values);
+             });
+
+            PyUtils.addEventPrecondition("switch", (key, values, location) =>
+            {
+                return LuaUtils.switches(values);
+            });
+
+            PyUtils.addEventPrecondition("npcxy", (key, values, location) =>
+            {
+                var v = values.Split(' ');
+                var name = v[0];
+
+                if (v.Length == 1)
+                    return Game1.getCharacterFromName(name) is NPC npcp && npcp.currentLocation == location;
+
+                var x = int.Parse(v[1]);
+
+                if (v.Length == 2)
+                    return Game1.getCharacterFromName(name) is NPC npcx && npcx.currentLocation == location && npcx.getTileX() == x;
+
+                var y = int.Parse(v[2]);
+                return Game1.getCharacterFromName(name) is NPC npc && npc.currentLocation == location && (x == -1 || npc.getTileX() == x) && (y == -1 || npc.getTileY() == y);
+            });
+
+            PyUtils.addEventPrecondition("items", (key, values, location) =>
+            {
+                var v = values.Split(',');
+                List<Item> items = new List<Item>(Game1.player.Items);
+                foreach (string pair in v)
+                {
+                    var p = pair.Split(':');
+                    var name = p[0];
+                    var stack = p.Length == 1 ? 1 : int.Parse(p[1]);
+                    int count = 0;
+
+                    foreach(Item item in items)
+                    {
+                        if (item.Name == name)
+                            count += item.Stack;
+
+                        if (count >= stack)
+                            return true;
+                    }
+                }
+
+                return false;
+            });
+
+            PyUtils.addEventPrecondition("counter", (key, values, location) =>
+            {
+                var v = values.Split(' ');
+                var c = LuaUtils.counters(v[0]);
+
+                if (v.Length == 2)
+                    return c == int.Parse(v[1]);
+                else
+                    return PyUtils.calcBoolean("c " + values, new KeyValuePair<string, object>("c", c));
+            });
+
+            PyUtils.addEventPrecondition("LC", (key, values, location) =>
+            {
+                return PyUtils.checkEventConditions(values.Replace("%div","/"), location, location);
+            });
+
+
         }
 
         private void registerTileActions()

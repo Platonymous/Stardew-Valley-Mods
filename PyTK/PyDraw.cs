@@ -54,6 +54,19 @@ namespace PyTK
             });
         }
 
+        public static Texture2D getBorderedRectangle(int width, int height, Color color, int border, Color borderColor)
+        {
+            return getRectangle(width, height, (x, y, w, h) =>
+            {
+                Point p = new Point(x, y);
+
+                if (x < border || y < border || x >= width - border || y >= height - border)
+                    return borderColor;
+                else
+                    return color;
+            });
+        }
+
         public static Texture2D getCircle(int diameter, Color color, bool ensureOddDiameter = true)
         {
             return getCircle(diameter, color, Color.Transparent, ensureOddDiameter);

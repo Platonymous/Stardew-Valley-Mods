@@ -38,7 +38,7 @@ namespace PyTK.Extensions
 
         public static Vector2 getTileAtMousePosition(this GameLocation t)
         {
-            return new Vector2((Game1.getOldMouseX() + Game1.viewport.X) / Game1.tileSize, (Game1.getOldMouseY() + Game1.viewport.Y) / Game1.tileSize);
+            return new Vector2((Game1.getMouseX() + Game1.viewport.X) / Game1.tileSize, (Game1.getMouseY() + Game1.viewport.Y) / Game1.tileSize);
         }
 
         /* Converter */
@@ -148,7 +148,5 @@ namespace PyTK.Extensions
         {
             return new ConsoleCommand(name, documentation, (s, p) => t.Invoke(p));
         }
-
-
     }
 }

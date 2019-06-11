@@ -1,7 +1,7 @@
 {
   "Name": "Portraiture",
   "Author": "Platonymous",
-  "Version": "1.7.3",
+  "Version": "1.7.4",
   "Description": "Helper Mod for Portraits.",
   "UniqueID": "Platonymous.Portraiture",
   "EntryDll": "Portraiture.dll",
@@ -10,7 +10,7 @@
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.9.1"
+      "MinimumVersion": "1.9.4"
     }
   ]
 }

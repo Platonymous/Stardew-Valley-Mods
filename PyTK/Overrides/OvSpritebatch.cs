@@ -58,6 +58,12 @@ namespace PyTK.Overrides
                 if (skip1 || !sourceRectangle.HasValue || Game1.activeClickableMenu is TitleMenu)
                     return true;
 
+                if (texture is MappedTexture2D mapped && mapped.Get(sourceRectangle.Value.X, sourceRectangle.Value.Y) is Texture2D t)
+                {
+                    drawMethodMono.Invoke(__instance, new object[] { t, destinationRectangle, new Rectangle(0, 0, t.Width, t.Height), color, rotation, origin, effect, depth, autoFlush });
+                    return false;
+                }
+
                 if (texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.Value is Rectangle r)
                 {
                     var newDestination = new Vector4(destinationRectangle.X, destinationRectangle.Y, destinationRectangle.Z, destinationRectangle.W);
@@ -112,6 +118,12 @@ namespace PyTK.Overrides
             {
                 if (skip1 || !sourceRectangle.HasValue || Game1.activeClickableMenu is TitleMenu)
                     return true;
+
+                if (texture is MappedTexture2D mapped && mapped.Get(sourceRectangle.Value.X, sourceRectangle.Value.Y) is Texture2D t)
+                {
+                    drawMethod.Invoke(__instance, new object[] { t, destination, scaleDestination, new Rectangle(0, 0, t.Width, t.Height), color, rotation, origin, effects, depth });
+                    return false;
+                }
 
                 if (texture is ScaledTexture2D s && sourceRectangle != null && sourceRectangle.Value is Rectangle r)
                 {

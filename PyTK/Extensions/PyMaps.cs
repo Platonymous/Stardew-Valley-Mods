@@ -119,6 +119,8 @@ namespace PyTK.Extensions
 
                 if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
                     maplayer.AfterDraw += (s, e) => drawLayer(layer, Location.Origin, layer.Properties.ContainsKey("WrapAround"));
+                else if (layer.Properties.ContainsKey("DrawAbove") && map.GetLayer(layer.Properties["DrawAbove"]) is Layer maplayerAbove)
+                    maplayerAbove.AfterDraw += (s, e) => drawLayer(layer, Location.Origin, layer.Properties.ContainsKey("WrapAround"));
                 else if (layer.Properties.ContainsKey("DrawBefore") && map.GetLayer(layer.Properties["DrawBefore"]) is Layer maplayerBefore)
                     maplayerBefore.BeforeDraw += (s, e) => drawLayer(layer, Location.Origin, layer.Properties.ContainsKey("WrapAround"));
 
@@ -127,7 +129,12 @@ namespace PyTK.Extensions
             return map;
         }
 
-        private static void drawLayer(Layer layer, Location offset, bool wrap = false)
+        public static void drawLayer(Layer layer, Location offset, bool wrap = false)
+        {
+            drawLayer(layer, Game1.mapDisplayDevice, Game1.viewport, Game1.pixelZoom, offset, wrap);
+        }
+
+        public static void drawLayer(Layer layer, xTile.Display.IDisplayDevice device, xTile.Dimensions.Rectangle viewport, int pixelZoom, Location offset,  bool wrap = false)
         {
             if (layer.Properties.ContainsKey("DrawConditions") && (!layer.Properties.ContainsKey("DrawConditionsResult") || layer.Properties["DrawConditionsResult"] != "T"))
                     return;
@@ -141,6 +148,8 @@ namespace PyTK.Extensions
                     layer.Properties["OffestYReset"] = offset.Y;
                 }
             }
+
+           
 
             if (!layer.Properties.ContainsKey("StartX"))
             {
@@ -178,20 +187,34 @@ namespace PyTK.Extensions
                     offset.Y += my;
             }
 
+            
             layer.Properties["offsetx"] = offset.X;
             layer.Properties["offsety"] = offset.Y;
 
-
+            if (layer.Properties.ContainsKey("tempOffsetx") && layer.Properties.ContainsKey("tempOffsety"))
+                offset = new Location( int.Parse(layer.Properties["tempOffsetx"]), int.Parse(layer.Properties["tempOffsety"]));
 
             if (layer.Properties.ContainsKey("isImageLayer"))
                 drawImageLayer(layer, offset, wrap);
             else
-                layer.Draw(Game1.mapDisplayDevice, Game1.viewport, offset, wrap, Game1.pixelZoom);
+            {
+                layer.Draw(device, viewport, offset, wrap, pixelZoom);
+            }
         }
 
         private static void drawImageLayer(Layer layer, Location offset, bool wrap = false)
         {
-            Texture2D texture = Helper.Content.Load<Texture2D>(layer.Map.GetTileSheet("zImageSheet_" + layer.Id).ImageSource, ContentSource.GameContent);
+            drawImageLayer(layer, Game1.mapDisplayDevice, Game1.viewport, Game1.pixelZoom, offset, wrap);
+        }
+
+        private static void drawImageLayer(Layer layer, xTile.Display.IDisplayDevice device, xTile.Dimensions.Rectangle viewport, int pixelZoom, Location offset, bool wrap = false)
+        {
+            string ts = "zImageSheet_" + layer.Id;
+
+            if (layer.Properties.ContainsKey("UseImageFrom"))
+                ts = "zImageSheet_" + layer.Properties["UseImageFrom"];
+
+            Texture2D texture = Helper.Content.Load<Texture2D>(layer.Map.GetTileSheet(ts).ImageSource, ContentSource.GameContent);
             Vector2 pos = new Vector2(offset.X, offset.Y);
 
 
@@ -219,9 +242,19 @@ namespace PyTK.Extensions
 
             }
 
+            Color color = Color.White;
+
+            if (layer.Properties.ContainsKey("Color"))
+            {
+                string[] c = layer.Properties["Color"].ToString().Split(' ');
+                color = new Color(int.Parse(c[0]), int.Parse(c[1]), int.Parse(c[2]), c.Length > 3 ? int.Parse(c[3]) : 255);
+            }
+
+
+
             Microsoft.Xna.Framework.Rectangle dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, texture.Width * Game1.pixelZoom, texture.Height * Game1.pixelZoom);
             if (!wrap)
-                Game1.spriteBatch.Draw(texture, dest, Color.White * (float)float.Parse(layer.Properties["opacity"]));
+                Game1.spriteBatch.Draw(texture, dest, color * (float)float.Parse(layer.Properties["opacity"]));
 
             var vp = new Microsoft.Xna.Framework.Rectangle(Game1.viewport.X, Game1.viewport.Y, Game1.viewport.Width, Game1.viewport.Height);
             if (wrap)
@@ -234,12 +267,12 @@ namespace PyTK.Extensions
                     s.Y -= dest.Height;
                 }
 
-                Vector2 e = new Vector2(vp.X + vp.Width + (dest.Width*2), vp.Height + vp.Y + (dest.Height * 2));
+                Vector2 e = new Vector2(vp.X + vp.Width + (dest.Width * 2), vp.Height + vp.Y + (dest.Height * 2));
 
                 for (float x = s.X; x <= e.X; x += dest.Width)
                     for (Microsoft.Xna.Framework.Rectangle n = new Microsoft.Xna.Framework.Rectangle((int)x, (int)s.Y, dest.Width, dest.Height); n.Y <= e.Y; n.Y += dest.Height)
                         if ((layer.Properties["WrapAround"] != "Y" || n.X == dest.X) && (layer.Properties["WrapAround"] != "X" || n.Y == dest.Y))
-                            Game1.spriteBatch.Draw(texture, n, Color.White * (float)float.Parse(layer.Properties["opacity"]));
+                            Game1.spriteBatch.Draw(texture, n, color * (float)float.Parse(layer.Properties["opacity"]));
             }
         }
 
