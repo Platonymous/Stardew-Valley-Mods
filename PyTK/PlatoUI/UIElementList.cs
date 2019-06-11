@@ -23,7 +23,6 @@ namespace PyTK.PlatoUI
         public UIElementList(string id = "element", bool vertical = true, int z = 0, float opacity = 1f, int margin = 0, int startPosition = 0, bool scrollable = true, Func<UIElement, UIElement, Rectangle> positioner = null, Func<UIElement, UIElement, Rectangle> elementPositioner = null, params UIElement[] elements)
             : base(id, positioner, z, null, Color.White, opacity, true)
         {
-
             Margin = margin;
             Position = 0;
             Scrollable = scrollable;
@@ -37,6 +36,9 @@ namespace PyTK.PlatoUI
             foreach (UIElement element in elements)
                 Add(element);
 
+            while (Position != startPosition)
+                if (!ChangePosition(1))
+                    break;
         }
 
         public virtual void Scroll(int direction)
@@ -54,7 +56,8 @@ namespace PyTK.PlatoUI
             if (id == null)
                 id = Id;
 
-            UIElementList e = (UIElementList) new UIElementList(id, IsVertical,Z,Opacity,Margin,Position,Scrollable, Positioner,ElementPositioner).WithInteractivity(UpdateAction, HoverAction, ClickAction,KeyAction,ScrollAction).WithTypes(Types.ToArray());
+            UIElement e = new UIElementList(id, IsVertical,Z,Opacity,Margin,Position,Scrollable, Positioner,ElementPositioner);
+            CopyBasicAttributes(ref e);
 
             List<UIElement> elements = new List<UIElement>();
             foreach (UIElement child in ListElements)
@@ -62,14 +65,6 @@ namespace PyTK.PlatoUI
 
             foreach (UIElement element in elements)
                 e.Add(element);
-
-            e.SelectAction = SelectAction;
-            e.IsSelectable = IsSelectable;
-            e.IsSelected = IsSelected;
-            e.SelectionId = SelectionId;
-            e.IsDraggable = IsDraggable;
-            e.DragAction = DragAction;
-            e.DragPoint = DragPoint;
 
             return e;
         }

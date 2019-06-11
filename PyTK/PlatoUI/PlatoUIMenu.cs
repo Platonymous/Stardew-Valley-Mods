@@ -17,6 +17,10 @@ namespace PyTK.PlatoUI
 
         public virtual Point LastMouse { get; set; } = Point.Zero;
 
+        protected virtual Action<SpriteBatch> BeforeDrawAction { get; set; } = null;
+        protected virtual Action<SpriteBatch> AfterDrawAction { get; set; } = null;
+
+
         public virtual string Id { get; set; }
 
         public PlatoUIMenu(string id, UIElement element, bool clone = false, Texture2D background = null, Color? backgroundColor = null, bool movingBackground = false)
@@ -34,16 +38,18 @@ namespace PyTK.PlatoUI
 
             BaseMenu.UpdateBounds();
         }
-        
+       
         public virtual void ClearMenu(UIElement element = null)
         {
             BaseMenu.Clear(element);
         }
         public override void draw(SpriteBatch b)
         {
+            BeforeDrawAction?.Invoke(b);
             this.drawBackground(b);
             UIHelper.DrawElement(b, BaseMenu);
             this.drawMouse(b);
+            AfterDrawAction?.Invoke(b);
         }
 
         public override void drawBackground(SpriteBatch b)

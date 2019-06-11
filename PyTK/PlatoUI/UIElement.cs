@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PyTK.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PyTK.PlatoUI
@@ -15,6 +17,57 @@ namespace PyTK.PlatoUI
         public virtual UIElement Base { get; set; } = null;
         public static UIElement DragElement { get; set; } = null;
         public virtual string Id { get; set; }
+
+        protected float _rotation = 0f;
+        public virtual float Rotation
+        {
+            get
+            {
+                if (Parent == null)
+                    return _rotation;
+
+                return Parent.Rotation + _rotation;
+            }
+            set
+            {
+                _rotation = value;
+            }
+        }
+
+        protected SpriteEffects _flip = SpriteEffects.None;
+        public virtual SpriteEffects SpriteEffects {
+            get
+            {
+                if (Parent == null || Parent.SpriteEffects == SpriteEffects.None || _flip != SpriteEffects.None)
+                    return _flip;
+                else
+                    return _flip;
+            }
+
+            set
+            {
+                _flip = value;
+            }
+
+        }
+
+        protected Vector2 _origin = Vector2.Zero;
+
+        public virtual Vector2 Origin
+        {
+            get
+            {
+                if (Parent == null)
+                    return _origin;
+
+                return (Parent.Origin + _origin);
+            }
+
+            set
+            {
+                _origin = value;
+            }
+        }
         public virtual List<string> Types { get; set; } = new List<string>();
 
         protected UIElement _parent = null;
@@ -99,8 +152,10 @@ namespace PyTK.PlatoUI
 
         public virtual Action<bool, UIElement> SelectAction { get; set; } = null;
 
-        public virtual Func<bool, Point, UIElement, bool> DragAction { get; set; } = null;
+        public virtual Action<SpriteBatch, UIElement> DrawAction { get; set; } = null;
 
+        public virtual Func<bool, Point, UIElement, bool> DragAction { get; set; } = null;
+        
         public virtual Func<UIElement, UIElement, Rectangle> Positioner { get; set; } = null;
 
         public virtual Rectangle? SourceRectangle { get; set; } = null;
@@ -119,7 +174,6 @@ namespace PyTK.PlatoUI
         public virtual Vector2 DragPoint { get; set; } = Vector2.Zero;
 
         protected virtual Point? TempDragPoint { get; set; } = null;
-
         public virtual bool IsBeingDragged
         {
             get
@@ -133,14 +187,26 @@ namespace PyTK.PlatoUI
         {
             get
             {
-                if (!_bounds.HasValue)
-                    CalculateBounds();
+                for (int i = 0; i < 100; i++)
+                {
+                    try
+                    {
+                        if (!_bounds.HasValue)
+                            CalculateBounds();
 
-                Rectangle r = new Rectangle(_bounds.Value.X + OffsetX, _bounds.Value.Y + OffsetY, _bounds.Value.Width + AddedWidth, _bounds.Value.Height + AddedHeight);
+                        Rectangle r = new Rectangle(_bounds.Value.X + OffsetX, _bounds.Value.Y + OffsetY, _bounds.Value.Width + AddedWidth, _bounds.Value.Height + AddedHeight);
 
-                if (IsBeingDragged && DragPosition.HasValue)
-                    return new Rectangle(DragPosition.Value.X, DragPosition.Value.Y, r.Width, r.Height);
-                return r;
+                        if (IsBeingDragged && DragPosition.HasValue)
+                            return new Rectangle(DragPosition.Value.X, DragPosition.Value.Y, r.Width, r.Height);
+                        return r;
+                    }
+                    catch
+                    {
+                        
+                    }
+                }
+
+                return new Rectangle(0, 0, 0, 0);
             }
         }
 
@@ -162,6 +228,20 @@ namespace PyTK.PlatoUI
                 Positioner = UIHelper.Fill;
             else
                 Positioner = positioner;
+        }
+
+        public virtual UIElement Rotated(float rotation, Vector2 origin)
+        {
+            Rotation = rotation;
+            Origin = origin;
+
+            return this;
+        }
+
+        public virtual UIElement Flipped(bool horizontal = true)
+        {
+            SpriteEffects spriteEffects = horizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.FlipVertically;
+            return this;
         }
 
         public virtual UIElement WithBase(UIElement element)
@@ -191,21 +271,40 @@ namespace PyTK.PlatoUI
                 child.Enable();
         }
 
+        public virtual void CopyBasicAttributes(ref UIElement to)
+        {
+            to.WithInteractivity(UpdateAction, HoverAction, ClickAction, KeyAction, ScrollAction, DrawAction);
+
+            if (IsSelectable)
+                to.AsSelectable(SelectionId, SelectAction);
+
+            if (IsDraggable)
+                to.AsDraggable(DragAction, DragPoint.X, DragPoint.Y);
+           
+            if (Tiled)
+                to.AsTiledBox(TileSize, Bordered);
+
+            if(_rotation != 0 || _origin != Vector2.Zero)
+                to.Rotated(_rotation, _origin);
+
+            if (_flip != SpriteEffects.None)
+                to.Flipped(_flip == SpriteEffects.FlipHorizontally);
+
+            if (Types.Count > 0)
+                to.WithTypes(Types.ToArray());
+        }
+
+
+
         public virtual UIElement Clone(string id = null)
         {
             if (id == null)
                 id = Id;
 
-            var e = new UIElement(id, Positioner, Z, Theme, Color, Opacity, IsContainer).AsTiledBox(TileSize, Bordered).WithInteractivity(UpdateAction, HoverAction, ClickAction).WithTypes(Types.ToArray());
+            var e = new UIElement(id, Positioner, Z, Theme, Color, Opacity, IsContainer);
+            CopyBasicAttributes(ref e);
             e.Base = null;
-            e.SelectAction = SelectAction;
-            e.IsSelectable = IsSelectable;
-            e.IsSelected = IsSelected;
-            e.SelectionId = SelectionId;
-            e.DragPoint = DragPoint;
-            e.IsDraggable = IsDraggable;
-            e.DragAction = DragAction;
-
+            
             foreach (UIElement child in Children)
                 e.Add(child.Clone());
 
@@ -368,7 +467,7 @@ namespace PyTK.PlatoUI
                     DragElement = this;
                     DragPosition = null;
                     TempDragPoint = null;
-                    if(DragPoint == Vector2.Zero)
+                    if (DragPoint == Vector2.Zero)
                     {
                         var b = Bounds;
                         TempDragPoint = new Point(point.X - b.X, point.Y - b.Y);
@@ -386,11 +485,14 @@ namespace PyTK.PlatoUI
                 ClickAction?.Invoke(point, right, release, hold, this);
             }
 
-            Task.Run(() =>
-           {
-               foreach (UIElement child in Children.Where(c => c.Visible))
-                   child.PerformClick(point, right, release, hold);
-           });
+            foreach (UIElement child in Children.Where(c => c.Visible))
+            {
+                try
+                {
+                    child.PerformClick(point, right, release, hold);
+                }
+                catch { }
+            }
         }
 
         public virtual void PerformMouseMove(Point point)
@@ -409,7 +511,10 @@ namespace PyTK.PlatoUI
             foreach (UIElement child in Children)
                 Task.Run(() =>
             {
+                try { 
                     child.PerformMouseMove(point);
+                }
+                catch { }
             });
                 UpdateBounds();
         }
@@ -424,7 +529,11 @@ namespace PyTK.PlatoUI
             foreach (UIElement child in Children)
                 Task.Run(() =>
             {
-                child.PerformKey(key, released);
+                try
+                {
+                    child.PerformKey(key, released);
+                }
+                catch { }
             });
         }
 
@@ -438,8 +547,19 @@ namespace PyTK.PlatoUI
             foreach (UIElement child in Children)
                 child.PerformScroll(direction);
         }
+
+        public virtual void PerfromDrawAction(SpriteBatch b)
+        {
+            if (OutOfBounds)
+                return;
+
+            DrawAction?.Invoke(b, this);
+
+            foreach (UIElement child in Children)
+                child.PerfromDrawAction(b);
+        }
         
-        public virtual UIElement WithInteractivity(Action<GameTime, UIElement> update = null, Action<Point, bool, UIElement> hover = null, Action<Point, bool,bool,bool, UIElement> click = null, Action<Keys,bool, UIElement> keys = null, Action<int,UIElement>scroll = null)
+        public virtual UIElement WithInteractivity(Action<GameTime, UIElement> update = null, Action<Point, bool, UIElement> hover = null, Action<Point, bool,bool,bool, UIElement> click = null, Action<Keys,bool, UIElement> keys = null, Action<int,UIElement>scroll = null, Action<SpriteBatch,UIElement> draw = null)
         {
             if(update != null)
                 UpdateAction = update;
@@ -456,16 +576,20 @@ namespace PyTK.PlatoUI
             if (scroll != null)
                 ScrollAction = scroll;
 
+            if (draw != null)
+                DrawAction = draw;
+
             return this;
         }
 
-        public virtual UIElement WithoutInteractivity(bool update = false, bool hover = false, bool click = false, bool keys = false, bool scroll = false)
+        public virtual UIElement WithoutInteractivity(bool update = false, bool hover = false, bool click = false, bool keys = false, bool scroll = false, bool draw = false)
         {
             UpdateAction = update ? null : UpdateAction;
             HoverAction = hover ? null :HoverAction;
             ClickAction = click ? null : ClickAction;
             KeyAction = keys ? null : KeyAction;
             ScrollAction = scroll ? null : ScrollAction;
+            DrawAction = draw ? null : DrawAction;
 
             return this;
         }
@@ -482,7 +606,6 @@ namespace PyTK.PlatoUI
 
         public virtual void UpdateBounds(bool children = true)
         {
-
             _bounds = null;
             CalculateBounds();
 

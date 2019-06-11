@@ -12,6 +12,19 @@ namespace PyTK.PlatoUI
     public class UIHelper
     {
         private static Texture2D _plain;
+        private static Texture2D _dark;
+        private static Texture2D _yellow;
+        private static Texture2D _yellowBox;
+        private static Texture2D _yellowComb1;
+        private static Texture2D _yellowComb2;
+        private static Texture2D _tab;
+        private static Texture2D _hourglas;
+        private static Texture2D _arrowUp;
+        private static Texture2D _arrowRight;
+        private static Texture2D _arrowDown;
+        private static Texture2D _arrowLeft;
+        private static Texture2D _whitebubble;
+        private static Texture2D _bounceClose;
 
         public static UIElement BaseHud = UIElement.GetContainer("BaseHud");
 
@@ -25,6 +38,7 @@ namespace PyTK.PlatoUI
                     return null;
             }
         }
+
 
         public static UIElement BaseMenu
         {
@@ -45,6 +59,149 @@ namespace PyTK.PlatoUI
                     _plain = PyTK.PyDraw.getRectangle(3,3, Color.White);
 
                 return _plain;
+            }
+        }
+
+        public static Texture2D DarkTheme
+        {
+            get
+            {
+                if (_dark == null)
+                    _dark = PyTK.PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors",StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(473,36,24,24));
+
+                return _dark;
+            }
+        }
+
+        public static Texture2D TabTheme
+        {
+            get
+            {
+                if (_tab == null)
+                    _tab = PyTK.PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(16, 368, 16, 16));
+
+                return _tab;
+            }
+        }
+
+        public static Texture2D YellowTheme
+        {
+            get
+            {
+                if (_yellow == null)
+                    _yellow = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/DialogBoxGreen", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(16, 16, 160, 160));
+
+                return _yellow;
+            }
+        }
+
+        public static Texture2D YellowbBoxTheme
+        {
+            get
+            {
+                if (_yellowBox == null)
+                    _yellowBox = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(293, 360, 24, 24));
+
+                return _yellowBox;
+            }
+        }
+
+        public static Texture2D YellowCombBoxesLeftTheme
+        {
+            get
+            {
+                if (_yellowComb1 == null)
+                    _yellowComb1 = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(293, 360, 18, 24));
+
+                return _yellowComb1;
+            }
+        }
+
+        public static Texture2D YellowCombBoxesRightTheme
+        {
+            get
+            {
+                if (_yellowComb2 == null)
+                    _yellowComb2 = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(311, 360, 18, 24));
+
+                return _yellowComb2;
+            }
+        }
+
+        public static Texture2D BounceClose
+        {
+            get
+            {
+                if (_bounceClose == null)
+                    _bounceClose = new AnimatedTexture2D(PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(289, 342, 121, 12)),11,12,12,true,true,1);
+
+                return _bounceClose;
+            }
+        }
+
+        public static Texture2D WhiteBubbly
+        {
+            get
+            {
+                if (_whitebubble == null)
+                    _whitebubble = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(111, 1870, 54, 49));
+
+                return _whitebubble;
+            }
+        }
+
+        public static Texture2D Houreglas
+        {
+            get
+            {
+                if (_hourglas == null)
+                    _hourglas = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(16, 0, 10, 16));
+
+                return _hourglas;
+            }
+        }
+
+        public static Texture2D ArrowUp
+        {
+            get
+            {
+                if (_arrowUp == null)
+                    _arrowUp = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(76, 72, 40, 44));
+
+                return _arrowUp;
+            }
+        }
+
+        public static Texture2D ArrowDown
+        {
+            get
+            {
+                if (_arrowDown == null)
+                    _arrowDown = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(12, 76, 40, 44));
+
+                return _arrowDown;
+            }
+        }
+
+        public static Texture2D ArrowRight
+        {
+            get
+            {
+                if (_arrowRight == null)
+                    _arrowRight = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(12, 204, 44, 40));
+
+                return _arrowRight;
+            }
+        }
+
+        public static Texture2D ArrowLeft
+        {
+            get
+            {
+                if (_arrowLeft == null)
+                    _arrowLeft = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(8, 268, 44, 40));
+
+                return _arrowLeft;
             }
         }
 
@@ -85,6 +242,8 @@ namespace PyTK.PlatoUI
 
         public static void DrawElement(SpriteBatch b, UIElement element, float opacity = 1f)
         {
+            element.PerfromDrawAction(b);
+
             foreach (UIElement child in element.Children.OrderBy(c => c.Z).Where(c => c.Z < 0))
                 DrawElement(b, child, element.Opacity * opacity);
 
@@ -93,7 +252,7 @@ namespace PyTK.PlatoUI
                 if (element.Theme != null && !element.OutOfBounds)
                 {
                     if (!element.Tiled)
-                        b.Draw(element.Theme is ScaledTexture2D s ? s.STexture : element.Theme, element.Bounds, element.SourceRectangle, element.Color * element.Opacity * opacity);
+                        b.Draw(element.Theme is ScaledTexture2D s ? s.STexture : element.Theme, element.Bounds, element.SourceRectangle, element.Color * element.Opacity * opacity,element.Rotation,element.Origin,element.SpriteEffects,0);
                     else
                         DrawTiled(b, element, opacity);
                 }

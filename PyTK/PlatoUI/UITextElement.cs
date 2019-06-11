@@ -61,15 +61,9 @@ namespace PyTK.PlatoUI
             if (id == null)
                 id = Id;
 
-            var e = new UITextElement(Text,Font,TextColor,Scale, Opacity,id,Z,Positioner).WithInteractivity(UpdateAction, HoverAction, ClickAction, KeyAction, ScrollAction).WithTypes(Types.ToArray());
+            UIElement e = new UITextElement(Text,Font,TextColor,Scale, Opacity,id,Z,Positioner);
 
-            e.SelectAction = SelectAction;
-            e.IsSelectable = IsSelectable;
-            e.IsSelected = IsSelected;
-            e.SelectionId = SelectionId;
-            e.IsDraggable = IsDraggable;
-            e.DragAction = DragAction;
-            e.DragPoint = DragPoint;
+            CopyBasicAttributes(ref e);
 
             foreach (UIElement child in Children)
                 e.Add(child.Clone());
