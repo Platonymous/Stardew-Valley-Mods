@@ -71,11 +71,11 @@ namespace CFAutomate.Framework
             if (!Machine.blueprint.production.Exists(p => p.materials != null && p.materials.Count > 0))
                 return false;
 
-            if (Machine.blueprint.conditionaldropin && !Machine.checkedToday)
+            /*
+            if (Machine.blueprint.conditionaldropin && !Machine.meetsConditions)
             {
                 Machine.meetsConditions = PyUtils.CheckEventConditions(Machine.conditions, this);
-                Machine.checkedToday = true;
-            }
+            }*/
 
             if (Machine.blueprint.conditionaldropin && !Machine.meetsConditions)
                 return false;
