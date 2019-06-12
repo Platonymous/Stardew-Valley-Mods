@@ -400,7 +400,7 @@ namespace PyTK.Extensions
                         }
                         catch (Exception e)
                         {
-                            Monitor.Log($"{e.Message} ({map.DisplayWidth} -> {layer.Id} -> {px}:{py})");
+                          Monitor.Log($"{e.Message} ({map.DisplayWidth} -> {layer.Id} -> {px}:{py})");
                         }
                     }
            
