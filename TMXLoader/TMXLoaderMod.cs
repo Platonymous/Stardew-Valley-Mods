@@ -21,6 +21,7 @@ using System;
 using xTile.Tiles;
 using PyTK.PlatoUI;
 using xTile.Dimensions;
+using StardewValley.TerrainFeatures;
 
 namespace TMXLoader
 {
@@ -207,8 +208,8 @@ namespace TMXLoader
         {
             try
             {
-                removeAssetEditor(toRemove._editor);
                 buildablesBuild.Remove(toRemove);
+                removeAssetEditor(toRemove._editor);
                 if (Game1.getLocationFromName(toRemove.Location) is GameLocation location)
                 {
                     helper.Content.InvalidateCache(location.mapPath.Value);
@@ -216,9 +217,9 @@ namespace TMXLoader
                     location.map.enableMoreMapLayers();
                 }
             }
-            catch
+            catch(Exception e)
             {
-
+                Monitor.Log(e.Message + ":" + e.StackTrace);
             }
 
             if (distribute && Game1.IsMultiplayer)
@@ -266,9 +267,9 @@ namespace TMXLoader
                 {
                     m = Helper.Content.Load<Map>("Maps/" + e.name, ContentSource.GameContent);
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    Monitor.Log(ex.Message + ":" + ex.StackTrace);
                 }
 
                 if (m == null)
@@ -354,6 +355,10 @@ namespace TMXLoader
                         {
                             Location tileLocation = new Location(x, y);
                             Tile tile = layer.Tiles[tileLocation];
+
+                            if (tile == null)
+                                continue;
+
                             keys.Clear();
 
                             foreach (var property in tile.Properties.Where(prop => propCheck(prop)))
@@ -362,11 +367,53 @@ namespace TMXLoader
                             foreach (string key in keys)
                                 tile.Properties[key] = propChange(key, tile.Properties[key]);
                         }
-                        catch
+                        catch (Exception ex)
                         {
+                            Monitor.Log(ex.Message + ":" + ex.StackTrace);
                             continue;
                         }
                     }
+            }
+
+            if (config.clearBuildingSpace)
+            {
+                foreach(xTile.Layers.Layer layer in map.Layers.Where(l => l.Id == "Back" || l.Id == "Buildings"))
+                {
+                    size = new Microsoft.Xna.Framework.Rectangle(0, 0, layer.DisplayWidth / Game1.tileSize, layer.DisplayHeight / Game1.tileSize);
+
+                    for (int x = 0; x < size.Width; x++)
+                        for (int y = 0; y < size.Height; y++)
+                        {
+                            Vector2 key = new Vector2(x + position.X, y + position.Y);
+                            if (layer.Id == "Buildings" && location.Objects.ContainsKey(key))
+                                location.Objects.Remove(key);
+
+                            if (layer.Id == "Back" && location.terrainFeatures.ContainsKey(key))
+                                location.terrainFeatures.Remove(key);
+
+
+                            List<LargeTerrainFeature> ltfToRemove = new List<LargeTerrainFeature>();
+
+                            foreach(var ltf in location.largeTerrainFeatures)
+                                if (LuaUtils.getDistance(ltf.tilePosition.Value, key) < 4)
+                                    ltfToRemove.Add(ltf);
+
+                            foreach (var ltf in ltfToRemove)
+                                location.largeTerrainFeatures.Remove(ltf);
+
+                            if (location is Farm farm)
+                            {
+                                List<ResourceClump> rcToRemove = new List<ResourceClump>();
+
+                                foreach (var rc in farm.resourceClumps)
+                                    if (rc.occupiesTile(x,y))
+                                        rcToRemove.Add(rc);
+
+                                foreach (var rc in rcToRemove)
+                                    farm.resourceClumps.Remove(rc);
+                            }
+                        }
+                }
             }
 
             edit._mapName = location.mapPath.Value;
@@ -385,9 +432,9 @@ namespace TMXLoader
             {
                 Helper.Reflection.GetMethod(location, "reloadMap").Invoke();
             }
-            catch
+            catch (Exception ex)
             {
-
+                Monitor.Log(ex.Message + ":" + ex.StackTrace);
             }
             location.updateSeasonalTileSheets();
             location.map.enableMoreMapLayers();
@@ -502,8 +549,9 @@ namespace TMXLoader
                             {
                                 Helper.Reflection.GetMethod(Game1.currentLocation, "reloadMap").Invoke();
                             }
-                            catch
+                            catch (Exception ex)
                             {
+                                Monitor.Log(ex.Message + ":" + ex.StackTrace);
 
                             }
                             e.NewLocation.updateSeasonalTileSheets();
@@ -623,8 +671,9 @@ namespace TMXLoader
                 {
                     location.loadLights();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Monitor.Log(ex.Message + ":" + ex.StackTrace);
 
                 }
                 location.IsOutdoors = false;
@@ -731,18 +780,18 @@ namespace TMXLoader
                     // mapsToSync.AddOrReplace(edit.name, map);
                 }
 
+                foreach (MapEdit edit in tmxPack.onlyWarps)
+                {
+                    addAssetEditor(new TMXAssetEditor(edit, null, EditType.Warps));
+                    // mapsToSync.AddOrReplace(edit.name, map);
+                }
+
                 foreach (BuildableEdit edit in tmxPack.buildables)
                 {
                     edit._icon = pack.LoadAsset<Texture2D>(edit.iconFile);
                     edit._map = TMXContent.Load(edit.file, Helper, pack);
                     edit._pack = pack;
                     buildables.Add(edit);
-                }
-
-                foreach (MapEdit edit in tmxPack.onlyWarps)
-                {
-                    addAssetEditor(new TMXAssetEditor(edit, null, EditType.Warps));
-                    // mapsToSync.AddOrReplace(edit.name, map);
                 }
             }
         }
@@ -758,8 +807,8 @@ namespace TMXLoader
 
         private TMXAssetEditor removeAssetEditor(TMXAssetEditor editor)
         {
-            if (editor.conditions != "" || editor.inLocation != null)
-                conditionals.Add(editor);
+            if (conditionals.Contains(editor))
+                conditionals.Remove(editor);
 
             Helper.Content.AssetEditors.Remove(editor);
             return editor;
@@ -821,8 +870,9 @@ namespace TMXLoader
                     map = Helper.Content.Load<Map>(path, ContentSource.GameContent);
                     map.LoadTileSheets(Game1.mapDisplayDevice);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Monitor.Log(ex.Message + ":" + ex.StackTrace);
                     continue;
                 }
 
@@ -1092,14 +1142,18 @@ namespace TMXLoader
                             {
                                 try
                                 {
-                                    layer.Properties.Remove("tempOffsetx");
-                                    layer.Properties.Remove("tempOffsety");
+                                    if (layer.Properties.ContainsKey("tempOffsetx"))
+                                        layer.Properties.Remove("tempOffsetx");
+
+                                    if (layer.Properties.ContainsKey("tempOffsety"))
+                                        layer.Properties.Remove("tempOffsety");
 
                                     if (layer.Properties.ContainsKey("ColorId") && layer.Properties.ContainsKey("Color"))
                                         colors.AddOrReplace(layer.Properties["ColorId"].ToString(), layer.Properties["Color"].ToString());
                                 }
-                                catch
+                                catch (Exception ex)
                                 {
+                                    Monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
 
                                 }
                             }
@@ -1112,9 +1166,9 @@ namespace TMXLoader
 
                             showBuildablesMenu(list.Position);
                         }
-                        catch(Exception e)
+                        catch(Exception ex)
                         {
-                            Monitor.Log(e.Message + ":" + e.StackTrace, LogLevel.Error);
+                            Monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
                         }
                     }
 
@@ -1274,8 +1328,15 @@ namespace TMXLoader
 
                     }, click: (p, right, release, hold, element) =>
                     {
-                        if (release && !right && element.Opacity == 1f)
-                            showBuildablesMenu(list.Position, element.Id, false);
+                        try
+                        {
+                            if (release && !right && element.Opacity == 1f)
+                                showBuildablesMenu(list.Position, element.Id, false);
+                        }
+                        catch(Exception e)
+                        {
+                            Monitor.Log(e.Message + ":" + e.StackTrace, LogLevel.Error);
+                        }
                     });
                     list.Add(buildableEntry);
                     UIElement buildableImage = UIElement.GetImage(b._icon, Color.White, b.id + "_icon", positioner: UIHelper.GetTopLeft(10, 10, 0, 180));

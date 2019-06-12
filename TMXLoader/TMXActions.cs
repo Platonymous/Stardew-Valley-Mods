@@ -148,8 +148,9 @@ namespace TMXLoader
                     else
                         item = Activator.CreateInstance(PyUtils.getTypeSDV(name), index) is Item i ? i : null;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    TMXLoaderMod.monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
                     TMXLoaderMod.monitor.Log("Couldn't load item SDVType: " + name);
                 }
             }
@@ -162,8 +163,9 @@ namespace TMXLoader
                     else
                         item = Activator.CreateInstance(Type.GetType(name), index) is Item i ? i : null;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    TMXLoaderMod.monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
                     TMXLoaderMod.monitor.Log("Couldn't load item ByType: " + name);
                 }
             }
@@ -199,8 +201,9 @@ namespace TMXLoader
                     {
                         price = inventory.price > 0 ? inventory.price : item.salePrice();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        TMXLoaderMod.monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
 
                     }
 
@@ -229,8 +232,9 @@ namespace TMXLoader
                             Game1.removeThisCharacterFromAllLocations(npc);
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        TMXLoaderMod.monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
 
                     }
                 }

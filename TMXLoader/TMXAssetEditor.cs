@@ -29,8 +29,19 @@ namespace TMXLoader
         public string assetName;
         public string conditions;
         public string inLocation;
+        public SaveBuildable saveBuildable = null;
 
         public bool lastCheck = true;
+
+        public override bool Equals(object obj)
+        {
+            return obj is TMXAssetEditor tmxe && edit == tmxe.edit && inLocation == tmxe.inLocation && assetName == tmxe.assetName;
+        }
+
+        public override int GetHashCode()
+        {
+            return (edit.GetHashCode() + ":" + inLocation + ":" + assetName + ":" + edit.position).GetHashCode();
+        }
 
         public TMXAssetEditor(MapEdit edit, Map map, EditType type)
         {
@@ -56,11 +67,17 @@ namespace TMXLoader
         }
         public bool CanEdit<T>(IAssetInfo asset)
         {
+            if (saveBuildable != null && !TMXLoaderMod.buildablesBuild.Contains(saveBuildable))
+                return false;
+
             return asset.AssetNameEquals(edit is BuildableEdit ? assetName : "Maps/" + assetName);
         }
 
         public void Edit<T>(IAssetData asset)
         {
+            if (saveBuildable != null && !TMXLoaderMod.buildablesBuild.Contains(saveBuildable))
+                return;
+
             if (!lastCheck)
                 return;
             Map map = newMap;

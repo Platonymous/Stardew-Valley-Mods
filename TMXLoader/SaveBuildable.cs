@@ -37,6 +37,7 @@ namespace TMXLoader
             Location = location;
             Colors = colors;
             _editor = editor;
+            editor.saveBuildable = this;
         }
     }
 }
