@@ -20,6 +20,7 @@ using xTile;
 using xTile.Dimensions;
 using PyTK.Overrides;
 using PyTK.APIs;
+using Microsoft.Xna.Framework.Input;
 
 namespace PyTK
 {
@@ -38,14 +39,10 @@ namespace PyTK
         {
             _helper = helper;
             _monitor = Monitor;
-            try
-            {
+    
                 harmonyFix();
-            }
-            catch
-            {
-                Monitor.Log("Harmony Patching failed", LogLevel.Error);
-            }
+        
+               // Monitor.Log("Harmony Patching failed", LogLevel.Error);
 
             FormatManager.Instance.RegisterMapFormat(new NewTiledTmxFormat());
 
@@ -179,6 +176,7 @@ namespace PyTK
         private void harmonyFix()
         {
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.PyTK");
+            OvSpritebatchNew.initializePatch(instance);
            // PyUtils.initOverride("SObject", PyUtils.getTypeSDV("Object"),typeof(DrawFix1), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
            // PyUtils.initOverride("TemporaryAnimatedSprite", PyUtils.getTypeSDV("TemporaryAnimatedSprite"),typeof(DrawFix2), new List<string>() { "draw" });
             instance.PatchAll(Assembly.GetExecutingAssembly());

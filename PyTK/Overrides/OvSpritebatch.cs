@@ -14,7 +14,7 @@ using StardewValley.Menus;
 namespace PyTK.Overrides
 {
     class OvSpritebatch
-    {
+    {/*
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
         internal static Dictionary<object, CustomObjectData> dataChache = new Dictionary<object, CustomObjectData>();
@@ -173,6 +173,6 @@ namespace PyTK.Overrides
                 return;
             }
         }
-
+*/
     }
 }

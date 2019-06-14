@@ -137,8 +137,8 @@ namespace PyTK.CustomElementHandler
 
             collection.AddOrReplace(id, this);
 
-            if (OvSpritebatch.recCache.ContainsKey(sdvSourceRectangle))
-                OvSpritebatch.recCache.Remove(sdvSourceRectangle);
+            if (OvSpritebatchNew.recCache.ContainsKey(sdvSourceRectangle))
+                OvSpritebatchNew.recCache.Remove(sdvSourceRectangle);
 
             if(inventoryCheck == null)
                 inventoryCheck = new ItemSelector<Item>(i => !(i is ISaveElement) && collection.Exists(c => c.Value.sdvId == i.ParentSheetIndex && (!(i is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable))).whenAddedToInventory(l => l.useAll(x => Game1.player.Items[new List<Item>(Game1.player.Items).FindIndex(o => o == x)] = collection.Find(c => c.Value.sdvId == x.ParentSheetIndex && (!(x is SObject sobj) || sobj.bigCraftable.Value == c.Value.bigCraftable)).Value.getObject(x)));
@@ -178,8 +178,8 @@ namespace PyTK.CustomElementHandler
             else
                 Game1.objectInformation.AddOrReplace(newIndex, data);
 
-            if (_sdvSourceRectangle.HasValue && OvSpritebatch.recCache.ContainsKey(_sdvSourceRectangle.Value))
-                OvSpritebatch.recCache.Remove(_sdvSourceRectangle.Value);
+            if (_sdvSourceRectangle.HasValue && OvSpritebatchNew.recCache.ContainsKey(_sdvSourceRectangle.Value))
+                OvSpritebatchNew.recCache.Remove(_sdvSourceRectangle.Value);
 
             _sdvSourceRectangle = null;
             _sourceRectangle = null;
