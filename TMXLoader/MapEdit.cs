@@ -1,4 +1,5 @@
-﻿using xTile;
+﻿using StardewModdingAPI;
+using xTile;
 
 namespace TMXLoader
 {
@@ -20,6 +21,7 @@ namespace TMXLoader
         public string conditions { get; set; } = "";
 
         internal Map _map = null;
+        internal IContentPack _pack = null;
 
         public override bool Equals(object obj)
         {

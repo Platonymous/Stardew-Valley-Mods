@@ -22,6 +22,7 @@ using xTile.Tiles;
 using PyTK.PlatoUI;
 using xTile.Dimensions;
 using StardewValley.TerrainFeatures;
+using Microsoft.Xna.Framework.Input;
 
 namespace TMXLoader
 {
@@ -75,7 +76,7 @@ namespace TMXLoader
                 foreach (SaveBuildable b in buildablesBuild)
                     if (b.UniqueId == s.UniqueId)
                     {
-                        removeSavedBuildable(b, false);
+                        removeSavedBuildable(b, false, false);
                         Monitor.Log("Removed " + s.Id);
 
                         return;
@@ -201,10 +202,10 @@ namespace TMXLoader
         private void removeAllSavedBuildables()
         {
             foreach (var toRemove in buildablesBuild)
-                removeSavedBuildable(toRemove, false);
+                removeSavedBuildable(toRemove,false, false);
         }
 
-        private void removeSavedBuildable(SaveBuildable toRemove, bool distribute = true)
+        private void removeSavedBuildable(SaveBuildable toRemove, bool pay, bool distribute)
         {
             try
             {
@@ -212,9 +213,29 @@ namespace TMXLoader
                 removeAssetEditor(toRemove._editor);
                 if (Game1.getLocationFromName(toRemove.Location) is GameLocation location)
                 {
-                    helper.Content.InvalidateCache(location.mapPath.Value);
+                    helper.Content.InvalidateCache<Map>();
+
                     Helper.Reflection.GetMethod(location, "reloadMap").Invoke();
                     location.map.enableMoreMapLayers();
+                }
+
+                if (pay && Game1.IsMasterGame && buildables.Find(b => b.id == toRemove.Id) is BuildableEdit be)
+                {
+                    Game1.player.Money += be.price;
+                    List<Item> items = new List<Item>();
+
+                    foreach (var buildItem in be.buildItems)
+                    {
+                        if (TMXActions.getItem(buildItem.type, buildItem.index, buildItem.name) is Item item)
+                        {
+                            item.Stack = buildItem.stack;
+                            items.Add(item);
+                        }
+                    }
+
+                    if (items.Count > 0)
+                        Game1.player.addItemsByMenuIfNecessary(items);
+
                 }
             }
             catch(Exception e)
@@ -702,7 +723,7 @@ namespace TMXLoader
             foreach (StardewModdingAPI.IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 TMXContentPack tmxPack = pack.ReadJsonFile<TMXContentPack>("content.json");
-
+                
                 if (tmxPack.scripts.Count > 0)
                     foreach (string script in tmxPack.scripts)
                         PyLua.loadScriptFromFile(Path.Combine(pack.DirectoryPath, script), pack.Manifest.UniqueID);
@@ -726,7 +747,7 @@ namespace TMXLoader
                 {
                     string filePath = Path.Combine(pack.DirectoryPath, edit.file);
                     Map map = TMXContent.Load(edit.file, Helper, pack);
-
+                    edit._pack = pack;
                     Helper.Content.AssetEditors.Add(new TMXAssetEditor(edit, map, EditType.SpouseRoom));
                     //  mapsToSync.AddOrReplace(edit.name, map);
                 }
@@ -761,6 +782,7 @@ namespace TMXLoader
                     map.inject("Maps/" + edit.name);
 
                     edit._map = map;
+                    edit._pack = pack;
                     if (edit.addLocation)
                         addedLocations.Add(edit);
                     //mapsToSync.AddOrReplace(edit.name, map);
@@ -769,6 +791,7 @@ namespace TMXLoader
                 foreach (MapEdit edit in tmxPack.replaceMaps)
                 {
                     Map map = TMXContent.Load(edit.file, Helper, pack);
+                    edit._pack = pack;
                     addAssetEditor(new TMXAssetEditor(edit, map, EditType.Replace));
                     // mapsToSync.AddOrReplace(edit.name, map);
                 }
@@ -776,6 +799,7 @@ namespace TMXLoader
                 foreach (MapEdit edit in tmxPack.mergeMaps)
                 {
                     Map map = TMXContent.Load(edit.file, Helper, pack);
+                    edit._pack = pack;
                     addAssetEditor(new TMXAssetEditor(edit, map, EditType.Merge));
                     // mapsToSync.AddOrReplace(edit.name, map);
                 }
@@ -1038,7 +1062,7 @@ namespace TMXLoader
                  {
                      var last = buildablesBuild.Where(l => l.Location == Game1.currentLocation.Name).Last();
 
-                     removeSavedBuildable(last);
+                     removeSavedBuildable(last,true,true);
                      showBuildablesMenu(position, selected, remove, selectedToRemove);
                      return;
                  }
@@ -1050,7 +1074,7 @@ namespace TMXLoader
                      {
                          var toRemove = selectedToRemove;
 
-                         removeSavedBuildable(toRemove);
+                         removeSavedBuildable(toRemove,true,true);
                          showBuildablesMenu(position, selected, remove, null);
                      }
              }
@@ -1276,7 +1300,7 @@ namespace TMXLoader
                         {
                             var toRemove = selectedToRemove;
 
-                            removeSavedBuildable(toRemove);
+                            removeSavedBuildable(toRemove,true,true);
                             showBuildablesMenu(position, selected, remove, null);
                         }
                         else if (release && !right)

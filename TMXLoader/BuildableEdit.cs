@@ -19,7 +19,6 @@ namespace TMXLoader
         internal Texture2D _icon = null;
         internal string _mapName = null;
         internal string _location = null;
-        internal IContentPack _pack = null;
 
         public BuildableEdit()
         {
@@ -38,7 +37,7 @@ namespace TMXLoader
         }
         public BuildableEdit Clone()
         {
-            BuildableEdit b = new BuildableEdit(id, indoorsFile, iconFile, price, _icon, _mapName, null, _pack);
+            BuildableEdit b = new BuildableEdit(id, indoorsFile, iconFile, price, _icon, _mapName, _location, _pack);
             b.conditions = conditions;
             b.file = file;
             b.info = info;
@@ -50,7 +49,6 @@ namespace TMXLoader
             b.sourceArea = sourceArea;
             b.type = type;
             b._map = _map;
-            b._location = _location;
             return b;
         }
     }
