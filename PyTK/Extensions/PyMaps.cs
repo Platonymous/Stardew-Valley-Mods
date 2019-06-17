@@ -18,6 +18,7 @@ using xTile.ObjectModel;
 using PyTK.Tiled;
 using Newtonsoft.Json;
 using Microsoft.Xna.Framework.Graphics;
+using xTile.Display;
 
 namespace PyTK.Extensions
 {
@@ -134,10 +135,37 @@ namespace PyTK.Extensions
             drawLayer(layer, Game1.mapDisplayDevice, Game1.viewport, Game1.pixelZoom, offset, wrap);
         }
 
-        public static void drawLayer(Layer layer, xTile.Display.IDisplayDevice device, xTile.Dimensions.Rectangle viewport, int pixelZoom, Location offset,  bool wrap = false)
+        public static bool setColorForTiledLayer(Layer layer)
         {
+            bool changed = false;
+
+            Color color = (Game1.mapDisplayDevice as XnaDisplayDevice).ModulationColour;
+
+            if (layer.Properties.ContainsKey("Color"))
+            {
+                changed = true;
+                string[] c = layer.Properties["Color"].ToString().Split(' ');
+                color = new Color(int.Parse(c[0]), int.Parse(c[1]), int.Parse(c[2]), c.Length > 3 ? int.Parse(c[3]) : 255);
+            }
+
+            float opacity = 1f;
+            PropertyValue opacityString = "1";
+
+            if (layer.Properties.TryGetValue("opacity", out opacityString))
+                float.TryParse(opacityString.ToString(), out opacity);
+
+            changed = changed || opacity != 1f;
+
+            (Game1.mapDisplayDevice as XnaDisplayDevice).ModulationColour = color * opacity;
+
+            return changed;
+        }
+
+        public static void drawLayer(Layer layer, xTile.Display.IDisplayDevice device, xTile.Dimensions.Rectangle viewport, int pixelZoom, Location offset, bool wrap = false)
+        {
+
             if (layer.Properties.ContainsKey("DrawConditions") && (!layer.Properties.ContainsKey("DrawConditionsResult") || layer.Properties["DrawConditionsResult"] != "T"))
-                    return;
+                return;
 
             if (layer.Properties.ContainsKey("offsetx") && layer.Properties.ContainsKey("offsety"))
             {
@@ -149,8 +177,6 @@ namespace PyTK.Extensions
                 }
             }
 
-           
-
             if (!layer.Properties.ContainsKey("StartX"))
             {
                 Vector2 local = Game1.GlobalToLocal(new Vector2(offset.X, offset.Y));
@@ -158,8 +184,9 @@ namespace PyTK.Extensions
                 layer.Properties["StartY"] = local.Y;
             }
 
-            if (layer.Properties.ContainsKey("AutoScrollX")) {
-                string[] ax =layer.Properties["AutoScrollX"].ToString().Split(',');
+            if (layer.Properties.ContainsKey("AutoScrollX"))
+            {
+                string[] ax = layer.Properties["AutoScrollX"].ToString().Split(',');
                 int cx = int.Parse(ax[0]);
                 int mx = 1;
                 if (ax.Length > 1)
@@ -187,19 +214,26 @@ namespace PyTK.Extensions
                     offset.Y += my;
             }
 
-            
+
             layer.Properties["offsetx"] = offset.X;
             layer.Properties["offsety"] = offset.Y;
 
+            bool resetColor = false;
+
             if (layer.Properties.ContainsKey("tempOffsetx") && layer.Properties.ContainsKey("tempOffsety"))
-                offset = new Location( int.Parse(layer.Properties["tempOffsetx"]), int.Parse(layer.Properties["tempOffsety"]));
+                offset = new Location(int.Parse(layer.Properties["tempOffsetx"]), int.Parse(layer.Properties["tempOffsety"]));
 
             if (layer.Properties.ContainsKey("isImageLayer"))
                 drawImageLayer(layer, offset, wrap);
             else
             {
+                resetColor = setColorForTiledLayer(layer);
                 layer.Draw(device, viewport, offset, wrap, pixelZoom);
             }
+
+            if (resetColor)
+                (Game1.mapDisplayDevice as XnaDisplayDevice).ModulationColour = Color.White;
+
         }
 
         private static void drawImageLayer(Layer layer, Location offset, bool wrap = false)
