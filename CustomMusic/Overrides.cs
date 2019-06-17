@@ -65,19 +65,25 @@ namespace CustomMusic
                 nextCue = new KeyValuePair<string, string>("none", "none");
             }
             bool ret = true;
-
-            var songs = CustomMusicMod.Music.Where(m => m.Id == name && CustomMusicMod.checkConditions(m.Conditions)).ToList();
-
-            if (songs.Count > 0 && songs.First() is StoredMusic music)
+            try
             {
-                ActiveMusic active = new ActiveMusic(__instance.Name, music.Sound.CreateInstance(), ref __instance, music.Ambient, music.Loop);
-                CustomMusicMod.Active.Add(active);
-                if (CustomMusicMod.config.Debug)
-                    CustomMusicMod.SMonitor.Log("Playing: " + name + (custom ? " (custom)" : " (Changed)"), StardewModdingAPI.LogLevel.Trace);
-                ret = false;
+                var songs = CustomMusicMod.Music.Where(m => m.Id == name && CustomMusicMod.checkConditions(m.Conditions)).ToList();
+
+                if (songs.Count > 0 && songs.First() is StoredMusic music)
+                {
+                    ActiveMusic active = new ActiveMusic(__instance.Name, music.Sound.CreateInstance(), ref __instance, music.Ambient, music.Loop);
+                    CustomMusicMod.Active.Add(active);
+                    if (CustomMusicMod.config.Debug)
+                        CustomMusicMod.SMonitor.Log("Playing: " + name + (custom ? " (custom)" : " (Changed)"), StardewModdingAPI.LogLevel.Trace);
+                    ret = false;
+                }
+                else if (CustomMusicMod.config.Debug)
+                    CustomMusicMod.SMonitor.Log("Playing: " + name, StardewModdingAPI.LogLevel.Trace);
             }
-            else if (CustomMusicMod.config.Debug)
-                CustomMusicMod.SMonitor.Log("Playing: " + name, StardewModdingAPI.LogLevel.Trace);
+            catch
+            {
+
+            }
 
             return ret;
         }
