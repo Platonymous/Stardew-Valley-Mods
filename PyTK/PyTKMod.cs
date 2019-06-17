@@ -319,6 +319,19 @@ namespace PyTK
 
         private void registerTileActions()
         {
+            TileAction CC = new TileAction("CC", (action, location, tile, layer) =>
+            {
+                List<string> text = action.Split(' ').ToList();
+                string key = text[1];
+                text.RemoveAt(0);
+                text.RemoveAt(0);
+                action = String.Join(" ", text);
+                if (key == "cs")
+                    action += ";";
+                 Helper.ConsoleCommands.Trigger(key, action.Split(' '));
+                 return true;
+             }).register();
+
             TileAction Game = new TileAction("Game", (action, location, tile, layer) =>
             {
                 List<string> text = action.Split(' ').ToList();

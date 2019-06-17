@@ -313,7 +313,7 @@ namespace PyTK.CustomElementHandler
 
         private static object checkReplacement(object replacement)
         {
-            if (replacement is Chest chest && !chest.playerChest)
+            if (replacement is Chest chest && !chest.playerChest.Value)
             {
                 Chest rchest = new Chest(true);
                 rchest.name = chest.name;

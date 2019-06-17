@@ -53,7 +53,7 @@ namespace TMXLoader
             if (edit is BuildableEdit b)
                 this.inLocation = b._location;
 
-            this.conditions = edit.conditions;
+            this.conditions = edit is BuildableEdit ? "" : edit.conditions;
             lastCheck = conditions == "";
         }
 
@@ -118,7 +118,13 @@ namespace TMXLoader
                     foreach (Layer layer in map.Layers)
                         layer.Id = layer.Id.Replace("Spouse", edit.info);
 
-                map.Properties.Add("EntryAction", "Lua Platonymous.TMXLoader.SpouseRoom entry");
+                string eAction = "Lua Platonymous.TMXLoader.SpouseRoom entry";
+
+                if (map.Properties.ContainsKey("EntryAction"))
+                    map.Properties["EntryAction"] = eAction + ";" + map.Properties["EntryAction"];
+                else
+                    map.Properties.Add("EntryAction", eAction);
+
                 map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), null, true);
             }
 

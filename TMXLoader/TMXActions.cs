@@ -24,6 +24,10 @@ namespace TMXLoader
         {
 
         }
+        public static bool IsBuilding()
+        {
+            return (Game1.activeClickableMenu is PyTK.PlatoUI.PlatoUIMenu p && p.Id == "BuildablesMenu");
+        }
 
         public static bool spawnTreasureAction(string action, GameLocation location, Vector2 tile, string layer)
         {
