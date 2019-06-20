@@ -80,21 +80,24 @@ namespace PyTK
 
             Helper.Events.Display.RenderingHud += (s, e) =>
             {
-                if(Game1.displayHUD)
-                    PyTK.PlatoUI.UIHelper.DrawHud(e.SpriteBatch, true);
+                if (Game1.displayHUD && Context.IsWorldReady)
+                PyTK.PlatoUI.UIHelper.DrawHud(e.SpriteBatch, true);
+
             };
 
             Helper.Events.Display.RenderedHud += (s, e) =>
             {
-                if (Game1.displayHUD)
+                if (Game1.displayHUD && Context.IsWorldReady)
                     PyTK.PlatoUI.UIHelper.DrawHud(e.SpriteBatch, false);
             };
 
             Helper.Events.Input.ButtonPressed += (s, e) =>
             {
-                if (Game1.displayHUD)
+                if (Game1.displayHUD && Context.IsWorldReady)
+                {
                     if (e.Button == SButton.MouseLeft || e.Button == SButton.MouseRight)
                         PlatoUI.UIHelper.BaseHud.PerformClick(e.Cursor.ScreenPixels.toPoint(), e.Button == SButton.MouseRight, false, false);
+                }
             };
 
             Helper.Events.Display.WindowResized += (s, e) =>
@@ -385,8 +388,6 @@ namespace PyTK
 
                                     PyLua.loadScriptFromString(script, id);
                                 }
-                                else
-                                    PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Map.\")", id);
                             }
                             else
                             {
@@ -395,11 +396,11 @@ namespace PyTK
                                 function callthis(location,tile,layer)
                                 " + lua + @"
                                 end", id);
-                                else
-                                    PyLua.loadScriptFromString("Luau.log(\"Error: Could not find Lua property on Tile.\")", id);
                             }
                         }
-                        PyLua.callFunction(id, "callthis", new object[] { location, tile, layer });
+
+                        if(PyLua.hasScript(id))
+                            PyLua.callFunction(id, "callthis", new object[] { location, tile, layer });
                     }
                     else
                         PyLua.callFunction(a[1], a[2], new object[] { location, tile, layer });
