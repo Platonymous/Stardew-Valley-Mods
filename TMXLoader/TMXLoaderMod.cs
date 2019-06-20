@@ -171,6 +171,10 @@ namespace TMXLoader
 
             helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
+                foreach(var edit in addedLocations)
+                    if (!(Game1.getLocationFromName(edit.name) is GameLocation))
+                        addLocation(edit);
+
                 restoreAllSavedBuildables();
             };
 
@@ -639,7 +643,7 @@ namespace TMXLoader
 
         private void Player_Warped(object sender, WarpedEventArgs e)
         {
-            if(!e.IsLocalPlayer)
+            if (!e.IsLocalPlayer)
                 return;
 
             foreach (TMXAssetEditor editor in conditionals)
@@ -777,10 +781,10 @@ namespace TMXLoader
             TileAction OpenShop = new TileAction("OpenShop", TMXActions.shopAction).register();
         }
 
-        private GameLocation addLocation(MapEdit edit)
+        internal static GameLocation addLocation(MapEdit edit)
         {
             GameLocation location;
-            Monitor.Log("Adding:" + edit.name);
+            monitor.Log("Adding:" + edit.name);
             if (edit.type == "Deco")
                 location = new DecoratableLocation(Path.Combine("Maps", edit.name), edit.name);
             else if (edit.type == "Cellar")
@@ -797,14 +801,16 @@ namespace TMXLoader
                 }
                 catch (Exception ex)
                 {
-                    Monitor.Log(ex.Message + ":" + ex.StackTrace);
+                    monitor.Log(ex.Message + ":" + ex.StackTrace);
 
                 }
                 location.IsOutdoors = false;
             }
 
+
             if (edit._map.Properties.ContainsKey("IsGreenHouse"))
-                location.IsGreenhouse = true;
+                if (location.GetType().GetProperty("IsGreenhouse").SetMethod is MethodInfo setG)
+                    setG.Invoke(location, new object[] { true });
 
             if (edit._map.Properties.ContainsKey("IsStructure"))
                 location.isStructure.Value = true;

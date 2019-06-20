@@ -1,4 +1,5 @@
 ﻿using Harmony;
+using StardewValley;
 using StardewValley.Locations;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,25 @@ namespace TMXLoader
 
                 return true;
             }
+        }
+
+
+        [HarmonyPatch]
+        internal class PathFinderFix
+        {
+            internal static MethodInfo TargetMethod()
+            {
+                return PyTK.PyUtils.getTypeSDV("NPC").GetMethod("populateRoutesFromLocationToLocationList", BindingFlags.Public | BindingFlags.Static);
+            }
+
+            internal static void Prefix()
+            {
+                foreach (var edit in TMXLoaderMod.addedLocations)
+                    if (Game1.getLocationFromName(edit.name) == null)
+                        TMXLoaderMod.addLocation(edit);
+
+            }
+
         }
     }
 }
