@@ -139,7 +139,7 @@ namespace TMXLoader
             {
                 foreach (var location in addedLocations)
                     if (Game1.getLocationFromName(location.name) is GameLocation l)
-                        l.seasonUpdate(Game1.currentSeason);
+                        l.seasonUpdate(Game1.currentSeason,true);
             };
 
 
@@ -201,8 +201,80 @@ namespace TMXLoader
 
         private void removeAllSavedBuildables()
         {
-            foreach (var toRemove in buildablesBuild)
+            List<SaveBuildable> removeList = new List<SaveBuildable>(buildablesBuild);
+            foreach (var toRemove in removeList)
                 removeSavedBuildable(toRemove,false, false);
+        }
+
+
+        private static List<GameLocation> locationsToFix = new List<GameLocation>();
+        private static bool fixFarmHouse = false;
+
+        private void resetLocations(GameLocation location)
+        {
+            locationsToFix.AddOrReplace(location);
+            locationsToFix.AddOrReplace(Game1.getFarm());
+
+            fixFarmHouse = true;
+            helper.Events.Display.Rendered -= resetLocationsAfterRendering;
+            helper.Events.Display.Rendered += resetLocationsAfterRendering;
+        }
+
+        private void resetLocationsAfterRendering(object sender, RenderedEventArgs e)
+        {
+            if (!Context.IsWorldReady)
+                return;
+            try
+            {
+                foreach (GameLocation location in locationsToFix)
+                {
+                    resetLocation(location);
+                    if (location == Game1.getFarm())
+                        foreach (var building in Game1.getFarm().buildings.Where(b => b.indoors.Value is GameLocation))
+                            building.updateInteriorWarps(building.indoors.Value);
+
+                    locationsToFix.Remove(location);
+                    break;
+                }
+
+                if (fixFarmHouse)
+                {
+                    Helper.Events.Player.Warped -= OneTimeFarmHouseFix;
+                    Helper.Events.Player.Warped += OneTimeFarmHouseFix;
+                    fixFarmHouse = false;
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void OneTimeFarmHouseFix(object sender, WarpedEventArgs e)
+        {
+            if (e.NewLocation is FarmHouse fh && !(fh is Cabin))
+                resetLocation(fh);
+
+            Helper.Events.Player.Warped -= OneTimeFarmHouseFix;
+        }
+
+        private void resetLocation(GameLocation location)
+        {
+            if (location == null)
+                return;
+
+            Helper.Reflection.GetMethod(location, "reloadMap").Invoke();
+            if(location == Game1.currentLocation)
+                location.map.enableMoreMapLayers();
+
+            helper.Reflection.GetMethod(location, "resetLocalState").Invoke();
+
+            if (location is FarmHouse fh)
+                fh.setMapForUpgradeLevel(fh.upgradeLevel);
+
+            location.updateSeasonalTileSheets();
+
+
         }
 
         private void removeSavedBuildable(SaveBuildable toRemove, bool pay, bool distribute)
@@ -214,9 +286,7 @@ namespace TMXLoader
                 if (Game1.getLocationFromName(toRemove.Location) is GameLocation location)
                 {
                     helper.Content.InvalidateCache<Map>();
-
-                    Helper.Reflection.GetMethod(location, "reloadMap").Invoke();
-                    location.map.enableMoreMapLayers();
+                    resetLocations(location);
                 }
 
                 if (pay && Game1.IsMasterGame && buildables.Find(b => b.id == toRemove.Id) is BuildableEdit be)
@@ -277,8 +347,10 @@ namespace TMXLoader
             if (edit.indoorsFile != null && edit._pack != null)
             {
                 string buildFile = edit.indoorsFile;
+                helper.Content.InvalidateCache(edit._pack.GetActualAssetKey(buildFile));
 
                 Map map = TMXContent.Load(buildFile, Helper, edit._pack);
+
 
                 map = loadVariablesToMap(map, edit, new Point(edit.position[0],edit.position[1]), colors, uniqueId, location);
                 var e = edit.Clone();
@@ -342,8 +414,8 @@ namespace TMXLoader
                             try
                             {
                                 Vector2 key = new Vector2(x + position.X, y + position.Y);
-                                if (layer.Id == "Buildings" && location.Objects.ContainsKey(key))
-                                    location.Objects.Remove(key);
+                                /*if (layer.Id == "Buildings" && location.Objects.ContainsKey(key))
+                                    location.Objects.Remove(key);*/
 
                                 if (layer.Id == "Back" && location.terrainFeatures.ContainsKey(key))
                                     location.terrainFeatures.Remove(key);
@@ -394,16 +466,7 @@ namespace TMXLoader
 
             helper.Content.InvalidateCache(edit._mapName);
 
-            try
-            {
-                Helper.Reflection.GetMethod(location, "reloadMap").Invoke();
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log(ex.Message + ":" + ex.StackTrace);
-            }
-            location.updateSeasonalTileSheets();
-            location.map.enableMoreMapLayers();
+            resetLocations(location);
 
             if (pay)
             {
@@ -576,6 +639,9 @@ namespace TMXLoader
 
         private void Player_Warped(object sender, WarpedEventArgs e)
         {
+            if(!e.IsLocalPlayer)
+                return;
+
             foreach (TMXAssetEditor editor in conditionals)
                 if (e.NewLocation is GameLocation gl && gl.mapPath.Value is string mp)
                 {
@@ -745,6 +811,9 @@ namespace TMXLoader
 
             if (edit._map.Properties.ContainsKey("IsFarm"))
                 location.IsFarm = true;
+
+            if (Game1.locations.Contains(location))
+                Game1.locations.Remove(location);
 
             if (!Game1.locations.Contains(location))
                 Game1.locations.Add(location);
@@ -946,7 +1015,7 @@ namespace TMXLoader
         }
 
         private bool showAll = false;
-        private string set = "all";
+        private string set = "All";
 
         private void showBuildablesMenu(int position = 0, string selected = "none", bool remove = false, SaveBuildable selectedToRemove = null)
         {
@@ -971,7 +1040,10 @@ namespace TMXLoader
             if(edit is BuildableEdit)
                 edit._map = TMXContent.Load(edit.file, Helper, edit._pack);
 
-            UIElement container = UIElement.GetContainer("BuildablesMenuContainer", 0, UIHelper.GetBottomRight(-64, -32, 480, 640)).WithInteractivity(draw: (b, e) =>
+            int menuWidth = 280;
+            int menuHeight = 440;
+
+            UIElement container = UIElement.GetContainer("BuildablesMenuContainer", 0, UIHelper.GetBottomRight(-64, -32, menuWidth, menuHeight)).WithInteractivity(draw: (b, e) =>
             {
                 if (selected != "none" && !remove && overlay != null)
                 {
@@ -1156,9 +1228,9 @@ namespace TMXLoader
 
             UIElement back = UIElement.GetImage(UIHelper.DarkTheme, Color.White * 0.9f, "BMCBack").AsTiledBox(16, true);
             container.Add(back);
-            UIElement listContainer = UIElement.GetContainer("BMCListContainer", 0, UIHelper.GetCentered(0, 0, 450, 620));
+            UIElement listContainer = UIElement.GetContainer("BMCListContainer", 0, UIHelper.GetCentered(0, 0, menuWidth - 30, menuHeight - 20));
             back.Add(listContainer);
-            UIElementList list = new UIElementList("BMCList", startPosition: position, margin: 10, elementPositioner: UIHelper.GetFixed(0, 0, 1f, 200));
+            UIElementList list = new UIElementList("BMCList", startPosition: position, margin: 5, elementPositioner: UIHelper.GetFixed(0, 0, 1f, (menuHeight - 40) /4));
             listContainer.Add(list);
             Texture2D entryBack = PyDraw.getBorderedRectangle(18, 18, Color.White * 0.1f, 4, Color.White * 0.5f);
             Texture2D entryBackHover = PyDraw.getBorderedRectangle(18, 18, Color.White * 0.1f, 4, Color.LightCyan);
@@ -1321,7 +1393,7 @@ namespace TMXLoader
                     if (b == null)
                         continue;
 
-                    if (set != "all" && b.set != set)
+                    if (set != "All" && b.set != set)
                         continue;
 
                     UIElement buildableEntry = UIElement.GetImage(selectedToRemove == bb ? entryBackSelected : entryBack, Color.White, b.id, 1f).AsTiledBox(6, true).WithInteractivity(hover: (p, hoverin, element) =>
@@ -1349,20 +1421,31 @@ namespace TMXLoader
                             showBuildablesMenu(list.Position, "none", true, null);
                     });
                     list.Add(buildableEntry);
-                    UIElement buildableImage = UIElement.GetImage(b._icon, Color.White, b.id + "_icon", positioner: UIHelper.GetTopLeft(10, 10, 0, 180));
+                    UIElement buildableImage = UIElement.GetImage(b._icon, Color.White, b.id + "_icon", positioner: UIHelper.GetTopLeft(10, 0.1f, 0, 0.8f));
                     buildableEntry.Add(buildableImage);
 
-                    UITextElement buildablePrice = new UITextElement("X " + bb.Position[0] + "  Y " + bb.Position[1], Game1.smallFont,  Color.White, 0.75f, 1, b.id + "_position", positioner: UIHelper.GetBottomRight(-10, -10));
+                    UITextElement buildablePrice = new UITextElement("X " + bb.Position[0] + "  Y " + bb.Position[1], Game1.smallFont,  Color.White, 0.5f, 1, b.id + "_position", positioner: UIHelper.GetBottomRight(-10, -10));
                     buildableEntry.Add(buildablePrice);
 
-                    UITextElement buildableName = new UITextElement(b.name, Game1.smallFont, Color.White, 1f, 1, b.id + "_name", positioner: UIHelper.GetBottomRight(-10, -40));
+                    UITextElement buildableName = new UITextElement(b.name, Game1.smallFont, Color.White, 0.7f, 1, b.id + "_name", positioner: UIHelper.GetBottomRight(-10, -40));
                     buildableEntry.Add(buildableName);
                 }
             }
             if (!remove)
             {
-                foreach (var b in buildables.Where(c => PyUtils.checkEventConditions(c.conditions, Game1.currentLocation) && (set == "all" || set == c.set)))
+                List<string> sets = new List<string>() { "All" };
+                Dictionary<string, int> bSets = new Dictionary<string, int>();
+                int cBd = 0;
+                foreach (var b in buildables.Where(c => PyUtils.checkEventConditions(c.conditions, Game1.currentLocation)))
                 {
+                    if (!bSets.ContainsKey(b.set))
+                        bSets.Add(b.set,0);
+
+                    bSets[b.set]++;
+                    cBd++;
+                    if ((set != "All" && set != b.set))
+                        continue;
+
                     bool affordable = Game1.player.Money >= b.price;
                     bool buildable = true;
 
@@ -1403,20 +1486,51 @@ namespace TMXLoader
                         }
                     });
                     list.Add(buildableEntry);
-                    UIElement buildableImage = UIElement.GetImage(b._icon, Color.White, b.id + "_icon", positioner: UIHelper.GetTopLeft(10, 10, 0, 180));
+                    UIElement buildableImage = UIElement.GetImage(b._icon, Color.White, b.id + "_icon", positioner: UIHelper.GetTopLeft(10, 0.1f, 0, 0.8f));
                     buildableEntry.Add(buildableImage);
 
                     UITextElement buildableItems = new UITextElement((itemString == "" ? " ---" : itemString), Game1.smallFont, buildable ? Color.White : Color.Red, 0.5f, 1, b.id + "_price", positioner: UIHelper.GetBottomRight(-10, -10));
                     buildableEntry.Add(buildableItems);
 
-                    UITextElement buildablePrice = new UITextElement(b.price + "g", Game1.smallFont, affordable ? Color.White : Color.Red, 0.75f, 1, b.id + "_price", positioner: UIHelper.GetBottomRight(-10, -40));
+                    UITextElement buildablePrice = new UITextElement(b.price + "g", Game1.smallFont, affordable ? Color.White : Color.Red, 0.5f, 1, b.id + "_price", positioner: UIHelper.GetBottomRight(-10, -40));
                     buildableEntry.Add(buildablePrice);
 
-                    UITextElement buildableName = new UITextElement(b.name, Game1.smallFont, Color.White, 1f, 1, b.id + "_name", positioner: UIHelper.GetBottomRight(-10, -70));
+                    UITextElement buildableName = new UITextElement(b.name, Game1.smallFont, Color.White, 0.7f, 1, b.id + "_name", positioner: UIHelper.GetBottomRight(-10, -60));
                     buildableEntry.Add(buildableName);
                 }
+
+                int sti = 0;
+
+                foreach (string sKey in bSets.Keys.OrderByDescending(sk => bSets[sk]))
+                    if (sets.Count < 12)
+                        sets.Add(sKey);
+                    else
+                        break;
+
+                bSets.Add("All", cBd);
+
+                foreach(string st in sets)
+                {
+                    UIElement stBtnText = new UITextElement(st + " [" + bSets[st] +"]", Game1.smallFont, Color.Black, 0.5f,1, st + "_Text", 0, UIHelper.GetCentered());
+                    int stW = (int) Math.Ceiling((stBtnText.Bounds.Width / 5f)) * 5;
+                    int stH = (int)Math.Ceiling((stBtnText.Bounds.Height / 5f)) * 5;
+
+                    UIElement cSetBtn = UIElement.GetImage(UIHelper.YellowbBoxTheme, Color.White, st, set == st ? 1 : 0.5f, 0, UIHelper.GetTopLeft(-(stW + 20), (stH + 15) * sti, (stW + 10), (stH + 10))).AsTiledBox(5,true).WithInteractivity(click:(point,right,release,hold,element)=>
+                    {
+                        if(release)
+                        {
+                            set = element.Id;
+                            showBuildablesMenu(position, selected, remove, selectedToRemove);
+                        }
+                    });
+                    cSetBtn.Add(stBtnText);
+                    listContainer.Add(cSetBtn);
+
+                    sti++;
+                }
             }
-            
+
+            fullContainer.UpdateBounds();
             Game1.activeClickableMenu = new PlatoUIMenu("BuildablesMenu", fullContainer);
         }
 

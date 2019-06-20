@@ -12,7 +12,6 @@ namespace TMXLoader
         public List<TileShopItem> buildItems { get; set; } = new List<TileShopItem>();
         public string iconFile { get; set; }
         public int[] exitTile { get; set; } = new int[] { 0, 0 };
-
         public string set { get; set; } = "Others";
         public int price { get; set; } = 10000;
 
