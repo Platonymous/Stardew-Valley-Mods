@@ -54,6 +54,46 @@ namespace PyTK
             });
         }
 
+        public static Texture2D getPatterns(int width, int height, params Texture2D[] textures)
+        {
+            List<Color[]> textureColors = new List<Color[]>();
+            int tWidth = textures[0].Width;
+            int tHeight = textures[0].Height;
+
+            foreach (Texture2D texture in textures)
+            {
+                int iWidth = texture.Width;
+                int iHeight = texture.Height;
+                Color[] colors = new Color[iWidth * iHeight];
+                texture.GetData(colors);
+                textureColors.Add(colors);
+            }
+
+            int tpw = width / tWidth;
+            int tph = height / tHeight;
+
+            int n = tpw * tph;
+
+            List<Color[]> placements = new List<Color[]>();
+            int j = 0;
+            for (int i = 0; i < n; i++) {
+                placements.Add(textureColors[j]);
+                j++;
+                if (j >= textureColors.Count)
+                    j = 0;
+            }
+            Console.Write("J:" + j);
+            return getRectangle(width, height, (x, y, w, h) =>
+            {
+                int t = (x / tWidth) + ((y / tHeight) * (tpw));
+
+                int xt = x % tWidth;
+                int yt = y % tHeight;
+
+                return placements[t][yt * tWidth + xt];
+            });
+        }
+
         public static Texture2D getBorderedRectangle(int width, int height, Color color, int border, Color borderColor)
         {
             return getRectangle(width, height, (x, y, w, h) =>

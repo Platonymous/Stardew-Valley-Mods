@@ -37,12 +37,13 @@ namespace PyTK
 
         public override void Entry(IModHelper helper)
         {
+
             _helper = helper;
             _monitor = Monitor;
     
                 harmonyFix();
-        
-               // Monitor.Log("Harmony Patching failed", LogLevel.Error);
+
+            // Monitor.Log("Harmony Patching failed", LogLevel.Error);
 
             FormatManager.Instance.RegisterMapFormat(new NewTiledTmxFormat());
 
@@ -141,8 +142,9 @@ namespace PyTK
                 if (Context.IsWorldReady && Game1.currentLocation is GameLocation location && location.Map is Map map)
                     PyUtils.checkDrawConditions(map);
             };
-        }
 
+        }
+        
         public static void syncCounter(string id, int value)
         {
             if (Game1.IsMultiplayer)
@@ -156,14 +158,37 @@ namespace PyTK
 
         private void Player_Warped(object sender, WarpedEventArgs e)
         {
+            if (!e.IsLocalPlayer)
+                return;
+
             e.NewLocation?.Map.enableMoreMapLayers();
 
             if (e.NewLocation is GameLocation g && g.map is Map m)
             {
-                if (m.Properties.ContainsKey("EntryAction"))
-                    TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
+                int forceX = Game1.player.getTileX();
+                int forceY = Game1.player.getTileY();
+                int forceF = Game1.player.FacingDirection;
+                if (e.OldLocation is GameLocation og && m.Properties.ContainsKey("ForceEntry_" + og.Name)){
+                    string[] pos = m.Properties["ForceEntry_" + og.Name].ToString().Split(' ');
+                    if(pos.Length > 0 && pos[1] != "X")
+                        int.TryParse(pos[0], out forceX);
 
-                PyUtils.checkDrawConditions(m);
+                    if (pos.Length > 1 && pos[1] != "Y")
+                        int.TryParse(pos[1], out forceY);
+
+                    if (pos.Length > 2 && pos[2] != "F")
+                        int.TryParse(pos[2], out forceF);
+
+                    Game1.player.Position = new Vector2(forceX, forceY);
+                    Game1.player.FacingDirection = forceF;
+                }
+                else {
+
+                    if (m.Properties.ContainsKey("EntryAction"))
+                        TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
+
+                    PyUtils.checkDrawConditions(m);
+                }
             }
         }
 
