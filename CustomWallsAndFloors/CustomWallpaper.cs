@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Netcode;
 using PyTK.CustomElementHandler;
 using StardewValley;
 using StardewValley.Objects;
@@ -9,8 +8,6 @@ using StardewValley.Locations;
 using xTile;
 using xTile.Tiles;
 using System.IO;
-using System;
-using System.Linq;
 
 namespace CustomWallsAndFloors
 {
@@ -78,12 +75,12 @@ namespace CustomWallsAndFloors
             if (isFloor)
             {
                 spriteBatch.Draw(wallpaperTexture, location + new Vector2(32f, 32f), new Rectangle?(floorContainerRect), color * transparency, 0.0f, new Vector2(8f, 8f), 4f * scaleSize, SpriteEffects.None, layerDepth);
-                spriteBatch.Draw(Texture, location + new Vector2(32f, 30f), new Rectangle?((Rectangle)((NetFieldBase<Rectangle, NetRectangle>)this.sourceRect)), color * transparency, 0.0f, new Vector2(14f, 13f), 2f * scaleSize, SpriteEffects.None, layerDepth + 1f / 1000f);
+                spriteBatch.Draw(Texture, location + new Vector2(32f, 30f), new Rectangle?(sourceRect.Value), color * transparency, 0.0f, new Vector2(14f, 13f), 2f * scaleSize, SpriteEffects.None, layerDepth + 1f / 1000f);
             }
             else
             {
                 spriteBatch.Draw(wallpaperTexture, location + new Vector2(32f, 32f), new Rectangle?(wallpaperContainerRect), color * transparency, 0.0f, new Vector2(8f, 8f), 4f * scaleSize, SpriteEffects.None, layerDepth);
-                spriteBatch.Draw(Texture, location + new Vector2(32f, 32f), new Rectangle?((Rectangle)((NetFieldBase<Rectangle, NetRectangle>)this.sourceRect)), color * transparency, 0.0f, new Vector2(8f, 14f), 2f * scaleSize, SpriteEffects.None, layerDepth + 1f / 1000f);
+                spriteBatch.Draw(Texture, location + new Vector2(32f, 32f), new Rectangle?(sourceRect.Value), color * transparency, 0.0f, new Vector2(8f, 14f), 2f * scaleSize, SpriteEffects.None, layerDepth + 1f / 1000f);
             }
         }
 
@@ -122,22 +119,22 @@ namespace CustomWallsAndFloors
             if (isFloor)
             {
                 floorChange = (r, w) => Floor_OnChange(r, w, dec);
-                dec.setFloor((int)((NetFieldBase<int, NetInt>)this.parentSheetIndex), whichRoom, true);
+                dec.setFloor(ParentSheetIndex, whichRoom, true);
                 dec.floor.OnChange += floorChange;
             }
             else
             {
                 wallChange = (r, w) => WallPaper_OnChange(r, w, dec);
-                dec.setWallpaper((int)((NetFieldBase<int, NetInt>)this.parentSheetIndex), whichRoom, true);
+                dec.setWallpaper(ParentSheetIndex, whichRoom, true);
                 dec.wallPaper.OnChange += wallChange;
             }
 
             PyTK.PyUtils.setDelayedAction(500, () => CustomWallsAndFloorsMod.skip = false);
 
             if(isFloor)
-                dec.setFloor((int)((NetFieldBase<int, NetInt>)this.parentSheetIndex), whichRoom, true);
+                dec.setFloor(ParentSheetIndex, whichRoom, true);
             else
-                dec.setWallpaper((int)((NetFieldBase<int, NetInt>)this.parentSheetIndex), whichRoom, true);
+                dec.setWallpaper(ParentSheetIndex, whichRoom, true);
         }
 
 

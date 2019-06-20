@@ -112,7 +112,7 @@ namespace CustomWallsAndFloors
                 who = Game1.player;
             if (who.currentLocation is DecoratableLocation dec)
             {
-                if (__instance.isFloor)
+                if (__instance.isFloor.Value)
                 {
                     CustomWallpaper.floorReset = (r, w) => CustomWallpaper.Floor_OnChange1(r, w, dec);
                     dec.floor.OnChange += CustomWallpaper.floorReset;
@@ -154,7 +154,7 @@ namespace CustomWallsAndFloors
                         if (wallTexture is AnimatedTexture awall && awall.AnimatedTiles.Find(t => !t.Floor && i > t.Index && i < t.Index + t.Frames) != null)
                             continue;
 
-                        InventoryItem inv = new InventoryItem(new CustomWallpaper(pack.Manifest.UniqueID, i, false), 100);
+                        InventoryItem inv = new InventoryItem(new CustomWallpaper(pack.Manifest.UniqueID, i, false), 0);
                         inv.addToWallpaperCatalogue();
                     }
                 }
@@ -176,7 +176,7 @@ namespace CustomWallsAndFloors
                         if (floorTexture is AnimatedTexture awall && awall.AnimatedTiles.Find(t => t.Floor && i > t.Index && i < t.Index + t.Frames) != null)
                             continue;
 
-                        InventoryItem inv = new InventoryItem(new CustomWallpaper(pack.Manifest.UniqueID, i, true), 100);
+                        InventoryItem inv = new InventoryItem(new CustomWallpaper(pack.Manifest.UniqueID, i, true), 0);
                         inv.addToWallpaperCatalogue();
                     }
                 }
