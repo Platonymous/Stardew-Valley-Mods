@@ -15,22 +15,18 @@ namespace TMXLoader
 
         public SaveLocation Indoors { get; set; }
 
-        internal TMXAssetEditor _editor;
-
         public SaveBuildable()
         {
 
         }
 
-        public SaveBuildable(string id, string location, Point position, string uniqueId, Dictionary<string,string> colors, TMXAssetEditor editor)
+        public SaveBuildable(string id, string location, Point position, string uniqueId, Dictionary<string,string> colors)
         {
             Position = new int[2]{position.X, position.Y };
             Id = id;
             UniqueId = uniqueId;
             Location = location;
             Colors = colors;
-            _editor = editor;
-            editor.saveBuildable = this;
         }
     }
 }

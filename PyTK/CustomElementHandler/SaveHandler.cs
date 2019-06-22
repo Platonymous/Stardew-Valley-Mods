@@ -66,7 +66,7 @@ namespace PyTK.CustomElementHandler
 
             Helper.Events.GameLoop.Saved += (s, e) =>
             {
-                if(Game1.IsMasterGame)
+               if(Game1.IsMasterGame)
                 RebuildFromActions();
             };
 

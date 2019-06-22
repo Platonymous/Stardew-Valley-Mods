@@ -134,7 +134,6 @@ namespace TMXLoader
 
             helper.Events.Player.Warped += Player_Warped;
 
-
             helper.Events.GameLoop.DayStarted += (s, e) =>
             {
                 foreach (var location in addedLocations)
@@ -209,92 +208,24 @@ namespace TMXLoader
             foreach (var toRemove in removeList)
                 removeSavedBuildable(toRemove,false, false);
         }
-
-
-        private static List<GameLocation> locationsToFix = new List<GameLocation>();
-        private static bool fixFarmHouse = false;
-
-        private void resetLocations(GameLocation location)
-        {
-            locationsToFix.AddOrReplace(location);
-            locationsToFix.AddOrReplace(Game1.getFarm());
-
-            fixFarmHouse = true;
-            helper.Events.Display.Rendered -= resetLocationsAfterRendering;
-            helper.Events.Display.Rendered += resetLocationsAfterRendering;
-        }
-
-        private void resetLocationsAfterRendering(object sender, RenderedEventArgs e)
-        {
-            if (!Context.IsWorldReady)
-                return;
-            try
-            {
-                foreach (GameLocation location in locationsToFix)
-                {
-                    resetLocation(location);
-                    if (location == Game1.getFarm())
-                        foreach (var building in Game1.getFarm().buildings.Where(b => b.indoors.Value is GameLocation))
-                            building.updateInteriorWarps(building.indoors.Value);
-
-                    locationsToFix.Remove(location);
-                    break;
-                }
-
-                if (fixFarmHouse)
-                {
-                    Helper.Events.Player.Warped -= OneTimeFarmHouseFix;
-                    Helper.Events.Player.Warped += OneTimeFarmHouseFix;
-                    fixFarmHouse = false;
-                }
-            }
-            catch
-            {
-
-            }
-        }
-
-        private void OneTimeFarmHouseFix(object sender, WarpedEventArgs e)
-        {
-            if (e.NewLocation is FarmHouse fh && !(fh is Cabin))
-                resetLocation(fh);
-
-            Helper.Events.Player.Warped -= OneTimeFarmHouseFix;
-        }
-
-        private void resetLocation(GameLocation location)
-        {
-            if (location == null)
-                return;
-
-            Helper.Reflection.GetMethod(location, "reloadMap").Invoke();
-            if(location == Game1.currentLocation)
-                location.map.enableMoreMapLayers();
-
-            helper.Reflection.GetMethod(location, "resetLocalState").Invoke();
-
-            if (location is FarmHouse fh)
-                fh.setMapForUpgradeLevel(fh.upgradeLevel);
-
-            location.updateSeasonalTileSheets();
-
-
-        }
-
+       
         private void removeSavedBuildable(SaveBuildable toRemove, bool pay, bool distribute)
         {
             try
             {
                 buildablesBuild.Remove(toRemove);
-                removeAssetEditor(toRemove._editor);
-                if (Game1.getLocationFromName(toRemove.Location) is GameLocation location)
-                {
-                    helper.Content.InvalidateCache<Map>();
-                    resetLocations(location);
-                }
-
+               
                 if (pay && Game1.IsMasterGame && buildables.Find(b => b.id == toRemove.Id) is BuildableEdit be)
                 {
+                    GameLocation loc = Game1.getLocationFromName(toRemove.Location);
+                    Map map = helper.Content.Load<Map>(loc.mapPath.Value,ContentSource.GameContent);
+                    Map bMap  = TMXContent.Load(be.file, Helper, be._pack);
+
+                    loc.map = map.mergeInto(loc.Map, new Vector2(toRemove.Position[0], toRemove.Position[1]),new Microsoft.Xna.Framework.Rectangle(toRemove.Position[0], toRemove.Position[1],bMap.DisplayWidth / Game1.tileSize, bMap.DisplayHeight / Game1.tileSize), true);
+                        loc.map.LoadTileSheets(Game1.mapDisplayDevice);
+                        loc.updateSeasonalTileSheets();
+                        loc.map.enableMoreMapLayers();
+
                     Game1.player.Money += be.price;
                     List<Item> items = new List<Item>();
 
@@ -459,19 +390,16 @@ namespace TMXLoader
             var e = edit.Clone();
             e._map = map;
 
-            
-
-
-            SaveBuildable sav = (new SaveBuildable(edit.id, location.Name, position, uniqueId, colors, addAssetEditor(new TMXAssetEditor(e, e._map, EditType.Merge))));
+            SaveBuildable sav = (new SaveBuildable(edit.id, location.Name, position, uniqueId, colors));
             buildablesBuild.Add(sav);
 
             if (distribute && Game1.IsMultiplayer)
                 PyNet.sendRequestToAllFarmers<bool>(buildableReceiverName, sav, null, SerializationType.JSON, -1);
 
-            helper.Content.InvalidateCache(edit._mapName);
-
-            resetLocations(location);
-
+            location.map = map.mergeInto(location.Map,position.GetVector2(),null,edit.removeEmpty);
+            location.map.LoadTileSheets(Game1.mapDisplayDevice);
+            location.updateSeasonalTileSheets();
+            location.map.enableMoreMapLayers();
             if (pay)
             {
                 Game1.player.Money -= edit.price;
@@ -860,6 +788,7 @@ namespace TMXLoader
                     string filePath = Path.Combine(pack.DirectoryPath, edit.file);
                     Map map = TMXContent.Load(edit.file, Helper, pack);
                     edit._pack = pack;
+
                     Helper.Content.AssetEditors.Add(new TMXAssetEditor(edit, map, EditType.SpouseRoom));
                     //  mapsToSync.AddOrReplace(edit.name, map);
                 }
