@@ -20,6 +20,8 @@ namespace TMXLoader
 {
     public class TMXActions
     {
+        public static Dictionary<string, List<Item>> itemLists = new Dictionary<string, List<Item>>();
+        public static string lastInventoryId = null;
         public TMXActions()
         {
 
@@ -41,6 +43,21 @@ namespace TMXLoader
             return spawnTreasureAction(Game1.getLocationFromName(location), x, y, type, index, name, stack, sound);
         }
 
+        public static bool addToItemList(string id, Item item)
+        {
+            if (!itemLists.ContainsKey(id))
+                itemLists.Add(id, new List<Item>());
+
+            for (int index = 0; index < itemLists[id].Count; ++index)
+                if (itemLists[id][index] != null && itemLists[id][index].canStackWith(item))
+                {
+                    item.Stack = itemLists[id][index].addToStack(item.Stack);
+                    return true;
+                }
+
+            itemLists[id].Add(item);
+            return true;
+        }
 
         public static bool spawnTreasureAction(GameLocation location, int x, int y, string type, int index = -1, string name = "none", int stack = 1, string sound = "crystal")
         {
@@ -180,15 +197,18 @@ namespace TMXLoader
         public static bool shopAction(string action, GameLocation location, Vector2 tile, string layer)
         {
             List<string> text = action.Split(' ').ToList();
-
+            lastInventoryId = null;
             if (text.Count < 2)
                 return false;
 
             List<TileShopItem> items = new List<TileShopItem>();
+            Dictionary<Item, int[]> priceAndStock = new Dictionary<Item, int[]>();
 
-            if (TMXLoaderMod.tileShops.TryGetValue(text[1], out items))
+            if (TMXLoaderMod.tileShops.Find(kvp => kvp.Key.id == text[1] || (text[1].StartsWith("EmptyShop_") && kvp.Key.id == "EmptyShop" )) is KeyValuePair<TileShop, List<TileShopItem>> ts && TMXLoaderMod.tileShops.TryGetValue(ts.Key, out items))
             {
-                Dictionary<Item, int[]> priceAndStock = new Dictionary<Item, int[]>();
+                if (text[1].StartsWith("EmptyShop_"))
+                    ts.Key.inventoryId = text[1].Split('_')[1];
+
                 foreach (TileShopItem inventory in items)
                 {
 
@@ -217,6 +237,18 @@ namespace TMXLoader
                     if (item != null)
                         priceAndStock.AddOrReplace(item, new int[] { price, inventory.stock });
                 }
+
+                if (ts.Key.inventoryId != null)
+                {
+                    if (!itemLists.ContainsKey(ts.Key.inventoryId))
+                        itemLists.Add(ts.Key.inventoryId, new List<Item>());
+
+                    lastInventoryId = ts.Key.inventoryId;
+                    foreach (Item item in itemLists[ts.Key.inventoryId])
+                        priceAndStock.AddOrReplace(item.getOne(), new int[] { item.salePrice(), item.Stack });
+
+                }
+
                 var shop = new ShopMenu(priceAndStock, 0,  null);
                 if (text.Count > 2)
                 {
@@ -235,6 +267,9 @@ namespace TMXLoader
                             shop.portraitPerson = npc;
                             Game1.removeThisCharacterFromAllLocations(npc);
                         }
+
+                        if (text[2] == "PlayerShop" && shop.portraitPerson is NPC shopNpc && location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Player", layer) is string playerId)
+                            shopNpc.endOfRouteMessage.Value = playerId;
                     }
                     catch (Exception ex)
                     {
@@ -252,6 +287,39 @@ namespace TMXLoader
             }
 
             return false;
+        }
+
+        public static void updateItemListAfterShop(object sender, StardewModdingAPI.Events.MenuChangedEventArgs e)
+        {
+            if(e.OldMenu is ShopMenu sm && lastInventoryId != null && itemLists.ContainsKey(lastInventoryId))
+            {
+                Dictionary<Item, int[]> itemPriceAndStock = TMXLoaderMod.helper.Reflection.GetField<Dictionary<Item, int[]>>(sm, "itemPriceAndStock").GetValue();
+                foreach(Item item in itemLists[lastInventoryId])
+                {
+                    Item i = item.getOne();
+                    int sold = 0;
+                    if (itemPriceAndStock.ContainsKey(i))
+                    {
+                        sold = item.Stack - itemPriceAndStock[i][1];
+                        item.Stack = itemPriceAndStock[i][1];
+                    }
+                    else
+                    {
+                        sold = item.Stack;
+                        item.Stack = 0;
+                    }
+
+                    if (sm.portraitPerson is NPC npc && npc.Name == "PlayerShop")
+                    {
+                        long umid = long.Parse(sm.portraitPerson.endOfRouteMessage.Value);
+                        if(Game1.getFarmer(umid) is Farmer f)
+                            ShopMenu.chargePlayer(f,sm.getCurrency(), -(i.salePrice() * sold));
+                    }
+                }
+
+                itemLists[lastInventoryId].RemoveAll(it => it.Stack <= 0);
+                lastInventoryId = null;
+            }
         }
 
         public static bool sayAction(string action, GameLocation location, Vector2 tile, string layer)

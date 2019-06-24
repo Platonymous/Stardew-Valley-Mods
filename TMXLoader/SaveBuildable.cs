@@ -11,6 +11,10 @@ namespace TMXLoader
         public int[] Position { get; set; }
         public string UniqueId { get; set; }
 
+        public string PlayerName { get; set; } = null;
+
+        public long PlayerId { get; set; } = -1;
+
         public Dictionary<string, string> Colors { get; set; } = new Dictionary<string, string>();
 
         public SaveLocation Indoors { get; set; }
@@ -20,13 +24,15 @@ namespace TMXLoader
 
         }
 
-        public SaveBuildable(string id, string location, Point position, string uniqueId, Dictionary<string,string> colors)
+        public SaveBuildable(string id, string location, Point position, string uniqueId, string playerName, long playerId, Dictionary<string,string> colors)
         {
             Position = new int[2]{position.X, position.Y };
             Id = id;
             UniqueId = uniqueId;
             Location = location;
             Colors = colors;
+            PlayerId = playerId;
+            PlayerName = playerName;
         }
     }
 }
