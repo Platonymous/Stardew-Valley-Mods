@@ -20,7 +20,6 @@ using xTile;
 using xTile.Dimensions;
 using PyTK.Overrides;
 using PyTK.APIs;
-using Microsoft.Xna.Framework.Input;
 
 namespace PyTK
 {

@@ -114,20 +114,20 @@ namespace SplitMoney
                     if (s.forSaving && !Game1.IsMasterGame)
                         return;
 
-                    Game1.player.money += s.forSaving ? s.Stack - 1 : s.Stack;
+                    Game1.player.Money += s.forSaving ? s.Stack - 1 : s.Stack;
                     Game1.player.removeItemFromInventory(s);
                     Game1.playSound("sell");
                 }
                 return;
             }
 
-            int a = forSaving ? Game1.player.money : Math.Min(999, Game1.player.money);
+            int a = forSaving ? Game1.player.Money : Math.Min(999, Game1.player.Money);
 
             if (a <= 0 && !forSaving)
                 return;
 
             if(!forSaving)
-                Game1.player.money -= a;
+                Game1.player.Money -= a;
             GoldItem gold = (GoldItem) CustomObjectData.collection["Platonymous.G"].getObject();
             gold.forSaving = forSaving;
             gold.Stack = forSaving ? a + 1 : a;
