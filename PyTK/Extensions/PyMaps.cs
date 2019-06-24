@@ -132,6 +132,9 @@ namespace PyTK.Extensions
 
         public static void drawLayer(Layer layer, Location offset, bool wrap = false)
         {
+            if (Game1.currentLocation is GameLocation location && location.map is Map map && !map.Layers.Contains(layer))
+                return;
+
             drawLayer(layer, Game1.mapDisplayDevice, Game1.viewport, Game1.pixelZoom, offset, wrap);
         }
 
@@ -415,6 +418,16 @@ namespace PyTK.Extensions
                         TileSheet tilesheet = map.GetTileSheet(sourceTile.TileSheet.Id);
                         Tile newTile = new StaticTile(mapLayer, tilesheet, BlendMode.Additive, sourceTile.TileIndex);
 
+                        try
+                        {
+                            if (sourceTile.Properties.ContainsKey("NoTileMerge"))
+                                newTile = mapLayer.Tiles[(int)px, (int)py];
+                        }
+                        catch
+                        {
+
+                        }
+
                         if (sourceTile is AnimatedTile aniTile)
                         {
                             List<StaticTile> staticTiles = new List<StaticTile>();
@@ -426,8 +439,19 @@ namespace PyTK.Extensions
                         }
 
                         if (properties)
+                        {
                             foreach (var prop in sourceTile.Properties)
-                                newTile.Properties.Add(prop);
+                                if (newTile.Properties.ContainsKey(prop.Key))
+                                    newTile.Properties[prop.Key] = prop.Value;
+                            else
+                                    newTile.Properties.Add(prop);
+
+                            foreach (var prop in sourceTile.TileIndexProperties)
+                                if (newTile.TileIndexProperties.ContainsKey(prop.Key))
+                                    newTile.TileIndexProperties[prop.Key] = prop.Value;
+                            else
+                                newTile.TileIndexProperties.Add(prop);
+                        }
                         try
                         {
                             mapLayer.Tiles[(int)px, (int)py] = newTile;
