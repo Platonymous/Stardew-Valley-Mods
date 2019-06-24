@@ -48,8 +48,8 @@ namespace PyTK.Overrides
 
             internal static bool Prefix(GameLocation __instance, ref string precondition,ref bool __result)
             {
-                string t = "M " + (Game1.player.money - 1);
-                string f = "M " + (Game1.player.money + 1);
+                string t = "M " + (Game1.player.Money - 1);
+                string f = "M " + (Game1.player.Money + 1);
 
                 foreach(var entry in eventConditions)
                 {

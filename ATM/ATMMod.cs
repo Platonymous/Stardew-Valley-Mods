@@ -76,7 +76,7 @@ namespace ATM
 
             var text = responses.Find(r => r.responseKey == key).responseText;
 
-            Game1.activeClickableMenu = new NumberSelectionMenu(text, (number, price, farmer) => processOrder(number, price, farmer, key), -1, 0, (key != "ATM_Withdraw") ? (key == "ATM_Daily_Deposit") ? Math.Max(Game1.player.money, bankAccount.DailyMoneyOrder) : Game1.player.Money : bankAccount.AvailableMoney, (key == "ATM_Daily_Deposit") ? bankAccount.DailyMoneyOrder : Math.Min((key != "ATM_Withdraw") ? Game1.player.money : bankAccount.AvailableMoney, 100));
+            Game1.activeClickableMenu = new NumberSelectionMenu(text, (number, price, farmer) => processOrder(number, price, farmer, key), -1, 0, (key != "ATM_Withdraw") ? (key == "ATM_Daily_Deposit") ? Math.Max(Game1.player.Money, bankAccount.DailyMoneyOrder) : Game1.player.Money : bankAccount.AvailableMoney, (key == "ATM_Daily_Deposit") ? bankAccount.DailyMoneyOrder : Math.Min((key != "ATM_Withdraw") ? Game1.player.Money : bankAccount.AvailableMoney, 100));
         }
 
         private void processOrder(int number, int price, Farmer who, string key)
@@ -147,7 +147,7 @@ namespace ATM
 
         private void setCreditLine()
         {
-            int value = (int)(Math.Max(0, Game1.player.money + bankAccount.Balance) / 28);
+            int value = (int)(Math.Max(0, Game1.player.Money + bankAccount.Balance) / 28);
             if (config.CreditInterest > 0)
                 value = (int)(value / config.CreditInterest) * 2;
             else
