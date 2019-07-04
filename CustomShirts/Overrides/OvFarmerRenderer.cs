@@ -121,48 +121,63 @@ namespace CustomShirts.Overrides
 
         public static bool Prefix_doChangeShirt(FarmerRenderer __instance, int whichShirt)
         {
-            if(whichShirt < 0 && ((whichShirt * -1) - 1) > 0 && ((whichShirt * -1) - 1) < CustomShirtsMod.shirts.Count)
+            try
             {
-                int id = CustomShirtsMod.shirts[(whichShirt * -1) - 1].baseid - 1;
-                CustomShirtsMod._helper.Reflection.GetMethod(__instance, "doChangeShirt").Invoke(new object[] { null, null, id });
-                return false;
-            }
+                if (whichShirt < 0 && ((whichShirt * -1) - 1) > 0 && ((whichShirt * -1) - 1) < CustomShirtsMod.shirts.Count)
+                {
+                    int id = CustomShirtsMod.shirts[(whichShirt * -1) - 1].baseid - 1;
+                    CustomShirtsMod._helper.Reflection.GetMethod(__instance, "doChangeShirt").Invoke(new object[] { null, null, id });
+                    return false;
+                }
 
-            return true;
+                return true;
+            }
+            catch
+            {
+                return true;
+            }
         }
 
         public static void Postfix_drawHairAndAccesories()
         {
-            FarmerRenderer.shirtsTexture = CustomShirtsMod.vanillaShirts;
+            if(CustomShirtsMod.vanillaShirts != null)
+                FarmerRenderer.shirtsTexture = CustomShirtsMod.vanillaShirts;
         }
 
         public static bool Prefix_changeShirt(Farmer __instance, int whichShirt)
         {
-            if (Game1.activeClickableMenu is TitleMenu)
+            try
             {
-                IClickableMenu sub = (IClickableMenu)typeof(TitleMenu).GetField("_subMenu", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
-                string submenu = sub == null ? "null" : sub.GetType().ToString().ToLower();
+                if (Game1.activeClickableMenu is TitleMenu)
+                {
+                    IClickableMenu sub = (IClickableMenu)typeof(TitleMenu).GetField("_subMenu", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                    string submenu = sub == null ? "null" : sub.GetType().ToString().ToLower();
 
-                if (!submenu.Contains("character"))
+                    if (!submenu.Contains("character"))
+                        return true;
+                }
+
+                int max = CustomShirtsMod.vanillaShirts.Height / 32 * (CustomShirtsMod.vanillaShirts.Width / 8) - 1;
+                if (whichShirt >= 0 && whichShirt <= max)
                     return true;
+
+                if (whichShirt > 0)
+                    whichShirt = -1 * ((CustomShirtsMod.shirts.Count + (max - whichShirt)) + 1);
+
+                if (whichShirt * -1 > CustomShirtsMod.shirts.Count)
+                    return true;
+
+                __instance.shirt.Set(whichShirt);
+                __instance.FarmerRenderer.changeShirt(whichShirt);
+
+                CustomShirtsMod.recolor = true;
+
+                return false;
             }
-
-            int max = CustomShirtsMod.vanillaShirts.Height / 32 * (CustomShirtsMod.vanillaShirts.Width / 8) - 1;
-            if (whichShirt >= 0 && whichShirt <= max)
+            catch
+            {
                 return true;
-
-            if (whichShirt > 0)
-                whichShirt = -1 * ((CustomShirtsMod.shirts.Count + (max - whichShirt)) + 1);
-
-            if (whichShirt * -1 > CustomShirtsMod.shirts.Count)
-                return true;
-
-            __instance.shirt.Set(whichShirt);
-            __instance.FarmerRenderer.changeShirt(whichShirt);
-
-            CustomShirtsMod.recolor = true;
-
-            return false;
+            }
         }
 
         public static void recolorShirt(long mid)

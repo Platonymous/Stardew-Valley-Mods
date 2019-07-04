@@ -25,11 +25,7 @@ namespace PyTK.Lua
 
         public static bool hasMod(string mod)
         {
-            foreach (var m in Helper.ModRegistry.GetAll())
-                if (m.Manifest.UniqueID.Equals(mod))
-                    return true;
-
-            return false;
+            return Helper.ModRegistry.IsLoaded(mod);
         }
 
         public static int setCounter(string id, int value)

@@ -246,6 +246,14 @@ namespace PyTK
             return (bool)script.Globals["result"];
         }
 
+        public static string getLuaString(string call)
+        {
+            var script = PyLua.getNewScript();
+            script.Globals["result"] = false;
+            script.DoString("result = (" + call + ")");
+            return (string)script.Globals["result"];
+        }
+
         public static List<GameLocation> getAllLocationsAndBuidlings()
         {
             List<GameLocation> list = Game1.locations.ToList();

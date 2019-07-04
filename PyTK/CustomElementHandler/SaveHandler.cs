@@ -66,7 +66,6 @@ namespace PyTK.CustomElementHandler
 
             Helper.Events.GameLoop.Saved += (s, e) =>
             {
-               if(Game1.IsMasterGame)
                 RebuildFromActions();
             };
 
@@ -80,6 +79,9 @@ namespace PyTK.CustomElementHandler
                 Game1.objectSpriteSheet.Tag = "cod_objects";
                 Game1.bigCraftableSpriteSheet.Tag = "cod_objects";
             };
+
+            Harmony.HarmonyInstance instance = Harmony.HarmonyInstance.Create("PytK.Savehandler.SyncFix");
+            instance.Patch(typeof(NewDaySynchronizer).GetMethod("start"), new Harmony.HarmonyMethod(typeof(SaveHandler), "Replace", null),null,null);
         }
 
         private static bool isRebuildable(object o)

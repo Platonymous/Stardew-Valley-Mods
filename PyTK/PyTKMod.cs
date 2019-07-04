@@ -34,6 +34,9 @@ namespace PyTK
         internal static List<IPyResponder> responders;
         internal static PyTKSaveData saveData = new PyTKSaveData();
 
+        internal static Dictionary<string, string> tokenStrings = new Dictionary<string, string>();
+        internal static Dictionary<string, bool> tokenBoleans = new Dictionary<string, bool>();
+
         public override void Entry(IModHelper helper)
         {
 
@@ -342,6 +345,46 @@ namespace PyTK
             });
 
 
+        }
+
+
+        private void registerCPTokens()
+        {
+            if (!Helper.ModRegistry.IsLoaded("Pathoschild.ContentPatcher"))
+                return;
+
+            IContentPatcherAPI api = Helper.ModRegistry.GetApi<IContentPatcherAPI>("Pathoschild.ContentPatcher");
+
+            api.RegisterToken(this.ModManifest, "LuaString", () =>
+            {
+                foreach (string k in tokenStrings.Keys)
+                    if (tokenStrings[k] != PyUtils.getLuaString(k))
+                        return true;
+
+                return false;
+            }, () => Context.IsWorldReady, (s) =>
+            {
+                tokenStrings.AddOrReplace(s, PyUtils.getLuaString(s));
+                return new string[] { tokenStrings[s] };
+            }, true, true);
+
+            api.RegisterToken(this.ModManifest, "Conditional", () =>
+            {
+                foreach (string k in tokenBoleans.Keys)
+                    if (tokenBoleans[k] != PyUtils.checkEventConditions(k.Split(new[] { " >: " }, StringSplitOptions.RemoveEmptyEntries)[0]))
+                        return true;
+
+                return false;
+            }, () => Context.IsWorldReady, (s) =>
+            {
+                string[] parts = s.Split(new [] { " >: " },StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length < 2)
+                    return null;
+
+                tokenBoleans.AddOrReplace(s, PyUtils.checkEventConditions(parts[0]));
+                return new string[] { tokenBoleans[s] ? parts[1] : parts.Length < 3 ? null : parts[2] };
+            }, true, true);
         }
 
         private void registerTileActions()

@@ -50,7 +50,6 @@ namespace TMXLoader
         internal PyReceiver<SaveBuildable> BuildableReceiver;
         internal PyReceiver<SaveBuildable> BuildableRemover;
 
-
         public override void Entry(IModHelper helper)
         {
             var empty = new TileShop();
@@ -125,7 +124,6 @@ namespace TMXLoader
             helper.Events.Display.RenderingHud += (s, e) =>
             {
                 PropertyValue rain = "";
-
                 if (!(Game1.currentLocation is GameLocation location) || !(location.Map is Map map) || !map.Properties.TryGetValue("Raining", out rain))
                     return;
 
@@ -139,12 +137,12 @@ namespace TMXLoader
 
             helper.Events.Player.Warped += Player_Warped;
 
-            helper.Events.GameLoop.DayStarted += (s, e) =>
+          /*  helper.Events.GameLoop.DayStarted += (s, e) =>
             {
                 foreach (var location in addedLocations)
                     if (Game1.getLocationFromName(location.name) is GameLocation l)
                         l.seasonUpdate(Game1.currentSeason,true);
-            };
+            };*/
 
 
             helper.Events.GameLoop.Saving += (s, e) =>
