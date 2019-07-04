@@ -173,7 +173,7 @@ namespace CustomFarmingRedux
                             if (ingredients[ii].stack == 0)
                                 ingredients.Remove(ingredients[ii]);
                             if (j.Stack <= 0)
-                                items[list].Remove(j);
+                                items[list][items[list].IndexOf(j)] = (Item)null;
                         }
             }
 
