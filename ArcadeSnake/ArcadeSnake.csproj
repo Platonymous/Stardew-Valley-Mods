@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Notes</AssemblyName>
-    <RootNamespace>Notes</RootNamespace>
-    <Version>1.0.6</Version>
+    <AssemblyName>Snake</AssemblyName>
+    <RootNamespace>Snake</RootNamespace>
+    <Version>1.1.1</Version>
     <TargetFramework>net452</TargetFramework>
     <Platforms>x86</Platforms>
     <PlatformTarget>x86</PlatformTarget>

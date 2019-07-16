@@ -1,75 +1,32 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4B5FC017-74C2-4C03-9A55-41DCD90C489B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CustomFurnitureAnywhere</RootNamespace>
     <AssemblyName>CustomFurnitureAnywhere</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <RootNamespace>CustomFurnitureAnywhere</RootNamespace>
+    <Version>0.9.2</Version>
+    <TargetFramework>net452</TargetFramework>
+    <Platforms>x86</Platforms>
+    <PlatformTarget>x86</PlatformTarget>
+
+    <EnableHarmony>true</EnableHarmony>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="1.2.0.1" />
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig">
-      <Version>3.0.0-beta.5</Version>
-    </PackageReference>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.0.0-beta.7" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CustomFurniture\CustomFurniture.csproj" />
+    <ProjectReference Include="..\PyTK\PyTK.csproj" />
+  </ItemGroup>
+  
   <ItemGroup>
     <Reference Include="EntoaroxFramework">
       <HintPath>.\EntoaroxFramework.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AnywhereCustomFurniture.cs" />
-    <Compile Include="CustomFurnitureAnywhereMod.cs" />
-    <Compile Include="FurnitureAnywhereModFix.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="manifest.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CustomFurniture\CustomFurniture.csproj">
-      <Project>{b60cc08a-abd5-4b7b-81bf-c0295c11a025}</Project>
-      <Name>CustomFurniture</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
-      <Name>PyTK</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
   <Import Project="$(SolutionDir)\common.targets" />
+
 </Project>
