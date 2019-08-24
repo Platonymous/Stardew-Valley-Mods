@@ -34,7 +34,7 @@ namespace PyTK.Overrides
 
             internal static bool Prefix(GameLocation __instance, GameLocation other, ref bool __result)
             {
-                __result = object.Equals((object)__instance.Name, (object)other.Name) && object.Equals((object)__instance.uniqueName.Value, (object)other.uniqueName.Value ) && object.Equals((object)__instance.isStructure.Value, (object)other.isStructure.Value);
+                __result = object.Equals((object)__instance.Name, (object)other?.Name) && object.Equals((object)__instance.uniqueName.Value, (object)other?.uniqueName.Value ) && object.Equals((object)__instance.isStructure.Value, (object)other?.isStructure.Value);
                 return false;
             }
         }
