@@ -1,4 +1,4 @@
-﻿using StardewModdingAPI;
+using StardewModdingAPI;
 using System.IO;
 using Microsoft.Xna.Framework.Audio;
 using Ogg2XNA;
@@ -134,11 +134,14 @@ namespace CustomMusic
                         addMusic(path, music);
                     else
                     {
-                        while (simLoad > simuMax || working.Contains(path))
-                            Thread.Sleep(slp);
+                        lock (this)
+                        {
+                            while (simLoad > simuMax || working.Contains(path))
+                                Thread.Sleep(slp);
 
-                        simLoad++;
-                        working.Add(path);
+                            simLoad++;
+                            working.Add(path);
+                        }
                         Task.Run(() =>
                         {
                             addMusic(path, music);
@@ -147,9 +150,8 @@ namespace CustomMusic
 
                 }
                 if (config.Convert)
-                    while(loads > 0)
+                    while (loads > 0)
                         Thread.Sleep(slp);
-
                 foreach (LocationItem location in content.Locations)
                 {
                     if (locations.ContainsKey(location.Location))
@@ -220,10 +222,12 @@ namespace CustomMusic
                 Monitor.Log(music.File + " failed to load", LogLevel.Warn);
                 //Monitor.Log(path + ":" +le.Message + ":" + le.StackTrace, LogLevel.Trace);
             }
-
-            loads--;
-            simLoad--;
-            working.Remove(oPath);
+            lock (this)
+            {
+                loads--;
+                simLoad--;
+                working.Remove(oPath);
+            }
         }
 
         public static SoundEffect LoadSoundEffect(string path)
