@@ -121,6 +121,7 @@ namespace CustomMusic
             foreach (IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
+                lock(this)
                 loads += content.Music.Count;
                 foreach (MusicItem music in content.Music)
                 {
