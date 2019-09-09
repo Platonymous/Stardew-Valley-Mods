@@ -121,7 +121,6 @@ namespace CustomMusic
             foreach (IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
-                lock(this)
                 loads += content.Music.Count;
                 foreach (MusicItem music in content.Music)
                 {
@@ -137,6 +136,7 @@ namespace CustomMusic
                     {
                         lock (this)
                         {
+                            //Mult-Thread shoulu have a lock
                             while (simLoad > simuMax || working.Contains(path))
                                 Thread.Sleep(slp);
 
@@ -210,24 +210,25 @@ namespace CustomMusic
             }
 
             SoundEffect soundEffect = LoadSoundEffect(path);
-
-            if (soundEffect != null)
-            {
-                Monitor.Log(music.File + " Loaded", LogLevel.Trace);
-                string[] ids = music.Id.Split(',').Select(p => p.Trim()).ToArray();
-                foreach (string id in ids)
-                    Music.Add(new StoredMusic(id,music.Preload ? soundEffect :null, music.Ambient, music.Loop, music.Conditions, path));
-            }
-            else
-            {
-                Monitor.Log(music.File + " failed to load", LogLevel.Warn);
-                //Monitor.Log(path + ":" +le.Message + ":" + le.StackTrace, LogLevel.Trace);
-            }
             lock (this)
             {
-                loads--;
-                simLoad--;
-                working.Remove(oPath);
+                    if (soundEffect != null)
+                {
+                    Monitor.Log(music.File + " Loaded", LogLevel.Trace);
+                    string[] ids = music.Id.Split(',').Select(p => p.Trim()).ToArray();
+                    foreach (string id in ids)
+                        //Mult-Thread shoulu have a lock
+                        Music.Add(new StoredMusic(id,music.Preload ? soundEffect :null, music.Ambient, music.Loop, music.Conditions, path));
+                }
+                else
+                {
+                    Monitor.Log(music.File + " failed to load", LogLevel.Warn);
+                    //Monitor.Log(path + ":" +le.Message + ":" + le.StackTrace, LogLevel.Trace);
+                }
+                    //Mult-Thread shoulu have a lock
+                    loads--;
+                    simLoad--;
+                    working.Remove(oPath);
             }
         }
 
