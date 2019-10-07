@@ -158,11 +158,11 @@ namespace CustomFarmingRedux
                     data2[(y - y2) * w + (x - x2)] = data[y * texture.Width + x];
 
             List<Color> colors = data2.ToList();
-            colors.RemoveAll(p => p == Color.White || p == Color.Black);
+            colors.RemoveAll(p => p == Color.White || p == Color.Black || p.A < 128);
 
-            int R = (int)colors.toList(c => (int)c.R).Average();
-            int G = (int)colors.toList(c => (int)c.G).Average(); ;
-            int B = (int)colors.toList(c => (int)c.B).Average(); ;
+            int R = (int)Math.Sqrt(colors.toList(c => c.R * c.R).Average());
+            int G = (int)Math.Sqrt(colors.toList(c => c.G * c.G).Average());
+            int B = (int)Math.Sqrt(colors.toList(c => c.B * c.B).Average());
 
             int nR = R;
             int nG = G;
