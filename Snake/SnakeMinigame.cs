@@ -417,6 +417,13 @@ namespace Snake
             return false;
         }
 
+        public bool forceQuit()
+        {
+            Game1.changeMusicTrack("none");
+            ShouldQuit = true;
+            return true;
+        }
+
         #endregion
     }
 }

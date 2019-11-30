@@ -18,6 +18,8 @@ using PyTK.Extensions;
 using xTile.Layers;
 using xTile;
 using PyTK.Types;
+using StardewValley.Objects;
+using StardewValley.Tools;
 
 namespace PyTK
 {
@@ -62,7 +64,7 @@ namespace PyTK
         public static void checkDrawConditions(Map map)
         {
             foreach (Layer layer in map.Layers.Where(l => l.Properties.ContainsKey("DrawConditions")))
-                layer.Properties.AddOrReplace("DrawConditionsResult", PyUtils.checkEventConditions(layer.Properties["DrawConditions"], layer,Game1.currentLocation) ? "T" : "F");
+                layer.Properties.AddOrReplace("DrawConditionsResult", PyUtils.checkEventConditions(layer.Properties["DrawConditions"], layer, Game1.currentLocation) ? "T" : "F");
         }
 
         internal static List<GameLocation> getWarpLocations(GameLocation location)
@@ -157,22 +159,11 @@ namespace PyTK
 
         public static bool checkEventConditions(string conditions, object caller, GameLocation location)
         {
-            if (!Context.IsWorldReady)
-            {
-                if (conditions.StartsWith("r "))
-                {
-                    string[] cond = conditions.Split(' ');
-                    return Game1.random.NextDouble() <= double.Parse(cond[1]);
-                }
-
-                return false;
-            }
+            bool result = false;
+            bool comparer = true;
 
             if (conditions == null || conditions == "")
                 return true;
-
-            bool result = false;
-            bool comparer = true;
 
             if (conditions.StartsWith("NOT "))
             {
@@ -180,6 +171,30 @@ namespace PyTK
                 comparer = false;
             }
 
+            if (!Context.IsWorldReady)
+            {
+                if (conditions.StartsWith("r "))
+                {
+                    string[] cond = conditions.Split(' ');
+                    return comparer == Game1.random.NextDouble() <= double.Parse(cond[1]);
+                }
+
+                if (conditions.StartsWith("LC ") || conditions.StartsWith("!LC "))
+                {
+                    try
+                    {
+                        result = checkLuaConditions(conditions.StartsWith("!LC "), conditions.Replace("LC ", "").Replace("!LC ", ""), caller);
+                    }
+                    catch
+                    {
+                        result = false;
+                    }
+                    return result == comparer;
+                }
+
+                return result;
+            }
+      
             if (conditions.StartsWith("PC "))
                 result = checkPlayerConditions(conditions.Replace("PC ", ""));
             else if (conditions.StartsWith("LC ") || conditions.StartsWith("!LC "))
@@ -197,7 +212,13 @@ namespace PyTK
                     if (conditions.StartsWith("r "))
                     {
                         string[] cond = conditions.Split(' ');
-                        return Game1.random.NextDouble() <= double.Parse(cond[1]);
+                        return comparer == Game1.random.NextDouble() <= double.Parse(cond[1]);
+                    }
+
+                    if (conditions.StartsWith("LC ") || conditions.StartsWith("!LC "))
+                    {
+                        result = checkLuaConditions(conditions.StartsWith("!LC "), conditions.Replace("LC ", "").Replace("!LC ", ""), caller);
+                        return result == comparer;
                     }
 
                     result = false;
@@ -206,14 +227,14 @@ namespace PyTK
                 {
                     try
                     {
-                        result = Helper.Reflection.GetMethod(location, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) != -1;
+                        result = Helper.Reflection.GetMethod(location, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) > 0;
                     }
                     catch
                     {
                         try
                         {
                             var m = typeof(GameLocation).GetMethod("checkEventPrecondition", BindingFlags.NonPublic | BindingFlags.Instance);
-                            result = (int)m.Invoke(location, new string[] { ("9999999/" + conditions) }) != -1;
+                            result = (int)m.Invoke(location, new string[] { ("9999999/" + conditions) }) > 0;
                         }
                         catch
                         {
@@ -369,6 +390,119 @@ namespace PyTK
             foreach (MethodInfo method in originals)
                 if (toPatch.Contains(method.Name))
                     harmony.Patch(method, prefix == null ? null : new HarmonyMethod(prefix), postfix == null ? null : new HarmonyMethod(postfix));
+        }
+
+        public static Item getItem(string type, int index = -1, string name = "none")
+        {
+            Item item = null;
+
+            if (type == "Object")
+            {
+                if (index != -1)
+                    item = new StardewValley.Object(index, 1);
+                else if (name != "none")
+                    item = new StardewValley.Object(Game1.objectInformation.getIndexByName(name), 1);
+            }
+            else if (type == "BigObject")
+            {
+                if (index != -1)
+                    item = new StardewValley.Object(Vector2.Zero, index);
+                else if (name != "none")
+                    item = new StardewValley.Object(Vector2.Zero, Game1.bigCraftablesInformation.getIndexByName(name));
+            }
+            else if (type == "Ring")
+            {
+                if (index != -1)
+                    item = new Ring(index);
+                else if (name != "none")
+                    item = new Ring(Game1.objectInformation.getIndexByName(name));
+            }
+            else if (type == "Hat")
+            {
+                if (index != -1)
+                    item = new Hat(index);
+                else if (name != "none")
+                    item = new Hat(Helper.Content.Load<Dictionary<int, string>>(@"Data/hats", ContentSource.GameContent).getIndexByName(name));
+            }
+            else if (type == "Boots")
+            {
+                if (index != -1)
+                    item = new Boots(index);
+                else if (name != "none")
+                    item = new Boots(Helper.Content.Load<Dictionary<int, string>>(@"Data/Boots", ContentSource.GameContent).getIndexByName(name));
+            }
+            else if (type == "TV")
+            {
+                if (index != -1)
+                    item = new StardewValley.Objects.TV(index, Vector2.Zero);
+                else if (name != "none")
+                    item = new TV(Helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(name), Vector2.Zero);
+            }
+            else if (type == "IndoorPot")
+                item = new StardewValley.Objects.IndoorPot(Vector2.Zero);
+            else if (type == "CrabPot")
+                item = new StardewValley.Objects.CrabPot(Vector2.Zero);
+            else if (type == "Chest")
+                item = new StardewValley.Objects.Chest(true);
+            else if (type == "Cask")
+                item = new StardewValley.Objects.Cask(Vector2.Zero);
+            else if (type == "Cask")
+                item = new StardewValley.Objects.Cask(Vector2.Zero);
+            else if (type == "Furniture")
+            {
+                if (index != -1)
+                    item = new StardewValley.Objects.Furniture(index, Vector2.Zero);
+                else if (name != "none")
+                    item = new Furniture(Helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(name), Vector2.Zero);
+            }
+            else if (type == "Sign")
+                item = new StardewValley.Objects.Sign(Vector2.Zero, index);
+            else if (type == "Wallpaper")
+                item = new StardewValley.Objects.Wallpaper(Math.Abs(index), false);
+            else if (type == "Floors")
+                item = new StardewValley.Objects.Wallpaper(Math.Abs(index), true);
+            else if (type == "MeleeWeapon")
+            {
+                if (index != -1)
+                    item = new MeleeWeapon(index);
+                else if (name != "none")
+                    item = new MeleeWeapon(Helper.Content.Load<Dictionary<int, string>>(@"Data/weapons", ContentSource.GameContent).getIndexByName(name));
+
+            }
+            else if (type == "CustomObject" && PyTK.CustomElementHandler.CustomObjectData.collection.ContainsKey(name))
+                item = PyTK.CustomElementHandler.CustomObjectData.collection[name].getObject();
+            else if (type == "SDVType")
+            {
+                try
+                {
+                    if (index == -1)
+                        item = Activator.CreateInstance(PyUtils.getTypeSDV(name)) is Item i ? i : null;
+                    else
+                        item = Activator.CreateInstance(PyUtils.getTypeSDV(name), index) is Item i ? i : null;
+                }
+                catch (Exception ex)
+                {
+                    Monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
+                    Monitor.Log("Couldn't load item SDVType: " + name);
+                }
+            }
+            else if (type == "ByType")
+            {
+                try
+                {
+                    if (index == -1)
+                        item = Activator.CreateInstance(Type.GetType(name)) is Item i ? i : null;
+                    else
+                        item = Activator.CreateInstance(Type.GetType(name), index) is Item i ? i : null;
+                }
+                catch (Exception ex)
+                {
+                    Monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
+                    Monitor.Log("Couldn't load item ByType: " + name);
+                }
+            }
+
+            return item;
         }
 
     }

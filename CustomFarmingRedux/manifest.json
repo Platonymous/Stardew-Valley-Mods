@@ -1,7 +1,7 @@
 {
   "Name": "Custom Farming Redux",
   "Author": "Platonymous",
-  "Version": "2.10.16",
+  "Version": "2.12.8",
   "Description": "Mod for Custom Machine creation.",
   "UniqueID": "Platonymous.CustomFarming",
   "EntryDll": "CustomFarmingRedux.dll",
@@ -9,8 +9,7 @@
   "MinimumApiVersion": "2.11.2",
   "Dependencies": [
     {
-      "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.9.2"
+      "UniqueID": "Platonymous.Toolkit"
     }
   ]
 }

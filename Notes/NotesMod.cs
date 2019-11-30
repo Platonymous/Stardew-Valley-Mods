@@ -57,8 +57,8 @@ namespace Notes
 
         private void initNotes()
         {
-            Texture2D noteTexture = Helper.Content.Load<Texture2D>("Assets/Note.png");
-            Texture2D deskTexture = Helper.Content.Load<Texture2D>("Assets/Desk.png");
+            Texture2D noteTexture = Helper.Content.Load<Texture2D>("assets/Note.png");
+            Texture2D deskTexture = Helper.Content.Load<Texture2D>("assets/Desk.png");
             Note = new CustomObjectData("Notes.Note", i18n.Get("notes.note.name") + "/0/-300/Basic/" + i18n.Get("notes.note.name") + "/" + i18n.Get("notes.note.name"),noteTexture,Color.White,type:typeof(Note));
             Desk = new CustomObjectData("Notes.Desk", $"{i18n.Get("notes.desk.name")}/100/-300/Crafting -9/{i18n.Get("notes.desk.description")}/true/true/0/{i18n.Get("notes.desk.name")}",deskTexture, Color.White, 0, true, typeof(Desk), new CraftingData("Notes.Desk", "388 2"));
         }

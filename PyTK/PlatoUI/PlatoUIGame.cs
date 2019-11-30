@@ -171,5 +171,11 @@ namespace PyTK.PlatoUI
         {
            
         }
+
+        public bool forceQuit()
+        {
+            Quit = true;
+            return true;
+        }
     }
 }

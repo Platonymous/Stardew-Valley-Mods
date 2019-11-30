@@ -33,6 +33,9 @@
   <ItemGroup>
     <PackageReference Include="AWSSDK.Core" Version="3.3.103.5" />
     <PackageReference Include="AWSSDK.Polly" Version="3.3.101.35" />
+    <PackageReference Include="Lib.Harmony">
+      <Version>1.2.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig">
       <Version>3.0.0-beta.5</Version>
     </PackageReference>
@@ -46,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AWSHandler.hidden.cs" />
+    <Compile Include="IGMCMAPI.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="PelicanTTSMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -54,6 +58,7 @@
     <Compile Include="SpeechHandler.cs" />
     <Compile Include="SpeechProfile.cs" />
     <Compile Include="VoiceControl.cs" />
+    <Compile Include="VoiceSetup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="config.json" />

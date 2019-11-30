@@ -1,0 +1,15 @@
+﻿{
+  "Name": "CustomMovies",
+  "Author": "Platonymous",
+  "Version": "0.9.3",
+  "Description": "Adds Custom Movies to the Theatre",
+  "UniqueID": "Platonymous.CustomMovies",
+  "EntryDll": "CustomMovies.dll",
+  "MinimumApiVersion": "3.0.0",
+  "UpdateKeys": [ "Nexus:4737" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ]
+}

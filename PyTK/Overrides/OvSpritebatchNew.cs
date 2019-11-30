@@ -69,14 +69,14 @@ namespace PyTK.Overrides
                 return false;
             }
 
-            if (texture.Tag is String tag)
+            if (texture != null && texture.Tag != null && texture.Tag is String tag)
             {
                 CustomObjectData data = CustomObjectData.collection.ContainsKey(tag) ? CustomObjectData.collection[tag] : getDataFromSourceRectangle(sourceRectangle.Value);
                 texture.Tag = "cod_object";
                 Game1.bigCraftableSpriteSheet.Tag = "cod_object";
                 Game1.objectSpriteSheet.Tag = "cod_object";
 
-                if (data != null)
+                if (data != null && data.texture != null)
                 {
                     skip = true;
                     __instance.Draw(data.texture, destinationRectangle, data.sourceRectangle, data.color, rotation, origin, effects, layerDepth);

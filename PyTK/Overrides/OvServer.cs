@@ -20,8 +20,8 @@ namespace PyTK.Overrides
 
             internal static void Prefix()
             {
-                if (Game1.IsMasterGame)
-                    SaveHandler.Replace();
+               if (Game1.IsMasterGame)
+                   SaveHandler.Replace();
             }
 
             internal static void Postfix()

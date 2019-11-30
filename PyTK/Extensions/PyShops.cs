@@ -59,7 +59,7 @@ namespace PyTK.Extensions
 
         public static List<Item> forSale(this List<InventoryItem> list)
         {
-            return list.Select(i => i.item).ToList();
+            return list.Select(i => (i.item as Item)).ToList();
         }
 
         public static Dictionary<Item, int[]> priceAndStock(this List<InventoryItem> list)

@@ -6,6 +6,12 @@ using PyTK.Extensions;
 using StardewValley.Menus;
 using System.Collections.Generic;
 using StardewValley;
+using StardewValley.TerrainFeatures;
+using StardewValley.Characters;
+using StardewValley.Monsters;
+using StardewValley.Quests;
+using System.Xml.Serialization;
+using StardewValley.Objects;
 
 namespace HarpOfYobaRedux
 {

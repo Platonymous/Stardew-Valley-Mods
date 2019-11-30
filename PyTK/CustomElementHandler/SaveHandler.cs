@@ -58,20 +58,20 @@ namespace PyTK.CustomElementHandler
         {
             fieldInfoChache = new Dictionary<Type, FieldInfo[]>();
             propInfoChache = new Dictionary<Type, PropertyInfo[]>();
-
+            
             Helper.Events.GameLoop.Saving += (s, e) =>
             {
-                Replace();
+                   // Replace();
             };
 
             Helper.Events.GameLoop.Saved += (s, e) =>
             {
-                RebuildFromActions();
+                //   RebuildFromActions();
             };
 
             Helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
-                Rebuild();
+                //   Rebuild();
             };
 
             Helper.Events.GameLoop.SaveLoaded += (s, e) =>
@@ -80,11 +80,13 @@ namespace PyTK.CustomElementHandler
                 Game1.bigCraftableSpriteSheet.Tag = "cod_objects";
             };
 
-            Harmony.HarmonyInstance instance = Harmony.HarmonyInstance.Create("PytK.Savehandler.SyncFix");
-            instance.Patch(typeof(NewDaySynchronizer).GetMethod("start"), new Harmony.HarmonyMethod(typeof(SaveHandler), "Replace", null),null,null);
+
+           Harmony.HarmonyInstance instance = Harmony.HarmonyInstance.Create("PytK.Savehandler.SyncFix");
+            // instance.Patch(typeof(NewDaySynchronizer).GetMethod("start"), new Harmony.HarmonyMethod(typeof(SaveHandler), "Replace", null),null,null);
+
         }
 
-        private static bool isRebuildable(object o)
+        public static bool isRebuildable(object o)
         {
             return getDataString(o).StartsWith(newPrefix);
         }
@@ -118,16 +120,20 @@ namespace PyTK.CustomElementHandler
 
         public static void RebuildAll(object obj, object parent)
         {
+                return;
             ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => getDataString(o).StartsWith(newPrefix), o => RebuildObject(o), setReverseAction: false);
         }
 
         public static void ReplaceAll(object obj, object parent)
         {
+                return;
+
             ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => hasSaveType(o), o => getReplacement(o), true);
         }
 
         internal static void RebuildFromActions()
         {
+                return;
             Monitor.Log("Rebuilding Custom Objects");
             rebuildActions.ForEach(a => a.Invoke());
             rebuildActions.Clear();
@@ -135,6 +141,7 @@ namespace PyTK.CustomElementHandler
 
         internal static void Replace()
         {
+                return;
             Monitor.Log("Replacing Custom Objects");
 
             //rebuildActions.Clear();
@@ -151,6 +158,8 @@ namespace PyTK.CustomElementHandler
 
         internal static void Rebuild()
         {
+                return;
+
             Monitor.Log("Rebuilding Custom Objects from Save");
             rebuildActions.Clear();
             OnBeforeRebuilding(EventArgs.Empty);
@@ -333,6 +342,8 @@ namespace PyTK.CustomElementHandler
 
         public static object rebuildElement(string dataString, object replacement)
         {
+            CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
+
             replacement = checkReplacement(replacement);
             objectPreProcessors.useAll(o => replacement = o.Invoke(replacement));
             preProcessors.useAll(p => dataString = p.Invoke(dataString));
@@ -378,7 +389,9 @@ namespace PyTK.CustomElementHandler
             }
             catch (Exception e)
             {
-                Monitor.Log("Exception while rebuilding element: " + dataString + ":" +e.Message + ":" +e.StackTrace, LogLevel.Trace);
+                if (PyTKMod.saveWasLoaded)
+                    Monitor.Log("Exception while rebuilding element: " + dataString + ":" + e.Message + ":" + e.StackTrace, LogLevel.Trace);
+
                 return replacement;
             }
         }
@@ -396,7 +409,16 @@ namespace PyTK.CustomElementHandler
 
         internal static string getReplacementName(ISaveElement element, string cat = "Item")
         {
-            string additionalSaveData = string.Join(seperator.ToString(), element.getAdditionalSaveData().Select(x => x.Key + "=" + x.Value));
+            string additionalSaveData = string.Join(seperator.ToString(), new Dictionary<string, string>().Select(x => x.Key + "=" + x.Value));
+            try
+            {
+                if (element.getAdditionalSaveData() is Dictionary<string, string> d)
+                    additionalSaveData = string.Join(seperator.ToString(), d.Select(x => x.Key + "=" + x.Value));
+            }
+            catch
+            {
+
+            }
             string type = getTypeName(element);
             string name = newPrefix + seperator + cat + seperator + type + seperator + additionalSaveData;
             return name;

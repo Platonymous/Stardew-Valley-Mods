@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 using StardewValley;
+using OpenCL.Net.Extensions;
+using OpenCL.Net;
 
 namespace Visualize
 {
@@ -59,6 +61,14 @@ namespace Visualize
         {
             if (e.IsMultipleOf(30)) // half-second tick
                 pass = 0;
+        }
+
+        internal static Texture2D callDrawHandlers(ref Texture2D texture)
+        {
+            foreach (IVisualizeHandler handler in _handlers)
+                handler.ProcessTexture(ref texture);
+
+            return texture;
         }
 
         internal static bool callDrawHandlers(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)

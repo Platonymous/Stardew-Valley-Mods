@@ -183,6 +183,8 @@ namespace PyTK.CustomElementHandler
 
             _sdvSourceRectangle = null;
             _sourceRectangle = null;
+
+            PyTKMod.UpdateCustomObjects = true;
         }
 
         public Item getObject(Item item = null)

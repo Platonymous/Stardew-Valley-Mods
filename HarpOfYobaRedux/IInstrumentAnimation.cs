@@ -1,7 +1,7 @@
 ﻿
 namespace HarpOfYobaRedux
 {
-    internal interface IInstrumentAnimation
+    public interface IInstrumentAnimation
     {
 
         void preAnimation();

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewValley;
 using System.Collections.Generic;
-using xTile;
 
 namespace TMXLoader
 {
@@ -18,6 +18,8 @@ namespace TMXLoader
         internal Texture2D _icon = null;
         internal string _mapName = null;
         internal string _location = null;
+
+        public Dictionary<string, BuildableTranslation> translations { get; set; } = new Dictionary<string, BuildableTranslation>();
 
         public BuildableEdit()
         {

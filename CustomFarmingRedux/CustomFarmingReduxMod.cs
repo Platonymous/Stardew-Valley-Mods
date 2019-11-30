@@ -44,7 +44,6 @@ namespace CustomFarmingRedux
             helper.Events.Display.MenuChanged += OnMenuChanged;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
 
-            harmonyFix();
             helper.ConsoleCommands.Add("replace_custom_farming", "Triggers Custom Farming Replacement", replaceCustomFarming);
             helper.ConsoleCommands.Add("cfclear", "Clears all machines", CFClear);
         }
@@ -66,6 +65,13 @@ namespace CustomFarmingRedux
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
+            CustomObject.betterArtisanGoods = System.Type.GetType("BetterArtisanGoodIcons.ArtisanGoodsManager, BetterArtisanGoodIcons");
+            CustomObject.hasBetterArtisanGoods = CustomObject.betterArtisanGoods != null;
+
+            if (CustomObject.hasBetterArtisanGoods)
+                harmonyFix();
+
+
             if (hasKisekae)
             {
                 var registry = Helper.ModRegistry.GetType().GetField("Registry", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Helper.ModRegistry);
@@ -99,9 +105,6 @@ namespace CustomFarmingRedux
                     Game1.player.craftingRecipes[c.Key] = c.Value;
                 else
                     Game1.player.craftingRecipes.Add(c.Key, c.Value);
-
-            CustomObject.betterArtisanGoods = System.Type.GetType("BetterArtisanGoodIcons.ArtisanGoodsManager, BetterArtisanGoodIcons");
-            CustomObject.hasBetterArtisanGoods = CustomObject.betterArtisanGoods != null;
         }
 
         private bool clickedOnWateringCan(Point pos)
@@ -202,8 +205,12 @@ namespace CustomFarmingRedux
 
         private void harmonyFix()
         {
-            typeof(SObjectBAI).PatchType(typeof(SObject), Helper);
-            typeof(SObjectBAI).PatchType(typeof(ColoredObject), Helper);
+            MethodInfo m = typeof(SObject).GetMethod("drawInMenuWithStackNumber", BindingFlags.Public | BindingFlags.Instance);
+            if (m == null)
+            {
+                typeof(SObjectBAI).PatchType(typeof(SObject), Helper);
+                typeof(SObjectBAI).PatchType(typeof(ColoredObject), Helper);
+            }
         }
 
         private void OnMenuChanged(object sender, MenuChangedEventArgs e)
@@ -212,7 +219,8 @@ namespace CustomFarmingRedux
             {
                 foreach (CustomMachineBlueprint blueprint in machines.Where(m => m.crafting != null))
                 {
-                    foreach (var page in craftingPage.pagesOfCraftingRecipes)
+                    List<Dictionary<ClickableTextureComponent, CraftingRecipe>> pagesOfCraftingRecipes = Helper.Reflection.GetField<List<Dictionary<ClickableTextureComponent, CraftingRecipe>>>(craftingPage, "pagesOfCraftingRecipes").GetValue();
+                    foreach (var page in pagesOfCraftingRecipes)
                     {
                         if (page.Find(k => k.Value.name == blueprint.fullid) is KeyValuePair<ClickableTextureComponent, CraftingRecipe> kv && kv.Value != null && kv.Key != null)
                         {
@@ -276,6 +284,10 @@ namespace CustomFarmingRedux
             foreach (CustomFarmingPack pack in packs)
                 foreach (CustomMachineBlueprint blueprint in pack.machines)
                 {
+                    if(blueprint.loadconditions != "" && !PyUtils.CheckEventConditions(blueprint.loadconditions))
+                    {
+                        continue;
+                    }
                     blueprint.pack = pack;
                     machines.AddOrReplace(blueprint);
 

@@ -1,7 +1,7 @@
 ﻿
 namespace HarpOfYobaRedux
 {
-    interface IMagic
+    public interface IMagic
     {
 
         void doMagic(bool playedToday);

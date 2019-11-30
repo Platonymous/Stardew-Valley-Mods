@@ -122,6 +122,8 @@ namespace CustomFarmingRedux
         public string item { get; set; } = "";
 
         public List<IngredientBlueprint> materials { get; set; }
+
+        public string conditions { get; set; } = "";
         public string texture { get; set; }
         public int tileindex
         {
@@ -225,7 +227,7 @@ namespace CustomFarmingRedux
             if (p is SObject obj && i.index == -999 && (i.exactquality == -1 || obj.Quality == i.exactquality) && obj.Quality >= i.quality && (i.quality >= 0 || obj.Quality < (i.quality * -1)))
                 return true;
 
-            return p is SObject o && (exclude == null || !exclude.Contains(o.ParentSheetIndex)) && (o.ParentSheetIndex == i.index || o.Category == i.index || (include != null && (include.Contains(o.ParentSheetIndex) || include.Contains(o.Category)))) && (i.exactquality == -1 || o.Quality == i.exactquality) && o.Quality >= i.quality && (i.quality >= 0 || o.Quality < (i.quality * -1));
+            return p is SObject o && (exclude == null || !exclude.Contains(o.ParentSheetIndex)) && (o.ParentSheetIndex == i.index || o.Category == i.index || (i.context.Count > 0 && i.context.Exists(ic => o.HasContextTag(ic))) || (include != null && (include.Contains(o.ParentSheetIndex) || include.Contains(o.Category)))) && (i.exactquality == -1 || o.Quality == i.exactquality) && o.Quality >= i.quality && (i.quality >= 0 || o.Quality < (i.quality * -1));
         }
 
         public bool fitsIngredient(Item p, List<IngredientBlueprint> l)
@@ -235,7 +237,7 @@ namespace CustomFarmingRedux
                 if (p is SObject obj && i.index == -999)
                     return true;
 
-                if (p is SObject o && (exclude == null || !exclude.Contains(o.ParentSheetIndex)) && (o.ParentSheetIndex == i.index || o.Category == i.index || (include != null && (include.Contains(o.ParentSheetIndex) || include.Contains(o.Category)))) && (i.exactquality == -1 || o.Quality == i.exactquality) && o.Quality >= i.quality && (i.quality >= 0 || o.Quality < (i.quality * -1)))
+                if (p is SObject o && (exclude == null || !exclude.Contains(o.ParentSheetIndex)) && (o.ParentSheetIndex == i.index || o.Category == i.index || (i.context.Count > 0 && i.context.Exists(ic => o.HasContextTag(ic)))|| (include != null && (include.Contains(o.ParentSheetIndex) || include.Contains(o.Category)))) && (i.exactquality == -1 || o.Quality == i.exactquality) && o.Quality >= i.quality && (i.quality >= 0 || o.Quality < (i.quality * -1)))
                     return true;
             }
 

@@ -27,6 +27,11 @@ namespace Visualize
 
         internal void Begin(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null, Effect effect = null, Matrix? transformMatrix = null)
         {
+            return;
+        }
+
+        internal void PlatformRenderBatch(Texture2D texture, object[] sprites, int offset,  int count)
+        {
 
         }
 

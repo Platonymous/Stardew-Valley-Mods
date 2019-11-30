@@ -33,8 +33,8 @@ namespace ShipFromInventory
             shippingBinLidRectangle = new Rectangle(134, 226, 30, 25);
             var instance = HarmonyInstance.Create("Platonymous.ShipFromInventory");
             instance.Patch(typeof(InventoryPage).GetConstructor(new[] { typeof(int), typeof(int), typeof(int), typeof(int) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageCon")));
-            instance.Patch(typeof(InventoryPage).GetMethod("draw",new[] { typeof(SpriteBatch) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageDraw")));
-            if(Type.GetType("BiggerBackpack.NewInventoryPage, BiggerBackpack") is Type bbpType)
+            instance.Patch(typeof(InventoryPage).GetMethod("draw", new[] { typeof(SpriteBatch) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageDraw")));
+            if (Type.GetType("BiggerBackpack.NewInventoryPage, BiggerBackpack") is Type bbpType)
                 instance.Patch(bbpType.GetMethod("draw", new[] { typeof(SpriteBatch) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageDraw")));
 
 
@@ -43,7 +43,7 @@ namespace ShipFromInventory
 
             instance.Patch(typeof(InventoryPage).GetMethod("receiveLeftClick"), new HarmonyMethod(this.GetType().GetMethod("InventoryPageLeftClick")));
 
-            if(config.LidAnimation)
+            if (config.LidAnimation)
                 helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
         }
 
@@ -88,8 +88,8 @@ namespace ShipFromInventory
             }
             else
             {
-                if(!closing && frame > 0 && config.LidSound)
-                        Game1.playSound("doorCreakReverse");
+                if (!closing && frame > 0 && config.LidSound)
+                    Game1.playSound("doorCreakReverse");
 
                 closing = frame > 0;
             }
@@ -103,7 +103,7 @@ namespace ShipFromInventory
             {
                 StardewValley.Object shipment = obj;
                 Farm farm = Game1.getFarm();
-                farm.shipItem(shipment);
+                farm.getShippingBin(Game1.player).Add(shipment);
                 farm.lastItemShipped = shipment;
                 Game1.playSound("Ship");
                 Game1.player.CursorSlotItem = null;

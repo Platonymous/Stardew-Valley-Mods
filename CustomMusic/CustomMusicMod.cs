@@ -36,7 +36,8 @@ namespace CustomMusic
             config = helper.ReadConfig<Config>();
             SMonitor = Monitor;
             SHelper = Helper;
-            loadContentPacks();
+            Thread thread = new Thread(loadContentPacks);
+            thread.Start();
             var harmony = HarmonyInstance.Create("Platonymous.CustomMusic");
             harmony.Patch(typeof(Cue).GetMethod("Stop"), new HarmonyMethod(typeof(Overrides), "Stop"));
             harmony.Patch(typeof(Cue).GetMethod("Play"), new HarmonyMethod(typeof(Overrides), "Play"));
@@ -61,7 +62,7 @@ namespace CustomMusic
             helper.ConsoleCommands.Add("playmusic", "Play a music cue. Format: playmusic [name]", (s, p) =>
               {
                   Monitor.Log("Playing: " + p[0], LogLevel.Info);
-                  Game1.nextMusicTrack = p[0];
+                  Game1.changeMusicTrack(p[0]);
               });
         }
 
@@ -79,7 +80,7 @@ namespace CustomMusic
                     name += ":" + s;
             }
 
-            DelayedAction d = new DelayedAction(500, () => Game1.nextMusicTrack = name);
+            DelayedAction d = new DelayedAction(500, () => Game1.changeMusicTrack(name));
             Game1.delayedActions.Add(d);
         }
 
@@ -98,7 +99,7 @@ namespace CustomMusic
                     if (n.Length <= 2 && Game1.currentSong != null && Game1.currentSong.Name is string s && s.Length > 0)
                         name += ":" + s;
                 }
-                Game1.nextMusicTrack = name;
+                Game1.changeMusicTrack(name);
             }
         }
 
@@ -116,8 +117,6 @@ namespace CustomMusic
 
         private void loadContentPacks()
         {
-            loads = 0;
-            simLoad = 0;
             foreach (IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
@@ -125,30 +124,8 @@ namespace CustomMusic
                 foreach (MusicItem music in content.Music)
                 {
                     string path = Path.Combine(pack.DirectoryPath, music.File);
-                    if (!music.Preload && !config.Convert)
-                        Task.Run(() =>
-                        {
-                            addMusic(path, music);
-                        });
-                    else if (!config.Convert)
-                        addMusic(path, music);
-                    else
-                    {
-                        while (simLoad > simuMax || working.Contains(path))
-                            Thread.Sleep(slp);
-
-                        simLoad++;
-                        working.Add(path);
-                        Task.Run(() =>
-                        {
-                            addMusic(path, music);
-                        });
-                    }
-
+                    addMusic(path, music);
                 }
-                if (config.Convert)
-                    while(loads > 0)
-                        Thread.Sleep(slp);
 
                 foreach (LocationItem location in content.Locations)
                 {
@@ -166,46 +143,7 @@ namespace CustomMusic
             string oPath = path;
 
             string orgPath = path;
-            path = config.Convert ? path.Replace(".ogg", ".wav") : path;
-            bool done = false;
-            int cc = 0;
-            if (config.Convert)
-            {
-                while (!done && cc < ti)
-                {
-
-                    if (File.Exists(path))
-                    {
-                        FileStream file = File.Open(path, FileMode.Open);
-                        try
-                        {
-                            if (file.Length < 100)
-                            {
-                                file.Close();
-                                file.Dispose();
-                                File.Delete(path);
-                                Convert(orgPath);
-                            }
-                            else
-                            {
-                                file.Close();
-                                file.Dispose();
-                            }
-                        }
-                        catch
-                        {
-                            cc++;
-                            file.Close();
-                            file.Dispose();
-                            Thread.Sleep(slp);
-                        }
-                    }
-                    else
-                        Convert(orgPath);
-                    done = true;
-                }
-            }
-
+           
             SoundEffect soundEffect = LoadSoundEffect(path);
 
             if (soundEffect != null)
@@ -218,25 +156,16 @@ namespace CustomMusic
             else
             {
                 Monitor.Log(music.File + " failed to load", LogLevel.Warn);
-                //Monitor.Log(path + ":" +le.Message + ":" + le.StackTrace, LogLevel.Trace);
             }
-
-            loads--;
-            simLoad--;
-            working.Remove(oPath);
         }
 
         public static SoundEffect LoadSoundEffect(string path)
         {
-            int c = 0;
-            Exception le = null;
             SoundEffect soundEffect = null;
 
 
             if (path.EndsWith(".wav"))
             {
-                while (soundEffect == null && c < ti)
-                {
                     FileStream stream = new FileStream(path, FileMode.Open);
                     try
                     {
@@ -245,30 +174,15 @@ namespace CustomMusic
                     catch (Exception e)
                     {
                         stream.Close();
-                        c++;
-                        le = e;
-                        Thread.Sleep(slp);
                     }
                     stream.Close();
                     stream.Dispose();
-                }
             }
             else
-            {
-                while (soundEffect == null && c < ti)
-                {
-                    try
-                    {
-                        soundEffect = OggLoader.Load(path);
-                    }
-                    catch (Exception e)
-                    {
-                        c++;
-                        le = e;
-                        Thread.Sleep(slp);
-                    }
-                }
-            }
+                soundEffect = OggLoader.Load(path);
+
+            if(soundEffect == null)
+                SMonitor?.Log("Failed to load: " + path, LogLevel.Error);
 
             return soundEffect;
         }

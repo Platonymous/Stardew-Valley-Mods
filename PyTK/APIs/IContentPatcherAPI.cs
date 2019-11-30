@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PyTK.APIs
 {
-    internal interface IContentPatcherAPI
+    public interface IContentPatcherAPI
     {
         /*********
         ** Methods

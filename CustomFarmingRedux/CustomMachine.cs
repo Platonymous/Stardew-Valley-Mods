@@ -52,6 +52,7 @@ namespace CustomFarmingRedux
         private bool skipDrop = false;
         private int identifier => (int)((double)tileLocation.X * 2000.0 + (double)tileLocation.Y);
         public PySync syncObject { get; set; }
+        private Item block = null;
 
 
         public virtual int frame {
@@ -167,7 +168,7 @@ namespace CustomFarmingRedux
             RecipeBlueprint result = null;
             if (blueprint.production != null)
                 foreach (RecipeBlueprint r in blueprint.production)
-                    if (r.hasIngredients(items))
+                    if (r.hasIngredients(items) && (r.conditions == "" || PyUtils.CheckEventConditions(r.conditions)))
                         result = r;
 
             return result;
@@ -178,7 +179,7 @@ namespace CustomFarmingRedux
             if (blueprint.production == null)
                 return null;
 
-            return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials));
+            return blueprint.production.Find(rec => rec.materials != null && rec.materials.Count > 0 && rec.fitsIngredient(item, rec.materials) && (rec.conditions == "" || PyUtils.CheckEventConditions(rec.conditions)));
         }
 
         public virtual RecipeBlueprint findRecipe(List<Item> items)
@@ -308,10 +309,11 @@ namespace CustomFarmingRedux
 
         public override void updateWhenCurrentLocation(GameTime time, GameLocation environment)
         {
-            if (tileLocation == Vector2.Zero)
-                if (!environment.objects.ContainsKey(tileLocation) || environment.objects[tileLocation] != this)
-                    if ((new List<SObject>(environment.objects.Values)).Contains(this))
-                        tileLocation.Value = new List<Vector2>(environment.objects.Keys).Find(k => environment.objects[k] == this);
+
+                if (environment != null && tileLocation != null && tileLocation.Value != null && tileLocation.Value == Vector2.Zero)
+                    if (!environment.objects.ContainsKey(tileLocation) || environment.objects[tileLocation] != this)
+                        if ((new List<SObject>(environment.objects.Values)).Contains(this))
+                            tileLocation.Value = new List<Vector2>(environment.objects.Keys).Find(k => environment.objects[k] == this);
 
                location = environment;
                bool isWorking = this.isWorking;
@@ -432,10 +434,13 @@ namespace CustomFarmingRedux
                 draw(spriteBatch, xNonTile, yNonTile, alpha);
         }
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
         {
             tileindex = 0;
             spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), sourceRectangle, Color.White * transparency, 0.0f, new Vector2(tilesize.Width / 2, tilesize.Width), Game1.pixelZoom * (scaleSize < 0.2 ? scaleSize : scaleSize / 2.00f), SpriteEffects.None, layerDepth);
+            if (((drawStackNumber != StackDrawType.Draw || this.maximumStackSize() <= 1 || this.Stack <= 1) && drawStackNumber != StackDrawType.Draw_OneInclusive || (double)scaleSize <= 0.3 ? 0 : (this.Stack != int.MaxValue ? 1 : 0)) == 0)
+                return;
+                Utility.drawTinyDigits(stack, spriteBatch, location + new Vector2((Game1.tileSize - Utility.getWidthOfTinyDigitString(stack, 3f * scaleSize)) + 3f * scaleSize, (float)(Game1.tileSize - 18.0 * scaleSize + 2.0)), 3f * scaleSize, 1f, Color.White);
         }
 
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, SFarmer f)
@@ -455,6 +460,8 @@ namespace CustomFarmingRedux
 
             if (location != null)
                 data.Add("location", location.Name);
+
+            data.Add("stack", this.Stack.ToString());
 
             if (activeRecipe != null && !blueprint.asdisplay)
                 data.Add("recipe", activeRecipe.id.ToString());
@@ -493,7 +500,10 @@ namespace CustomFarmingRedux
             if (additionalSaveData.ContainsKey("completionTime"))
                 completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
 
-           build(blueprint);
+            build(blueprint);
+
+            if (additionalSaveData.ContainsKey("stack"))
+                this.Stack = int.Parse(additionalSaveData["stack"]);
 
             if (additionalSaveData.ContainsKey("location"))
             {
@@ -503,28 +513,16 @@ namespace CustomFarmingRedux
 
             if (additionalSaveData.ContainsKey("recipe"))
                 activeRecipe = blueprint.production.Find(r => r.id == additionalSaveData["recipe"]);
-            
+
             if (additionalSaveData.ContainsKey("completionTime"))
                 completionTime = new STime(int.Parse(additionalSaveData["completionTime"]));
             else
                 completionTime = STime.CURRENT;
 
-            meetsConditions = PyUtils.checkEventConditions(conditions, this, location);
-
-            if (completionTime != null && completionTime > STime.CURRENT && !meetsConditions)
-            {
-                int minutesToCompletion = (completionTime - STime.CURRENT).timestamp;
-                completionTime = STime.CURRENT + STime.DAY;
-                completionTime.hour = 6;
-                completionTime.minute = 0;
-                completionTime += minutesToCompletion < 0 ? 0 : minutesToCompletion;
-                minutesUntilReady.Set((completionTime + 1 - STime.CURRENT).timestamp);
-            }
-
             Chest c = (Chest)replacement;
             tileLocation.Value = c.TileLocation;
 
-            if(additionalSaveData.ContainsKey("tileLocation"))
+            if (additionalSaveData.ContainsKey("tileLocation"))
                 tileLocation.Value = additionalSaveData["tileLocation"].Split(',').toList(s => int.Parse(s)).toVector<Vector2>();
             if (c.items.Count > 0 && c.items[0] is SObject o)
                 heldObject.Value = o;
@@ -544,6 +542,19 @@ namespace CustomFarmingRedux
         {
             this.location = location;
            meetsConditions = PyUtils.checkEventConditions(conditions, this, location);
+            meetsConditions = PyUtils.checkEventConditions(conditions, this, location);
+
+            if (completionTime != null && completionTime > STime.CURRENT && !meetsConditions)
+            {
+                int minutesToCompletion = (completionTime - STime.CURRENT).timestamp;
+                completionTime = STime.CURRENT + STime.DAY;
+                completionTime.hour = 6;
+                completionTime.minute = 0;
+                completionTime += minutesToCompletion < 0 ? 0 : minutesToCompletion;
+                minutesUntilReady.Set((completionTime + 1 - STime.CURRENT).timestamp);
+            }
+            updateWhenCurrentLocation(Game1.currentGameTime, location);
+
         }
 
         public override bool checkForAction(SFarmer who, bool justCheckingForActivity = false)
@@ -568,7 +579,7 @@ namespace CustomFarmingRedux
             {
                 if (justCheckingForActivity)
                     return true;
-                Game1.activeClickableMenu = (IClickableMenu)new ItemGrabMenu((IList<Item>)(heldObject.Value as Chest).items, false, true, new InventoryMenu.highlightThisItem(InventoryMenu.highlightAllItems), new ItemGrabMenu.behaviorOnItemSelect((heldObject.Value as Chest).grabItemFromInventory), (string)null, new ItemGrabMenu.behaviorOnItemSelect((heldObject.Value as Chest).grabItemFromChest), false, true, true, true, true, 1, null, -1, (object)null);
+                Game1.activeClickableMenu = (IClickableMenu)new ItemGrabMenu(inventory: (IList<Item>)(heldObject.Value as Chest).items, reverseGrab: false, showReceivingMenu: true, highlightFunction: new InventoryMenu.highlightThisItem(InventoryMenu.highlightAllItems), behaviorOnItemSelectFunction: new ItemGrabMenu.behaviorOnItemSelect((heldObject.Value as Chest).grabItemFromInventory), message: (string)null, behaviorOnItemGrab: new ItemGrabMenu.behaviorOnItemSelect((heldObject.Value as Chest).grabItemFromChest), canBeExitedWithKey: true, showOrganizeButton: true, source: 1);
             }
 
             if (machineHandler is MachineHandler handler && handler.ClickAction != null)
@@ -625,6 +636,9 @@ namespace CustomFarmingRedux
 
         public virtual bool deliverProduce(SFarmer who, bool toInventory = true)
         {
+            if (heldObject.Value is Item hv)
+                block = hv;
+
             skipDrop = true;
 
             if (toInventory && !who.addItemToInventoryBool(heldObject, false))
@@ -648,7 +662,7 @@ namespace CustomFarmingRedux
 
         public virtual void startAutoProduction()
         {
-            if (meetsConditions && !isWorking && blueprint.production != null && blueprint.production[0].materials == null)
+            if (meetsConditions && !isWorking && blueprint.production != null && blueprint.production[0].materials == null && (blueprint.production[0].conditions == "" || PyUtils.CheckEventConditions(blueprint.production[0].conditions)))
                 startProduction(null, blueprint.production[0], null);
         }
 
@@ -800,6 +814,13 @@ namespace CustomFarmingRedux
                 skipDrop = false;
                 return false;
             }
+
+            if (block == dropInItem)
+            {
+                block = null;
+                return false;
+            }
+
 
             if (!(dropInItem is SObject))
                 return false;
