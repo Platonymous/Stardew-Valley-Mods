@@ -248,7 +248,7 @@ namespace PyTK.Extensions
             {
                 ShopMenu shop = (ShopMenu)e.NewMenu;
                 List<Item> forSale = shop.getForSale();
-                Dictionary<Item, int[]> priceAndStock = shop.getItemPriceAndStock();
+                Dictionary<ISalable, int[]> priceAndStock = shop.getItemPriceAndStock();
                 forSale = forSale.Union(inventory.forSale()).ToList();
                 priceAndStock = priceAndStock.Union(inventory.priceAndStock()).ToDictionary(dict => dict.Key, dict => dict.Value);
             };
@@ -295,7 +295,7 @@ namespace PyTK.Extensions
             {
                 ShopMenu shop = (ShopMenu)e.NewMenu;
                 List<Item> forSale = shop.getForSale();
-                Dictionary<Item, int[]> priceAndStock = shop.getItemPriceAndStock();
+                Dictionary<ISalable, int[]> priceAndStock = shop.getItemPriceAndStock();
                 forSale.AddOrReplace(inventory.item);
                 priceAndStock.AddOrReplace(inventory.item, new int[] { inventory.price, inventory.stock });
             };

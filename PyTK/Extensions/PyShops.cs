@@ -52,9 +52,9 @@ namespace PyTK.Extensions
             return Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
         }
 
-        public static Dictionary<Item, int[]> getItemPriceAndStock(this ShopMenu shop)
+        public static Dictionary<ISalable, int[]> getItemPriceAndStock(this ShopMenu shop)
         {
-            return Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
+            return Helper.Reflection.GetField<Dictionary<ISalable, int[]>>(shop, "itemPriceAndStock").GetValue();
         }
 
         public static List<Item> forSale(this List<InventoryItem> list)
@@ -62,9 +62,9 @@ namespace PyTK.Extensions
             return list.Select(i => (i.item as Item)).ToList();
         }
 
-        public static Dictionary<Item, int[]> priceAndStock(this List<InventoryItem> list)
+        public static Dictionary<ISalable, int[]> priceAndStock(this List<InventoryItem> list)
         {
-            Dictionary<Item, int[]> priceAndStock = new Dictionary<Item, int[]>();
+            Dictionary<ISalable, int[]> priceAndStock = new Dictionary<ISalable, int[]>();
             foreach (InventoryItem inventory in list)
                 priceAndStock.Add(inventory.item, new int[] { inventory.price, inventory.stock });
             return priceAndStock;
