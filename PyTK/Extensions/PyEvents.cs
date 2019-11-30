@@ -247,7 +247,7 @@ namespace PyTK.Extensions
             EventHandler<MenuChangedEventArgs> d = delegate (object sender, MenuChangedEventArgs e)
             {
                 ShopMenu shop = (ShopMenu)e.NewMenu;
-                List<Item> forSale = shop.getForSale();
+                List<ISalable> forSale = shop.getForSale();
                 Dictionary<ISalable, int[]> priceAndStock = shop.getItemPriceAndStock();
                 forSale = forSale.Union(inventory.forSale()).ToList();
                 priceAndStock = priceAndStock.Union(inventory.priceAndStock()).ToDictionary(dict => dict.Key, dict => dict.Value);
@@ -294,7 +294,7 @@ namespace PyTK.Extensions
             EventHandler<MenuChangedEventArgs> d = delegate (object sender, MenuChangedEventArgs e)
             {
                 ShopMenu shop = (ShopMenu)e.NewMenu;
-                List<Item> forSale = shop.getForSale();
+                List<ISalable> forSale = shop.getForSale();
                 Dictionary<ISalable, int[]> priceAndStock = shop.getItemPriceAndStock();
                 forSale.AddOrReplace(inventory.item);
                 priceAndStock.AddOrReplace(inventory.item, new int[] { inventory.price, inventory.stock });

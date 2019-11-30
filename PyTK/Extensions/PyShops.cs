@@ -26,19 +26,19 @@ namespace PyTK.Extensions
 
         public static bool isFurnitureCataogue(this ShopMenu shop)
         {
-            List<Item> items = shop.getForSale();
+            List<ISalable> items = shop.getForSale();
             return (!(shop.portraitPerson is NPC) && shop.sellsOnly<Furniture>());
         }
 
         public static bool isWallpaperCatalogue(this ShopMenu shop)
         {
-            List<Item> items = shop.getForSale();
+            List<ISalable> items = shop.getForSale();
             return (!(shop.portraitPerson is NPC) && shop.sellsOnly<Wallpaper>());
         }
 
         public static bool isHatShop(this ShopMenu shop)
         {
-            List<Item> items = shop.getForSale();
+            List<ISalable> items = shop.getForSale();
             return (!(shop.portraitPerson is NPC) && shop.sellsOnly<Hat>());
         }
 
@@ -47,9 +47,9 @@ namespace PyTK.Extensions
             return Helper.Reflection.GetField<int>(shop, "currency").GetValue();
         }
 
-        public static List<Item> getForSale(this ShopMenu shop)
+        public static List<ISalable> getForSale(this ShopMenu shop)
         {
-            return Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
+            return Helper.Reflection.GetField<List<ISalable>>(shop, "forSale").GetValue();
         }
 
         public static Dictionary<ISalable, int[]> getItemPriceAndStock(this ShopMenu shop)
@@ -57,9 +57,9 @@ namespace PyTK.Extensions
             return Helper.Reflection.GetField<Dictionary<ISalable, int[]>>(shop, "itemPriceAndStock").GetValue();
         }
 
-        public static List<Item> forSale(this List<InventoryItem> list)
+        public static List<ISalable> forSale(this List<InventoryItem> list)
         {
-            return list.Select(i => (i.item as Item)).ToList();
+            return list.Select(i => (i.item as ISalable)).ToList();
         }
 
         public static Dictionary<ISalable, int[]> priceAndStock(this List<InventoryItem> list)
