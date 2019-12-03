@@ -15,8 +15,20 @@ namespace PyTK.CustomElementHandler
 {
     public class CustomObjectData
     {
-        internal static IModHelper Helper { get; } = PyTKMod._helper;
-        internal static IMonitor Monitor { get; } = PyTKMod._monitor;
+        internal static IModHelper Helper
+        {
+            get
+            {
+                return PyTKMod._helper;
+            }
+        }
+        internal static IMonitor Monitor
+        {
+            get
+            {
+                return PyTKMod._monitor;
+            }
+        }
         internal static int minIndex = 3000;
         internal static int minIndexBig = 4000;
         internal static string CODSyncerName = "Platonymous.PyTK.CODSync";
@@ -38,6 +50,9 @@ namespace PyTK.CustomElementHandler
         public Texture2D texture;
         public Color color;
         public int tileIndex;
+        public static AssetInjector< IDictionary<int, string>,IDictionary<int,string>> injector;
+        public static AssetInjector<IDictionary<int, string>, IDictionary<int, string>> injectorBig;
+
 
         public Texture2D sdvTexture
         {
@@ -171,6 +186,32 @@ namespace PyTK.CustomElementHandler
             return newIndex;
         }
 
+        public static AssetInjector<IDictionary<int, string>, IDictionary<int, string>> setupBigCraftableInjector()
+        {
+            Func<IDictionary<int, string>, IDictionary<int, string>> merger = new Func<IDictionary<int, string>, IDictionary<int, string>>(delegate (IDictionary<int, string> asset)
+            {
+                foreach (var entry in collection.Values.Where(v => v.sdvId != -1 && v.bigCraftable))
+                    asset.AddOrReplace(entry.sdvId, entry.data);
+
+                return asset;
+            });
+
+            return new AssetInjector<IDictionary<int, string>, IDictionary<int, string>>("Data\\BigCraftablesInformation", merger).injectEdit();
+        }
+
+        public static AssetInjector<IDictionary<int, string>, IDictionary<int, string>> setupObjectInjector()
+        {
+            Func<IDictionary<int, string>, IDictionary<int, string>> merger = new Func<IDictionary<int, string>, IDictionary<int, string>>(delegate (IDictionary<int, string> asset)
+            {
+                foreach (var entry in collection.Values.Where(v => v.sdvId != -1 && v.bigCraftable))
+                    asset.AddOrReplace(entry.sdvId, entry.data);
+
+                return asset;
+            });
+
+            return new AssetInjector<IDictionary<int, string>, IDictionary<int, string>>("Data\\BigCraftablesInformation", merger).injectEdit();
+        }
+
         public void forceNewSDVId(int newIndex)
         {
             if (bigCraftable)
@@ -185,6 +226,13 @@ namespace PyTK.CustomElementHandler
             _sourceRectangle = null;
 
             PyTKMod.UpdateCustomObjects = true;
+
+            if (bigCraftable && injectorBig == null)
+                    injectorBig = setupBigCraftableInjector();
+            else if(!bigCraftable && injector == null)
+                injector = setupObjectInjector();
+            else
+                PyTKMod.ReInjectCustomObjects = true;
         }
 
         public Item getObject(Item item = null)
