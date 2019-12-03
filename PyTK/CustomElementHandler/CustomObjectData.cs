@@ -173,14 +173,20 @@ namespace PyTK.CustomElementHandler
 
         public void forceNewSDVId(int newIndex)
         {
-            if (bigCraftable)
-                Game1.bigCraftablesInformation.AddOrReplace(newIndex, data);
-            else
-                Game1.objectInformation.AddOrReplace(newIndex, data);
-
             Dictionary<int, string> tmp = new Dictionary<int, string>();
             tmp.Add(newIndex, data);
-            tmp.injectInto("Data\\BigCraftablesInformation");
+
+            if (bigCraftable)
+            {
+                Game1.bigCraftablesInformation.AddOrReplace(newIndex, data);
+                tmp.injectInto("Data\\BigCraftablesInformation");
+            }
+            else
+            {
+                Game1.objectInformation.AddOrReplace(newIndex, data);
+                tmp.injectInto("Data\\ObjectInformation");
+            }
+
 
             if (_sdvSourceRectangle.HasValue && OvSpritebatchNew.recCache.ContainsKey(_sdvSourceRectangle.Value))
                 OvSpritebatchNew.recCache.Remove(_sdvSourceRectangle.Value);
