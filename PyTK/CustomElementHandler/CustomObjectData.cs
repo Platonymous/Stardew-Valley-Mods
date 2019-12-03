@@ -178,6 +178,10 @@ namespace PyTK.CustomElementHandler
             else
                 Game1.objectInformation.AddOrReplace(newIndex, data);
 
+            Dictionary<int, string> tmp = new Dictionary<int, string>();
+            tmp.Add(newIndex, data);
+            tmp.injectInto("Data\\BigCraftablesInformation");
+
             if (_sdvSourceRectangle.HasValue && OvSpritebatchNew.recCache.ContainsKey(_sdvSourceRectangle.Value))
                 OvSpritebatchNew.recCache.Remove(_sdvSourceRectangle.Value);
 
