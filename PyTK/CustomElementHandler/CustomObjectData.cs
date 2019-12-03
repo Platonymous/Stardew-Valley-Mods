@@ -203,13 +203,13 @@ namespace PyTK.CustomElementHandler
         {
             Func<IDictionary<int, string>, IDictionary<int, string>> merger = new Func<IDictionary<int, string>, IDictionary<int, string>>(delegate (IDictionary<int, string> asset)
             {
-                foreach (var entry in collection.Values.Where(v => v.sdvId != -1 && v.bigCraftable))
+                foreach (var entry in collection.Values.Where(v => v.sdvId != -1 && !v.bigCraftable))
                     asset.AddOrReplace(entry.sdvId, entry.data);
 
                 return asset;
             });
 
-            return new AssetInjector<IDictionary<int, string>, IDictionary<int, string>>("Data\\BigCraftablesInformation", merger).injectEdit();
+            return new AssetInjector<IDictionary<int, string>, IDictionary<int, string>>("Data\\ObjectInformation", merger).injectEdit();
         }
 
         public void forceNewSDVId(int newIndex)
