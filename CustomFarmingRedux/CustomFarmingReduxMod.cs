@@ -307,7 +307,7 @@ namespace CustomFarmingRedux
 
                     if (blueprint.forsale)
                         new InventoryItem(new CustomMachine(blueprint), blueprint.price).addToNPCShop(blueprint.shop, blueprint.condition);
-                    Monitor.Log("Added:" + blueprint.fullid);
+                    Monitor.VerboseLog("Added:" + blueprint.fullid);
                 }
             
             Monitor.Log(packs.Count + " Content Packs with " + machines.Count + " machines found.", LogLevel.Trace);

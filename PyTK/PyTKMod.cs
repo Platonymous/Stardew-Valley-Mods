@@ -28,7 +28,9 @@ namespace PyTK
 
     public class PyTKMod : Mod
     {
+        public static IModHelper _helper;
         internal static IModEvents _events => _helper.Events;
+        internal static IMonitor _monitor;
         internal static bool _activeSpriteBatchFix = true;
         internal static string sdvContentFolder => PyUtils.ContentPath;
         internal static List<IPyResponder> responders;
@@ -37,30 +39,20 @@ namespace PyTK
         internal static Dictionary<string, string> tokenStrings = new Dictionary<string, string>();
         internal static Dictionary<string, bool> tokenBoleans = new Dictionary<string, bool>();
         internal static bool UpdateCustomObjects = false;
-        internal static bool ReInjectCustomObjects = false;
         internal static bool UpdateLuaTokens = false;
         internal static Dictionary<IManifest, Func<object, object>> PreSerializer = new Dictionary<IManifest, Func<object, object>>();
         internal static Dictionary<IManifest, Func<object, object>> PostSerializer = new Dictionary<IManifest, Func<object, object>>();
-        internal static PyTKMod _instance { get; set; }
-        internal static IMonitor _monitor {
-            get {
-                return _instance.Monitor;
-            }
-        }
-        public static IModHelper _helper
-        {
-            get
-            {
-                return _instance.Helper;
-            }
-        }
+
         public override void Entry(IModHelper helper)
         {
-            _instance = this;
+            //createTemplates();
+            _helper = helper;
+            _monitor = Monitor;
             PostSerializer.Add(ModManifest, Rebuilder);
             PreSerializer.Add(ModManifest, Replacer);
             harmonyFix();
 
+            // Monitor.Log("Harmony Patching failed", LogLevel.Error);
             FormatManager.Instance.RegisterMapFormat(new TMXTile.TMXFormat(Game1.tileSize / Game1.pixelZoom, Game1.tileSize / Game1.pixelZoom, Game1.pixelZoom, Game1.pixelZoom));
             
             initializeResponders();
@@ -73,17 +65,6 @@ namespace PyTK
             SaveHandler.setUpEventHandlers();
             CustomObjectData.CODSyncer.start();
             ContentSync.ContentSyncHandler.initialize();
-
-            helper.Events.GameLoop.DayStarted += (s, e) =>
-            {
-                if (ReInjectCustomObjects)
-                {
-                    ReInjectCustomObjects = false;
-                    CustomObjectData.injector.Invalidate();
-                    CustomObjectData.injectorBig.Invalidate();
-                }
-            };
-
             this.Helper.Events.Player.Warped += Player_Warped;
             this.Helper.Events.GameLoop.DayStarted += OnDayStarted;
             this.Helper.Events.Multiplayer.PeerContextReceived += (s, e) =>
@@ -570,7 +551,7 @@ namespace PyTK
                 return new string[] { tokenBoleans[s] ? parts[1] : parts.Length < 3 ? null : parts[2] };
             }, true, true);
 
-            api.RegisterToken(
+            /*api.RegisterToken(
                 mod: this.ModManifest,
                 name: "ObjectByName",
                 updateContext: () =>
@@ -585,7 +566,7 @@ namespace PyTK
                 getValue: GetObjectByNameTokenValue,
                 allowsInput: true,
                 requiresInput: true
-            );
+            );*/
 
             api.RegisterToken(
                 mod: this.ModManifest,
