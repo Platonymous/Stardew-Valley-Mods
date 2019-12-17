@@ -1,19 +1,19 @@
 {
-  "Name": "Arcade Pong",
-  "Author": "Platonymous",
-  "Version": "1.1.1",
-  "Description": "Takes Cat's Pong and puts it where it belongs.",
-  "UniqueID": "Platonymous.ArcadePong",
-  "EntryDll": "ArcadePong.dll",
-  "MinimumApiVersion": "2.9.0",
-  "UpdateKeys": [ "Nexus:2044" ],
-  "Dependencies": [
-    {
-      "UniqueID": "cat.Pong",
-      "MinimumVersion": "1.1.0"
-    },
-    {
-      "UniqueID": "Platonymous.Toolkit"
-    }
-  ]
+    "Name": "Arcade Pong",
+    "Author": "Platonymous",
+    "Version": "1.1.2-unofficial.1-minervamaga",
+    "Description": "Takes Cat's Pong and puts it where it belongs.",
+    "UniqueID": "Platonymous.ArcadePong",
+    "EntryDll": "ArcadePong.dll",
+    "MinimumApiVersion": "2.9.0",
+    "UpdateKeys": [ "Nexus:2044" ],
+    "Dependencies": [
+        {
+            "UniqueID": "cat.Pong",
+            "MinimumVersion": "1.1.0"
+        },
+        {
+            "UniqueID": "Platonymous.Toolkit"
+        }
+    ]
 }

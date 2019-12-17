@@ -1,7 +1,7 @@
 {
     "Name": "PyTK",
     "Author": "Platonymous",
-    "Version": "1.12.14-unofficial.1-minervamaga",
+    "Version": "1.12.14-unofficial.2-minervamaga",
     "Description": "Platonymous Toolkit",
     "UniqueID": "Platonymous.Toolkit",
     "EntryDll": "PyTK.dll",
@@ -9,7 +9,12 @@
     "UpdateKeys": [ "Nexus:1726" ],
     "Dependencies": [
         {
-            "UniqueID": "Pathoschild.ContentPatcher"
+            "UniqueID": "Pathoschild.ContentPatcher",
+            "IsRequired":  false
+        },
+        {
+            "UniqueID": "spacechase0.JsonAssets",
+            "IsRequired":  false
         }
     ]
 }

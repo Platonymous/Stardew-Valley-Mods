@@ -120,6 +120,13 @@ namespace TMXLoader
                 else if (name != "none")
                     item = new Boots(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Boots", ContentSource.GameContent).getIndexByName(name));
             }
+            else if (type == "Clothing")
+            {
+                if (index != -1)
+                    item = new Clothing(index);
+                else if (name != "none")
+                    item = new Clothing(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/ClothingInformation", ContentSource.GameContent).getIndexByName(name));
+            }
             else if (type == "TV")
             {
                 if (index != -1)

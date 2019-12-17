@@ -1,7 +1,7 @@
 {
   "Name": "Custom Farming Redux",
   "Author": "Platonymous",
-  "Version": "2.12.9-unofficial.1-minervamaga",
+  "Version": "2.12.9-unofficial.2-minervamaga",
   "Description": "Mod for Custom Machine creation.",
   "UniqueID": "Platonymous.CustomFarming",
   "EntryDll": "CustomFarmingRedux.dll",

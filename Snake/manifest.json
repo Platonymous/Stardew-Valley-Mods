@@ -1,15 +1,15 @@
 {
-  "Name": "Snake",
-  "Author": "Platonymous",
-  "Version": "1.2.2",
-  "Description": "Play Snake.",
-  "UniqueID": "Platonymous.Snake",
-  "EntryDll": "Snake.dll",
-  "MinimumApiVersion": "3.0.0",
-  "UpdateKeys": [ "Nexus:2056" ],
-  "Dependencies": [
-    {
-      "UniqueID": "Platonymous.Toolkit"
-    }
-  ]
+    "Name": "Snake",
+    "Author": "Platonymous",
+    "Version": "1.2.3-unofficial.1-minervamaga",
+    "Description": "Play Snake.",
+    "UniqueID": "Platonymous.Snake",
+    "EntryDll": "Snake.dll",
+    "MinimumApiVersion": "3.0.0",
+    "UpdateKeys": [ "Nexus:2056" ],
+    "Dependencies": [
+        {
+            "UniqueID": "Platonymous.Toolkit"
+        }
+    ]
 }

@@ -1,18 +1,18 @@
 {
-  "Name": "Custom Farming Automate Bridge",
-  "Author": "Platonymous",
-  "Version": "2.12.7",
-  "Description": "Allows Custom Farming to work with Automate",
-  "UniqueID": "Platonymous.CFAutomate",
-  "EntryDll": "CFAutomate.dll",
-  "MinimumApiVersion": "3.0.0",
-  "UpdateKeys": [ "Nexus:991" ],
-  "Dependencies": [
-    {
-      "UniqueID": "Pathoschild.Automate"
-    },
-    {
-      "UniqueID": "Platonymous.CustomFarming"
-    }
-  ]
+    "Name": "Custom Farming Automate Bridge",
+    "Author": "Platonymous",
+    "Version": "2.12.8-unofficial.1-minervamaga",
+    "Description": "Allows Custom Farming to work with Automate",
+    "UniqueID": "Platonymous.CFAutomate",
+    "EntryDll": "CFAutomate.dll",
+    "MinimumApiVersion": "3.0.0",
+    "UpdateKeys": [ "Nexus:991" ],
+    "Dependencies": [
+        {
+            "UniqueID": "Pathoschild.Automate"
+        },
+        {
+            "UniqueID": "Platonymous.CustomFarming"
+        }
+    ]
 }
