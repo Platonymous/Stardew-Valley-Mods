@@ -1,7 +1,7 @@
 {
   "Name": "Seed Bag",
   "Author": "Platonymous",
-  "Version": "1.3.1",
+  "Version": "1.3.2-unofficial.1-minervamaga",
   "Description": "Adds a Seed Bag to the Game",
   "UniqueID": "Platonymous.SeedBag",
   "EntryDll": "SeedBag.dll",
