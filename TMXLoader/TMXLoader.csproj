@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="BuildableEdit.cs" />
     <Compile Include="BuildableTranslation.cs" />
+    <Compile Include="Other\IJsonAssetsAPI.cs" />
     <Compile Include="SaveBuildable.cs" />
     <Compile Include="TMXAssetEditor.cs" />
     <Compile Include="Compatibility\CustomFarmTypes.cs" />

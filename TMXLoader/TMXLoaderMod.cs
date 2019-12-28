@@ -24,6 +24,7 @@ using xTile.Dimensions;
 using StardewValley.TerrainFeatures;
 using xTile.Layers;
 using System.Collections;
+using TMXLoader.Other;
 
 namespace TMXLoader
 {
@@ -245,6 +246,7 @@ namespace TMXLoader
             if (!Game1.IsMasterGame)
                 return;
 
+            var ja = Helper.ModRegistry.GetApi<IJsonAssetsAPI>("spacechase0.JsonAssets");
             saveData = Helper.Data.ReadSaveData<SaveData>("Locations");
             if (saveData != null)
             {
@@ -253,10 +255,14 @@ namespace TMXLoader
                     Monitor.Log("Restore Location objects: " + loc.Name);
 
                     setLocationObejcts(loc);
+                    ja.FixIdsInLocation(Game1.getLocationFromName(loc.Name));
                 }
 
                 foreach (var b in saveData.Buildables)
+                {
                     loadSavedBuildable(b);
+                    ja.FixIdsInLocation(Game1.getLocationFromName(b.Indoors.Name));
+                }
             }
         }
 
