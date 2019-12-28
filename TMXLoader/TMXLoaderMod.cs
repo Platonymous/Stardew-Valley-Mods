@@ -255,13 +255,15 @@ namespace TMXLoader
                     Monitor.Log("Restore Location objects: " + loc.Name);
 
                     setLocationObejcts(loc);
-                    ja.FixIdsInLocation(Game1.getLocationFromName(loc.Name));
+                    if (ja != null)
+                        ja.FixIdsInLocation(Game1.getLocationFromName(loc.Name));
                 }
 
                 foreach (var b in saveData.Buildables)
                 {
                     loadSavedBuildable(b);
-                    ja.FixIdsInLocation(Game1.getLocationFromName(b.Indoors.Name));
+                    if (ja != null)
+                        ja.FixIdsInLocation(Game1.getLocationFromName(b.Indoors.Name));
                 }
             }
         }
