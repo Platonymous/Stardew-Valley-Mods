@@ -29,8 +29,8 @@ namespace PyTK.CustomElementHandler
                 return PyTKMod._monitor;
             }
         }
-        internal static int minIndex = 3000;
-        internal static int minIndexBig = 4000;
+        internal static int minIndex = 9000;
+        internal static int minIndexBig = 5000;
         internal static string CODSyncerName = "Platonymous.PyTK.CODSync";
         internal static PyReceiver<CODSyncMessage> CODSyncer = new PyReceiver<CODSyncMessage>(CODSyncerName, (cm) =>
           {

@@ -100,5 +100,10 @@ namespace ArcadePong
         {
             return false;
         }
+
+        public bool forceQuit()
+        {
+            return quit;
+        }
     }
 }

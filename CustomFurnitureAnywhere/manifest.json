@@ -1,7 +1,7 @@
 {
   "Name": "Custom Furniture Anywhere",
   "Author": "Platonymous",
-  "Version": "0.10.4",
+  "Version": "0.10.5",
   "Description": "Makes Custom Furniture work with Furniture Anywhere",
   "UniqueID": "Platonymous.CustomFurnitureAnywhere",
   "EntryDll": "CustomFurnitureAnywhere.dll",
