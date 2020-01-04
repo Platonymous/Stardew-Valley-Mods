@@ -779,7 +779,6 @@ namespace TMXLoader
 
         private void fixCompatibilities()
         {
-            Compatibility.CustomFarmTypes.LoadingTheMaps();
             helper.Events.GameLoop.SaveLoaded += (s, e) => Compatibility.CustomFarmTypes.fixGreenhouseWarp();
         }
 
