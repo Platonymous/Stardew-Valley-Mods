@@ -866,6 +866,12 @@ namespace ChessBoard
             return "Platonymous.Chess";
         }
 
+        public bool forceQuit()
+        {
+            Quit = true;
+            return true;
+        }
+
         #endregion
     }
 }

@@ -61,6 +61,7 @@ namespace SeedBag
 
         }
 
+
         public SeedBagTool(CustomObjectData data)
             : this()
         {
@@ -129,7 +130,7 @@ namespace SeedBag
             return numAttachmentSlots.Value;
         }
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
         {
             spriteBatch.Draw(texture, location + new Vector2(32f, 32f), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(texture, 16, 16, this.IndexOfMenuItemView)), color * transparency, 0.0f, new Vector2(8f, 8f), 4f * scaleSize, SpriteEffects.None, layerDepth);
 

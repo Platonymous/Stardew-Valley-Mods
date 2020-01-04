@@ -51,9 +51,10 @@ namespace CustomFurniture
             rotatedBoxWidth *= Game1.tileSize;
             rotatedBoxHeight = data.rotatedBoxHeight == -1 ? data.boxWidth : data.rotatedBoxHeight;
             rotatedBoxHeight *= Game1.tileSize;
+            this.data = data;
+
             setTexture();
             animationFrames = data.animationFrames;
-            this.data = data;
             frameWidth = data.setWidth;
             frame = 0;
             skipFrame = 60 / data.fps;
@@ -99,6 +100,7 @@ namespace CustomFurniture
 
         private void setTexture()
         {
+            restore();
             string folder = new DirectoryInfo(data.folderName).Name;
             string tkey = $"{folder}/{data.texture}";
             if (Textures.ContainsKey(tkey))
@@ -204,7 +206,7 @@ namespace CustomFurniture
             return defaultBoundingBox;
         }
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
         {
             if (texture == null)
                 setTexture();
@@ -248,6 +250,7 @@ namespace CustomFurniture
 
         private void customDrawAtNonTileSpot(CustomFurniture ho, SpriteBatch spriteBatch, Vector2 location, float layerDepth, float alpha = 1f)
         {
+            restore();
             spriteBatch.Draw(ho.texture, location, new Rectangle?(ho.sourceRect.Value), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, this.Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, layerDepth);
         }
 
@@ -271,6 +274,17 @@ namespace CustomFurniture
             savedata.Add("rotation", ((int) fRotation).ToString());
             savedata.Add("rotations", rotations.ToString());
             return savedata;
+        }
+
+        public void restore()
+        {
+            if (this.data == null)
+           foreach(var f in CustomFurnitureMod.furniturePile)
+                if (f.Value.data.name == name)
+                {
+                    build(f.Value.data, f.Key, tileLocation);
+                    break;
+                }
         }
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)

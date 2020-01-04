@@ -25,6 +25,16 @@ namespace Visualize
         internal static int[] whitecolor = new int[] { 255, 255, 255, 255 };
         internal static bool active = false;
 
+        public Texture2D ProcessTexture(ref Texture2D texture)
+        {
+           
+            Profile useProfile = VisualizeMod._activeProfile;
+
+            texture = changeColor(texture, useProfile.saturation, useProfile.palette);
+
+            return texture;
+        }
+
         public bool Draw(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
         {
             if (active || texture.Height == Game1.viewport.Height && texture.Width == Game1.viewport.Width)

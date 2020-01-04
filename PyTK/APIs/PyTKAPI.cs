@@ -4,10 +4,11 @@ using PyTK.Types;
 using System;
 using System.IO;
 using PyTK.Extensions;
+using StardewModdingAPI;
 
 namespace PyTK.APIs
 {
-    public class PyTKAPI : IScalerAPI
+    public class PyTKAPI : IScalerAPI, ISerializerAPI
     {
         public Texture2D CreateScaledTexture2D(Texture2D orgTexture, Texture2D scaledTexture, float scale = -1, Rectangle? forcedSourceRectangle = null)
         {
@@ -98,6 +99,16 @@ namespace PyTK.APIs
                 return sTexture;
 
             return CreateScaledTexture2D(texture, sTexture, scale, forcedSourceRectangle);
+        }
+
+        public void AddPreSerialization(IManifest manifest, Func<object, object> preserializer)
+        {
+            PyTKMod.PostSerializer.AddOrReplace(manifest, preserializer);
+        }
+
+        public void AddPostDeserialization(IManifest manifest, Func<object, object> postserializer)
+        {
+            PyTKMod.PostSerializer.AddOrReplace(manifest, postserializer);
         }
     }
 }

@@ -268,7 +268,7 @@ namespace PyTK.ContentSync
 
             if (response.type == (int)ContentType.Map)
             {
-                NewTiledTmxFormat format = new NewTiledTmxFormat();
+                TMXTile.TMXFormat format = new TMXTile.TMXFormat(Game1.tileSize / Game1.pixelZoom, Game1.tileSize / Game1.pixelZoom, Game1.pixelZoom, Game1.pixelZoom);
                 StringReader reader = new StringReader(PyNet.DecompressString(response.content));
                 Map map = format.Load(XmlReader.Create(reader));
                 return (T)(object)map;
@@ -332,8 +332,8 @@ namespace PyTK.ContentSync
 
             if(type == ContentType.Map)
             {
-                NewTiledTmxFormat format = new NewTiledTmxFormat();
-                return PyNet.CompressString(format.AsString((contents as Map)));
+                var format = new TMXTile.TMXFormat(Game1.tileSize / Game1.pixelZoom,Game1.tileSize / Game1.pixelZoom,Game1.pixelZoom,Game1.pixelZoom);
+                return PyNet.CompressString(format.StoreAsString((contents as Map)));
             }
 
             return "na";

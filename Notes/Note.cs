@@ -70,7 +70,7 @@ namespace Notes
             return Game1.parseText(text, Game1.smallFont, 272);
         }
 
-        public override bool canStackWith(Item other)
+        public override bool canStackWith(ISalable other)
         {
             return false;
         }

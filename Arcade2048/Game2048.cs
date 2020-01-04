@@ -369,6 +369,7 @@ namespace Arcade2048
                 }
         }
 
+
         public void receiveKeyRelease(Keys k)
         {
             if (k.Equals(Keys.Escape))
@@ -413,6 +414,12 @@ namespace Arcade2048
         public bool doMainGameUpdates()
         {
             return false;
+        }
+
+        public bool forceQuit()
+        {
+            quit = true;
+            return true;
         }
 
         #endregion

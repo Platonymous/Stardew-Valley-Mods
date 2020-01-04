@@ -1,16 +1,15 @@
 {
   "Name": "Harp of Yoba Redux",
   "Author": "Platonymous",
-  "Version": "2.6.4",
+  "Version": "2.7.2",
   "Description": "Adds The Harp of Yoba to the game.",
   "UniqueID": "Platonymous.HarpOfYobaRedux",
   "EntryDll": "HarpOfYobaRedux.dll",
-  "MinimumApiVersion": "2.11.2",
+  "MinimumApiVersion": "3.0.0",
   "UpdateKeys": [ "Nexus:914" ],
   "Dependencies": [
     {
-      "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.5.0"
+      "UniqueID": "Platonymous.Toolkit"
     }
   ]
 }

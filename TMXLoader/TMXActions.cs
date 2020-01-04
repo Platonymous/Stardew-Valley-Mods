@@ -51,7 +51,7 @@ namespace TMXLoader
             for (int index = 0; index < itemLists[id].Count; ++index)
                 if (itemLists[id][index] != null && itemLists[id][index].canStackWith(item))
                 {
-                    item.Stack = itemLists[id][index].addToStack(item.Stack);
+                    item.Stack = itemLists[id][index].addToStack(item);
                     return true;
                 }
 
@@ -202,7 +202,7 @@ namespace TMXLoader
                 return false;
 
             List<TileShopItem> items = new List<TileShopItem>();
-            Dictionary<Item, int[]> priceAndStock = new Dictionary<Item, int[]>();
+            Dictionary<ISalable, int[]> priceAndStock = new Dictionary<ISalable, int[]>();
 
             if (TMXLoaderMod.tileShops.Find(kvp => kvp.Key.id == text[1] || (text[1].StartsWith("EmptyShop_") && kvp.Key.id == "EmptyShop" )) is KeyValuePair<TileShop, List<TileShopItem>> ts && TMXLoaderMod.tileShops.TryGetValue(ts.Key, out items))
             {

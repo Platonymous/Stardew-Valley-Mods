@@ -13,7 +13,7 @@ namespace ScaleUp
         public override void Entry(IModHelper helper)
         {
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.ScaleUp");
-            instance.Patch(Type.GetType("StardewModdingAPI.Toolkit.Utilities.PathUtilities, StardewModdingAPI.Toolkit").GetMethod("IsSafeRelativePath"), null, new HarmonyMethod(GetType().GetMethod("IsSafeRelativePath")));
+            instance.Patch(Type.GetType("StardewModdingAPI.Toolkit.Utilities.PathUtilities, SMAPI.Toolkit").GetMethod("IsSafeRelativePath"), null, new HarmonyMethod(GetType().GetMethod("IsSafeRelativePath")));
 
             loadContentPacks();
             helper.Content.AssetEditors.Add(new Scaler(helper));

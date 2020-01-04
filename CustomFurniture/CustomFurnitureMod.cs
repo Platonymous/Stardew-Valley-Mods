@@ -19,7 +19,7 @@ namespace CustomFurniture
     {
         internal static IModHelper helper;
         internal static Dictionary<string,CustomFurniture> furniture = new Dictionary<string, CustomFurniture>();
-        private static Dictionary<string, CustomFurniture> furniturePile = new Dictionary<string, CustomFurniture>();
+        internal static Dictionary<string, CustomFurniture> furniturePile = new Dictionary<string, CustomFurniture>();
         public static Mod instance;
 
         public override void Entry(IModHelper helper)
@@ -102,7 +102,7 @@ namespace CustomFurniture
 
         public static void log(string text)
         {
-            instance.Monitor.Log(text);
+            instance.Monitor.Log(text,LogLevel.Trace);
         }
 
         private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
@@ -157,7 +157,7 @@ namespace CustomFurniture
 
             }
 
-            Monitor.Log(countPacks + " Content Packs with " + countObjects + " Objects found.");
+            Monitor.Log(countPacks + " Content Packs with " + countObjects + " Objects found.",LogLevel.Trace);
         }
 
         private string[] parseDir(string path, string extension)

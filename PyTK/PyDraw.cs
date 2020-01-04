@@ -4,9 +4,6 @@ using PyTK.Extensions;
 using StardewValley;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PyTK
 {
@@ -82,7 +79,6 @@ namespace PyTK
                 if (j >= textureColors.Count)
                     j = 0;
             }
-            Console.Write("J:" + j);
             return getRectangle(width, height, (x, y, w, h) =>
             {
                 int t = (x / tWidth) + ((y / tHeight) * (tpw));

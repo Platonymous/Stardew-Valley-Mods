@@ -127,7 +127,7 @@ namespace PlanImporter
 
         public TerrainFeature getTerrainFeature(string type, Vector2 pos)
         {
-            switch (type)
+            switch (type.ToLower())
             {
                 case "wood-floor": return new Flooring(0);
                 case "stone-floor": return new Flooring(1);
@@ -196,7 +196,7 @@ namespace PlanImporter
 
         public SObject getObject(string type, Vector2 pos)
         {
-            switch (type)
+            switch (type.ToLower())
             {
                 case "bee-hive": return new SObject(pos,10);
                 case "mayo": return new SObject(pos, 24);
@@ -230,13 +230,14 @@ namespace PlanImporter
                 case "campfire": return new SObject(pos, 146);
                 case "stone": return new SObject(pos, 449,1);
                 case "twig": return new SObject(pos,294, 1);
+                case "wood-sign": return new Sign(pos, 37);
                 default: return null;
             }
         }
 
         public Building getBuilding(string type, Vector2 pos)
         {
-            switch (type)
+            switch (type.ToLower())
             {
                 case "silo": return new Building(new BluePrint("Silo"), pos);
                 case "mill": return new Mill(new BluePrint("Mill"), pos);
@@ -249,7 +250,11 @@ namespace PlanImporter
                 case "earth-obelisk": return new Building(new BluePrint("Earth Obelisk"), pos);
                 case "gold-clock": return new Building(new BluePrint("Gold Clock"), pos);
                 case "junimo-hut": return new JunimoHut(new BluePrint("Junimo Hut"), pos);
-                case "Shed": return new Building(new BluePrint("Shed"), pos);
+                case "shed": return new Building(new BluePrint("Shed"), pos);
+                case "shipping-bin": return new ShippingBin(new BluePrint("Shipping Bin"), pos);
+                case "stone-cabin": return new Building(new BluePrint("Stone Cabin"), pos);
+                case "plank-cabin": return new Building(new BluePrint("Plank Cabin"), pos);
+                case "log-cabin": return new Building(new BluePrint("Log Cabin"), pos);
                 default: return null;
             }
         }

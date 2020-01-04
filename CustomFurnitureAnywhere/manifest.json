@@ -1,11 +1,11 @@
 {
   "Name": "Custom Furniture Anywhere",
   "Author": "Platonymous",
-  "Version": "0.9.2",
+  "Version": "0.10.4",
   "Description": "Makes Custom Furniture work with Furniture Anywhere",
   "UniqueID": "Platonymous.CustomFurnitureAnywhere",
   "EntryDll": "CustomFurnitureAnywhere.dll",
-  "MinimumApiVersion": "2.11.2",
+  "MinimumApiVersion": "3.0.0",
   "UpdateKeys": [ "Nexus:1254" ],
   "Dependencies": [
     {

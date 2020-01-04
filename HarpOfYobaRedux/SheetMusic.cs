@@ -18,17 +18,18 @@ namespace HarpOfYobaRedux
         private string music;
         public int length;
         public IMagic magic;
-        public bool playedToday;
- 
+        public bool playedToday = false;
 
         public SheetMusic()
         {
-
+            
         }
 
         public SheetMusic(CustomObjectData data)
             :this(data.id.Split('.')[2])
         {
+
+
 
         }
 
@@ -73,11 +74,28 @@ namespace HarpOfYobaRedux
 
         public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
+            build(additionalSaveData["id"]);
+        }
+
+        public override void updateWhenCurrentLocation(GameTime time, GameLocation environment)
+        {
+            restore();
         }
 
         public override bool canBeDropped()
         {
             return false;
+        }
+
+        public void restore()
+        {
+            if (texture == null)
+                foreach (var s in allSheets)
+                    if (s.Value.Name == Name)
+                    {
+                        build(s.Value.sheetMusicID);
+                        break;
+                    }
         }
 
         public override bool canBeGivenAsGift()
@@ -118,7 +136,7 @@ namespace HarpOfYobaRedux
         public void doMagic()
         {
             if(HarpOfYobaReduxMod.config.magic)
-                magic.doMagic(playedToday);
+                magic?.doMagic(playedToday);
 
             playedToday = true;
         }
@@ -129,8 +147,11 @@ namespace HarpOfYobaRedux
             Game1.changeMusicTrack(music);
         }
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
         {
+            restore();
+            if (texture == null)
+                return;
             Rectangle sourceRectangle = new Rectangle(0, 0, 16, 16);
             spriteBatch.Draw(texture, location + new Vector2((Game1.tileSize / 2), (Game1.tileSize / 2)), new Rectangle?(sourceRectangle), Color.White * transparency, 0.0f, new Vector2(8, 8), Game1.pixelZoom * scaleSize * 0.8f, SpriteEffects.None, layerDepth);
             Rectangle sourceRectangleNote = new Rectangle(16, 0, 16, 16);
@@ -139,6 +160,9 @@ namespace HarpOfYobaRedux
 
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, StardewValley.Farmer f)
         {
+            restore();
+            if (texture == null)
+                return;
             Rectangle sourceRectangle = new Rectangle(0, 0, 16, 16);
             spriteBatch.Draw(texture, objectPosition, new Rectangle?(sourceRectangle), Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 2) / 10000f));
             Rectangle sourceRectangleNote = new Rectangle(16, 0, 16, 16);

@@ -166,6 +166,8 @@ namespace PyTK.Extensions
 
         public static void drawLayer(Layer layer, xTile.Display.IDisplayDevice device, xTile.Dimensions.Rectangle viewport, int pixelZoom, Location offset, bool wrap = false)
         {
+            if (layer.Properties.ContainsKey("DrawConditions") && !layer.Properties.ContainsKey("DrawConditionsResult") && Game1.currentLocation is GameLocation gl && gl.Map is Map m)
+                PyUtils.checkDrawConditions(m);
 
             if (layer.Properties.ContainsKey("DrawConditions") && (!layer.Properties.ContainsKey("DrawConditionsResult") || layer.Properties["DrawConditionsResult"] != "T"))
                 return;

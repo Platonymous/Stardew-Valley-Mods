@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using PyTK.CustomElementHandler;
 using PyTK;
+using System.Xml.Serialization;
 
 namespace HarpOfYobaRedux
 {
@@ -25,7 +26,7 @@ namespace HarpOfYobaRedux
 
         public Instrument()
         {
-            
+            build("harp");
         }
 
         public Instrument(CustomObjectData data)
@@ -60,6 +61,7 @@ namespace HarpOfYobaRedux
             this.description = description;
             this.texture = texture;
             instrumentID = id;
+           
 
             if (allInstruments.ContainsKey(id))
                 allInstruments.Remove(id);
@@ -155,9 +157,8 @@ namespace HarpOfYobaRedux
             }
             return replacement;
         }
-
-
-        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
+            
+            public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
         {
             if (replacement is Tool t && t.attachments.Count > 0)
             {
@@ -256,7 +257,7 @@ namespace HarpOfYobaRedux
             return false;
         }
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, bool drawStackNumber, Color color, bool drawShadow)
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
         {
             float alpha = 1.0f;
             int minutesTillReady = 0;
@@ -312,7 +313,7 @@ namespace HarpOfYobaRedux
 
         public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
         {
-            return new Instrument(additionalSaveData["id"]);
+           return new Instrument(additionalSaveData["id"]);
         }
     }
 }

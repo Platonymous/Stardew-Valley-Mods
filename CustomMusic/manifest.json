@@ -1,10 +1,10 @@
 ﻿{
   "Name": "CustomMusic",
   "Author": "Platonymous",
-  "Version": "1.2.4",
+  "Version": "1.5.3",
   "Description": "Changes the games music",
   "UniqueID": "Platonymous.CustomMusic",
   "EntryDll": "CustomMusic.dll",
-  "MinimumApiVersion": "2.11.2",
+  "MinimumApiVersion": "3.0.0",
   "UpdateKeys": [ "Nexus:3043" ]
 }

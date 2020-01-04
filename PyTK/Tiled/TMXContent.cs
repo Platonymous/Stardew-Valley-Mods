@@ -14,7 +14,8 @@ namespace PyTK.Tiled
 {
     public static class TMXContent
     {
-        public static IMapFormat TMXFormat = new NewTiledTmxFormat();
+        public static IMapFormat TMXFormatNew = new TMXTile.TMXFormat(Game1.tileSize / Game1.pixelZoom, Game1.tileSize / Game1.pixelZoom, Game1.pixelZoom, Game1.pixelZoom);
+
         internal static IModHelper Helper = PyTKMod._helper;
         internal static IMonitor Monitor = PyTKMod._monitor;
         internal static List<string> Injected = new List<string>();
@@ -37,12 +38,17 @@ namespace PyTK.Tiled
             return map;
         }
 
-        public static bool doesExist(bool failed, TileSheet t, IContentPack contentPack, IModHelper helper, string tileSheetPath)
+        public static bool doesExist(bool failed, ref TileSheet t, IContentPack contentPack, IModHelper helper, string tileSheetPath)
         {
             if (!failed)
             {
                 FileInfo tileSheetFile = new FileInfo(Path.Combine(contentPack != null ? contentPack.DirectoryPath : helper.DirectoryPath, tileSheetPath));
-                FileInfo tileSheetFileVanilla = new FileInfo(Path.Combine(PyUtils.ContentPath, "Content", t.ImageSource + ".xnb"));
+                FileInfo tileSheetFileVanilla = new FileInfo(Path.Combine(PyUtils.ContentPath, "Content", "Maps", t.ImageSource + ".xnb"));
+
+                if (!tileSheetFileVanilla.Exists)
+                    tileSheetFileVanilla = new FileInfo(Path.Combine(PyUtils.ContentPath, "Content", t.ImageSource + ".xnb"));
+                else
+                    t.ImageSource = @"Maps/" + t.ImageSource;
 
                 return tileSheetFile.Exists && !tileSheetFileVanilla.Exists;
             }
@@ -53,10 +59,28 @@ namespace PyTK.Tiled
                 try
                 {
                     ts = contentPack != null ? contentPack.LoadAsset<Texture2D>(tileSheetPath) : helper.Content.Load<Texture2D>(tileSheetPath);
-                    tsv = helper.Content.Load<Texture2D>(tileSheetPath,ContentSource.GameContent);
                 }
                 catch
                 {
+                }
+
+                try
+                {
+                    tsv = helper.Content.Load<Texture2D>(tileSheetPath, ContentSource.GameContent);
+                }
+                catch
+                {
+
+                }
+
+                try
+                {
+                    if(tsv == null)
+                    tsv = helper.Content.Load<Texture2D>("Maps//"+tileSheetPath, ContentSource.GameContent);
+                }
+                catch
+                {
+
                 }
 
                 return (ts != null && tsv == null);
@@ -69,15 +93,15 @@ namespace PyTK.Tiled
             Map map = tmx2map(Path.Combine(contentPack != null ? contentPack.DirectoryPath : helper.DirectoryPath,path));
             string fileName = new FileInfo(path).Name;
             
-            foreach (TileSheet t in map.TileSheets)
+            for(int i = 0; i < map.TileSheets.Count; i++)
             {
+                var t = map.TileSheets[i];
                 t.ImageSource = t.ImageSource.Replace(".png", "");
                 string[] seasons = new string[] { "summer_", "fall_", "winter_" };
                 string tileSheetPath = path.Replace(fileName, t.ImageSource + ".png");
                 bool failed = PyUtils.ContentPath == "failed";
 
-                
-                if ((doesExist(failed, t,contentPack,helper,tileSheetPath) && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource).Key == null))
+                if ((doesExist(failed, ref t,contentPack,helper,tileSheetPath) && tilesheets.Find(k => k.Key.ImageSource == t.ImageSource).Key == null))
                 {
                     Texture2D tilesheet = contentPack != null ? contentPack.LoadAsset<Texture2D>(tileSheetPath) : helper.Content.Load<Texture2D>(tileSheetPath);
                     if (!Injected.Contains(t.ImageSource))
@@ -254,6 +278,7 @@ namespace PyTK.Tiled
 
         internal static MemoryStream tmx2tbin(string path)
         {
+
             Map newMap = FormatManager.Instance.LoadMap(path);
 
             foreach (TileSheet t in newMap.TileSheets)
@@ -261,6 +286,7 @@ namespace PyTK.Tiled
 
             MemoryStream stream = new MemoryStream();
             FormatManager.Instance.BinaryFormat.Store(newMap, stream);
+
             return stream;
         }
 
@@ -269,17 +295,13 @@ namespace PyTK.Tiled
             path = path.Replace(@"/[TMX Loader]", "");
             Map newMap = FormatManager.Instance.LoadMap(path);
 
-            foreach (TileSheet t in newMap.TileSheets)
-                t.ImageSource = t.ImageSource.Contains(".png") ? t.ImageSource.Replace(".png","") : t.ImageSource;
-
-
             return newMap;
         }
 
         internal static MemoryStream map2tmx(Map map)
         {
             MemoryStream stream = new MemoryStream();
-            TMXFormat.Store(map, stream);
+            TMXFormatNew.Store(map, stream);
             return stream;
         }
 
