@@ -79,8 +79,8 @@ namespace PyTK
                 if (ReInjectCustomObjects)
                 {
                     ReInjectCustomObjects = false;
-                    CustomObjectData.injector.Invalidate();
-                    CustomObjectData.injectorBig.Invalidate();
+                    CustomObjectData.injector?.Invalidate();
+                    CustomObjectData.injectorBig?.Invalidate();
                 }
             };
 
