@@ -1,14 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>ArcadePong</AssemblyName>
-    <RootNamespace>ArcadePong</RootNamespace>
+    <AssemblyName>Snake</AssemblyName>
+    <RootNamespace>Snake</RootNamespace>
     <Version>1.1.1</Version>
     <TargetFramework>net452</TargetFramework>
     <Platforms>x86</Platforms>
     <PlatformTarget>x86</PlatformTarget>
-
-    <EnableHarmony>true</EnableHarmony>
   </PropertyGroup>
 
   <ItemGroup>

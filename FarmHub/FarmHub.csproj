@@ -1,46 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F0BF4AC4-8B39-4906-A72E-492A4F436433}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FarmHub</RootNamespace>
     <AssemblyName>FarmHub</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <RootNamespace>FarmHub</RootNamespace>
+    <Version>0.9.0</Version>
+    <TargetFramework>net452</TargetFramework>
+    <Platforms>x86</Platforms>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
     <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" />
     <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig">
-      <Version>3.0.0-beta.5</Version>
-    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.0.0" />
     <PackageReference Include="System.Reactive" Version="3.1.1" />
     <PackageReference Include="System.Reactive.Core" Version="3.1.1" />
     <PackageReference Include="System.Reactive.Interfaces" Version="3.1.1" />
@@ -48,9 +23,8 @@
     <PackageReference Include="System.Reactive.PlatformServices" Version="3.1.1" />
     <PackageReference Include="System.Reactive.Windows.Threading" Version="3.1.1" />
   </ItemGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Net.Http">
       <Private>False</Private>
     </Reference>
@@ -65,63 +39,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="FarmHubMod.cs" />
-    <Compile Include="FarmHubServer.cs" />
-    <Compile Include="FHConfig.cs" />
-    <Compile Include="FirebaseNet45\ExceptionEventArgs.cs" />
-    <Compile Include="FirebaseNet45\Extensions\ObservableExtensions.cs" />
-    <Compile Include="FirebaseNet45\Extensions\TaskExtensions.cs" />
-    <Compile Include="FirebaseNet45\FirebaseClient.cs" />
-    <Compile Include="FirebaseNet45\FirebaseException.cs" />
-    <Compile Include="FirebaseNet45\FirebaseKeyGenerator.cs" />
-    <Compile Include="FirebaseNet45\FirebaseObject.cs" />
-    <Compile Include="FirebaseNet45\FirebaseOptions.cs" />
-    <Compile Include="FirebaseNet45\Http\HttpClientExtensions.cs" />
-    <Compile Include="FirebaseNet45\Http\PostResult.cs" />
-    <Compile Include="FirebaseNet45\ObservableExtensions.cs" />
-    <Compile Include="FirebaseNet45\Offline\ConcurrentOfflineDatabase.cs" />
-    <Compile Include="FirebaseNet45\Offline\DatabaseExtensions.cs" />
-    <Compile Include="FirebaseNet45\Offline\InitialPullStrategy.cs" />
-    <Compile Include="FirebaseNet45\Offline\Internals\MemberAccessVisitor.cs" />
-    <Compile Include="FirebaseNet45\Offline\ISetHandler.cs" />
-    <Compile Include="FirebaseNet45\Offline\OfflineCacheAdapter.cs" />
-    <Compile Include="FirebaseNet45\Offline\OfflineDatabase.cs" />
-    <Compile Include="FirebaseNet45\Offline\OfflineEntry.cs" />
-    <Compile Include="FirebaseNet45\Offline\RealtimeDatabase.cs" />
-    <Compile Include="FirebaseNet45\Offline\SetHandler.cs" />
-    <Compile Include="FirebaseNet45\Offline\StreamingOptions.cs" />
-    <Compile Include="FirebaseNet45\Offline\SyncOptions.cs" />
-    <Compile Include="FirebaseNet45\Query\AuthQuery.cs" />
-    <Compile Include="FirebaseNet45\Query\ChildQuery.cs" />
-    <Compile Include="FirebaseNet45\Query\FilterQuery.cs" />
-    <Compile Include="FirebaseNet45\Query\FirebaseQuery.cs" />
-    <Compile Include="FirebaseNet45\Query\IFirebaseQuery.cs" />
-    <Compile Include="FirebaseNet45\Query\OrderQuery.cs" />
-    <Compile Include="FirebaseNet45\Query\ParameterQuery.cs" />
-    <Compile Include="FirebaseNet45\Query\QueryExtensions.cs" />
-    <Compile Include="FirebaseNet45\Query\QueryFactoryExtensions.cs" />
-    <Compile Include="FirebaseNet45\Query\SilentQuery.cs" />
-    <Compile Include="FirebaseNet45\Streaming\FirebaseCache.cs" />
-    <Compile Include="FirebaseNet45\Streaming\FirebaseEvent.cs" />
-    <Compile Include="FirebaseNet45\Streaming\FirebaseEventSource.cs" />
-    <Compile Include="FirebaseNet45\Streaming\FirebaseEventType.cs" />
-    <Compile Include="FirebaseNet45\Streaming\FirebaseServerEventType.cs" />
-    <Compile Include="FirebaseNet45\Streaming\FirebaseSubscription.cs" />
-    <Compile Include="FirebaseNet45\Streaming\NonBlockingStreamReader.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="manifest.json" />
-    <None Include="README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Project>{a8e6272f-a6a1-4bfe-ba8f-021f63596987}</Project>
-      <Name>PyTK</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
+
   <ItemGroup>
     <Content Include="System.Net.Http.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -148,7 +66,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\PyTK\PyTK.csproj" />
+  </ItemGroup>
+
   <Import Project="$(SolutionDir)\common.targets" />
-  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''" />
+
 </Project>

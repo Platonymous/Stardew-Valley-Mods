@@ -31,7 +31,7 @@ namespace JoJaBan
         public override void Entry(IModHelper helper)
         {
             SHelper = helper;
-            maxLevel = Directory.GetFiles(Path.Combine(Helper.DirectoryPath, "Level"), "*.tmx", SearchOption.AllDirectories).Count();
+            maxLevel = Directory.GetFiles(Path.Combine(Helper.DirectoryPath, "assets", "levels"), "*.tmx", SearchOption.AllDirectories).Count();
 
             TileAction exitAction = new TileAction("JoJaBan.Exit", exitGame);
             exitAction.register();
@@ -40,7 +40,7 @@ namespace JoJaBan
 
             helper.Events.GameLoop.GameLaunched += (o, e) =>
             {
-                arcadeTexture = helper.Content.Load<Texture2D>(@"Assets/arcade.png");
+                arcadeTexture = helper.Content.Load<Texture2D>(@"assets/arcade.png");
                 arcadeData = new CustomObjectData("JoJaBan", "JoJaBan/0/-300/Crafting -9/Play 'JoJaBan by Platonymous' at home!/true/true/0/JoJaBan", arcadeTexture, Color.White, bigCraftable: true, type: typeof(JoJaBanMachine));
                 Texture2D townInterior = Helper.Content.Load<Texture2D>(@"Maps/townInterior", ContentSource.GameContent);
                 boxTexture = townInterior.getArea(new Rectangle(304, 1024, 16, 32));
@@ -115,7 +115,7 @@ namespace JoJaBan
                 return;
             }
 
-            Map level = TMXContent.Load(Path.Combine("Level", $"level{l}.tmx"), SHelper);
+            Map level = TMXContent.Load(Path.Combine("assets", "levels", $"level{l}.tmx"), SHelper);
             string[] start = ((string)level.Properties["Start"]).Split(',');
             Vector2 startPos = new Vector2(int.Parse(start[0]), int.Parse(start[1]));
 

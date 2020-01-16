@@ -45,8 +45,8 @@ namespace Speedster
         private void build(int index)
         {
             this.index = index;
-            shirts = SpeedsterMod.ModHelper.Content.Load<Texture2D>("Assets/shirts.png");
-            masks = SpeedsterMod.ModHelper.Content.Load<Texture2D>("Assets/masks.png");
+            shirts = SpeedsterMod.ModHelper.Content.Load<Texture2D>("assets/shirts.png");
+            masks = SpeedsterMod.ModHelper.Content.Load<Texture2D>("assets/masks.png");
             oldPants = Game1.player.pantsColor;
             oldShirt = Game1.player.shirt;
             oldHair = Game1.player.hair;
@@ -60,7 +60,7 @@ namespace Speedster
                 oldShoes = 12;
             }
 
-            string path = Path.Combine(SpeedsterMod.ModHelper.DirectoryPath, "Assets", "masks.png");
+            string path = Path.Combine(SpeedsterMod.ModHelper.DirectoryPath, "assets", "masks.png");
             if (!setup)
             {
                 baseIndex = setTextures(path, 20, 20 * 4);

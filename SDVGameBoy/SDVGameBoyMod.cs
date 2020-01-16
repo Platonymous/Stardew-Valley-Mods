@@ -22,11 +22,11 @@ namespace SDVGameBoy
         {
             _monitor = Monitor;
             cData = new List<CustomObjectData>();
-            cartTexture = Helper.Content.Load<Texture2D>(@"Assets/cartridge.png");
+            cartTexture = Helper.Content.Load<Texture2D>(@"assets/cartridge.png");
             romfolder = Path.Combine(helper.DirectoryPath, "roms");
             GBCartridge.roms = new Dictionary<string, byte[]>();
-            GameBoy.attTexture = helper.Content.Load<Texture2D>(@"Assets/slot.png");
-            gbData = new CustomObjectData("GameBoy", "GameBoy/0/-300/Crafting -9/A classic GameBoy,but it looks damaged./GameBoy", helper.Content.Load<Texture2D>(@"Assets/gameboy.png"), Color.White, type: typeof(GameBoy));
+            GameBoy.attTexture = helper.Content.Load<Texture2D>(@"assets/slot.png");
+            gbData = new CustomObjectData("GameBoy", "GameBoy/0/-300/Crafting -9/A classic GameBoy,but it looks damaged./GameBoy", helper.Content.Load<Texture2D>(@"assets/gameboy.png"), Color.White, type: typeof(GameBoy));
             loadRoms();
 
             helper.Events.GameLoop.SaveLoaded += (s, e) =>

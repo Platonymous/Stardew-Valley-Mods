@@ -1,10 +1,20 @@
 {
   "Name": "PyTK",
   "Author": "Platonymous",
-  "Version": "1.12.13",
+  "Version": "1.12.14",
   "Description": "Platonymous Toolkit",
   "UniqueID": "Platonymous.Toolkit",
   "EntryDll": "PyTK.dll",
   "MinimumApiVersion": "3.0.0",
-  "UpdateKeys": [ "Nexus:1726" ]
+  "UpdateKeys": [ "Nexus:1726" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Pathoschild.ContentPatcher",
+      "IsRequired": false
+    },
+    {
+      "UniqueID": "spacechase0.JsonAssets",
+      "IsRequired": false
+    }
+  ]
 }

@@ -1,7 +1,7 @@
 {
   "Name": "Arcade 2048",
   "Author": "Platonymous",
-  "Version": "1.1.1",
+  "Version": "1.1.2",
   "Description": "Play 2048.",
   "UniqueID": "Platonymous.2048",
   "EntryDll": "Arcade2048.dll",
