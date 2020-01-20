@@ -1,15 +1,15 @@
 {
-  "Name": "Seed Bag",
-  "Author": "Platonymous",
-  "Version": "1.3.2",
-  "Description": "Adds a Seed Bag to the Game",
-  "UniqueID": "Platonymous.SeedBag",
-  "EntryDll": "SeedBag.dll",
-  "MinimumApiVersion": "3.0.0",
-  "UpdateKeys": [ "Nexus:1133" ],
-  "Dependencies": [
-    {
-      "UniqueID": "Platonymous.Toolkit"
-    }
-  ]
+    "Name": "Seed Bag",
+    "Author": "Platonymous",
+    "Version": "1.3.2-unofficial.2-minervamaga",
+    "Description": "Adds a Seed Bag to the Game",
+    "UniqueID": "Platonymous.SeedBag",
+    "EntryDll": "SeedBag.dll",
+    "MinimumApiVersion": "3.0.0",
+    "UpdateKeys": [ "Nexus:1133" ],
+    "Dependencies": [
+        {
+            "UniqueID": "Platonymous.Toolkit"
+        }
+    ]
 }

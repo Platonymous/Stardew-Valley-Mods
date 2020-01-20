@@ -1,7 +1,7 @@
 ﻿{
   "Name": "Notes",
   "Author": "Platonymous",
-  "Version": "1.1.0",
+  "Version": "1.0.7-unofficial.1-minervamaga",
   "Description": "Write and place notes",
   "UniqueID": "Platonymous.Notes",
   "EntryDll": "Notes.dll",
