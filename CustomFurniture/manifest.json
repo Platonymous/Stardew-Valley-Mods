@@ -1,7 +1,7 @@
 {
   "Name": "Custom Furniture",
   "Author": "Platonymous",
-  "Version": "0.10.5",
+  "Version": "0.10.6-unofficial.1-Strobe",
   "Description": "Helper Mod for Custom Furniture creation.",
   "UniqueID": "Platonymous.CustomFurniture",
   "EntryDll": "CustomFurniture.dll",

@@ -24,7 +24,7 @@ namespace CustomFurniture.Overrides
  
             if (__instance is CustomFurniture ho)
             {
-                CustomFurnitureMod.harmonyDraw(ho.texture, location, new Rectangle?(ho.sourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, ho.flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, layerDepth);
+                CustomFurnitureMod.harmonyDraw(ho.texture, location, new Rectangle?(ho.sourceRect.Value), Color.White * alpha, 0.0f, Vector2.Zero, Game1.pixelZoom, ho.Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, layerDepth);
                 return false;
             }
 

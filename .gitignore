@@ -35,3 +35,7 @@ nuget.exe
 **/TTS/
 *.lnk
 .DS_Store
+*.zip
+_releases/CustomFurniture 0.10.5.zip
+_releases/CustomFurniture 0.10.5.zip
+*.zip
