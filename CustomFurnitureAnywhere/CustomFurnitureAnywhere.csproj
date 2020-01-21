@@ -16,8 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CustomFurniture\CustomFurniture.csproj" />
-    <ProjectReference Include="..\PyTK\PyTK.csproj" />
+    <ProjectReference Include="..\CustomFurniture\CustomFurniture.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\PyTK\PyTK.csproj">
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
   
   <ItemGroup>

@@ -22,7 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PyTK\PyTK.csproj" />
+    <ProjectReference Include="..\PyTK\PyTK.csproj">
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

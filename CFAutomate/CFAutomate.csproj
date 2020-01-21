@@ -14,8 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CustomFarmingRedux\CustomFarmingRedux.csproj" />
-    <ProjectReference Include="..\PyTK\PyTK.csproj" />
+    <ProjectReference Include="..\CustomFarmingRedux\CustomFarmingRedux.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\PyTK\PyTK.csproj">
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
