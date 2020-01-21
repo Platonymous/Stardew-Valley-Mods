@@ -356,6 +356,9 @@ namespace TMXLoader
 
         private GameLocation buildBuildableIndoors(BuildableEdit edit, string uniqueId, string playerName, long playerId, GameLocation location, Dictionary<string,string> colors)
         {
+            if (Game1.getLocationFromName(getLocationName(uniqueId)) is GameLocation preLocation)
+                return preLocation;
+
             if (edit.indoorsFile != null && edit._pack != null)
             {
                 string buildFile = edit.indoorsFile;
@@ -406,8 +409,8 @@ namespace TMXLoader
 
             GameLocation indoors = buildBuildableIndoors(edit, uniqueId, playerName,playerId, location, colors);
 
-            if (indoors != null)
-                buildablesExits.AddOrReplace(indoors.Name, new Warp(0, 0, location.Name, edit.exitTile[0] + position.X, edit.exitTile[1] + position.Y, false));
+            if (indoors != null && !buildablesExits.ContainsKey(indoors.Name))
+                buildablesExits.Add(indoors.Name, new Warp(0, 0, location.Name, edit.exitTile[0] + position.X, edit.exitTile[1] + position.Y, false));
 
           
             string buildFile = edit.file;
@@ -699,12 +702,28 @@ namespace TMXLoader
                             helper.Content.InvalidateCache(Game1.currentLocation.mapPath.Value);
                             try
                             {
-                                Helper.Reflection.GetMethod(Game1.currentLocation, "reloadMap").Invoke();
+                                Helper.Reflection.GetMethod(Game1.currentLocation, "reloadMap")?.Invoke();
+                                Game1.currentLocation.GetType().GetField("_appliedMapOverrides", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation,new HashSet<string>());
+                                Game1.currentLocation.GetType().GetField("ccRefurbished", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation, false);
+                                Game1.currentLocation.GetType().GetField("isShowingDestroyedJoja", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation, false);
+                                Game1.currentLocation.GetType().GetField("isShowingUpgradedPamHouse", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation, false);
+                                Game1.currentLocation.GetType().GetField("isShowingDestroyedJoja", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation, false);
+
+                                Helper.Reflection.GetMethod(Game1.currentLocation, "resetLocalState")?.Invoke();
+                                foreach (var buildable in new List<SaveBuildable>(buildablesBuild.Where(b => b.Location == Game1.currentLocation.Name)))
+                                {
+                                    buildablesBuild.Remove(buildable);
+                                    BuildableEdit edit = buildables.Find(be => be.id == buildable.Id);
+
+                                    if (edit.indoorsFile != null && Game1.getLocationFromName(getLocationName(buildable.UniqueId)) is GameLocation location)
+                                        buildable.Indoors = getLocationSaveData(location);
+
+                                    loadSavedBuildable(buildable);
+                                }
                             }
                             catch (Exception ex)
                             {
                                 Monitor.Log(ex.Message + ":" + ex.StackTrace);
-
                             }
                             e.NewLocation.updateSeasonalTileSheets();
 
