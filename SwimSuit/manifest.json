@@ -1,7 +1,7 @@
 {
   "Name": "Swim Suit",
   "Author": "Platonymous",
-  "Version": "0.6.0",
+  "Version": "0.6.1-unofficial.1-Strobe",
   "Description": "Swim almost anywhere",
   "UniqueID": "Platonymous.SwimSuit",
   "EntryDll": "SwimSuit.dll",

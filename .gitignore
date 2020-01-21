@@ -34,3 +34,4 @@ nuget.exe
 
 **/TTS/
 *.lnk
+.DS_Store
