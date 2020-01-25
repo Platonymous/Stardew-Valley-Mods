@@ -290,16 +290,16 @@ namespace PyTK
             List<Type> AddedTypes = new List<Type>()
         {
                 typeof(StardewValley.Object),
+                typeof(StardewValley.Objects.Furniture),
+                typeof(StardewValley.Item),
+                 typeof(StardewValley.Tool),
                  typeof(StardewValley.Farm),
                  typeof(StardewValley.FarmAnimal),
                  typeof(StardewValley.Farmer),
                  typeof(StardewValley.AnimalHouse),
                  typeof(StardewValley.Character),
-                 typeof(StardewValley.Tool),
-                 typeof(StardewValley.Item),
                  typeof(StardewValley.NPC),
                  typeof(StardewValley.GameLocation),
-                 typeof(StardewValley.Objects.Furniture),
                  typeof(StardewValley.Locations.FarmHouse),
                  typeof(SaveGame)
         };
@@ -315,8 +315,6 @@ namespace PyTK
             }; 
 
             SaveGame sg = new SaveGame();
-
-
 
             foreach (Type type in AddedTypes)// typeof(Game1).Assembly.GetTypes().Where(t => t.GetConstructor(new Type[] { }) != null && !t.IsGenericType && t.IsPublic && t.IsClass && t.Namespace != null && t.Namespace.Contains("Stardew") && AddedNamespaces.Exists(n => t.Namespace.Contains(n))))
                 SaveGame.GetSerializer(type);

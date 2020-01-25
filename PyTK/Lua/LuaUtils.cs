@@ -54,6 +54,23 @@ namespace PyTK.Lua
             return PyTKMod.saveData.Counters[id];
         }
 
+        public static object getInstance(string type, params object[] args)
+        {
+           return Activator.CreateInstance(Type.GetType(type),args);
+        }
+        public object callStaticMethod(Type type, string method, params object[] args)
+        {
+            if (type.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic) is MethodInfo methodInfo)
+                return methodInfo.Invoke(null, args);
+            else
+                return false;
+        }
+
+        public object callStaticMethod(string typeName, string method, params object[] args)
+        {
+           return callStaticMethod(Type.GetType(typeName),method,args);
+        }
+
         public static bool invertSwitch(string id)
         {
             id = "switch_" + id;
