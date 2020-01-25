@@ -75,10 +75,10 @@ namespace CustomFurniture
 
             if (param[0] == "shop" && Game1.activeClickableMenu is ShopMenu shop)
             {
-                Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
-                List<Item> selling = Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
-                List<Item> remove = new List<Item>();
-                List<Item> additions = new List<Item>();
+                Dictionary<ISalable, int[]> items = Helper.Reflection.GetField<Dictionary<ISalable, int[]>>(shop, "itemPriceAndStock").GetValue();
+                List<ISalable> selling = Helper.Reflection.GetField<List<ISalable>>(shop, "forSale").GetValue();
+                List<ISalable> remove = new List<ISalable>();
+                List<ISalable> additions = new List<ISalable>();
 
                 foreach (Item i in selling)
                     if (i is Chest chest && furniturePile.Keys.Any(f => f.Equals(i.Name)))
@@ -175,8 +175,8 @@ namespace CustomFurniture
             if (Game1.activeClickableMenu is ShopMenu)
             {
                 ShopMenu shop = (ShopMenu)Game1.activeClickableMenu;
-                Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
-                List<Item> selling = Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
+                Dictionary<ISalable, int[]> items = Helper.Reflection.GetField<Dictionary<ISalable, int[]>>(shop, "itemPriceAndStock").GetValue();
+                List<ISalable> selling = Helper.Reflection.GetField<List<ISalable>>(shop, "forSale").GetValue();
                 int currency = Helper.Reflection.GetField<int>(shop, "currency").GetValue();
                 bool isCatalogue = (currency == 0 && selling.Count > 0 && selling[0] is Furniture);
                 string shopkeeper = "Robin";
@@ -184,7 +184,7 @@ namespace CustomFurniture
 
                 if (shop.portraitPerson != null || isCatalogue)
                 {
-                    Dictionary<Item, int> newItemsToSell = new Dictionary<Item, int>();
+                    Dictionary<ISalable, int> newItemsToSell = new Dictionary<ISalable, int>();
 
                     foreach (CustomFurniture f in furniture.Values)
                     {
@@ -207,7 +207,7 @@ namespace CustomFurniture
                                 newItemsToSell.Add(f, isCatalogue ? 0 : f.Price);
                     }
 
-                    foreach (Item item in newItemsToSell.Keys)
+                    foreach (ISalable item in newItemsToSell.Keys)
                         if (!items.ContainsKey(item))
                         {
                             items.Add(item, new int[] { newItemsToSell[item], int.MaxValue });
