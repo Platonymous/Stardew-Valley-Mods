@@ -34,3 +34,6 @@ nuget.exe
 
 **/TTS/
 *.lnk
+
+#Archived
+Archived/
