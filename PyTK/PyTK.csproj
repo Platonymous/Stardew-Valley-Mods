@@ -3,12 +3,38 @@
   <PropertyGroup>
     <AssemblyName>PyTK</AssemblyName>
     <RootNamespace>PyTK</RootNamespace>
-    <Version>1.9.12</Version>
+    <Version>1.12.15</Version>
     <TargetFramework>net452</TargetFramework>
     <Platforms>x86</Platforms>
     <PlatformTarget>x86</PlatformTarget>
 
     <EnableHarmony>true</EnableHarmony>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <Authors>Platonymous</Authors>
+
+    <Description>Modding Toolkit for Stardew Valley</Description>
+
+    <Copyright>Copyright 2019</Copyright>
+
+    <PackageProjectUrl>https://github.com/Platonymous/Stardew-Valley-Mods/blob/master/PyTK/Examples.md</PackageProjectUrl>
+
+    <PackageIcon>pytk-nuget-icon.png</PackageIcon>
+
+    <PackageIconUrl />
+
+    <RepositoryUrl>https://github.com/Platonymous/Stardew-Valley-Mods/</RepositoryUrl>
+
+    <RepositoryType>GitHub</RepositoryType>
+
+    <PackageLicenseExpression></PackageLicenseExpression>
+
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+
+    <PackageId>Platonymous.PyTK</PackageId>
+
+    <Product>Platonymous.PyTK</Product>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +44,17 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.0.0" />
     <PackageReference Include="Platonymous.TMXTile" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="pytk-nuget-icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
