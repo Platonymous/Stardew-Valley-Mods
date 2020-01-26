@@ -18,6 +18,7 @@ namespace TMXLoader
         internal Texture2D _icon = null;
         internal string _mapName = null;
         internal string _location = null;
+        public List<string> tags { get; set; } = new List<string>();
 
         public Dictionary<string, BuildableTranslation> translations { get; set; } = new Dictionary<string, BuildableTranslation>();
 
@@ -50,6 +51,7 @@ namespace TMXLoader
             b.sourceArea = sourceArea;
             b.type = type;
             b._map = _map;
+            b.tags = tags;
             return b;
         }
     }

@@ -476,6 +476,22 @@ namespace TMXLoader
             e._map = map;
 
             SaveBuildable sav = (new SaveBuildable(edit.id, location.Name, position, uniqueId, playerName,playerId, colors));
+
+            if (edit.tags.Contains("IsUnique"))
+                foreach (SaveBuildable sb in new List<SaveBuildable>(buildablesBuild.Where(bb => bb.Id == edit.id && bb.UniqueId != uniqueId)))
+                {
+                    BuildableEdit sbedit = buildables.Find(be => be.id == sb.Id);
+
+                    if (sbedit.indoorsFile != null && Game1.getLocationFromName(getLocationName(sb.UniqueId)) is GameLocation sblocation)
+                    {
+                        var locSaveData = getLocationSaveData(sblocation);
+                        locSaveData.Name = getLocationName(uniqueId);
+                        setLocationObejcts(locSaveData);
+                    }
+
+                    removeSavedBuildable(sb, pay, distribute);
+                }
+
             buildablesBuild.Add(sav);
 
             if (distribute && Game1.IsMultiplayer)
@@ -503,8 +519,7 @@ namespace TMXLoader
 
                         Game1.player.removeItemsFromInventory(item.ParentSheetIndex, tItem.stock);
                     }
-
-            }
+            }           
         }
 
         private void fixWaterTiles(GameLocation location)
