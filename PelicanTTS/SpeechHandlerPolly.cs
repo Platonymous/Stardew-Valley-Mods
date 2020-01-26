@@ -42,7 +42,7 @@ namespace PelicanTTS
 
         }
 
-        internal static void configSay(string name, string voice, string text)
+        internal static void configSay(string name, string voice, string text, float pitch = -1)
         {
             Task.Run(() =>
            {
@@ -92,7 +92,7 @@ namespace PelicanTTS
                currentSpeech = nextSpeech.CreateInstance();
 
                speak = false;
-               currentSpeech.Pitch =  (mumbling ? 0.5f : PelicanTTSMod.config.Voices[name].Pitch);
+               currentSpeech.Pitch =  (mumbling ? 0.5f : pitch == -1 ? PelicanTTSMod.config.Voices[name].Pitch : pitch);
                currentSpeech.Volume = PelicanTTSMod.config.Volume;
 
                currentSpeech.Play();
