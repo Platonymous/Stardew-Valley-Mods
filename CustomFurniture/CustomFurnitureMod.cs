@@ -55,8 +55,8 @@ namespace CustomFurniture
         {
             if (param[0] == "itemMenu" && Game1.activeClickableMenu is ItemGrabMenu itemMenu)
             {
-                List<ISalable> remove = new List<ISalable>();
-                List<ISalable> additions = new List<ISalable>();
+                List<Item> remove = new List<Item>();
+                List<Item> additions = new List<Item>();
 
                 foreach (Item item in itemMenu.ItemsToGrabMenu.actualInventory)
                     if (item is Chest chest && furniturePile.Keys.Where(f => f.Equals(item.Name)).Any())
@@ -75,10 +75,10 @@ namespace CustomFurniture
 
             if (param[0] == "shop" && Game1.activeClickableMenu is ShopMenu shop)
             {
-                Dictionary<ISalable, int[]> items = Helper.Reflection.GetField<Dictionary<ISalable, int[]>>(shop, "itemPriceAndStock").GetValue();
-                List<ISalable> selling = Helper.Reflection.GetField<List<ISalable>>(shop, "forSale").GetValue();
-                List<ISalable> remove = new List<ISalable>();
-                List<ISalable> additions = new List<ISalable>();
+                Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
+                List<Item> selling = Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
+                List<Item> remove = new List<Item>();
+                List<Item> additions = new List<Item>();
 
                 foreach (Item i in selling)
                     if (i is Chest chest && furniturePile.Keys.Any(f => f.Equals(i.Name)))
@@ -175,8 +175,8 @@ namespace CustomFurniture
             if (Game1.activeClickableMenu is ShopMenu)
             {
                 ShopMenu shop = (ShopMenu)Game1.activeClickableMenu;
-                Dictionary<ISalable, int[]> items = Helper.Reflection.GetField<Dictionary<ISalable, int[]>>(shop, "itemPriceAndStock").GetValue();
-                List<ISalable> selling = Helper.Reflection.GetField<List<ISalable>>(shop, "forSale").GetValue();
+                Dictionary<Item, int[]> items = Helper.Reflection.GetField<Dictionary<Item, int[]>>(shop, "itemPriceAndStock").GetValue();
+                List<Item> selling = Helper.Reflection.GetField<List<Item>>(shop, "forSale").GetValue();
                 int currency = Helper.Reflection.GetField<int>(shop, "currency").GetValue();
                 bool isCatalogue = (currency == 0 && selling.Count > 0 && selling[0] is Furniture);
                 string shopkeeper = "Robin";
@@ -184,7 +184,7 @@ namespace CustomFurniture
 
                 if (shop.portraitPerson != null || isCatalogue)
                 {
-                    Dictionary<ISalable, int> newItemsToSell = new Dictionary<ISalable, int>();
+                    Dictionary<Item, int> newItemsToSell = new Dictionary<Item, int>();
 
                     foreach (CustomFurniture f in furniture.Values)
                     {
