@@ -26,8 +26,7 @@ namespace ArcadePong
             monitor = Monitor;
             HarmonyInstance.Create("Platonymous.ArcadePong").PatchAll(Assembly.GetExecutingAssembly());
             helper.Events.GameLoop.SaveLoaded += (o, e) => setup();
-            pdata = new CustomObjectData("Pong", "Pong/0/-300/Crafting -9/Play 'Pong by Cat' at home!/true/true/0/Pong", Game1.bigCraftableSpriteSheet.getTile(159, 16, 32).setSaturation(0).setLight(130), Color.Yellow, bigCraftable: true, type: typeof(PongMachine));
-           
+            helper.Events.GameLoop.GameLaunched += (o, e ) => pdata = new CustomObjectData("Pong", "Pong/0/-300/Crafting -9/Play 'Pong by Cat' at home!/true/true/0/Pong", Game1.bigCraftableSpriteSheet.getTile(159, 16, 32).setSaturation(0).setLight(130), Color.Yellow, bigCraftable: true, type: typeof(PongMachine));
         }
 
         private void setup()
