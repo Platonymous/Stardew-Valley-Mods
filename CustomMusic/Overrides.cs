@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Audio;
+using StardewValley;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CustomMusic
@@ -67,10 +69,36 @@ namespace CustomMusic
             bool ret = true;
             try
             {
-                var songs = CustomMusicMod.Music.Where(m => m.Id == name && CustomMusicMod.checkConditions(m.Conditions)).ToList();
+                string preset = "Default";
+
+                if (CustomMusicMod.config.Presets.ContainsKey(name))
+                    preset = CustomMusicMod.config.Presets[name];
+
+                if (preset == "Vanilla")
+                    return ret;
+
+                List<StoredMusic> songs = null;
+
+                if (preset != "Default" && preset != "Random" && preset != "Any")
+                    songs = CustomMusicMod.Music.Where(m => Path.GetFileNameWithoutExtension(m.Path) == preset).ToList();
+
+                if (preset == "Any")
+                    songs = CustomMusicMod.Music.ToList();
+
+                if(songs == null || songs.Count() == 0)
+                    songs = CustomMusicMod.Music.Where(m => m.Id == name && CustomMusicMod.checkConditions(m.Conditions)).ToList();
+
+                if (preset == "Random" || preset == "Any")
+                    songs.Add(new StoredMusic() { Id = "Vanilla" });
 
                 if (songs.Count > 0 && songs.First() is StoredMusic music)
                 {
+                    if (songs.Count > 1)
+                        music = songs[Game1.random.Next(songs.Count())];
+
+                    if (music.Id == "Vanilla")
+                        return ret;
+
                     ActiveMusic active = new ActiveMusic(__instance.Name, music.Sound.CreateInstance(), ref __instance, music.Ambient, music.Loop);
                     CustomMusicMod.Active.Add(active);
                     if (CustomMusicMod.config.Debug)

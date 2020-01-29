@@ -23,7 +23,7 @@ namespace CustomMusic
         internal static IModHelper SHelper;
         internal static MethodInfo checkEventConditions = null;
         internal static Dictionary<string, string> locations = new Dictionary<string, string>();
-        internal static Config config;
+        public static Config config;
         internal static int loads = 0;
         internal static int simLoad = 0;
         internal static List<string> working = new List<string>();
@@ -117,6 +117,9 @@ namespace CustomMusic
 
         private void loadContentPacks()
         {
+            List<string> ids = new List<string>();
+            List<string> files = new List<string>();
+
             foreach (IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
@@ -125,6 +128,11 @@ namespace CustomMusic
                 {
                     string path = Path.Combine(pack.DirectoryPath, music.File);
                     addMusic(path, music);
+                    if (!ids.Contains(music.Id))
+                        ids.Add(music.Id);
+
+                    if (!files.Contains(Path.GetFileNameWithoutExtension(path)))
+                        files.Add(Path.GetFileNameWithoutExtension(path));
                 }
 
                 foreach (LocationItem location in content.Locations)
@@ -135,6 +143,56 @@ namespace CustomMusic
                     locations.Add(location.Location, location.MusicId);
                 }
             }
+
+            List<GMCMOption> options = new List<GMCMOption>();
+
+            foreach(var id in ids)
+            {
+                List<string> choices = new List<string>() { "CM:Default", "Vanilla", "Random", "Any" };
+                
+                foreach(var file in files.OrderBy(f => f))
+                    choices.Add(Path.GetFileNameWithoutExtension(file));
+
+                int activeIndex = 0;
+
+                if (config.Presets.ContainsKey(id) && config.Presets[id] != "Default" && choices.Exists(c => c == config.Presets[id]))
+                    activeIndex = choices.IndexOf(config.Presets[id]);
+
+                choices[1] = choices[1] + ":" + id;
+
+                options.Add(new GMCMOption(id, choices, "", activeIndex));
+            }
+
+            if (options.Count == 0)
+                return;
+
+            GMCMConfig gmcmConfig = new GMCMConfig(ModManifest, (key, value) =>
+            {
+                if (key == "save" && value == "file")
+                {
+                    Helper.WriteConfig<Config>(config);
+                    return;
+                }
+
+                if (value == "CM:Default")
+                    value = "Default";
+
+                if (value.StartsWith("Vanilla:"))
+                    value = "Vanilla";
+
+                    if (!config.Presets.ContainsKey(key))
+                        config.Presets.Add(key, value);
+                    else
+                        config.Presets[key] = value;
+               
+
+            }, options, new GMCMLabel("Music Choices", "Default: Content packs. Random: Packs and vanilla mixed. Any: All mixed."));
+
+            while (!Context.IsGameLaunched)
+                Thread.Sleep(1);
+
+            if (gmcmConfig.register(Helper))
+                Monitor.Log("Added Custom Music Config to GMCM", LogLevel.Info);
         }
 
         private void addMusic(string path, MusicItem music)
@@ -270,7 +328,7 @@ namespace CustomMusic
         {
             if (condition == null || condition == "")
                 return true;
-            
+
             GameLocation location = Game1.currentLocation;
             if (location == null)
                 location = Game1.getFarm();
