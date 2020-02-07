@@ -1,0 +1,20 @@
+{
+  "leader": "排行榜",
+  "white": "白",
+  "black": "黑",
+  "spectator": "观众",
+  "waiting": "等待其他玩家",
+  "win": "{Player} 赢了",
+  "checkmateWin": "将死!",
+  "surrenderWin": "投降!",
+  "castling": "王车易位",
+  "promotion": "晋升",
+  "yes": "是",
+  "no": "不",
+  "queen": "女王",
+  "knight": "骑士",
+  "close": "关闭",
+  "reset": "复位",
+  "last": "最后结果",
+  "surrender": "投降"
+}
