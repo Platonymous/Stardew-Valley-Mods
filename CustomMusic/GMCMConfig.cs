@@ -76,9 +76,16 @@ namespace CustomMusic
             };
 
             Patched = true;
+
+            instance.Patch(Type.GetType("GenericModConfigMenu.UI.Scrollbar, GenericModConfigMenu").GetMethod("Scroll"), new HarmonyMethod(typeof(GMCMConfig).GetMethod("ScrollGMCM")));
         }
 
-        public static IGMCMAPI GetAPI(IModHelper helper)
+        public static bool ScrollGMCM(object __instance)
+        {
+            return Mouse.GetState().LeftButton != ButtonState.Pressed;
+        }
+
+            public static IGMCMAPI GetAPI(IModHelper helper)
         {
             if (Api is IGMCMAPI)
                 return Api;
