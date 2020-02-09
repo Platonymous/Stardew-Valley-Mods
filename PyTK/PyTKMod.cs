@@ -147,6 +147,8 @@ namespace PyTK
 
             helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
+                CustomTVMod.reloadStrings();
+
                 if (Game1.IsMasterGame)
                 {
                     try

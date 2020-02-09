@@ -14,11 +14,11 @@ namespace PyTK.CustomTV
         internal static IModHelper Helper { get => PyTKMod._helper; }
         internal static IMonitor Monitor { get => PyTKMod._monitor; }
 
-        private static string weatherString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13105");
-        private static string fortuneString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13107");
-        private static string queenString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13114");
-        private static string landString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13111");
-        private static string rerunString { get; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13117");
+        private static string weatherString { get; set; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13105");
+        private static string fortuneString { get; set; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13107");
+        private static string queenString { get; set; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13114");
+        private static string landString { get; set; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13111");
+        private static string rerunString { get; set; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13117");
         private static bool hasLoaded = false;
 
         private static TemporaryAnimatedSprite tvScreen
@@ -49,7 +49,7 @@ namespace PyTK.CustomTV
 
         private static int currentpage = 0;
         private static List<List<Response>> pages = new List<List<Response>>();
-        private static Dictionary<string, TVChannel> channels = new Dictionary<string, TVChannel>();
+        internal static Dictionary<string, TVChannel> channels = new Dictionary<string, TVChannel>();
 
         internal static void load()
         {
@@ -57,6 +57,17 @@ namespace PyTK.CustomTV
                 loadDefaultChannels();
 
             hasLoaded = true;
+        }
+
+        internal static void reloadStrings()
+        {
+            weatherString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13105");
+            fortuneString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13107");
+            queenString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13114");
+            landString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13111");
+            rerunString = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13117");
+
+            loadDefaultChannels();
         }
 
         private static void loadDefaultChannels()
