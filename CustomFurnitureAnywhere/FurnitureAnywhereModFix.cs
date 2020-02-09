@@ -21,9 +21,9 @@ namespace CustomFurnitureAnywhere
         {
             if (i is CustomFurniture.CustomFurniture)
             {
-                for (int c = 0; c < Game1.player.items.Count; c++)
-                    if (Game1.player.items[c] != null && Game1.player.items[c].Equals(i))
-                        Game1.player.items[c] = new AnywhereCustomFurniture(Game1.player.items[c] as CustomFurniture.CustomFurniture);
+                for (int c = 0; c < Game1.player.Items.Count; c++)
+                    if (Game1.player.Items[c] != null && Game1.player.Items[c].Equals(i))
+                        Game1.player.Items[c] = new AnywhereCustomFurniture(Game1.player.Items[c] as CustomFurniture.CustomFurniture);
 
                 return false;
             }
@@ -62,10 +62,10 @@ namespace CustomFurnitureAnywhere
 
         internal static bool Prefix()
         {
-            for (int c = 0; c < Game1.player.items.Count; c++)
-                if (Game1.player.items[c] != null && Game1.player.items[c] is AnywhereCustomFurniture)
+            for (int c = 0; c < Game1.player.Items.Count; c++)
+                if (Game1.player.Items[c] != null && Game1.player.Items[c] is AnywhereCustomFurniture)
                 {
-                    Game1.player.items[c] = (Game1.player.items[c] as AnywhereCustomFurniture).Revert();
+                    Game1.player.Items[c] = (Game1.player.Items[c] as AnywhereCustomFurniture).Revert();
                     return false;
                 }
             return true;
@@ -91,7 +91,7 @@ namespace CustomFurnitureAnywhere
                 return;
 
             foreach (Vector2 k in objects.Keys)
-                if (objects[k] is Furniture f && f.furniture_type != Furniture.rug && f.boundingBox.Value.Intersects(position))
+                if (objects[k] is Furniture f && f.furniture_type.Value != Furniture.rug && f.boundingBox.Value.Intersects(position))
                 {
                     __result = true;
                     return;

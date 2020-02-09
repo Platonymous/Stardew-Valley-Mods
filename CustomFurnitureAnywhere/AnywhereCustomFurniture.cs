@@ -14,7 +14,7 @@ namespace CustomFurnitureAnywhere
 
         }
 
-        public AnywhereCustomFurniture(CustomFurniture.CustomFurniture item) : base(item.data, item.id, item.tileLocation)
+        public AnywhereCustomFurniture(CustomFurniture.CustomFurniture item) : base(item.data, item.id, item.TileLocation)
         {
             this.defaultBoundingBox.Value = item.defaultBoundingBox.Value;
             this.boundingBox.Value = item.boundingBox.Value;
@@ -29,9 +29,9 @@ namespace CustomFurnitureAnywhere
 
         public Furniture Revert()
         {
-            CustomFurniture.CustomFurniture self = new CustomFurniture.CustomFurniture(this.data, this.id, this.tileLocation);
+            CustomFurniture.CustomFurniture self = new CustomFurniture.CustomFurniture(this.data, this.id, this.TileLocation);
             self.defaultBoundingBox.Value = this.defaultBoundingBox.Value;
-            self.boundingBox.Value = this.boundingBox;
+            self.boundingBox.Value = this.boundingBox.Value;
             self.currentRotation.Value = this.currentRotation.Value;
             self.rotations.Value = this.rotations.Value;
             self.sourceRect.Value = this.sourceRect.Value;
@@ -43,7 +43,7 @@ namespace CustomFurnitureAnywhere
         }
         public override bool isPassable()
         {
-            return this.furniture_type == 12;
+            return this.furniture_type.Value == 12;
         }
         public override string getCategoryName()
         {
@@ -66,24 +66,24 @@ namespace CustomFurnitureAnywhere
                         {
                             Vector2 vector2 = key * Game1.tileSize - new Vector2(Game1.tileSize / 2);
                             CustomFurniture.CustomFurniture furniture = (CustomFurniture.CustomFurniture)l.objects[key];
-                            if (furniture.furniture_type == 11 && (furniture.getBoundingBox(furniture.tileLocation).Contains((int)vector2.X, (int)vector2.Y) && furniture.heldObject == null && this.getTilesWide() == 1))
+                            if (furniture.furniture_type.Value == 11 && (furniture.getBoundingBox(furniture.TileLocation).Contains((int)vector2.X, (int)vector2.Y) && furniture.heldObject.Value == null && this.getTilesWide() == 1))
                                 return true;
-                            if ((furniture.furniture_type != 12 || this.furniture_type == 12) && furniture.getBoundingBox(furniture.tileLocation).Contains((int)vector2.X, (int)vector2.Y))
+                            if ((furniture.furniture_type.Value != 12 || this.furniture_type.Value == 12) && furniture.getBoundingBox(furniture.TileLocation).Contains((int)vector2.X, (int)vector2.Y))
                                 return false;
                         }
                         return false;
                     }
                 }
             }
-            if (this.parentSheetIndex == 710 && l.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Water", "Back") != null && (!l.objects.ContainsKey(tile) && l.doesTileHaveProperty((int)tile.X + 1, (int)tile.Y, "Water", "Back") != null) && l.doesTileHaveProperty((int)tile.X - 1, (int)tile.Y, "Water", "Back") != null || l.doesTileHaveProperty((int)tile.X, (int)tile.Y + 1, "Water", "Back") != null && l.doesTileHaveProperty((int)tile.X, (int)tile.Y - 1, "Water", "Back") != null || (this.parentSheetIndex == 105 && this.bigCraftable && (l.terrainFeatures.ContainsKey(tile) && l.terrainFeatures[tile] is StardewValley.TerrainFeatures.Tree) && !l.objects.ContainsKey(tile) || this.name != null && this.name.Contains("Bomb") && (!l.isTileOccupiedForPlacement(tile, this) || l.isTileOccupiedByFarmer(tile) != null)))
+            if (this.ParentSheetIndex == 710 && l.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Water", "Back") != null && (!l.objects.ContainsKey(tile) && l.doesTileHaveProperty((int)tile.X + 1, (int)tile.Y, "Water", "Back") != null) && l.doesTileHaveProperty((int)tile.X - 1, (int)tile.Y, "Water", "Back") != null || l.doesTileHaveProperty((int)tile.X, (int)tile.Y + 1, "Water", "Back") != null && l.doesTileHaveProperty((int)tile.X, (int)tile.Y - 1, "Water", "Back") != null || (this.parentSheetIndex == 105 && this.bigCraftable && (l.terrainFeatures.ContainsKey(tile) && l.terrainFeatures[tile] is StardewValley.TerrainFeatures.Tree) && !l.objects.ContainsKey(tile) || this.name != null && this.name.Contains("Bomb") && (!l.isTileOccupiedForPlacement(tile, this) || l.isTileOccupiedByFarmer(tile) != null)))
                 return true;
             return !l.isTileOccupiedForPlacement(tile, this);
         }
         public override bool placementAction(GameLocation location, int x, int y, StardewValley.Farmer who = null)
         {
             Point point = new Point(x / Game1.tileSize, y / Game1.tileSize);
-            this.tileLocation.Value = new Vector2(point.X, point.Y);
-            if (this.furniture_type == 6 || this.furniture_type == 13 || this.parentSheetIndex == 1293)
+            this.TileLocation = new Vector2(point.X, point.Y);
+            if (this.furniture_type.Value == 6 || this.furniture_type.Value == 13 || this.ParentSheetIndex == 1293)
             {
                 Game1.showRedMessage("Can only be placed in House");
                 return false;
@@ -104,7 +104,7 @@ namespace CustomFurnitureAnywhere
             this.boundingBox.Value = new Rectangle(x / Game1.tileSize * Game1.tileSize, y / Game1.tileSize * Game1.tileSize, this.boundingBox.Width, this.boundingBox.Height);
             foreach (Character character in Game1.getAllFarmers())
             {
-                if (character.currentLocation == location && character.GetBoundingBox().Intersects(this.boundingBox))
+                if (character.currentLocation == location && character.GetBoundingBox().Intersects(this.boundingBox.Value))
                 {
                     Game1.showRedMessage("Can't place on top of a person.");
                     return false;
@@ -116,7 +116,7 @@ namespace CustomFurnitureAnywhere
                 {
                     CustomFurniture.CustomFurniture furniture = (CustomFurniture.CustomFurniture)i;
                     
-                    if (furniture.getBoundingBox(furniture.tileLocation).Intersects(this.boundingBox))
+                    if (furniture.getBoundingBox(furniture.TileLocation).Intersects(this.boundingBox.Value))
                     {
                         Game1.showRedMessage("Furniture can't be placed here");
                         return false;
@@ -128,20 +128,20 @@ namespace CustomFurnitureAnywhere
             {
                 StardewValley.Object @object = (StardewValley.Object)this.getOne();
                 @object.shakeTimer = 50;
-                @object.tileLocation.Value = this.tileLocation.Value;
-                if (location.objects.ContainsKey(this.tileLocation))
+                @object.TileLocation = this.TileLocation;
+                if (location.objects.ContainsKey(this.TileLocation))
                 {
-                    if (location.objects[this.tileLocation].ParentSheetIndex != this.parentSheetIndex)
+                    if (location.objects[this.TileLocation].ParentSheetIndex != this.ParentSheetIndex)
                     {
-                        Game1.createItemDebris(location.objects[this.tileLocation], this.tileLocation.Value * Game1.tileSize, Game1.random.Next(4), null);
-                        location.objects[this.tileLocation] = @object;
+                        Game1.createItemDebris(location.objects[this.TileLocation], this.TileLocation * Game1.tileSize, Game1.random.Next(4), null);
+                        location.objects[this.TileLocation] = @object;
                     }
                 }
                 else
-                    location.objects.Add(this.tileLocation, @object);
+                    location.objects.Add(this.TileLocation, @object);
                 (@object as AnywhereCustomFurniture).sourceRect.Value = this.sourceRect.Value;
                 (@object as AnywhereCustomFurniture).boundingBox.Value = this.boundingBox.Value;
-                @object.initializeLightSource(this.tileLocation);
+                @object.initializeLightSource(this.TileLocation);
             }
 
             Game1.playSound("woodyStep");
@@ -181,7 +181,7 @@ namespace CustomFurnitureAnywhere
             Console.Write("Clicked");
 
             Game1.haltAfterCheck = false;
-            if ((int)((NetFieldBase<int, NetInt>)this.furniture_type) == 11 && who.ActiveObject != null && (who.ActiveObject != null && this.heldObject.Value == null))
+            if (furniture_type.Value == 11 && who.ActiveObject != null && (who.ActiveObject != null && this.heldObject.Value == null))
                 return false;
             if (this.heldObject.Value == null && (who.ActiveObject == null || !(who.ActiveObject is Furniture)))
             {
@@ -198,7 +198,7 @@ namespace CustomFurnitureAnywhere
                 this.heldObject.Value = (StardewValley.Object)null;
                 if (who.addItemToInventoryBool((Item)this.Revert(), false))
                 {
-                    @object.performRemoveAction((Vector2)((NetFieldBase<Vector2, NetVector2>)this.tileLocation), who.currentLocation);
+                    @object.performRemoveAction(TileLocation, who.currentLocation);
                     Game1.playSound("coin");
                     return true;
                 }

@@ -678,14 +678,14 @@ namespace TMXLoader
                         inGame.largeTerrainFeatures.Add(obj);
             }
 
-            PyTK.CustomElementHandler.SaveHandler.RebuildAll(inGame, Game1.locations);
+            //PyTK.CustomElementHandler.SaveHandler.RebuildAll(inGame, Game1.locations);
             inGame.DayUpdate(Game1.dayOfMonth);
             return true;
         }
 
         private SaveLocation getLocationSaveData(GameLocation location)
         {
-            PyTK.CustomElementHandler.SaveHandler.ReplaceAll(location, Game1.locations);
+           // PyTK.CustomElementHandler.SaveHandler.ReplaceAll(location, Game1.locations);
             string objects = "";
 
             XmlWriterSettings settings = new XmlWriterSettings();
