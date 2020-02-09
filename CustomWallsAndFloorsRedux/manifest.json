@@ -1,16 +1,16 @@
 ﻿{
-  "Name": "CustomWallsAndFloors",
+  "Name": "CustomWallsAndFloorsRedux",
   "Author": "Platonymous",
-  "Version": "1.1.7",
+  "Version": "2.1.2",
   "Description": "Add custom Walls and Floors to SDV",
   "UniqueID": "Platonymous.CustomWallsAndFloors",
-  "EntryDll": "CustomWallsAndFloors.dll",
-  "MinimumApiVersion": "2.9.3",
+  "EntryDll": "CustomWallsAndFloorsRedux.dll",
+  "MinimumApiVersion": "3.2",
   "UpdateKeys": [ "Nexus:3010" ],
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.5.1"
+      "MinimumVersion": "1.12.19"
     }
   ]
 }
