@@ -42,7 +42,7 @@ namespace PelicanTTS
 
         }
 
-        internal static void configSay(string name, string voice, string text, float pitch = -1)
+        internal static void configSay(string name, string voice, string text, int rate = -1, float pitch = -1, float volume = -1)
         {
             Task.Run(() =>
            {
@@ -59,7 +59,7 @@ namespace PelicanTTS
                if (mumbling)
                    text = @"<speak><amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" + Dialogue.convertToDwarvish(text) + @"</amazon:effect></amazon:effect></speak>";
                else
-                   text = @"<speak><amazon:auto-breaths><amazon:effect phonation='soft'>" + text + @"</amazon:effect></amazon:auto-breaths></speak>";
+                   text = @"<speak><amazon:auto-breaths><amazon:effect phonation='soft'><prosody rate='"+ (rate == -1 ? PelicanTTSMod.config.Rate : rate) + "%'>" + text + @"</prosody></amazon:effect></amazon:auto-breaths></speak>";
 
 
                int hash = text.GetHashCode();
@@ -93,8 +93,7 @@ namespace PelicanTTS
 
                speak = false;
                currentSpeech.Pitch =  (mumbling ? 0.5f : pitch == -1 ? PelicanTTSMod.config.Voices[name].Pitch : pitch);
-               currentSpeech.Volume = PelicanTTSMod.config.Volume;
-
+               currentSpeech.Volume = volume == -1 ? PelicanTTSMod.config.Volume : volume;
                currentSpeech.Play();
            });
         }
@@ -248,7 +247,7 @@ namespace PelicanTTS
                     if (mumbling)
                         currentText = @"<speak><amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" + Dialogue.convertToDwarvish(currentText) + @"</amazon:effect></amazon:effect></speak>";
                     else
-                        currentText = @"<speak><amazon:auto-breaths><amazon:effect phonation='soft'>" + currentText + @"</amazon:effect></amazon:auto-breaths></speak>";
+                        currentText = @"<speak><amazon:auto-breaths><amazon:effect phonation='soft'><prosody rate='" + PelicanTTSMod.config.Rate + "%'>" + currentText + @"</prosody></amazon:effect></amazon:auto-breaths></speak>";
 
 
                     int hash = currentText.GetHashCode();

@@ -9,6 +9,8 @@ namespace PelicanTTS
         public bool MumbleDialogues { get; set; } = false;
         public bool Greeting { get; set; } = true;
 
+        public int Rate { get; set; } = 100;
+
         public Dictionary<string, VoiceSetup> Voices { get; set; } = new Dictionary<string, VoiceSetup>();
 
     }
