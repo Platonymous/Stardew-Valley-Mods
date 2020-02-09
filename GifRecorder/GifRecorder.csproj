@@ -16,6 +16,12 @@
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Generated\gifs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Import Project="$(SolutionDir)\common.targets" />
 
 </Project>

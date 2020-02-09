@@ -194,9 +194,9 @@ namespace CropExtensions
 
                 api.RegisterLabel(ModManifest, label, description);
                 api.RegisterChoiceOption(ModManifest, "Start season", "", () => config.Presets[label].Seasons[0], (value) => config.Presets[label].Seasons[0] = value, cSeasons);
-                api.RegisterChoiceOption(ModManifest, "Start day", "", () => config.Presets[label].Days[0] == 0 ? "default" : config.Presets[label].Days[0].ToString(), (value) => config.Presets[label].Days[0] = value == "default" ? 0 : int.Parse(value), days);
+                api.RegisterClampedOption(ModManifest, "Start day", "", () => config.Presets[label].Days[0], (value) => config.Presets[label].Days[0] = (int)value,0,28);
                 api.RegisterChoiceOption(ModManifest, "End season", "", () => config.Presets[label].Seasons[1], (value) => config.Presets[label].Seasons[1] = value, cSeasons);
-                api.RegisterChoiceOption(ModManifest, "End day", "", () => config.Presets[label].Days[1] == 0 ? "default" : config.Presets[label].Days[1].ToString(), (value) => config.Presets[label].Days[1] = value == "default" ? 0 : int.Parse(value), days);
+                api.RegisterClampedOption(ModManifest, "End day", "", () => config.Presets[label].Days[1], (value) => config.Presets[label].Days[1] = (int)value, 0, 28);
             }
 
             Helper.WriteConfig<Config>(config);
