@@ -19,7 +19,7 @@ namespace PyTK.Overrides
 
             internal static bool Prefix(ref TV __instance, SFarmer who, bool justCheckingForActivity)
             {
-                if (CustomTVMod.channels.Count < 6)
+                if (CustomTVMod.channels.Count < 6 && !CustomTVMod.changed)
                     return true;
 
                 if (Game1.Date.Season == "fall" && Game1.Date.DayOfMonth == 26 && (Game1.stats.getStat("childrenTurnedToDoves") > 0U && !who.mailReceived.Contains("cursed_doll")))
@@ -30,7 +30,7 @@ namespace PyTK.Overrides
 
             internal static void Postfix(ref bool __result, ref TV __instance, SFarmer who, bool justCheckingForActivity)
             {
-                if (CustomTVMod.channels.Count < 5)
+                if (CustomTVMod.channels.Count < 6 && !CustomTVMod.changed)
                     return;
 
                 if (Game1.Date.Season == "fall" && Game1.Date.DayOfMonth == 26 && (Game1.stats.getStat("childrenTurnedToDoves") > 0U && !who.mailReceived.Contains("cursed_doll")))

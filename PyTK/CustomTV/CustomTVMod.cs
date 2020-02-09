@@ -21,6 +21,8 @@ namespace PyTK.CustomTV
         private static string rerunString { get; set; } = Game1.content.LoadString("Strings\\StringsFromCSFiles:TV.cs.13117");
         private static bool hasLoaded = false;
 
+        internal static bool changed = false;
+
         private static TemporaryAnimatedSprite tvScreen
         {
             get
@@ -170,11 +172,13 @@ namespace PyTK.CustomTV
 
         public static void addChannel(TVChannel tvChannel)
         {
+            changed = true;
             channels.AddOrReplace(tvChannel.id, tvChannel);
         }
 
         public static void changeAction(string id, Action<TV, TemporaryAnimatedSprite, SFarmer, string> action)
         {
+            changed = true;
             load();
             if (channels.ContainsKey(id))
                 channels[id].action = action;
@@ -182,11 +186,13 @@ namespace PyTK.CustomTV
 
         public static void removeChannel(string key)
         {
+            changed = true;
             removeKey(key);
         }
 
         public static void removeKey(string key)
         {
+            changed = true;
             load();
             channels.Remove(key);
         }
