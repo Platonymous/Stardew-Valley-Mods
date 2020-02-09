@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Interop;
 using Netcode;
 using PyTK.CustomElementHandler;
 using PyTK.Extensions;
@@ -10,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PyTK.Lua
 {
@@ -25,20 +28,26 @@ namespace PyTK.Lua
 
         internal static void init()
         {
-            registerTypes();
+            UserData.DefaultAccessMode = InteropAccessMode.LazyOptimized;
+
+            Task.Run(() => {
+
+                registerTypes();
+
+                if (!File.Exists(consoleChache))
+                    File.WriteAllText(consoleChache, "");
+                addGlobal("Game1", Game1.game1);
+                addGlobal("Luau", new LuaUtils());
+                addGlobal("Pyu", new PyUtils());
+                addGlobal("COD", new CustomObjectData());
+                addGlobal("Color", new Color());
+                addGlobal("Vecor2", new Vector2());
+
+                loadGlobals();
+                loadScriptFromFile(consoleChache, consoleCacheID);
+            });
             scripts = new Dictionary<string, Script>();
-            if (!File.Exists(consoleChache))
-                File.WriteAllText(consoleChache, "");
-
-            addGlobal("Game1", Game1.game1);
-            addGlobal("Luau", new LuaUtils());
-            addGlobal("Pyu", new PyUtils());
-            addGlobal("COD", new CustomObjectData());
-            addGlobal("Color", new Color());
-            addGlobal("Vecor2", new Vector2());
-
-            loadGlobals();
-            loadScriptFromFile(consoleChache, consoleCacheID);
+            
         }
 
         public static bool hasScript(string uniqueId)
@@ -139,6 +148,8 @@ namespace PyTK.Lua
 
         private static void registerTypes()
         {
+            
+
             registerType(typeof(LuaUtils),false,true);
 
             /* XNA */

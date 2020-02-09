@@ -12,16 +12,13 @@ using Harmony;
 using System.Reflection;
 using StardewValley.Menus;
 using System.Collections.Generic;
-using xTile.Format;
 using System.Linq;
-using PyTK.Tiled;
 using PyTK.Lua;
 using xTile;
 using PyTK.Overrides;
 using PyTK.APIs;
 using System.Threading;
-using System.IO;
-using Microsoft.Xna.Framework.Graphics;
+
 
 namespace PyTK
 {
@@ -60,8 +57,6 @@ namespace PyTK
             PostSerializer.Add(ModManifest, Rebuilder);
             PreSerializer.Add(ModManifest, Replacer);
             harmonyFix();
-
-            FormatManager.Instance.RegisterMapFormat(new TMXTile.TMXFormat(Game1.tileSize / Game1.pixelZoom, Game1.tileSize / Game1.pixelZoom, Game1.pixelZoom, Game1.pixelZoom));
             
             initializeResponders();
             startResponder();
@@ -175,18 +170,19 @@ namespace PyTK
 
             helper.Events.GameLoop.GameLaunched += (s, e) =>
             {
-                if (!Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu"))
-                    return;
-
                 try
                 {
                     registerCPTokens();
                 }
                 catch { }
-
             };
 
-            helper.Events.GameLoop.DayStarted += (s, e) => UpdateLuaTokens = true;
+            helper.Events.GameLoop.DayStarted += (s, e) =>
+            {
+
+                UpdateLuaTokens = true;
+                GC.Collect();
+            };
 
         }
     
@@ -203,6 +199,8 @@ namespace PyTK
 
         private void Player_Warped(object sender, WarpedEventArgs e)
         {
+            PyMaps.ImageLayerCache.Clear();
+            
             if (!e.IsLocalPlayer)
                 return;
 
@@ -280,17 +278,19 @@ namespace PyTK
         public static List<string> patchedMethods = new List<string>();
         public void GenerateSerializers()
         {
-        Thread thread = new Thread(GenerateSerializersThread);
-        thread.Start();
+            Thread thread = new Thread(GenerateSerializersThread);
+            thread.Start();
         }
 
         public void GenerateSerializersThread()
         {
             serializerReady = false;
             List<Type> AddedTypes = new List<Type>()
-        {
+            {
                 typeof(StardewValley.Object),
                 typeof(StardewValley.Objects.Furniture),
+                typeof(StardewValley.Objects.TV),
+                typeof(StardewValley.Objects.Hat),
                 typeof(StardewValley.Item),
                  typeof(StardewValley.Tool),
                  typeof(StardewValley.Farm),
@@ -302,17 +302,7 @@ namespace PyTK
                  typeof(StardewValley.GameLocation),
                  typeof(StardewValley.Locations.FarmHouse),
                  typeof(SaveGame)
-        };
-
-            List<string> AddedNamespaces = new List<string>()
-            {
-                ".Buildings",
-                ".Characters",
-                ".Locations",
-                ".Objects",
-                ".Monsters",
-                ".Tools"
-            }; 
+            };
 
             SaveGame sg = new SaveGame();
 

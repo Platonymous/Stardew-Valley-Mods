@@ -27,6 +27,8 @@ namespace PyTK.Extensions
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
+        internal static Dictionary<string, Texture2D> ImageLayerCache = new Dictionary<string, Texture2D>();
+
         /// <summary>Looks for an object of the requested type on this map position.</summary>
         /// <returns>Return the object or null.</returns>
         public static T sObjectOnMap<T>(this Vector2 t) where T : SObject
@@ -243,7 +245,7 @@ namespace PyTK.Extensions
 
         private static void drawImageLayer(Layer layer, Location offset, bool wrap = false)
         {
-            drawImageLayer(layer, Game1.mapDisplayDevice, Game1.viewport, Game1.pixelZoom, offset, wrap);
+           drawImageLayer(layer, Game1.mapDisplayDevice, Game1.viewport, Game1.pixelZoom, offset, wrap);
         }
 
         private static void drawImageLayer(Layer layer, xTile.Display.IDisplayDevice device, xTile.Dimensions.Rectangle viewport, int pixelZoom, Location offset, bool wrap = false)
@@ -253,11 +255,16 @@ namespace PyTK.Extensions
             if (layer.Properties.ContainsKey("UseImageFrom"))
                 ts = "zImageSheet_" + layer.Properties["UseImageFrom"];
 
-            Texture2D texture = Helper.Content.Load<Texture2D>(layer.Map.GetTileSheet(ts).ImageSource, ContentSource.GameContent);
-            Vector2 pos = new Vector2(offset.X, offset.Y);
+            Texture2D texture = null;
 
-
-            pos = Game1.GlobalToLocal(pos);
+            if (ImageLayerCache.ContainsKey(ts))
+                texture = ImageLayerCache[ts];
+            else
+            {
+                texture = Helper.Content.Load<Texture2D>(layer.Map.GetTileSheet(ts).ImageSource, ContentSource.GameContent);
+                ImageLayerCache.Add(ts, texture);
+            }
+            Vector2 pos = Game1.GlobalToLocal(new Vector2(offset.X, offset.Y));
 
             if (layer.Properties.ContainsKey("ParallaxX") || layer.Properties.ContainsKey("ParallaxY"))
             {
@@ -288,8 +295,6 @@ namespace PyTK.Extensions
                 string[] c = layer.Properties["Color"].ToString().Split(' ');
                 color = new Color(int.Parse(c[0]), int.Parse(c[1]), int.Parse(c[2]), c.Length > 3 ? int.Parse(c[3]) : 255);
             }
-
-
 
             Microsoft.Xna.Framework.Rectangle dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, texture.Width * Game1.pixelZoom, texture.Height * Game1.pixelZoom);
             if (!wrap)
