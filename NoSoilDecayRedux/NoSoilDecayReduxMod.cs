@@ -22,6 +22,7 @@ namespace NoSoilDecayRedux
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += (s,e) => restoreHoeDirt();
             helper.Events.GameLoop.DayEnding += (s, e) => saveHoeDirt();
+            helper.Events.GameLoop.GameLaunched += (s, e) => addConfig();
         }
 
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
@@ -40,7 +41,7 @@ namespace NoSoilDecayRedux
             if (Game1.IsMasterGame)
             {
                 foreach (SaveTiles st in savedata.data)
-                    foreach (GameLocation l in getAllLocationsAndBuidlings().Where(lb => lb.name == st.location))
+                    foreach (GameLocation l in getAllLocationsAndBuidlings().Where(lb => lb.Name == st.location))
                     {
                         if (config.farmonly && !(l is Farm || l.IsGreenhouse || l is BuildableGameLocation))
                             continue;
@@ -97,6 +98,17 @@ namespace NoSoilDecayRedux
                 savedata = new SaveData(hoeDirtChache);
                 Helper.Data.WriteSaveData("nsd.save", savedata);
             }
+        }
+
+        private void addConfig()
+        {
+            if (!Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu"))
+                return;
+
+            var api = Helper.ModRegistry.GetApi<IGMCMAPI>("spacechase0.GenericModConfigMenu");
+
+            api.RegisterModConfig(ModManifest, () => config = new Config(), () => Helper.WriteConfig<Config>(config));
+            api.RegisterSimpleOption(ModManifest, "Only on Farm-Locations", "", () => config.farmonly, (value) => config.farmonly = value);
         }
     }
     
