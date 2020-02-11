@@ -41,8 +41,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomMovies", "CustomMovie
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomMusic", "CustomMusic\CustomMusic.csproj", "{46B2BF68-888F-4058-9FA8-932A9D12A905}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomWallsAndFloors", "CustomWallsAndFloors\CustomWallsAndFloors.csproj", "{067CEBB3-824F-4EC7-91DB-9A98E45647F9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GhostTown", "GhostTown\GhostTown.csproj", "{26D418E0-499A-41FA-8D7F-C26E278AF823}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HarpOfYobaRedux", "HarpOfYobaRedux\HarpOfYobaRedux.csproj", "{B10C290B-D96F-437C-9EB6-F8B843D2B3E7}"
@@ -72,6 +70,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Visualize", "Visualize\Visualize.csproj", "{BD39D8E8-4DD1-4AF5-8AC5-85BB8824EAE4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GifRecorder", "GifRecorder\GifRecorder.csproj", "{CD6CFB58-AEC3-481F-9364-143F04817CEF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomWallsAndFloorsRedux", "CustomWallsAndFloorsRedux\CustomWallsAndFloorsRedux.csproj", "{811E0F8F-5D12-4CA1-97F8-BFFFA30CF2A6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatoWarpMenu", "PlatoWarpMenu\PlatoWarpMenu.csproj", "{A2598F1C-5DCC-4B3C-82B3-8DA6401515AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -159,12 +161,6 @@ Global
 		{46B2BF68-888F-4058-9FA8-932A9D12A905}.Release|Any CPU.ActiveCfg = Release|x86
 		{46B2BF68-888F-4058-9FA8-932A9D12A905}.Release|x86.ActiveCfg = Release|x86
 		{46B2BF68-888F-4058-9FA8-932A9D12A905}.Release|x86.Build.0 = Release|x86
-		{067CEBB3-824F-4EC7-91DB-9A98E45647F9}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{067CEBB3-824F-4EC7-91DB-9A98E45647F9}.Debug|x86.ActiveCfg = Debug|x86
-		{067CEBB3-824F-4EC7-91DB-9A98E45647F9}.Debug|x86.Build.0 = Debug|x86
-		{067CEBB3-824F-4EC7-91DB-9A98E45647F9}.Release|Any CPU.ActiveCfg = Release|x86
-		{067CEBB3-824F-4EC7-91DB-9A98E45647F9}.Release|x86.ActiveCfg = Release|x86
-		{067CEBB3-824F-4EC7-91DB-9A98E45647F9}.Release|x86.Build.0 = Release|x86
 		{26D418E0-499A-41FA-8D7F-C26E278AF823}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{26D418E0-499A-41FA-8D7F-C26E278AF823}.Debug|x86.ActiveCfg = Debug|x86
 		{26D418E0-499A-41FA-8D7F-C26E278AF823}.Debug|x86.Build.0 = Debug|x86
@@ -255,6 +251,18 @@ Global
 		{CD6CFB58-AEC3-481F-9364-143F04817CEF}.Release|Any CPU.ActiveCfg = Release|x86
 		{CD6CFB58-AEC3-481F-9364-143F04817CEF}.Release|x86.ActiveCfg = Release|x86
 		{CD6CFB58-AEC3-481F-9364-143F04817CEF}.Release|x86.Build.0 = Release|x86
+		{811E0F8F-5D12-4CA1-97F8-BFFFA30CF2A6}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{811E0F8F-5D12-4CA1-97F8-BFFFA30CF2A6}.Debug|x86.ActiveCfg = Debug|x86
+		{811E0F8F-5D12-4CA1-97F8-BFFFA30CF2A6}.Debug|x86.Build.0 = Debug|x86
+		{811E0F8F-5D12-4CA1-97F8-BFFFA30CF2A6}.Release|Any CPU.ActiveCfg = Release|x86
+		{811E0F8F-5D12-4CA1-97F8-BFFFA30CF2A6}.Release|x86.ActiveCfg = Release|x86
+		{811E0F8F-5D12-4CA1-97F8-BFFFA30CF2A6}.Release|x86.Build.0 = Release|x86
+		{A2598F1C-5DCC-4B3C-82B3-8DA6401515AE}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A2598F1C-5DCC-4B3C-82B3-8DA6401515AE}.Debug|x86.ActiveCfg = Debug|x86
+		{A2598F1C-5DCC-4B3C-82B3-8DA6401515AE}.Debug|x86.Build.0 = Debug|x86
+		{A2598F1C-5DCC-4B3C-82B3-8DA6401515AE}.Release|Any CPU.ActiveCfg = Release|x86
+		{A2598F1C-5DCC-4B3C-82B3-8DA6401515AE}.Release|x86.ActiveCfg = Release|x86
+		{A2598F1C-5DCC-4B3C-82B3-8DA6401515AE}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
