@@ -46,6 +46,9 @@ namespace PyTK.Overrides
                 return true;
             }
 
+            if (texture == null || destinationRectangle == null)
+                return false;
+
             sourceRectangle = sourceRectangle.HasValue ? sourceRectangle.Value : new Rectangle(0, 0, texture.Width, texture.Height);
 
             if (texture is MappedTexture2D mapped && mapped.Get(sourceRectangle.Value.X, sourceRectangle.Value.Y) is Texture2D t)
