@@ -24,6 +24,8 @@ namespace PlatoWarpMenu
 
         internal UIElement CurrentLocation { get; set; }
 
+        internal static Texture2D CircleMarker { get; set; }
+
 
         const int menuWidth = 1260;
         const int menuHeight = 700;
@@ -50,6 +52,9 @@ namespace PlatoWarpMenu
 
         private UIElement SetUpMenu()
         {
+            if (CircleMarker == null)
+                CircleMarker = PyDraw.getCircle(363, Color.White);
+
             UIElement menu = UIElement.GetContainer("WarpMenu", 0, UIHelper.GetCentered(0, 0, menuWidth, menuHeight), 1f);
             UIElement back = UIElement.GetImage(UIHelper.DarkTheme, Color.White * 0.9f, "Back", 1, -1).AsTiledBox(16, true);
             menu.Add(back);
@@ -199,6 +204,8 @@ namespace PlatoWarpMenu
 
         private void AddWarpMenu()
         {
+            MenuItem ArtifactsMenuItem = new MenuItem("menu.artifacts", null);
+            MenuItem CharacterMenuItem = new MenuItem("menu.characters", null);
             MenuItem OutdoorsMenuItem = new MenuItem("menu.outdoors", null);
             MenuItem IndoorsMenuItem = new MenuItem("menu.indoors", null);
             MenuItem FarmMenuItem = new MenuItem("menu.farm", null);
@@ -209,6 +216,12 @@ namespace PlatoWarpMenu
             for (int i = 0; i < locs.Count; i++)
                 if (locs[i] is GameLocation location)
                 {
+                    foreach (var npc in location.getCharacters().Where(n => n.isVillager()))
+                        CharacterMenuItem.Children.Add(new MenuItem("menu.characters." + i + "_" + npc.Name + "_", GetMenuForLocation(location, npc), false, npc.Name));
+
+                    if(location.Objects.Values.FirstOrDefault(o => o.ParentSheetIndex == 590) is StardewValley.Object)
+                        ArtifactsMenuItem.Children.Add(new MenuItem("menu.artifacts." + i + "_" + location.Name + "_", GetMenuForLocation(location, null, true), false, location.Name));
+
                     bool isCurrent = false;
                     if (Game1.currentLocation is GameLocation gl && gl == location)
                         isCurrent = true;
@@ -219,7 +232,7 @@ namespace PlatoWarpMenu
                         if (location.Map.Properties.ContainsKey("Group") && location.Map.Properties["Name"].ToString() is string n)
                             name = n;
 
-                        var menuItem = new MenuItem("menu.group_" + group + "." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, name);
+                        var menuItem = new MenuItem("menu.group_" + group + "." + i + "_" + location.Name + "_", GetMenuForLocation(location), isCurrent, name);
 
                         if (OtherMenus.ContainsKey(group))
                             OtherMenus[group].Add(menuItem);
@@ -227,13 +240,13 @@ namespace PlatoWarpMenu
                             OtherMenus.Add(group, new List<MenuItem>() { menuItem });
                     }
                     else if ((location.IsFarm || location.IsGreenhouse) && !location.Name.ToLower().StartsWith("buildable") && !location.isStructure.Value)
-                        FarmMenuItem.Children.Add(new MenuItem("menu.farm." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, location.Name));
+                        FarmMenuItem.Children.Add(new MenuItem("menu.farm." + i + "_" + location.Name + "_", GetMenuForLocation(location), isCurrent, location.Name));
                     else if (location.IsOutdoors && !location.Name.ToLower().StartsWith("buildable") && !location.isStructure.Value)
-                        OutdoorsMenuItem.Children.Add(new MenuItem("menu.outdoors." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, location.Name));
+                        OutdoorsMenuItem.Children.Add(new MenuItem("menu.outdoors." + i + "_" + location.Name + "_", GetMenuForLocation(location), isCurrent, location.Name));
                     else if (!location.Name.ToLower().StartsWith("buildable") && !location.isStructure.Value)
-                        IndoorsMenuItem.Children.Add(new MenuItem("menu.indoors." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, location.Name));
+                        IndoorsMenuItem.Children.Add(new MenuItem("menu.indoors." + i + "_" + location.Name + "_", GetMenuForLocation(location), isCurrent, location.Name));
                     else
-                        BuildingsMenuItem.Children.Add(new MenuItem("menu.buildings." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, location.Name));
+                        BuildingsMenuItem.Children.Add(new MenuItem("menu.buildings." + i + "_" + location.Name + "_", GetMenuForLocation(location), isCurrent, location.Name));
                 }
 
             if (OutdoorsMenuItem.Children.Count > 0)
@@ -247,7 +260,7 @@ namespace PlatoWarpMenu
 
             if (FarmMenuItem.Children.Count > 0)
                 menuItems.Add(FarmMenuItem);
-
+            
             foreach (var g in OtherMenus)
             {
                 var mg = new MenuItem("menu.group_" + g.Key, null,false, g.Key);
@@ -255,9 +268,15 @@ namespace PlatoWarpMenu
                     mg.Children.Add(mi);
                 menuItems.Add(mg);
             }
+
+            if (CharacterMenuItem.Children.Count > 0)
+                menuItems.Add(CharacterMenuItem);
+
+            if (ArtifactsMenuItem.Children.Count > 0)
+                menuItems.Add(ArtifactsMenuItem);
         }
 
-        private UIElement GetMenuForLocation(GameLocation location)
+        private UIElement GetMenuForLocation(GameLocation location, NPC npc = null, bool artifacts = false)
         {
             var lmenu = UIElement.GetContainer("Location Menu " + location.Name, positioner: UIHelper.GetCentered(0, 0, 1f, 1f));
 
@@ -293,7 +312,7 @@ namespace PlatoWarpMenu
             {
                     PlatoWarpMenuMod.GetLocationShot(location, () =>
                     {
-                        var image = UIElement.GetImage(PlatoWarpMenuMod._helper.Content.Load<Texture2D>("Temp/"+location.Name + ".png"), Color.White, positioner: el.Positioner);
+                        var image = UIElement.GetImage(PlatoWarpMenuMod.LastScreen, Color.White, positioner: el.Positioner);
                         image.WithInteractivity(click: (point, right, released, hold, imageContainer) =>
                          {
                              if (released && !right)
@@ -321,9 +340,32 @@ namespace PlatoWarpMenu
                         lmenu.Add(image);
                         lmenu.Remove(lmenuViewer);
                         lmenu.UpdateBounds();
+
+                        if (npc != null)
+                        {
+                            var rect = image.Bounds;
+                            int mx =(int) ((npc.getTileX() / (double) location.Map.GetLayer("Back").LayerWidth) * rect.Width);
+                            int my = (int)((npc.getTileY() / (double)location.Map.GetLayer("Back").LayerHeight) * rect.Height);
+                            var lmenuMarker = UIElement.GetImage(CircleMarker, Color.Magenta * 0.6f, positioner: UIHelper.GetTopLeft(mx - 12, my - 12, 33, 33));
+                            image.Add(lmenuMarker);
+                        }
+
+                        if (artifacts)
+                        {
+                            foreach (var spot in location.Objects.Keys.Where(o => location.Objects[o].ParentSheetIndex == 590))
+                            {
+                                var rect = image.Bounds;
+                                int mx = (int)((spot.X / (double)location.Map.GetLayer("Back").LayerWidth) * rect.Width);
+                                int my = (int)((spot.Y / (double)location.Map.GetLayer("Back").LayerHeight) * rect.Height);
+                                var lmenuMarker = UIElement.GetImage(CircleMarker, Color.Red, positioner: UIHelper.GetTopLeft(mx - 5, my - 5, 11, 11));
+                                image.Add(lmenuMarker);
+                            }
+
+                        }
                     });
                 el.WithoutInteractivity(true);
             });
+            
 
             lmenu.Add(lmenuHead);
             lmenu.Add(lmenuWarp);

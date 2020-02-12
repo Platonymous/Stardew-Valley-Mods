@@ -1,4 +1,7 @@
 ﻿{
+  "MenuButton": "Open Menu Button",
+  "menu.artifacts": "Artifact Spots",
+  "menu.characters": "Characters",
   "menu.outdoors": "Outdoors",
   "menu.indoors": "Indoors",
   "menu.buildings": "Buildings",

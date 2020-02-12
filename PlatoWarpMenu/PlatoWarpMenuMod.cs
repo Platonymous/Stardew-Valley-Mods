@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -21,7 +22,9 @@ namespace PlatoWarpMenu
         internal static GameLocation CurrentLocation;
 
         internal static Action Callback;
-        
+
+        public static Texture2D LastScreen = null;
+
         public override void Entry(IModHelper helper)
         {
             _helper = helper;
@@ -30,6 +33,8 @@ namespace PlatoWarpMenu
             config = helper.ReadConfig<Config>();
 
             helper.Events.Input.ButtonPressed += Input_ButtonPressed;
+
+            helper.Events.GameLoop.GameLaunched += (s, e) => SetUpConfigMenu();
 
             var harmony = Harmony.HarmonyInstance.Create("Platonymous.PlatoWarpMenu");
             harmony.Patch(typeof(Image).GetMethod("Save", new Type[] { typeof(string), typeof(ImageFormat) }), prefix: new Harmony.HarmonyMethod(this.GetType().GetMethod("InterceptScreenshot",System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)));
@@ -41,6 +46,7 @@ namespace PlatoWarpMenu
             Callback = callback;
             PyTK.PyUtils.setDelayedAction(1, () => _helper.Events.Display.RenderedActiveMenu += Display_Rendered);
         }
+
 
         public static void Display_Rendered(object sender, RenderedActiveMenuEventArgs e)
         {
@@ -74,7 +80,14 @@ namespace PlatoWarpMenu
                 Directory.CreateDirectory(Path.Combine(_helper.DirectoryPath, "Temp"));
 
             filename = Path.Combine(_helper.DirectoryPath, "Temp", Path.GetFileName(filename));
-            return true;
+
+            using (var mem = new MemoryStream())
+            {
+                (__instance as Bitmap).Save(mem, ImageFormat.Png);
+                LastScreen = Texture2D.FromStream(Game1.graphics.GraphicsDevice, mem);
+            }
+
+            return false;
         }
 
         private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
@@ -87,6 +100,26 @@ namespace PlatoWarpMenu
 
             if(Context.IsWorldReady)
                 WarpMenu.Open();
+        }
+
+        private void SetUpConfigMenu()
+        {
+            if (!Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu"))
+                return;
+
+            var api = Helper.ModRegistry.GetApi<IGMCMAPI>("spacechase0.GenericModConfigMenu");
+
+
+            api.RegisterModConfig(ModManifest, () =>
+            {
+                config.MenuButton = SButton.J;
+            }, () =>
+            {
+                Helper.WriteConfig<Config>(config);
+            });
+
+            api.RegisterLabel(ModManifest, ModManifest.Name, ModManifest.Description);
+            api.RegisterSimpleOption(ModManifest, i18n.Get("MenuButton"), "", () => config.MenuButton, (SButton b) => config.MenuButton = b);
         }
     }
 }
