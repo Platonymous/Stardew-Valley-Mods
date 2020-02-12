@@ -175,8 +175,34 @@ namespace CustomMovies
             return reactions;
         }
 
-        public static void GetMovieForDate(ref MovieData __result)
+        public static void GetMovieForDate(ref MovieData __result, WorldDate date)
         {
+            bool next = false;
+            if (date != new WorldDate(Game1.Date))
+            {
+                date.TotalDays -= 21;
+                next = true;
+            }
+
+            int r = date.TotalDays / 7;
+
+            var data = MovieTheater.GetMovieData();
+
+            string season = Game1.currentSeason;
+           
+            if(next && Game1.dayOfMonth > 21)
+                switch (season)
+                {
+                    case "spring" : season = "summer";break;
+                    case "summer": season = "fall";break;
+                    case "fall": season = "winter";break;
+                    case "winter": season = "spring";break;
+                }
+
+            List<MovieData> movies = data.Values.Where(m => m.ID.StartsWith(season)).ToList();
+            
+            __result = movies[r % movies.Count];
+
             if (__result.Tags.Contains("CustomMovie"))
                 CMVAssetEditor.CurrentMovie = allTheMovies[__result.Tags.Find(t => t.StartsWith("CMovieID:")).Split(':')[1]];
             else
