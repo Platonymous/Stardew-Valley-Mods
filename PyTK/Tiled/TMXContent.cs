@@ -37,25 +37,23 @@ namespace PyTK.Tiled
         {
             FileInfo pathFile = new FileInfo(path);
             Dictionary<TileSheet, Texture2D> tilesheets = Helper.Reflection.GetField<Dictionary<TileSheet, Texture2D>>(Game1.mapDisplayDevice, "m_tileSheetTextures").GetValue();
-
+            
             if (pathFile.Exists)
                 return;
             
             if (includeTilesheets)
                 foreach (TileSheet ts in map.TileSheets)
                 {
-                    if (ts.ImageSource.Contains('\\'))
-                    {
-                        string subDirectoryPath = Path.Combine(pathFile.Directory.FullName, ts.ImageSource.Split('\\')[0]);
-                        DirectoryInfo subDirectory = new DirectoryInfo(subDirectoryPath);
-                        if (!subDirectory.Exists)
-                            subDirectory.Create();
-                    }
+                    string folder = Path.Combine(Path.GetDirectoryName(path), Path.GetDirectoryName(ts.ImageSource));
 
+                    if (!Directory.Exists(folder))
+                        Directory.CreateDirectory(folder);
+     
                     if (!tilesheets.ContainsKey(ts))
                         continue;
 
-                    string exportPath = Path.Combine(pathFile.Directory.FullName, ts.ImageSource + ".png");
+                    string exportPath = Path.Combine(pathFile.Directory.FullName, Path.GetDirectoryName(ts.ImageSource), Path.GetFileNameWithoutExtension(ts.ImageSource) + ".png");
+
                     FileInfo exportFile = new FileInfo(exportPath);
 
                     if (exportFile.Exists)
@@ -68,8 +66,11 @@ namespace PyTK.Tiled
                         if(monitor != null)
                             monitor.Log("Saving: " + exportFile.Name);
                     }
-                    catch
+                    catch (Exception e)
                     {
+                        Monitor.Log(e.Message, LogLevel.Error);
+                        Monitor.Log(e.StackTrace, LogLevel.Error);
+
                         try
                         {
                             string normalized = ts.ImageSource.Split('.')[0];
@@ -87,13 +88,23 @@ namespace PyTK.Tiled
                                 ts.ImageSource = normalized;
                             }
                         }
-                        catch
+                        catch(Exception e2)
                         {
-
+                            Monitor.Log(e2.Message, LogLevel.Error);
+                            Monitor.Log(e2.StackTrace, LogLevel.Error);
                         }
                     }
                 }
 
+            List<xTile.Layers.Layer> layers = new List<xTile.Layers.Layer>();
+
+            foreach (var layer in map.Layers)
+                if (layer.Properties.ContainsKey("DrawChecked"))
+                {
+                    layers.Add(layer);
+                    layer.Properties.Remove("DrawChecked");
+                }
+                    
             try
             {
                 MemoryStream mem = map2tmx(map);
@@ -107,6 +118,9 @@ namespace PyTK.Tiled
             {
 
             }
+
+            foreach (var layer in layers)
+                layer.Properties.Add("DrawChecked", true);
         }
 
         public static bool Convert (string pathIn, string pathOut, IModHelper helper, ContentSource contentSource = ContentSource.ModFolder, IMonitor monitor = null)

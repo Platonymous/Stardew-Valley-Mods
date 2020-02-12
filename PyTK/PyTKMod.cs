@@ -18,7 +18,10 @@ using xTile;
 using PyTK.Overrides;
 using PyTK.APIs;
 using System.Threading;
-
+using StardewValley.Objects;
+using Netcode;
+using StardewValley.Buildings;
+using StardewValley.Locations;
 
 namespace PyTK
 {
@@ -38,6 +41,8 @@ namespace PyTK
         internal static bool UpdateLuaTokens = false;
         internal static Dictionary<IManifest, Func<object, object>> PreSerializer = new Dictionary<IManifest, Func<object, object>>();
         internal static Dictionary<IManifest, Func<object, object>> PostSerializer = new Dictionary<IManifest, Func<object, object>>();
+
+        internal static object waitForIt = new object();
         internal static PyTKMod _instance { get; set; }
         internal static IMonitor _monitor {
             get {
@@ -251,6 +256,7 @@ namespace PyTK
             instance.PatchAll(Assembly.GetExecutingAssembly());
 
             instance.Patch(typeof(SaveGame).GetMethod("Load",BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
+
             GenerateSerializers();
 
             Helper.Events.GameLoop.DayStarted += (s, e) => saveWasLoaded = true;
@@ -266,14 +272,17 @@ namespace PyTK
             Helper.Events.GameLoop.DayStarted -= GameLoop_DayStarted;
         }
 
-        public static bool serializerReady = false;
         public static bool saveWasLoaded = false;
 
         public static void saveLoadedXMLFix()
         {
-            saveWasLoaded = true;
-            while (!serializerReady)
-                Thread.Sleep(10);
+            if (saveWasLoaded)
+                return;
+
+            lock (waitForIt)
+            {
+                saveWasLoaded = true;
+            }
         }
 
 
@@ -286,8 +295,9 @@ namespace PyTK
 
         public void GenerateSerializersThread()
         {
-            serializerReady = false;
-            List<Type> AddedTypes = new List<Type>()
+            lock (waitForIt)
+            {
+                List<Type> AddedTypes = new List<Type>()
             {
                 typeof(StardewValley.Object),
                 typeof(StardewValley.Objects.Furniture),
@@ -306,12 +316,13 @@ namespace PyTK
                  typeof(SaveGame)
             };
 
-            SaveGame sg = new SaveGame();
+                SaveGame sg = new SaveGame();
 
-            foreach (Type type in AddedTypes)// typeof(Game1).Assembly.GetTypes().Where(t => t.GetConstructor(new Type[] { }) != null && !t.IsGenericType && t.IsPublic && t.IsClass && t.Namespace != null && t.Namespace.Contains("Stardew") && AddedNamespaces.Exists(n => t.Namespace.Contains(n))))
-                SaveGame.GetSerializer(type);
+                foreach (Type type in AddedTypes)// typeof(Game1).Assembly.GetTypes().Where(t => t.GetConstructor(new Type[] { }) != null && !t.IsGenericType && t.IsPublic && t.IsClass && t.Namespace != null && t.Namespace.Contains("Stardew") && AddedNamespaces.Exists(n => t.Namespace.Contains(n))))
+                    SaveGame.GetSerializer(type);
 
-            PatchGeneratedSerializers();
+                PatchGeneratedSerializers();
+            }
         }
 
 
@@ -320,8 +331,6 @@ namespace PyTK
             foreach (var ass in AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains("Microsoft.GeneratedCode")))
                 foreach (var ty in ass.GetTypes().Where(t => t.Name.StartsWith("XmlSerializationWriter") || t.Name.StartsWith("XmlSerializationReader")))
                     PatchGeneratedSerializerType(ty);
-
-            serializerReady = true;
         }
 
         public static void PatchGeneratedSerializerType(Type ty)

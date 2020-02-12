@@ -1,16 +1,6 @@
-﻿using Harmony;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using PyTK;
-using PyTK.Extensions;
-using PyTK.Tiled;
-using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework;
 using StardewValley;
-using StardewValley.Events;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using xTile;
 
 namespace TMXLoader.Compatibility

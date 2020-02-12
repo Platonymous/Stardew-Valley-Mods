@@ -399,6 +399,12 @@ namespace TMXLoader
                    
                 }
 
+                if (!map.Properties.ContainsKey("Group"))
+                    map.Properties.Add("Group", "Buildables");
+
+                if (!map.Properties.ContainsKey("Name"))
+                    map.Properties.Add("Name", edit.name);
+
                 if (m == null)
                     map.inject("Maps/" + e.name);
 
@@ -780,10 +786,8 @@ namespace TMXLoader
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
             if (config.converter)
-            {
                 exportAllMaps();
-                convert();
-            }
+
             loadContentPacks();
             setTileActions();
 
@@ -811,6 +815,18 @@ namespace TMXLoader
                 }
 
             }).register();
+
+            helper.ConsoleCommands.Add("export_map", "Exports current map as tmx file", (s, p) =>
+             {
+                 if(Context.IsWorldReady && Game1.currentLocation is GameLocation location && location.Map is Map map)
+                 {
+                     string exportFolderPath = Path.Combine(helper.DirectoryPath, "Exports");
+                     if (Directory.Exists(exportFolderPath))
+                         Directory.CreateDirectory(exportFolderPath);
+
+                     TMXContent.Save(location.Map, Path.Combine(exportFolderPath, Path.GetFileNameWithoutExtension(location.mapPath.Value) + ".tmx"), true, Monitor);
+                 }
+             });
 
             fixCompatibilities();
             harmonyFix();
@@ -938,8 +954,6 @@ namespace TMXLoader
             if (!Game1.locations.Contains(location))
                 Game1.locations.Add(location);
 
-          //  location.seasonUpdate(Game1.currentSeason, true);
-
             monitor.Log("Successfully added:" + location.Name);
 
             return location;
@@ -1010,6 +1024,21 @@ namespace TMXLoader
                 {
                     Map map = TMXContent.Load(edit.file, Helper, pack);
                     TMXAssetEditor.editWarps(map, edit.addWarps, edit.removeWarps, map);
+
+                    string groupName = "TMXL";
+
+                    if (pack.Manifest.UniqueID.Contains("StardewValleyExpanded"))
+                        groupName = "SDV Expanded";
+
+                    if (edit.addLocation)
+                    {
+                        if (!map.Properties.ContainsKey("Group"))
+                            map.Properties.Add("Group", groupName);
+
+                        if (!map.Properties.ContainsKey("Name"))
+                            map.Properties.Add("Name", edit.name);
+                    }
+
                     map.inject("Maps/" + edit.name);
 
                     edit._map = map;
@@ -1074,43 +1103,15 @@ namespace TMXLoader
             return editor;
         }
 
-        private void convert()
-        {
-            Monitor.Log("Converting..", LogLevel.Trace);
-            string inPath = Path.Combine(Helper.DirectoryPath, "Converter", "IN");
-
-
-
-            string[] directories = Directory.GetDirectories(inPath, "*.*", SearchOption.TopDirectoryOnly);
-
-            foreach (string dir in directories)
-            {
-                DirectoryInfo inddir = new DirectoryInfo(dir);
-                DirectoryInfo outdir = new DirectoryInfo(dir.Replace("IN", "OUT"));
-                if (!outdir.Exists)
-                    outdir.Create();
-
-                foreach (FileInfo file in inddir.GetFiles())
-                {
-                    string importPath = Path.Combine("Converter", "IN", inddir.Name, file.Name);
-                    string exportPath = Path.Combine("Converter", "OUT", inddir.Name, file.Name).Replace(".xnb", ".tmx").Replace(".tbin", ".tmx");
-                    if (TMXContent.Convert(importPath, exportPath, Helper, ContentSource.ModFolder, Monitor))
-                        file.Delete();
-                }
-            }
-            Monitor.Log("..Done!", LogLevel.Trace);
-        }
-
         private void exportAllMaps()
         {
             string exportFolderPath = Path.Combine(Helper.DirectoryPath, "Converter", "FullMapExport");
-            DirectoryInfo exportFolder = new DirectoryInfo(exportFolderPath);
-            DirectoryInfo modFolder = new DirectoryInfo(Helper.DirectoryPath);
+            if (Directory.Exists(exportFolderPath))
+                Directory.CreateDirectory(exportFolderPath);
+
             string contentPath = PyUtils.ContentPath;
 
-            if (!exportFolder.Exists && contentPath != null && contentPath != "")
-                exportFolder.Create();
-            else
+            if (contentPath == null || contentPath == "")
                 return;
 
             string[] files = Directory.GetFiles(Path.Combine(contentPath, "Maps"), "*.xnb", SearchOption.TopDirectoryOnly);
