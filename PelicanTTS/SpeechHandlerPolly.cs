@@ -172,10 +172,10 @@ namespace PelicanTTS
             speakerName = name;
 
             string t = PelicanTTSMod.i18n.Get(name);
-            if (t.ToString() != "")
+            if (t.ToString() != "" && !t.Contains("no translation"))
                 return t;
 
-            return "default_" + (female ? "female" : "male");
+            return PelicanTTSMod.i18n.Get("default_" + (female ? "female" : "male"));
         }
 
 

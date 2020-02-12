@@ -29,7 +29,9 @@ namespace PelicanTTS
             _helper = helper;
             config = Helper.ReadConfig<ModConfig>();
 
-            Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+            Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
+
+            helper.ConsoleCommands.Add("tts_update", "Updates new NPCs", (s,p) => setUpNPCConfig());
 
             Helper.WriteConfig<ModConfig>(config);
             string tmppath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "Content"), "TTS");
@@ -51,7 +53,15 @@ namespace PelicanTTS
 
         }
 
-        private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
+        private void GameLoop_OneSecondUpdateTicked(object sender, OneSecondUpdateTickedEventArgs e)
+        {
+            setUpNPCConfig();
+            setUpConfig();
+            Helper.Events.GameLoop.OneSecondUpdateTicked -= GameLoop_OneSecondUpdateTicked;
+
+        }
+
+        private void setUpNPCConfig()
         {
             var npcs = Helper.Content.Load<Dictionary<string, string>>("Data//NPCDispositions", ContentSource.GameContent);
             foreach (string npc in npcs.Keys)
@@ -61,8 +71,8 @@ namespace PelicanTTS
             }
             config.Rate = Math.Max(50, Math.Min(config.Rate, 200));
             Helper.WriteConfig<ModConfig>(config);
-            setUpConfig();
         }
+       
         public static Dictionary<string, MenuVoiceSetup> activeVoiceSetup = new Dictionary<string, MenuVoiceSetup>();
         public static int activeRate = 100;
         public static float activeVolume = 1;
