@@ -21,7 +21,7 @@ namespace PlatoWarpMenu
         internal static GameLocation CurrentLocation;
 
         internal static Action Callback;
-
+        
         public override void Entry(IModHelper helper)
         {
             _helper = helper;

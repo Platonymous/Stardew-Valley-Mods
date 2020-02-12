@@ -13,13 +13,17 @@ namespace PlatoWarpMenu
 
         public UIElement Screen { get; }
 
-        public MenuItem(string id, UIElement screen, string name = "")
+        public bool Special { get; set; } = false;
+
+        public MenuItem(string id, UIElement screen, bool special = false, string name = "")
         {
             Id = id;
             Screen = screen;
 
             if (name == "")
                 name = WarpMenu.i18n.Get(Id);
+
+            Special = special;
 
             Name = name;
         }

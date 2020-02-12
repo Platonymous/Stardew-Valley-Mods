@@ -22,6 +22,8 @@ namespace PlatoWarpMenu
 
         internal UIElement InfoBack { get; set; }
 
+        internal UIElement CurrentLocation { get; set; }
+
 
         const int menuWidth = 1260;
         const int menuHeight = 700;
@@ -85,8 +87,6 @@ namespace PlatoWarpMenu
                     AddLeftMenuOption(leftMenu, item, i);
 
             menu.Add(leftMenu);
-            if (leftMenu.Children.FirstOrDefault() is UIElement element)
-                element.ClickAction.Invoke(Point.Zero, false, true, false,element);
         }
 
         private void AddLeftMenuOption(UIElement leftMenu, MenuItem item, int index, int row = 0)
@@ -103,6 +103,9 @@ namespace PlatoWarpMenu
             button.Z = row;
             button.Add(text);
             leftMenu.Add(button);
+
+            if (item.Special)
+                PyTK.PyUtils.setDelayedAction(100, () => button.ClickAction(Point.Zero, false, true, false, button));
 
             if (row > 0)
             {
@@ -206,25 +209,31 @@ namespace PlatoWarpMenu
             for (int i = 0; i < locs.Count; i++)
                 if (locs[i] is GameLocation location)
                 {
+                    bool isCurrent = false;
+                    if (Game1.currentLocation is GameLocation gl && gl == location)
+                        isCurrent = true;
+
                     if (location.Map.Properties.ContainsKey("Group") && location.Map.Properties["Group"].ToString() is string group)
                     {
                         string name = location.Name;
                         if (location.Map.Properties.ContainsKey("Group") && location.Map.Properties["Name"].ToString() is string n)
                             name = n;
 
+                        var menuItem = new MenuItem("menu.group_" + group + "." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, name);
+
                         if (OtherMenus.ContainsKey(group))
-                            OtherMenus[group].Add(new MenuItem("menu.group_" + group + "." + i + "_" + location.Name, GetMenuForLocation(location), name));
+                            OtherMenus[group].Add(menuItem);
                         else
-                            OtherMenus.Add(group, new List<MenuItem>() { new MenuItem("menu.group_" + group + "." + i + "_" + location.Name, GetMenuForLocation(location), name) });
+                            OtherMenus.Add(group, new List<MenuItem>() { menuItem });
                     }
                     else if ((location.IsFarm || location.IsGreenhouse) && !location.Name.ToLower().StartsWith("buildable") && !location.isStructure.Value)
-                        FarmMenuItem.Children.Add(new MenuItem("menu.farm." + i + "_" + location.Name, GetMenuForLocation(location), location.Name));
+                        FarmMenuItem.Children.Add(new MenuItem("menu.farm." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, location.Name));
                     else if (location.IsOutdoors && !location.Name.ToLower().StartsWith("buildable") && !location.isStructure.Value)
-                        OutdoorsMenuItem.Children.Add(new MenuItem("menu.outdoors." + i + "_" + location.Name, GetMenuForLocation(location), location.Name));
+                        OutdoorsMenuItem.Children.Add(new MenuItem("menu.outdoors." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, location.Name));
                     else if (!location.Name.ToLower().StartsWith("buildable") && !location.isStructure.Value)
-                        IndoorsMenuItem.Children.Add(new MenuItem("menu.indoors." + i + "_" + location.Name, GetMenuForLocation(location), location.Name));
+                        IndoorsMenuItem.Children.Add(new MenuItem("menu.indoors." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, location.Name));
                     else
-                        BuildingsMenuItem.Children.Add(new MenuItem("menu.buildings." + i + "_" + location.Name, GetMenuForLocation(location), location.Name));
+                        BuildingsMenuItem.Children.Add(new MenuItem("menu.buildings." + i + "_" + location.Name, GetMenuForLocation(location), isCurrent, location.Name));
                 }
 
             if (OutdoorsMenuItem.Children.Count > 0)
@@ -241,7 +250,7 @@ namespace PlatoWarpMenu
 
             foreach (var g in OtherMenus)
             {
-                var mg = new MenuItem("menu.group_" + g.Key, null, g.Key);
+                var mg = new MenuItem("menu.group_" + g.Key, null,false, g.Key);
                 foreach (var mi in g.Value)
                     mg.Children.Add(mi);
                 menuItems.Add(mg);
