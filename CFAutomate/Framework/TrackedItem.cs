@@ -32,6 +32,8 @@ namespace CFAutomate.Framework
         /// <summary>The number of items in the stack.</summary>
         public int Count => this.Item.Stack;
 
+        public ItemType Type => throw new NotImplementedException("Can't track a null item type.");
+
 
         /*********
         ** Public methods
