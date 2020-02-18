@@ -193,6 +193,12 @@ namespace PelicanTTS
                 {
                     DialogueBox dialogueBox = (DialogueBox)Game1.activeClickableMenu;
 
+                    if (!dialogueBox.isPortraitBox() && !PelicanTTSMod.config.ReadNonCharacterMessages)
+                        return;
+
+                    if (dialogueBox.isPortraitBox() && !PelicanTTSMod.config.ReadDialogues)
+                        return;
+
                     if (dialogueBox.isPortraitBox() && Game1.currentSpeaker != null)
                         setVoice(Game1.currentSpeaker.Name, Game1.currentSpeaker.Gender != 0);
                     else
@@ -205,7 +211,7 @@ namespace PelicanTTS
                     }
 
                 }
-                else if (Game1.activeClickableMenu is LetterViewerMenu lvm && !PelicanTTSMod.config.MumbleDialogues)
+                else if (Game1.activeClickableMenu is LetterViewerMenu lvm && !PelicanTTSMod.config.MumbleDialogues && PelicanTTSMod.config.ReadLetters)
                 {
                     setVoice("default");
                     List<string> mailMessage = Helper.Reflection.GetField<List<string>>(lvm, "mailMessage").GetValue();
@@ -216,7 +222,7 @@ namespace PelicanTTS
                         lastLetter = letter;
                     }
                 }
-                else if (Game1.hudMessages.Count > 0 && !PelicanTTSMod.config.MumbleDialogues)
+                else if (Game1.hudMessages.Count > 0 && !PelicanTTSMod.config.MumbleDialogues && PelicanTTSMod.config.ReadHudMessages)
                 {
                     if (Game1.hudMessages[Game1.hudMessages.Count - 1].Message != lastHud)
                     {
