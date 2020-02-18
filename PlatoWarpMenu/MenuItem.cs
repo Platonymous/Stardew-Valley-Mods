@@ -9,7 +9,7 @@ namespace PlatoWarpMenu
 
         public string Name { get; }
 
-        public List<MenuItem> Children { get; } = new List<MenuItem>();
+        public List<MenuItem> Children { get; set; } = new List<MenuItem>();
 
         public UIElement Screen { get; }
 

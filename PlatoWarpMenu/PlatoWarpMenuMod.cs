@@ -12,7 +12,7 @@ namespace PlatoWarpMenu
 {
     public class PlatoWarpMenuMod : Mod
     {
-        internal Config config;
+        public Config config;
         internal ITranslationHelper i18n => Helper.Translation;
 
         internal static bool intercept = false;
@@ -25,8 +25,11 @@ namespace PlatoWarpMenu
 
         public static Texture2D LastScreen = null;
 
+        internal static PlatoWarpMenuMod instance;
+
         public override void Entry(IModHelper helper)
         {
+            instance = this;
             _helper = helper;
             WarpMenu.Helper = Helper;
 
@@ -57,7 +60,7 @@ namespace PlatoWarpMenu
                 try
                 {
                     Game1.spriteBatch.End();
-                    Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.Name);
+                    Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name);
                     Game1.spriteBatch.Begin();
                 }
                 catch
@@ -81,6 +84,9 @@ namespace PlatoWarpMenu
 
             filename = Path.Combine(_helper.DirectoryPath, "Temp", Path.GetFileName(filename));
 
+            if (instance.config.UseTempFolder)
+                return true;
+
             using (var mem = new MemoryStream())
             {
                 (__instance as Bitmap).Save(mem, ImageFormat.Png);
@@ -97,7 +103,6 @@ namespace PlatoWarpMenu
             if (e.Button != config.MenuButton)
                 return;
 
-
             if(Context.IsWorldReady)
                 WarpMenu.Open();
         }
@@ -113,6 +118,7 @@ namespace PlatoWarpMenu
             api.RegisterModConfig(ModManifest, () =>
             {
                 config.MenuButton = SButton.J;
+                config.UseTempFolder = false;
             }, () =>
             {
                 Helper.WriteConfig<Config>(config);
@@ -120,6 +126,8 @@ namespace PlatoWarpMenu
 
             api.RegisterLabel(ModManifest, ModManifest.Name, ModManifest.Description);
             api.RegisterSimpleOption(ModManifest, i18n.Get("MenuButton"), "", () => config.MenuButton, (SButton b) => config.MenuButton = b);
+            api.RegisterSimpleOption(ModManifest, i18n.Get("UseTempFolder"), "", () => config.UseTempFolder, (bool b) => config.UseTempFolder = b);
+
         }
     }
 }

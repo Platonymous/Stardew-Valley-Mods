@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,6 +8,8 @@ using PyTK;
 using PyTK.PlatoUI;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Buildings;
+using StardewValley.Locations;
 
 namespace PlatoWarpMenu
 {
@@ -219,10 +222,20 @@ namespace PlatoWarpMenu
                     foreach (var npc in location.getCharacters().Where(n => n.isVillager()))
                         CharacterMenuItem.Children.Add(new MenuItem("menu.characters." + i + "_" + npc.Name + "_", GetMenuForLocation(location, npc), false, npc.Name));
 
-                    if(location.Objects.Values.FirstOrDefault(o => o.ParentSheetIndex == 590) is StardewValley.Object)
+                    if (location.Objects.Values.FirstOrDefault(o => o.ParentSheetIndex == 590) is StardewValley.Object)
                         ArtifactsMenuItem.Children.Add(new MenuItem("menu.artifacts." + i + "_" + location.Name + "_", GetMenuForLocation(location, null, true), false, location.Name));
 
+                    if (location is BuildableGameLocation bgl)
+                    {
+                        foreach (Building b in bgl.buildings.Where(bu => bu.indoors.Value is GameLocation))
+                        {
+                            bool current = b.indoors.Value == Game1.currentLocation;
+                            BuildingsMenuItem.Children.Add(new MenuItem("menu.buildings." + i + "_" + b.indoors.Value.uniqueName.Value + "_", GetMenuForLocation(b.indoors.Value, null,false,true), current, b.indoors.Value.uniqueName.Value + $"(X{b.humanDoor.X} Y{b.humanDoor.Y})"));
+                        }
+                    }
+
                     bool isCurrent = false;
+
                     if (Game1.currentLocation is GameLocation gl && gl == location)
                         isCurrent = true;
 
@@ -266,21 +279,28 @@ namespace PlatoWarpMenu
                 var mg = new MenuItem("menu.group_" + g.Key, null,false, g.Key);
                 foreach (var mi in g.Value)
                     mg.Children.Add(mi);
+                mg.Children = mg.Children.OrderBy(c => c.Name).ToList();
                 menuItems.Add(mg);
             }
 
             if (CharacterMenuItem.Children.Count > 0)
+            {
+                CharacterMenuItem.Children = CharacterMenuItem.Children.OrderBy(c => c.Name).ToList();
                 menuItems.Add(CharacterMenuItem);
+            }
 
             if (ArtifactsMenuItem.Children.Count > 0)
+            {
+                ArtifactsMenuItem.Children = ArtifactsMenuItem.Children.OrderBy(c => c.Name).ToList();
                 menuItems.Add(ArtifactsMenuItem);
+            }
         }
 
-        private UIElement GetMenuForLocation(GameLocation location, NPC npc = null, bool artifacts = false)
+        private UIElement GetMenuForLocation(GameLocation location, NPC npc = null, bool artifacts = false, bool structure = false)
         {
             var lmenu = UIElement.GetContainer("Location Menu " + location.Name, positioner: UIHelper.GetCentered(0, 0, 1f, 1f));
 
-            var lmenuHead = new UITextElement(location.Name, Game1.dialogueFont, Color.White, 0.7f, positioner: UIHelper.GetTopCenter(0, 5));
+            var lmenuHead = new UITextElement(!structure ? location.Name : location.uniqueName.Value, Game1.dialogueFont, Color.White, 0.7f, positioner: UIHelper.GetTopCenter(0, 5));
            
             var back = location.Map.GetLayer("Back");
             
@@ -312,7 +332,10 @@ namespace PlatoWarpMenu
             {
                     PlatoWarpMenuMod.GetLocationShot(location, () =>
                     {
-                        var image = UIElement.GetImage(PlatoWarpMenuMod.LastScreen, Color.White, positioner: el.Positioner);
+                        Texture2D screen = PlatoWarpMenuMod.LastScreen;
+                        if (PlatoWarpMenuMod.instance.config.UseTempFolder)
+                            screen = Helper.Content.Load<Texture2D>(Path.Combine("Temp", (location.isStructure.Value ? location.uniqueName.Value : location.Name) + ".png"));
+                        var image = UIElement.GetImage(screen, Color.White, positioner: el.Positioner);
                         image.WithInteractivity(click: (point, right, released, hold, imageContainer) =>
                          {
                              if (released && !right)
@@ -320,7 +343,7 @@ namespace PlatoWarpMenu
                                  if (!location.isTileLocationTotallyClearAndPlaceableIgnoreFloors(new Vector2(tPoint.X, tPoint.Y)))
                                      return;
                                  Game1.activeClickableMenu = null;
-                                 Game1.player.warpFarmer(new Warp(0, 0, location.Name, tPoint.X, tPoint.Y, false));
+                                 Game1.player.warpFarmer(new Warp(0, 0, structure ? location.uniqueName.Value : location.Name, tPoint.X, tPoint.Y, false));
                              }
                          }, hover: (point, drag, imageContainer) =>
                            {
