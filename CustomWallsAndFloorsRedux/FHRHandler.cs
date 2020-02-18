@@ -27,7 +27,7 @@ namespace CustomWallsAndFloorsRedux
                             results.Add(frooms.IndexOf(data.Key));
                 }
             }
-            catch (Exception e)
+            catch
             {
 
             }

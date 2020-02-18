@@ -12,8 +12,6 @@ using PyTK.Extensions;
 using System.Linq;
 using StardewValley.Objects;
 using PyTK.Types;
-using StardewValley.Locations;
-using System;
 
 namespace CustomWallsAndFloorsRedux
 {
@@ -69,13 +67,12 @@ namespace CustomWallsAndFloorsRedux
 
             helper.Events.Player.Warped += (st, e) =>
             {
-                foreach (var req in Requests.Where(r => r.Location == e.NewLocation.Name).ToList())
-                    LoadReceivedData(req, e.NewLocation);
+                foreach (var req in Requests.Where(r => (r.Location == e.NewLocation.Name && !r.Structure)||(r.Structure && r.Location == e.NewLocation.uniqueName.Value)).ToList())
+                        LoadReceivedData(req, e.NewLocation);
             };
 
             helper.ConsoleCommands.Add("reset_walls", "removes all custom walls and floors", (s, p) => reset());
             helper.ConsoleCommands.Add("reload_walls", "reloads all custom walls and floors", (s, p) => LoadSavedWallsAndFloors());
-
         }
 
         private void reset()
@@ -102,9 +99,9 @@ namespace CustomWallsAndFloorsRedux
                 foreach (SavedWallpaper sav in saveData.Wallpaper)
                 {
 
-                    if (Game1.IsMultiplayer || (Game1.currentLocation is GameLocation l && sav.Location == l.Name))
+                    if (Game1.IsMultiplayer || (Game1.currentLocation is GameLocation l && ((!sav.Structure && sav.Location == l.Name)  || (sav.Structure && sav.Location == l.uniqueName.Value))))
                     {
-                        if (Sets.FirstOrDefault(s => s.Pack.Manifest.UniqueID == sav.SetId) is CustomSet set && Game1.getLocationFromName(sav.Location) is GameLocation location)
+                        if (Sets.FirstOrDefault(s => s.Pack.Manifest.UniqueID == sav.SetId) is CustomSet set && Game1.getLocationFromName(sav.Location, sav.Structure) is GameLocation location)
                             if (sav.IsFloors && set.HasFloors && set.GetFloors().FirstOrDefault(f => f.CustomIndex == sav.CustomIndex) is CustomWallpaper cf)
                                 cf.place(location, sav.X, sav.Y, send);
                             else if (!sav.IsFloors && set.HasWalls && set.GetWalls().FirstOrDefault(w => w.CustomIndex == sav.CustomIndex) is CustomWallpaper cw)
@@ -118,11 +115,11 @@ namespace CustomWallsAndFloorsRedux
         {
             wallpaperReceiver = new PyReceiver<SavedWallpaper>(wpReceiverName, (w) =>
             {
-                if (Game1.getLocationFromName(w.Location) is GameLocation location)
+                if (Game1.getLocationFromName(w.Location,w.Structure) is GameLocation location)
                 {
                     if (!Game1.IsMasterGame)
                     {
-                        if (Game1.currentLocation.Name == w.Location)
+                        if (Game1.currentLocation == location)
                         {
                             LoadReceivedData(w, location);
                         }
@@ -190,7 +187,7 @@ namespace CustomWallsAndFloorsRedux
 
             try
             {
-                if (tileLayer.Tiles[tileX, tileY] is Tile tile && tile.TileSheet.Id != "walls_and_floors")
+                if (tileLayer.Tiles[tileX, tileY] is Tile tile && !tile.TileSheet.Id.Contains("walls"))
                     return false;
             }
             catch { }
@@ -225,7 +222,7 @@ namespace CustomWallsAndFloorsRedux
 
             try
             {
-                if (tileLayer.Tiles[tileX, tileY] is Tile tile && tile.TileSheet.Id != "walls_and_floors")
+                if (tileLayer.Tiles[tileX, tileY] is Tile tile && !tile.TileSheet.Id.Contains("walls"))
                     return;
             }
             catch { }
@@ -241,9 +238,8 @@ namespace CustomWallsAndFloorsRedux
 
                 if (CustomWallpaper.BeingSaved.ShouldBeSend)
                     foreach (Farmer farmer in Game1.getAllFarmers().Where(f => f.isActive() && f != Game1.player))
-                    {
                         PyTK.PyNet.sendDataToFarmer(wpReceiverName, CustomWallpaper.BeingSaved, farmer, SerializationType.JSON);
-                    }
+
                 CustomWallpaper.BeingSaved = null;
             }
 
@@ -269,11 +265,13 @@ namespace CustomWallsAndFloorsRedux
             }
 
             Layer cwfLayer;
-
-            if (!TryGetLayer(__instance.Map, tsid + "_" + layer, out cwfLayer))
+            string cwflayerid = tsid + "_" + layer + "_" + __instance.Name.ToLower().Trim().Replace(" ", "_");
+            if (!TryGetLayer(__instance.Map, cwflayerid, out cwfLayer))
             {
-                cwfLayer = new Layer(tsid + "_" + layer, __instance.Map, tileLayer.LayerSize, tileLayer.TileSize);
+                cwfLayer = new Layer(cwflayerid, __instance.Map, tileLayer.LayerSize, tileLayer.TileSize);
                 cwfLayer.Properties.Add("DrawAbove", layer);
+                if(__instance.uniqueName.Value != null)
+                cwfLayer.Properties.Add("DrawConditions", "LC Game1.currentLocation.uniqueName.Value == '" + __instance.uniqueName.Value +"'");
                 __instance.Map.AddLayer(cwfLayer);
                 __instance.Map.enableMoreMapLayers();
             }

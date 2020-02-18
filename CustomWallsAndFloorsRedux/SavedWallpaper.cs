@@ -27,14 +27,18 @@ namespace CustomWallsAndFloorsRedux
 
         public string Layer { get; set; }
 
+        public bool Structure { get; set; }
+
         internal bool ShouldBeSend { get; set; } = false;
+
+
 
         public SavedWallpaper()
         {
 
         }
 
-        public SavedWallpaper(string id, int index, string location, int x, int y, bool isFloors, bool shouldBeSend = false)
+        public SavedWallpaper(string id, int index, string location, int x, int y, bool isFloors, bool shouldBeSend = false, bool isStructure = false)
         {
             SetId = id;
             CustomIndex = index;
@@ -43,6 +47,7 @@ namespace CustomWallsAndFloorsRedux
             Y = y;
             IsFloors = isFloors;
             ShouldBeSend = shouldBeSend;
+            Structure = isStructure;
         }
 
     }

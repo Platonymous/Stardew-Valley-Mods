@@ -113,14 +113,15 @@ namespace CustomWallsAndFloorsRedux
                         if (floors[whichRoom].Contains(point))
                         {
                             CustomWallsAndFloorsMod.Placing = true;
-                            BeingSaved = new SavedWallpaper(Set.Pack.Manifest.UniqueID, CustomIndex, location.Name, x, y, isFloor, send);
+                            BeingSaved = new SavedWallpaper(Set.Pack.Manifest.UniqueID, CustomIndex, location.isStructure.Value ? location.uniqueName.Value : location.Name, x, y, isFloor, send, location.isStructure.Value);
                             BeingPlaced = this;
+
                             currentLocation.GetType().GetMethod("doSetVisibleFloor", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(currentLocation, new object[] { whichRoom, ParentSheetIndex });
-                            
+
                             if (currentLocation is FarmHouse fh)
                                 foreach (var r in FHRHandler.GetConnectedWalls(fh, whichRoom, isFloor.Value))
                                     currentLocation.GetType().GetMethod("doSetVisibleFloor", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(currentLocation, new object[] { r, ParentSheetIndex });
-
+                                    
                             BeingPlaced = null;
                             CustomWallsAndFloorsMod.Placing = false;
                         }
@@ -130,14 +131,15 @@ namespace CustomWallsAndFloorsRedux
                         if (walls[whichRoom].Contains(point))
                         {
                             CustomWallsAndFloorsMod.Placing = true;
-                            BeingSaved = new SavedWallpaper(Set.Pack.Manifest.UniqueID, CustomIndex, location.Name, x, y, isFloor, send);
+                            BeingSaved = new SavedWallpaper(Set.Pack.Manifest.UniqueID, CustomIndex, location.isStructure.Value ? location.uniqueName.Value : location.Name, x, y, isFloor, send, location.isStructure.Value);
                             BeingPlaced = this;
-                            currentLocation.GetType().GetMethod("doSetVisibleWallpaper", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(currentLocation, new object[] { whichRoom, ParentSheetIndex });
 
+                            currentLocation.GetType().GetMethod("doSetVisibleWallpaper", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(currentLocation, new object[] { whichRoom, ParentSheetIndex });
+                            
                             if (currentLocation is FarmHouse fh)
                                 foreach (var r in FHRHandler.GetConnectedWalls(fh, whichRoom, isFloor.Value))
                                     currentLocation.GetType().GetMethod("doSetVisibleWallpaper", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(currentLocation, new object[] { r, ParentSheetIndex });
-
+                                    
                             BeingPlaced = null;
                             CustomWallsAndFloorsMod.Placing = false;
                         }

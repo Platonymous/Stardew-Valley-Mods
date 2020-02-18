@@ -559,6 +559,8 @@ namespace CustomFarmingRedux
 
         public override bool checkForAction(SFarmer who, bool justCheckingForActivity = false)
         {
+            Helper.Input.Suppress(SButton.MouseRight);
+            Helper.Input.Suppress(SButton.Left);
 
             if (blueprint.category == "Mailbox")
             {
@@ -795,6 +797,9 @@ namespace CustomFarmingRedux
 
         public override bool performObjectDropInAction(Item dropInItem, bool probe, SFarmer who)
         {
+            Helper.Input.Suppress(SButton.MouseRight);
+            Helper.Input.Suppress(SButton.Left);
+
             return performDropInAction(dropInItem, probe, getItemLists(who));
         }
 
