@@ -1,0 +1,16 @@
+{
+  "Name": "SleepWorker",
+  "Author": "Platonymous",
+  "Version": "1.2.3",
+  "Description": "Skips time before you sleep",
+  "UniqueID": "Platonymous.SleepWorker",
+  "EntryDll": "SleepWorker.dll",
+  "MinimumApiVersion": "3.2.0",
+  "UpdateKeys": [ "Nexus:2062" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit",
+      "MinimumVersion": "1.12.28"
+    }
+  ]
+}
