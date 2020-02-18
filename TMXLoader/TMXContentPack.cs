@@ -4,6 +4,10 @@ namespace TMXLoader
 {
     internal class TMXContentPack
     {
+        public List<string> hasMods { get; set; } = new List<string>();
+
+        public List<string> hasNotMods { get; set; } = new List<string>();
+        public List<string> alsoLoad { get; set; } = new List<string>();
         public List<MapEdit> addMaps { get; set; } = new List<MapEdit>();
         public List<MapEdit> replaceMaps { get; set; } = new List<MapEdit>();
         public List<MapEdit> mergeMaps { get; set; } = new List<MapEdit>();

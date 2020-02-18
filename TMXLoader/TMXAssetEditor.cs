@@ -62,8 +62,9 @@ namespace TMXLoader
             this.npcedit = npcedit;
             this.type = type;
             this.assetName = npcedit.map;
-            this.conditions = "";
+            this.conditions = npcedit.conditions;
             this.inLocation = null;
+            lastCheck = conditions == "";
         }
         public bool CanEdit<T>(IAssetInfo asset)
         {

@@ -300,7 +300,7 @@ namespace TMXLoader
         {
             if(e.OldMenu is ShopMenu sm && lastInventoryId != null && itemLists.ContainsKey(lastInventoryId))
             {
-                Dictionary<Item, int[]> itemPriceAndStock = TMXLoaderMod.helper.Reflection.GetField<Dictionary<Item, int[]>>(sm, "itemPriceAndStock").GetValue();
+                Dictionary<ISalable, int[]> itemPriceAndStock = sm.itemPriceAndStock;
                 foreach(Item item in itemLists[lastInventoryId])
                 {
                     Item i = item.getOne();
@@ -497,6 +497,52 @@ namespace TMXLoader
         public static Tile getTile(GameLocation location, string layer, int x, int y)
         {
             return location.map.GetLayer(layer).PickTile(new Location(x * Game1.tileSize, y * Game1.tileSize), Game1.viewport.Size);
+        }
+
+        public static Tile getTile(Map map, string layer, int x, int y)
+        {
+            if (map.GetLayer(layer) is Layer l)
+                if (l.Tiles[x, y] is Tile t)
+                    return t;
+
+            return null;
+        }
+
+        public static void setTile(Map map, string layer, int x, int y, int index, string tilesheet = "")
+        {
+            if (map.GetLayer(layer) is Layer l)
+                if (l.Tiles[x, y] is StaticTile t && tilesheet == "")
+                    t.TileIndex = index;
+                else if (tilesheet != "" && map.GetTileSheet(tilesheet) is TileSheet ts)
+                    l.Tiles[x, y] = new StaticTile(l, ts, BlendMode.Alpha, index);
+        }
+
+        public static void setTile(Map map, string layer, int x, int y, Tile tile)
+        {
+            if (map.GetLayer(layer) is Layer l)
+                    l.Tiles[x, y] = tile;
+        }
+
+        public static StaticTile createStaticTile(Map map, string layer, string tilesheet, int index)
+        {
+            if (map.GetLayer(layer) is Layer l && map.GetTileSheet(tilesheet) is TileSheet ts)
+                return new StaticTile(l, ts, BlendMode.Alpha, index);
+
+            return null;
+        }
+
+        public static AnimatedTile createAnimatedTile(Map map, string layer, string tilesheet, long intervall, params int[] index)
+        {
+            List<StaticTile> tiles = new List<StaticTile>();
+            if (map.GetLayer(layer) is Layer l && map.GetTileSheet(tilesheet) is TileSheet ts)
+            {
+                foreach (int i in index)
+                    tiles.Add(new StaticTile(l, ts, BlendMode.Alpha, i));
+
+                return new AnimatedTile(l, tiles.ToArray(), intervall);
+            }
+
+            return null;
         }
     }
 }
