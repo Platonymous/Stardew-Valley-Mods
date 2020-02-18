@@ -303,7 +303,7 @@ namespace CustomFarmingRedux
                         blueprint.production[0].time = 0;
                     }
 
-                    CustomObjectData data = new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, typeof(CustomMachine), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.fullid, blueprint.crafting));
+                    CustomObjectData data = new CustomObjectData(blueprint.fullid, $"{blueprint.name}/{blueprint.price}/-300/Crafting -9/{blueprint.description}/true/true/0/{blueprint.name}", blueprint.getTexture(), Color.White, blueprint.tileindex, true, typeof(CustomMachine), (blueprint.crafting == null || blueprint.crafting == "") ? null : new CraftingData(blueprint.fullid, blueprint.crafting, blueprint.name));
 
                     if (blueprint.forsale)
                         new InventoryItem(new CustomMachine(blueprint), blueprint.price).addToNPCShop(blueprint.shop, blueprint.condition);

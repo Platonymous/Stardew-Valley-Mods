@@ -45,7 +45,7 @@ namespace PyTK.CustomElementHandler
             this.displayName = displayName;
 
             if (displayName == "")
-                displayName = name;
+                this.displayName = name;
 
             this.recipe = recipe;
             this.field = field;
