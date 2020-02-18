@@ -19,9 +19,10 @@ using PyTK.Overrides;
 using PyTK.APIs;
 using System.Threading;
 using StardewValley.Objects;
-using Netcode;
-using StardewValley.Buildings;
 using StardewValley.Locations;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace PyTK
 {
@@ -39,10 +40,17 @@ namespace PyTK
         internal static bool UpdateCustomObjects = false;
         internal static bool ReInjectCustomObjects = false;
         internal static bool UpdateLuaTokens = false;
-        internal static Dictionary<IManifest, Func<object, object>> PreSerializer = new Dictionary<IManifest, Func<object, object>>();
-        internal static Dictionary<IManifest, Func<object, object>> PostSerializer = new Dictionary<IManifest, Func<object, object>>();
+        public static Dictionary<IManifest, Func<object, object>> PreSerializer = new Dictionary<IManifest, Func<object, object>>();
+        public static Dictionary<IManifest, Func<object, object>> PostSerializer = new Dictionary<IManifest, Func<object, object>>();
+
+        internal static List<GameLocation> RecheckedLocations = new List<GameLocation>();
+
+        internal static List<Type> SerializerTypes = new List<Type>();
 
         internal static object waitForIt = new object();
+        internal static object waitForPatching = new object();
+        internal static object waitForItems = new object();
+
         internal static PyTKMod _instance { get; set; }
         internal static IMonitor _monitor {
             get {
@@ -61,6 +69,7 @@ namespace PyTK
             _instance = this;
             PostSerializer.Add(ModManifest, Rebuilder);
             PreSerializer.Add(ModManifest, Replacer);
+
             harmonyFix();
             
             initializeResponders();
@@ -135,7 +144,7 @@ namespace PyTK
             Helper.Events.Multiplayer.ModMessageReceived += PyNet.Multiplayer_ModMessageReceived;
             helper.Events.GameLoop.Saving += (s, e) =>
             {
-                if(Game1.IsMasterGame)
+                if (Game1.IsMasterGame)
                     try
                 {
                     helper.Data.WriteSaveData<PyTKSaveData>("PyTK.ModSaveData",saveData);
@@ -147,6 +156,7 @@ namespace PyTK
 
             helper.Events.GameLoop.ReturnedToTitle += (s, e) =>
             {
+                RecheckedLocations = null;
                 saveData = new PyTKSaveData();
             };
 
@@ -174,23 +184,71 @@ namespace PyTK
                     PyUtils.checkDrawConditions(map);
             };
 
-
-            helper.Events.GameLoop.GameLaunched += (s, e) =>
-            {
-                try
-                {
-                    registerCPTokens();
-                }
-                catch { }
-            };
-
             helper.Events.GameLoop.DayStarted += (s, e) =>
             {
-
+                if(Game1.currentLocation is GameLocation loc)
+                fixObjectsInLocation(loc);
                 UpdateLuaTokens = true;
-                GC.Collect();
             };
 
+            helper.Events.Player.Warped += (s, e) =>
+            {
+                if (RecheckedLocations is List<GameLocation> && !RecheckedLocations.Contains(e.NewLocation))
+                {
+                    RecheckedLocations.Add(e.NewLocation);
+                    fixObjectsInLocation(e.NewLocation);
+                }
+            };
+
+        }
+
+        public static void fixObjectsInLocation(GameLocation location)
+        {
+            Task.Run(() =>
+            {
+                bool r = false;
+                lock (waitForItems)
+                {
+                    if(Game1.player is Farmer farmer)
+                    foreach(Item item in farmer.Items.ToList())
+                        {
+                            var n = (Item)SaveHandler.rebuildElement(SaveHandler.getDataString(item), item);
+                            if (!SaveHandler.isRebuildable(n))
+                            {
+                                int index = farmer.Items.IndexOf(item);
+                                farmer.Items[index] = n;
+                                r = true;
+                            }
+                        }
+
+                    foreach (Vector2 key in location.Objects.Keys.ToList())
+                        if (location.Objects[key] is StardewValley.Object obj && SaveHandler.isRebuildable(obj))
+                        {
+                            var n = (StardewValley.Object)SaveHandler.rebuildElement(SaveHandler.getDataString(obj), obj);
+                            if (!SaveHandler.isRebuildable(n))
+                            {
+                                location.Objects[key] = n;
+                                r = true;
+                            }
+                        }
+
+                    if (location is DecoratableLocation dec)
+                        foreach (Furniture furniture in dec.furniture.ToList())
+                            if (SaveHandler.isRebuildable(furniture))
+                            {
+                                var n = (Furniture)SaveHandler.rebuildElement(SaveHandler.getDataString(furniture), furniture);
+                                if (!SaveHandler.isRebuildable(n))
+                                {
+                                    dec.furniture.Remove(furniture);
+                                    dec.furniture.Add(n);
+                                    r = true;
+                                }
+                            }
+
+                    if (r)
+                        PatchGeneratedSerializers();
+                }
+            });
         }
     
         public static void syncCounter(string id, int value)
@@ -256,13 +314,30 @@ namespace PyTK
             instance.PatchAll(Assembly.GetExecutingAssembly());
 
             instance.Patch(typeof(SaveGame).GetMethod("Load",BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
+            
+            foreach(MethodInfo method in typeof(System.Xml.Serialization.XmlSerializer).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(m => m.Name.StartsWith("Serialize")))
+            instance.Patch(method, prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("serializeFix", BindingFlags.Static | BindingFlags.Public)));
 
             GenerateSerializers();
-
             Helper.Events.GameLoop.DayStarted += (s, e) => saveWasLoaded = true;
             Helper.Events.GameLoop.ReturnedToTitle += (s, e) => saveWasLoaded = false;
             Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted; 
                 
+        }
+
+        public static void serializeFix(ref System.Object o)
+        {
+            foreach (var serializer in PreSerializer.Keys)
+                try
+                {
+                    o = PreSerializer[serializer].Invoke(o);
+                }
+                catch (Exception e)
+                {
+                    _monitor.Log("Error during serialization: " + serializer.Name, LogLevel.Error);
+                    _monitor.Log(e.Message);
+                    _monitor.Log(e.StackTrace);
+                }
         }
 
         private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
@@ -299,8 +374,10 @@ namespace PyTK
             {
                 List<Type> AddedTypes = new List<Type>()
             {
-                typeof(StardewValley.Object),
+               typeof(StardewValley.Object),
+                typeof(StardewValley.Objects.Chest),
                 typeof(StardewValley.Objects.Furniture),
+                typeof(StardewValley.TerrainFeatures.FruitTree),
                 typeof(StardewValley.Objects.TV),
                 typeof(StardewValley.Objects.Hat),
                 typeof(StardewValley.Item),
@@ -317,8 +394,10 @@ namespace PyTK
             };
 
                 SaveGame sg = new SaveGame();
+                DecoratableLocation d = new DecoratableLocation();
+                Farm ff = new Farm();
 
-                foreach (Type type in AddedTypes)// typeof(Game1).Assembly.GetTypes().Where(t => t.GetConstructor(new Type[] { }) != null && !t.IsGenericType && t.IsPublic && t.IsClass && t.Namespace != null && t.Namespace.Contains("Stardew") && AddedNamespaces.Exists(n => t.Namespace.Contains(n))))
+                foreach (Type type in AddedTypes)
                     SaveGame.GetSerializer(type);
 
                 PatchGeneratedSerializers();
@@ -328,9 +407,12 @@ namespace PyTK
 
         public static void PatchGeneratedSerializers()
         {
-            foreach (var ass in AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains("Microsoft.GeneratedCode")))
-                foreach (var ty in ass.GetTypes().Where(t => t.Name.StartsWith("XmlSerializationWriter") || t.Name.StartsWith("XmlSerializationReader")))
-                    PatchGeneratedSerializerType(ty);
+            lock (waitForPatching)
+            {
+                foreach (var ass in AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains("Microsoft.GeneratedCode")))
+                    foreach (var ty in ass.GetTypes().Where(t => t.Name.StartsWith("XmlSerializationWriter") || t.Name.StartsWith("XmlSerializationReader")))
+                        PatchGeneratedSerializerType(ty);
+            }
         }
 
         public static void PatchGeneratedSerializerType(Type ty)
@@ -342,7 +424,6 @@ namespace PyTK
                        else if (met.Name.StartsWith("Read") && met.ReturnType != null && met.ReturnType.IsClass && met.ReturnType.FullName.Contains("Stardew"))
                            instance.Patch(met, postfix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLRebuilder", BindingFlags.Static | BindingFlags.Public)));
         }
-
 
         public static void saveXMLReplacer(ref object o)
         {
@@ -386,7 +467,7 @@ namespace PyTK
         }
 
         public object Replacer(object o)
-        {
+        { 
             if (SaveHandler.hasSaveType(o))
                 return SaveHandler.getReplacement(o);
 
@@ -464,10 +545,10 @@ namespace PyTK
                  bool result = LuaUtils.hasMod(mod);
                  return result;
              });
-
+            
             PyUtils.addEventPrecondition("switch", (key, values, location) =>
             {
-                return LuaUtils.switches(values.Replace("switch ",""));
+                return LuaUtils.switches(values.Replace("switch ", ""));
             });
 
             PyUtils.addEventPrecondition("npcxy", (key, values, location) =>
@@ -498,7 +579,7 @@ namespace PyTK
                     var stack = p.Length == 1 ? 1 : int.Parse(p[1]);
                     int count = 0;
 
-                    foreach(Item item in items)
+                    foreach (Item item in items)
                     {
                         if (item.Name == name)
                             count += item.Stack;
@@ -524,86 +605,11 @@ namespace PyTK
 
             PyUtils.addEventPrecondition("LC", (key, values, location) =>
             {
-                return PyUtils.checkEventConditions(values.Replace("%div","/"), location, location);
+                return PyUtils.checkEventConditions(values.Replace("%div", "/"), location, location);
             });
 
 
-        }
-
-
-        private void registerCPTokens()
-        {
-            if (!Helper.ModRegistry.IsLoaded("Pathoschild.ContentPatcher"))
-                return;
-
-            IContentPatcherAPI api = Helper.ModRegistry.GetApi<IContentPatcherAPI>("Pathoschild.ContentPatcher");
-            /*
-            api.RegisterToken(this.ModManifest, "LuaString", () =>
-            {
-                foreach (string k in tokenStrings.Keys)
-                    if (tokenStrings[k] != PyUtils.getLuaString(k))
-                        return true;
-
-                return false;
-            }, () => Context.IsWorldReady, (s) =>
-            {
-                tokenStrings.AddOrReplace(s, PyUtils.getLuaString(s));
-                return new string[] { tokenStrings[s] };
-            }, true, true);*/
-
-            api.RegisterToken(this.ModManifest, "Conditional", () =>
-            {
-                foreach (string k in tokenBoleans.Keys)
-                    if (tokenBoleans[k] != PyUtils.checkEventConditions(k.Split(new[] { " >: " }, StringSplitOptions.RemoveEmptyEntries)[0]))
-                        return true;
-
-                return false;
-            }, () => Context.IsWorldReady, (s) =>
-            {
-                string[] parts = s.Split(new [] { " >: " },StringSplitOptions.RemoveEmptyEntries);
-
-                if (parts.Length < 2)
-                    return null;
-
-                tokenBoleans.AddOrReplace(s, PyUtils.checkEventConditions(parts[0]));
-                return new string[] { tokenBoleans[s] ? parts[1] : parts.Length < 3 ? null : parts[2] };
-            }, true, true);
-
-            api.RegisterToken(
-                mod: this.ModManifest,
-                name: "ObjectByName",
-                updateContext: () =>
-                {
-                    if (!PyTK.PyTKMod.UpdateCustomObjects)
-                        return false;
-
-                    UpdateCustomObjects = false;
-                    return true;
-                },
-                isReady: () => Context.IsWorldReady,
-                getValue: GetObjectByNameTokenValue,
-                allowsInput: true,
-                requiresInput: true
-            );
-
-            api.RegisterToken(
-                mod: this.ModManifest,
-                name: "LuaString",
-                updateContext: () =>
-                {
-                    if (!UpdateLuaTokens)
-                        return false;
-
-                    UpdateLuaTokens = false;
-                    return true;
-                },
-                isReady: () => Context.IsWorldReady,
-                getValue: GetLuaString,
-                allowsInput: true,
-                requiresInput: true
-            );
-        }
-
+        }       
         private IEnumerable<string> GetObjectByNameTokenValue(string input)
         {
             string[] request = input.Split(':');
@@ -677,11 +683,20 @@ namespace PyTK
                             }
                         }
 
-                        if(PyLua.hasScript(id))
+                        if (PyLua.hasScript(id))
                             PyLua.callFunction(id, "callthis", new object[] { location, tile, layer });
                     }
                     else
-                        PyLua.callFunction(a[1], a[2], new object[] { location, tile, layer });
+                    {
+                        try
+                        {
+                            PyLua.callFunction(a[1], a[2], new object[] { location, tile, layer });
+                        }
+                        catch
+                        {
+
+                        }
+                    }
                 return true;
             }).register();
 

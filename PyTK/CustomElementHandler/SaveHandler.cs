@@ -59,31 +59,13 @@ namespace PyTK.CustomElementHandler
             fieldInfoChache = new Dictionary<Type, FieldInfo[]>();
             propInfoChache = new Dictionary<Type, PropertyInfo[]>();
             
-            Helper.Events.GameLoop.Saving += (s, e) =>
-            {
-                   // Replace();
-            };
-
-            Helper.Events.GameLoop.Saved += (s, e) =>
-            {
-                //   RebuildFromActions();
-            };
-
-            Helper.Events.GameLoop.SaveLoaded += (s, e) =>
-            {
-                //   Rebuild();
-            };
-
             Helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
                 Game1.objectSpriteSheet.Tag = "cod_objects";
                 Game1.bigCraftableSpriteSheet.Tag = "cod_objects";
             };
 
-
            Harmony.HarmonyInstance instance = Harmony.HarmonyInstance.Create("PytK.Savehandler.SyncFix");
-            // instance.Patch(typeof(NewDaySynchronizer).GetMethod("start"), new Harmony.HarmonyMethod(typeof(SaveHandler), "Replace", null),null,null);
-
         }
 
         public static bool isRebuildable(object o)
@@ -121,55 +103,27 @@ namespace PyTK.CustomElementHandler
         public static void RebuildAll(object obj, object parent)
         {
                 return;
-            ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => getDataString(o).StartsWith(newPrefix), o => RebuildObject(o), setReverseAction: false);
         }
 
         public static void ReplaceAll(object obj, object parent)
         {
                 return;
-
-            ReplaceAllObjects<object>(FindAllObjects(obj, parent), o => hasSaveType(o), o => getReplacement(o), true);
         }
 
         internal static void RebuildFromActions()
         {
                 return;
-            Monitor.Log("Rebuilding Custom Objects");
-            rebuildActions.ForEach(a => a.Invoke());
-            rebuildActions.Clear();
         }
 
         internal static void Replace()
         {
                 return;
-            Monitor.Log("Replacing Custom Objects");
-
-            //rebuildActions.Clear();
-            OnBeforeRemoving(EventArgs.Empty);
-
-            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
-            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
-            foreach (Farmer farmer in Game1.otherFarmers.Values)
-                ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), o => hasSaveType(o), o => getReplacement(o), true);
-
-            OnFinishedRemoving(EventArgs.Empty);
         }
 
 
         internal static void Rebuild()
         {
                 return;
-
-            Monitor.Log("Rebuilding Custom Objects from Save");
-            rebuildActions.Clear();
-            OnBeforeRebuilding(EventArgs.Empty);
-
-            ReplaceAllObjects<object>(FindAllObjects(Game1.player, Game1.game1), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o),setReverseAction:false);
-            ReplaceAllObjects<object>(FindAllObjects(Game1.locations, Game1.game1), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o), setReverseAction: false);
-            foreach (Farmer farmer in Game1.otherFarmers.Values)
-                ReplaceAllObjects<object>(FindAllObjects(farmer, Game1.game1), o => getDataString(o).StartsWith(newPrefix), o => rebuildElement(getDataString(o), o), setReverseAction: false);
-
-            OnFinishedRebuilding(EventArgs.Empty);
         }       
 
         internal static void Cleanup()
@@ -342,6 +296,9 @@ namespace PyTK.CustomElementHandler
 
         public static object rebuildElement(string dataString, object replacement)
         {
+            if (!dataString.StartsWith(newPrefix))
+                return replacement;
+
             CustomObjectData.collection.useAll(k => k.Value.sdvId = k.Value.getNewSDVId());
 
             replacement = checkReplacement(replacement);
@@ -350,7 +307,6 @@ namespace PyTK.CustomElementHandler
 
             dataString = dataString.Replace(" " + valueSeperator.ToString() + " ", valueSeperator.ToString());
             string[] data = splitElemets(dataString);
-
             try
             {
                 Type T = Type.GetType(data[2]);
@@ -389,6 +345,8 @@ namespace PyTK.CustomElementHandler
             }
             catch (Exception e)
             {
+                Monitor.Log(dataString, LogLevel.Error);
+
                 if (PyTKMod.saveWasLoaded)
                     Monitor.Log("Exception while rebuilding element: " + dataString + ":" + e.Message + ":" + e.StackTrace, LogLevel.Trace);
 

@@ -1,5 +1,7 @@
 ﻿using Harmony;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using PyTK.ConsoleCommands;
 using PyTK.CustomElementHandler;
 using PyTK.Extensions;
 using PyTK.Types;
@@ -20,6 +22,7 @@ namespace PyTK.Overrides
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
         internal static Dictionary<int, Rectangle> rectangleCache = new Dictionary<int, Rectangle>();
         internal static Dictionary<string, Func<string, string, GameLocation, bool>> eventConditions = new Dictionary<string, Func<string,string, GameLocation, bool>>();
+        internal static bool skip = false;
 
         [HarmonyPatch]
         internal class GLBugFix

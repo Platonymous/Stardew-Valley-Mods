@@ -7,7 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using xTile;
+using xTile.Layers;
 using xTile.ObjectModel;
+using xTile.Tiles;
 using SObject = StardewValley.Object;
 
 
@@ -157,7 +159,7 @@ namespace PyTK.Lua
             location.warps.Clear();
             PropertyValue p = "";
             if (location.Map.Properties.TryGetValue("Warp", out p) && p != "")
-                Helper.Reflection.GetMethod(location, "updateWarps").Invoke();
+                location.updateWarps();
         }
 
         public static bool setGameValue(string field, object value, int delay = 0, object root = null)
@@ -239,6 +241,6 @@ namespace PyTK.Lua
             if (bigCraftable)
                 return new SObject(Vector2.Zero, index);
             return new SObject(index, 1);
-        }
+        }     
     }
 }
