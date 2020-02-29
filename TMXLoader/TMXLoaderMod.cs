@@ -28,6 +28,7 @@ using TMXLoader.Other;
 using StardewValley.Monsters;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
+using StardewValley.Buildings;
 
 namespace TMXLoader
 {
@@ -69,6 +70,7 @@ namespace TMXLoader
             var empty = new TileShop();
             empty.id = "EmptyShop";
             tileShops.Add(empty, new List<TileShopItem>());
+
             BuildableReceiver = new PyReceiver<SaveBuildable>(buildableReceiverName, (s) =>
             {
                 if (Game1.IsMasterGame)
@@ -295,7 +297,8 @@ namespace TMXLoader
                     GameLocation loc = Game1.getLocationFromName(toRemove.Location);
                     Map map = helper.Content.Load<Map>(loc.mapPath.Value,ContentSource.GameContent);
                     Map bMap  = TMXContent.Load(be.file, Helper, be._pack);
-
+                    if (bMap == null)
+                        return;
                     loc.map = map.mergeInto(loc.Map, new Vector2(toRemove.Position[0], toRemove.Position[1]),new Microsoft.Xna.Framework.Rectangle(toRemove.Position[0], toRemove.Position[1],bMap.DisplayWidth / Game1.tileSize, bMap.DisplayHeight / Game1.tileSize), true);
 
                     List<Layer> layersToRemove = new List<Layer>();
@@ -374,7 +377,8 @@ namespace TMXLoader
                 helper.Content.InvalidateCache(edit._pack.GetActualAssetKey(buildFile));
 
                 Map map = TMXContent.Load(buildFile, Helper, edit._pack);
-
+                if (map == null)
+                    return null;
 
                 map = loadVariablesToMap(map, edit, new Point(edit.position[0],edit.position[1]), colors, uniqueId, playerName, playerId, location);
                 var e = edit.Clone();
@@ -432,7 +436,11 @@ namespace TMXLoader
 
             Map map = edit._map;
             if (edit._pack != null)
+            {
                 map = TMXContent.Load(buildFile, Helper, edit._pack);
+                if (map == null)
+                    return;
+            }
 
             var size = new Microsoft.Xna.Framework.Rectangle(0, 0, 1, 1);
 
@@ -849,12 +857,13 @@ namespace TMXLoader
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.TMXLoader");
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("loadDataToLocations"), postfix: new HarmonyMethod(this.GetType().GetMethod("SavePatch", BindingFlags.Public | BindingFlags.Static)));
-           
+
             if (!helper.ModRegistry.IsLoaded("Entoarox.FurnitureAnywhere"))
                 return;
             if (Type.GetType("Entoarox.FurnitureAnywhere.ModEntry, FurnitureAnywhere") is Type Me && Me.GetMethod("SleepFurniture", BindingFlags.NonPublic | BindingFlags.Instance) is MethodInfo SF)
                 instance.Patch(SF, new HarmonyMethod(this.GetType().GetMethod("GetFA", BindingFlags.Public | BindingFlags.Static)));
         }
+
 
         public static void GetFA(Mod __instance)
         {
@@ -917,7 +926,10 @@ namespace TMXLoader
             TileAction Say = new TileAction("Say", TMXActions.sayAction).register();
             TileAction SwitchLayers = new TileAction("SwitchLayers", TMXActions.switchLayersAction).register();
             TileAction CopyLayers = new TileAction("CopyLayers", TMXActions.copyLayersAction).register();
-            TileAction SpwanTreasure = new TileAction("SpawnTreasure", TMXActions.spawnTreasureAction).register();
+            TileAction SpawnTreasure = new TileAction("SpawnTreasure", TMXActions.spawnTreasureAction).register();
+            TileAction WarpHome = new TileAction("WarpHome", TMXActions.warpHomeAction).register();
+            TileAction WarpInto = new TileAction("WarpInto", TMXActions.warpIntoAction).register();
+            TileAction WarpFrom = new TileAction("WarpFrom", TMXActions.warpFromAction).register();
             TileAction Confirm = new TileAction("Confirm", TMXActions.confirmAction).register();
             TileAction OpenShop = new TileAction("OpenShop", TMXActions.shopAction).register();
         }
@@ -925,11 +937,25 @@ namespace TMXLoader
         internal static GameLocation addLocation(MapEdit edit)
         {
             GameLocation location;
-            monitor.Log("Adding:" + edit.name);
+            monitor.Log("Adding:" + edit.name, LogLevel.Trace);
             if (edit.type == "Deco")
                 location = new DecoratableLocation(Path.Combine("Maps", edit.name), edit.name);
+            if (edit.type == "Farm")
+                location = new Farm(Path.Combine("Maps", edit.name), edit.name);
             else if (edit.type == "Cellar")
                 location = new Cellar(Path.Combine("Maps", edit.name), edit.name);
+            else if (edit.type == "Shed")
+                location = new Shed(Path.Combine("Maps", edit.name), edit.name);
+            else if (edit.type.StartsWith("SDV:"))
+            {
+                location = (GameLocation)PyTK.PyUtils.getTypeSDV(edit.type.Substring(4)).GetConstructor(new Type[] { typeof(string), typeof(string) }).Invoke(new object[] { Path.Combine("Maps", edit.name), edit.name });
+                monitor.Log("Type:" + (edit.type.Substring(4)), LogLevel.Trace);
+            }
+            else if (edit.type.StartsWith("Custom:"))
+            {
+                location = (GameLocation)Type.GetType(edit.type.Substring(7)).GetConstructor(new Type[] { typeof(string), typeof(string) }).Invoke(new object[] { Path.Combine("Maps", edit.name), edit.name });
+                monitor.Log("Type:" + edit.type.Substring(7), LogLevel.Trace);
+            }
             else
                 location = new GameLocation(Path.Combine("Maps", edit.name), edit.name);
 
@@ -1020,6 +1046,8 @@ namespace TMXLoader
             {
                 string filePath = Path.Combine(pack.DirectoryPath, edit.file);
                 Map map = TMXContent.Load(edit.file, Helper, pack);
+                if (map == null)
+                    continue;
                 edit._pack = pack;
 
                 Helper.Content.AssetEditors.Add(new TMXAssetEditor(edit, map, EditType.SpouseRoom));
@@ -1052,6 +1080,9 @@ namespace TMXLoader
             foreach (MapEdit edit in tmxPack.addMaps)
             {
                 Map map = TMXContent.Load(edit.file, Helper, pack);
+                if (map == null)
+                    continue;
+
                 TMXAssetEditor.editWarps(map, edit.addWarps, edit.removeWarps, map);
 
                 string groupName = "TMXL";
@@ -1079,6 +1110,8 @@ namespace TMXLoader
             foreach (MapEdit edit in tmxPack.replaceMaps)
             {
                 Map map = TMXContent.Load(edit.file, Helper, pack);
+                if (map == null)
+                    continue;
                 edit._pack = pack;
                 addAssetEditor(new TMXAssetEditor(edit, map, EditType.Replace));
                 // mapsToSync.AddOrReplace(edit.name, map);
@@ -1087,6 +1120,8 @@ namespace TMXLoader
             foreach (MapEdit edit in tmxPack.mergeMaps)
             {
                 Map map = TMXContent.Load(edit.file, Helper, pack);
+                if (map == null)
+                    continue;
                 edit._pack = pack;
                 addAssetEditor(new TMXAssetEditor(edit, map, EditType.Merge));
                 // mapsToSync.AddOrReplace(edit.name, map);
@@ -1108,6 +1143,8 @@ namespace TMXLoader
 
                 edit._icon = pack.LoadAsset<Texture2D>(edit.iconFile);
                 edit._map = TMXContent.Load(edit.file, Helper, pack);
+                if (edit._map == null)
+                    continue;
                 edit._pack = pack;
                 buildables.Add(edit);
             }
@@ -1212,9 +1249,13 @@ namespace TMXLoader
            // Dictionary<string, string> colors = new Dictionary<string, string>();
 
             UIElement overlay = null;
-            if(edit is BuildableEdit)
+            if (edit is BuildableEdit)
+            {
                 edit._map = TMXContent.Load(edit.file, Helper, edit._pack);
 
+                if (edit._map == null)
+                    return;
+            }
             int menuWidth = 280;
             int menuHeight = 440;
 

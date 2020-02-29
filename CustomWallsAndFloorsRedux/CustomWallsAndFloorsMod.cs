@@ -12,6 +12,8 @@ using PyTK.Extensions;
 using System.Linq;
 using StardewValley.Objects;
 using PyTK.Types;
+using StardewValley.Locations;
+using StardewValley.Buildings;
 
 namespace CustomWallsAndFloorsRedux
 {
@@ -86,6 +88,14 @@ namespace CustomWallsAndFloorsRedux
                 Helper.Data.WriteSaveData(saveDataKey, Saved);
         }
 
+        public static string getWarpString(GameLocation location)
+        {
+            if (!location.isStructure.Value || location.warps.Count == 0)
+                return "";
+
+            return string.Join("-", location.warps.Select((w) => w.TargetName + ":" + w.TargetX + ":" + w.TargetY));
+        }
+
         private void LoadSavedWallsAndFloors(bool send = false)
         {
             Saved = new SaveData();
@@ -96,7 +106,19 @@ namespace CustomWallsAndFloorsRedux
             SaveData saveData = Helper.Data.ReadSaveData<SaveData>(saveDataKey);
 
             if (saveData != null)
-                foreach (SavedWallpaper sav in saveData.Wallpaper)
+                for (int i = 0; i < saveData.Wallpaper.Count; i++)
+                    if (saveData.Wallpaper[i] is SavedWallpaper sav && sav.Structure && sav.WarpString != "" && !(Game1.getLocationFromName(sav.Location, true) is GameLocation))
+                    {
+                        foreach (BuildableGameLocation location in Game1.locations.Where(l => l is BuildableGameLocation))
+                            if (location.buildings.FirstOrDefault(b => b.indoors.Value is GameLocation l && getWarpString(l) == sav.WarpString) is Building building)
+                            {
+                                sav.Location = building.indoors.Value.uniqueName.Value;
+                                break;
+                            }
+                    }
+
+            if (saveData != null)
+                foreach (SavedWallpaper sav in saveData.Wallpaper.ToList())
                 {
 
                     if (Game1.IsMultiplayer || (Game1.currentLocation is GameLocation l && ((!sav.Structure && sav.Location == l.Name)  || (sav.Structure && sav.Location == l.uniqueName.Value))))

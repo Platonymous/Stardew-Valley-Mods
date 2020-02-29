@@ -17,9 +17,10 @@ namespace PelicanTTS
 
         public bool ReadHudMessages { get; set; } = true;
 
+       // public bool ReadChatMessages { get; set; } = true;
+
         public int Rate { get; set; } = 100;
 
         public Dictionary<string, VoiceSetup> Voices { get; set; } = new Dictionary<string, VoiceSetup>();
-
     }
 }

@@ -1,10 +1,7 @@
-﻿using Harmony;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Visualize
@@ -25,31 +22,23 @@ namespace Visualize
         internal static int[] whitecolor = new int[] { 255, 255, 255, 255 };
         internal static bool active = false;
 
-        public Texture2D ProcessTexture(ref Texture2D texture)
+        public Texture2D ProcessTexture(Texture2D texture)
         {
-           
             Profile useProfile = VisualizeMod._activeProfile;
 
             texture = changeColor(texture, useProfile.saturation, useProfile.palette);
 
             return texture;
         }
-
-        public bool Draw(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
+        public bool Draw(SpriteBatch __instance, Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color,  Vector2 origin, float rotation, SpriteEffects effects, float layerDepth)
         {
             if (active || texture.Height == Game1.viewport.Height && texture.Width == Game1.viewport.Width)
             {
                 active = false;
                 return true;
             }
-                
-            Profile useProfile = VisualizeMod._activeProfile;
-            MethodInfo drawMethod;
 
-            if (Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics") != null)
-                drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, Microsoft.Xna.Framework.Graphics"), "InternalDraw");
-            else
-                drawMethod = AccessTools.Method(Type.GetType("Microsoft.Xna.Framework.Graphics.SpriteBatch, MonoGame.Framework"), "DrawInternal");
+            Profile useProfile = VisualizeMod._activeProfile;
 
             active = true;
 
@@ -67,9 +56,59 @@ namespace Visualize
                 }
             }
 
-            drawMethod.Invoke(__instance, new object[] { changeColor(texture, useProfile.saturation, useProfile.palette), destination, scaleDestination, sourceRectangle, newColor, rotation, origin, effects, depth });
+            __instance.Draw(changeColor(texture, useProfile.saturation, useProfile.palette), destinationRectangle, sourceRectangle, newColor, rotation, origin, effects, layerDepth);
 
             return false;
+        }
+        public bool Draw(SpriteBatch __instance, SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2? origin, float scale, SpriteEffects effects, float layerDepth)
+        {
+            if (active)
+            {
+                active = false;
+                return true;
+            }
+
+            Profile useProfile = VisualizeMod._activeProfile;
+
+            active = true;
+
+            Color newColor = changeColor(color, useProfile.saturation, useProfile.palette);
+
+            if (useProfile.tint != whitecolor)
+            {
+                if (tintColorCache.ContainsKey(newColor))
+                    newColor = tintColorCache[newColor];
+                else
+                {
+                    Color tintedColor = multiply(newColor, new Color(useProfile.tint[0], useProfile.tint[1], useProfile.tint[2], useProfile.tint[3]));
+                    tintColorCache.Add(newColor, tintedColor);
+                    newColor = tintedColor;
+                }
+            }
+
+            __instance.DrawString(spriteFont, text, position, newColor, rotation, origin.HasValue ? origin.Value : Vector2.Zero, scale, effects, layerDepth);
+
+            return false;
+        }
+
+        public Color ProcessColor(Color color)
+        {
+            Profile useProfile = VisualizeMod._activeProfile;
+
+            Color newColor = changeColor(color, useProfile.saturation, useProfile.palette);
+            if (useProfile.tint != whitecolor)
+            {
+                if (tintColorCache.ContainsKey(newColor))
+                    newColor = tintColorCache[newColor];
+                else
+                {
+                    Color tintedColor = multiply(newColor, new Color(useProfile.tint[0], useProfile.tint[1], useProfile.tint[2], useProfile.tint[3]));
+                    tintColorCache.Add(newColor, tintedColor);
+                    newColor = tintedColor;
+                }
+            }
+
+            return color;
         }
 
         public Color multiply(Color color1, Color color2)
@@ -239,5 +278,7 @@ namespace Visualize
 
             return map[index];
         }
+
+        
     }
 }

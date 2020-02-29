@@ -81,6 +81,48 @@ namespace TMXLoader
             return false;
         }
 
+        public static bool warpHomeAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            GameLocation home = Game1.getLocationFromName(Game1.player.homeLocation.Value, Game1.player.homeLocation.Value == "FarmHouse");
+            Game1.warpFarmer(Game1.player.homeLocation.Value, home.warps[0].X, home.warps[0].Y - 1, Game1.player.FacingDirection, home.isStructure.Value);
+            return true;
+        }
+
+        public static bool warpIntoAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            List<string> text = action.Split(' ').ToList();
+            int w = 0;
+            if (text.Count > 2)
+                w = int.Parse(text[2]);
+
+            GameLocation target = Game1.getLocationFromName(text[1],false);
+            bool up = Game1.player.FacingDirection == 0;
+            Game1.warpFarmer(text[1], target.warps[w].X, target.warps[w].Y + (up ? -1 : 1), Game1.player.FacingDirection);
+            return true;
+        }
+
+        public static bool warpFromAction(string action, GameLocation location, Vector2 tile, string layer)
+        {
+            List<string> text = action.Split(' ').ToList();
+            int w = 0;
+            if (text.Count > 3)
+                w = int.Parse(text[3]);
+
+            GameLocation target = Game1.getLocationFromName(text[1], false);
+            int direction = Game1.player.FacingDirection;
+
+            if (text.Count > 4)
+                direction = int.Parse(text[4]);
+
+            List<Warp> warps = target.warps.ToList();
+
+            if (text.Count > 2)
+                warps = warps.Where(wp => wp.TargetName == text[2]).ToList();
+
+            Game1.warpFarmer(text[1], warps[w].X + (direction == 1 ? 1 : direction == 3 ? -1 : 0), warps[w].Y + (direction == 0 ? -1 : direction == 2 ? 1 : 0), direction);
+            return true;
+        }
+
         public static Item getItem(string type, int index = -1, string name = "none")
         {
             Item item = null;

@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 using StardewValley;
-using OpenCL.Net.Extensions;
-using OpenCL.Net;
 
 namespace Visualize
 {
@@ -21,7 +19,6 @@ namespace Visualize
         internal static List<Color> palette = new List<Color>();
         internal static Effect shader = null;
         internal static Dictionary<Texture2D, List<Color>> paletteCache = new Dictionary<Texture2D, List<Color>>();
-        internal static Dictionary<string, Effect> shaderChache = new Dictionary<string, Effect>();
         internal static List<Profile> profiles = new List<Profile>();
         internal static List<IVisualizeHandler> _handlers = new List<IVisualizeHandler>();
         internal static Effects _handler = new Effects();
@@ -63,18 +60,35 @@ namespace Visualize
                 pass = 0;
         }
 
-        internal static Texture2D callDrawHandlers(ref Texture2D texture)
+        internal static Texture2D callDrawHandlers(Texture2D texture)
         {
             foreach (IVisualizeHandler handler in _handlers)
-                handler.ProcessTexture(ref texture);
+                handler.ProcessTexture(texture);
 
             return texture;
         }
 
-        internal static bool callDrawHandlers(ref SpriteBatch __instance, ref Texture2D texture, ref Vector4 destination, ref bool scaleDestination, ref Rectangle? sourceRectangle, ref Color color, ref float rotation, ref Vector2 origin, ref SpriteEffects effects, ref float depth)
+        internal static Color callDrawHandlers(Color color)
         {
             foreach (IVisualizeHandler handler in _handlers)
-                if (!handler.Draw(ref __instance, ref texture, ref destination, ref scaleDestination, ref sourceRectangle, ref color, ref rotation, ref origin, ref effects, ref depth))
+                handler.ProcessColor(color);
+
+            return color;
+        }
+
+        internal static bool callDrawHandlers(SpriteBatch __instance, Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color, Vector2 origin, float rotation, SpriteEffects effects, float layerDepth)
+        {
+            foreach (IVisualizeHandler handler in _handlers)
+                if (!handler.Draw(__instance, texture, destinationRectangle, sourceRectangle, color, origin, rotation, effects, layerDepth))
+                    return false;
+
+            return true;
+        }
+
+        internal static bool callDrawHandlers(SpriteBatch __instance, SpriteFont spriteFont, string text, Vector2 position, Color color, float rotation, Vector2? origin, float scale, SpriteEffects effects, float layerDepth)
+        {
+            foreach (IVisualizeHandler handler in _handlers)
+                if (!handler.Draw(__instance, spriteFont, text, position, color, rotation, origin, scale, effects, layerDepth))
                     return false;
 
             return true;
@@ -184,6 +198,7 @@ namespace Visualize
         {
             var instance = HarmonyInstance.Create("Platonymous.Visualize");
             instance.PatchAll(Assembly.GetExecutingAssembly());
+            SpritbatchFixNew.initializePatch(instance);
         }
 
         private void loadProfiles()

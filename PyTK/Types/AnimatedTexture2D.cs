@@ -11,6 +11,7 @@ namespace PyTK.Types
 {
     public class AnimatedTexture2D : ScaledTexture2D
     {
+        public static bool ticked = false;
         private List<Texture2D> Frames = new List<Texture2D>();
         public int CurrentFrame = 0;
         private int SkipFrame = 0;
@@ -20,9 +21,10 @@ namespace PyTK.Types
 
         public override Texture2D STexture {
             get {
-                if (Paused)
+                if (Paused || ticked)
                     return Frames[CurrentFrame];
 
+                ticked = true;
                 Counter++;
                 Counter = Counter > SkipFrame ? 0 : Counter;
                 if (Counter % SkipFrame == 0)
@@ -48,7 +50,7 @@ namespace PyTK.Types
         }
 
         public AnimatedTexture2D(Texture2D spriteSheet, int tileWidth, int tileHeight, int fps, bool startPaused, bool loop = true, float scale = 1)
-            : base(spriteSheet,tileWidth,tileHeight)
+            : base(spriteSheet,(int)(tileWidth/scale), (int)(tileHeight /scale))
         {
             Paused = startPaused;
             Loop = loop;

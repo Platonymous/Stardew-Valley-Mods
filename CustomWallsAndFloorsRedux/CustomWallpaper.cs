@@ -103,7 +103,7 @@ namespace CustomWallsAndFloorsRedux
             ParentSheetIndex = 0;
             wallpaperTexture = wt;
         }
-
+        
         public void place(GameLocation location, int x, int y, bool send = false)
         {
             if (location is DecoratableLocation currentLocation && new Point(x / 64, y / 64) is Point point)
@@ -113,7 +113,12 @@ namespace CustomWallsAndFloorsRedux
                         if (floors[whichRoom].Contains(point))
                         {
                             CustomWallsAndFloorsMod.Placing = true;
-                            BeingSaved = new SavedWallpaper(Set.Pack.Manifest.UniqueID, CustomIndex, location.isStructure.Value ? location.uniqueName.Value : location.Name, x, y, isFloor, send, location.isStructure.Value);
+
+                            if (location.isStructure.Value) {
+                            }
+
+
+                            BeingSaved = new SavedWallpaper(Set.Pack.Manifest.UniqueID, CustomIndex, location.isStructure.Value ? location.uniqueName.Value : location.Name, x, y, isFloor, send, location.isStructure.Value, CustomWallsAndFloorsMod.getWarpString(location));
                             BeingPlaced = this;
 
                             currentLocation.GetType().GetMethod("doSetVisibleFloor", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(currentLocation, new object[] { whichRoom, ParentSheetIndex });
@@ -131,7 +136,7 @@ namespace CustomWallsAndFloorsRedux
                         if (walls[whichRoom].Contains(point))
                         {
                             CustomWallsAndFloorsMod.Placing = true;
-                            BeingSaved = new SavedWallpaper(Set.Pack.Manifest.UniqueID, CustomIndex, location.isStructure.Value ? location.uniqueName.Value : location.Name, x, y, isFloor, send, location.isStructure.Value);
+                            BeingSaved = new SavedWallpaper(Set.Pack.Manifest.UniqueID, CustomIndex, location.isStructure.Value ? location.uniqueName.Value : location.Name, x, y, isFloor, send, location.isStructure.Value, CustomWallsAndFloorsMod.getWarpString(location));
                             BeingPlaced = this;
 
                             currentLocation.GetType().GetMethod("doSetVisibleWallpaper", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(currentLocation, new object[] { whichRoom, ParentSheetIndex });

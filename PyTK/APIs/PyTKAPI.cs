@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using PyTK.Extensions;
 using StardewModdingAPI;
+using System.Collections.Generic;
 
 namespace PyTK.APIs
 {
@@ -109,6 +110,14 @@ namespace PyTK.APIs
         public void AddPostDeserialization(IManifest manifest, Func<object, object> postserializer)
         {
             PyTKMod.PostSerializer.AddOrReplace(manifest, postserializer);
+        }
+
+        public void ReplaceAssetAt(string assetName, Rectangle sourceRectangle, Texture2D texture)
+        {
+            if (Overrides.OvSpritebatchNew.repTextures.ContainsKey(assetName))
+                Overrides.OvSpritebatchNew.repTextures[assetName].AddOrReplace(sourceRectangle, texture);
+            else
+                Overrides.OvSpritebatchNew.repTextures.Add(assetName, new Dictionary<Rectangle?, Texture2D>() { { sourceRectangle, texture } });
         }
     }
 }

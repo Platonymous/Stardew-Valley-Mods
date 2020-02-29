@@ -12,7 +12,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.0.0" />
+    <None Remove="BuildableEdit.cs~RF11759495.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>

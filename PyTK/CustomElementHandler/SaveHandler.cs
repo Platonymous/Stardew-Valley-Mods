@@ -347,8 +347,7 @@ namespace PyTK.CustomElementHandler
             {
                 Monitor.Log(dataString, LogLevel.Error);
 
-                if (PyTKMod.saveWasLoaded)
-                    Monitor.Log("Exception while rebuilding element: " + dataString + ":" + e.Message + ":" + e.StackTrace, LogLevel.Trace);
+                Monitor.Log("Exception while rebuilding element: " + dataString + ":" + e.Message + ":" + e.StackTrace, LogLevel.Trace);
 
                 return replacement;
             }

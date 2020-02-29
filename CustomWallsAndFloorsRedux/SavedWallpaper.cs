@@ -29,17 +29,19 @@ namespace CustomWallsAndFloorsRedux
 
         public bool Structure { get; set; }
 
+        public string WarpString { get; set; } = "";
+
         internal bool ShouldBeSend { get; set; } = false;
-
-
+        
 
         public SavedWallpaper()
         {
 
         }
 
-        public SavedWallpaper(string id, int index, string location, int x, int y, bool isFloors, bool shouldBeSend = false, bool isStructure = false)
+        public SavedWallpaper(string id, int index, string location, int x, int y, bool isFloors, bool shouldBeSend = false, bool isStructure = false, string warpString = "")
         {
+            WarpString = warpString;
             SetId = id;
             CustomIndex = index;
             Location = location;

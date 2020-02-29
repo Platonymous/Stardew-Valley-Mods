@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using PyTK.CustomElementHandler;
 using PyTK.Extensions;
 using PyTK.Types;
+using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace PyTK.Overrides
     class OvSpritebatchNew
     {
         internal static Dictionary<Rectangle, CustomObjectData> recCache = new Dictionary<Rectangle, CustomObjectData>();
-
+        internal static Dictionary<string, Dictionary<Rectangle?, Texture2D>> repTextures = new Dictionary<string, Dictionary<Rectangle?, Texture2D>>(); 
 
         internal static bool skip = false;
 
@@ -48,6 +49,13 @@ namespace PyTK.Overrides
 
             if (texture == null || destinationRectangle == null)
                 return false;
+
+
+            if (sourceRectangle.HasValue && texture.Name != null && texture.Name != "" && repTextures.ContainsKey(texture.Name) && repTextures[texture.Name].Keys.FirstOrDefault(k => k.HasValue && k.Value.Contains(sourceRectangle.Value)) is Rectangle srr)
+            {
+                texture = repTextures[texture.Name][srr];
+                sourceRectangle = new Rectangle(sourceRectangle.Value.X - srr.X, sourceRectangle.Value.Y - srr.Y, sourceRectangle.Value.Width, sourceRectangle.Value.Height);
+            }
 
             sourceRectangle = sourceRectangle.HasValue ? sourceRectangle.Value : new Rectangle(0, 0, texture.Width, texture.Height);
 

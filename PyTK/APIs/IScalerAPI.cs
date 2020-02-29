@@ -27,6 +27,8 @@ namespace PyTK.APIs
 
         Texture2D ScaleUpTexture(Texture2D texture, float scale, bool asScaledTexture2D = true, Rectangle? forcedSourceRectangle = null);
 
+        void ReplaceAssetAt(string assetName, Rectangle sourceRectangle, Texture2D texture);
+
 
     }
 }

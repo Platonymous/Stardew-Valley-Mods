@@ -14,8 +14,6 @@ namespace PyTK.Tiled
 {
     public static class TMXContent
     {
-        public static IMapFormat TMXFormatNew = new TMXTile.TMXFormat(Game1.tileSize / Game1.pixelZoom, Game1.tileSize / Game1.pixelZoom, Game1.pixelZoom, Game1.pixelZoom);
-
         internal static IModHelper Helper = PyTKMod._helper;
         internal static IMonitor Monitor = PyTKMod._monitor;
         internal static List<string> Injected = new List<string>();
@@ -23,12 +21,22 @@ namespace PyTK.Tiled
 
         public static Map Load(string path, IModHelper helper, IContentPack contentPack = null)
         {
-            return Load(path, helper, false, contentPack);
+            string content = "Content";
+            if (contentPack is IContentPack cp)
+                content = cp.Manifest.UniqueID;
+            Monitor.Log("Loading Map: " + content + ">" + path, LogLevel.Trace);
+                return Load(path, helper, false, contentPack);
+            
         }
 
         public static Map Load(string path, IModHelper helper, bool syncTexturesToClients, IContentPack contentPack)
         {
             Map map = contentPack != null ? contentPack.LoadAsset<Map>(path) : helper.Content.Load<Map>(path);
+
+            for (int index = 0; index < map.TileSheets.Count; ++index)
+                if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(map.TileSheets[index].ImageSource)))
+                    map.TileSheets[index].ImageSource = Path.Combine("Maps", Path.GetFileName(map.TileSheets[index].ImageSource));
+
             map?.LoadTileSheets(Game1.mapDisplayDevice);
             return map;
         }
@@ -194,7 +202,7 @@ namespace PyTK.Tiled
         internal static MemoryStream map2tmx(Map map)
         {
             MemoryStream stream = new MemoryStream();
-            TMXFormatNew.Store(map, stream);
+            xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx").Store(map, stream);
             return stream;
         }
 

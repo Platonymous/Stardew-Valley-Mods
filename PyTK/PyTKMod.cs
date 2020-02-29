@@ -21,7 +21,8 @@ using System.Threading;
 using StardewValley.Objects;
 using StardewValley.Locations;
 using System.Threading.Tasks;
-using System.Xml;
+using StardewValley.Buildings;
+using System.Collections;
 using System.Xml.Serialization;
 
 namespace PyTK
@@ -156,7 +157,6 @@ namespace PyTK
 
             helper.Events.GameLoop.ReturnedToTitle += (s, e) =>
             {
-                RecheckedLocations = null;
                 saveData = new PyTKSaveData();
             };
 
@@ -187,69 +187,12 @@ namespace PyTK
             helper.Events.GameLoop.DayStarted += (s, e) =>
             {
                 if(Game1.currentLocation is GameLocation loc)
-                fixObjectsInLocation(loc);
                 UpdateLuaTokens = true;
             };
 
-            helper.Events.Player.Warped += (s, e) =>
-            {
-                if (RecheckedLocations is List<GameLocation> && !RecheckedLocations.Contains(e.NewLocation))
-                {
-                    RecheckedLocations.Add(e.NewLocation);
-                    fixObjectsInLocation(e.NewLocation);
-                }
-            };
+            helper.Events.GameLoop.UpdateTicked += (s, e) => AnimatedTexture2D.ticked = false;
 
-        }
-
-        public static void fixObjectsInLocation(GameLocation location)
-        {
-            Task.Run(() =>
-            {
-                bool r = false;
-                lock (waitForItems)
-                {
-                    if(Game1.player is Farmer farmer)
-                    foreach(Item item in farmer.Items.ToList())
-                        {
-                            var n = (Item)SaveHandler.rebuildElement(SaveHandler.getDataString(item), item);
-                            if (!SaveHandler.isRebuildable(n))
-                            {
-                                int index = farmer.Items.IndexOf(item);
-                                farmer.Items[index] = n;
-                                r = true;
-                            }
-                        }
-
-                    foreach (Vector2 key in location.Objects.Keys.ToList())
-                        if (location.Objects[key] is StardewValley.Object obj && SaveHandler.isRebuildable(obj))
-                        {
-                            var n = (StardewValley.Object)SaveHandler.rebuildElement(SaveHandler.getDataString(obj), obj);
-                            if (!SaveHandler.isRebuildable(n))
-                            {
-                                location.Objects[key] = n;
-                                r = true;
-                            }
-                        }
-
-                    if (location is DecoratableLocation dec)
-                        foreach (Furniture furniture in dec.furniture.ToList())
-                            if (SaveHandler.isRebuildable(furniture))
-                            {
-                                var n = (Furniture)SaveHandler.rebuildElement(SaveHandler.getDataString(furniture), furniture);
-                                if (!SaveHandler.isRebuildable(n))
-                                {
-                                    dec.furniture.Remove(furniture);
-                                    dec.furniture.Add(n);
-                                    r = true;
-                                }
-                            }
-
-                    if (r)
-                        PatchGeneratedSerializers();
-                }
-            });
-        }
+        }       
     
         public static void syncCounter(string id, int value)
         {
@@ -312,17 +255,60 @@ namespace PyTK
             // PyUtils.initOverride("SObject", PyUtils.getTypeSDV("Object"),typeof(DrawFix1), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
             // PyUtils.initOverride("TemporaryAnimatedSprite", PyUtils.getTypeSDV("TemporaryAnimatedSprite"),typeof(DrawFix2), new List<string>() { "draw" });
             instance.PatchAll(Assembly.GetExecutingAssembly());
+            instance.Patch(typeof(SaveGame).GetMethod("Load", BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
 
-            instance.Patch(typeof(SaveGame).GetMethod("Load",BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
+            foreach(ConstructorInfo mc in typeof(GameLocation).GetConstructors())
+                instance.Patch(mc, postfix: new HarmonyMethod(typeof(OvLocations).GetMethod("GameLocationConstructor", BindingFlags.Static | BindingFlags.Public)));
+
+
+            Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
+
+            if(Constants.TargetPlatform != GamePlatform.Android)
+                SetUpAssemblyPatch(instance, new XmlSerializer[] { SaveGame.farmerSerializer, SaveGame.locationSerializer, SaveGame.serializer });
             
-            foreach(MethodInfo method in typeof(System.Xml.Serialization.XmlSerializer).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(m => m.Name.StartsWith("Serialize")))
-            instance.Patch(method, prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("serializeFix", BindingFlags.Static | BindingFlags.Public)));
+            Helper.Events.GameLoop.GameLaunched += (s, e) =>
+            {
+                Task.Run(() =>
+               {
+                   lock (waitForIt)
+                       PatchGeneratedSerializers(AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains("Microsoft.GeneratedCode")));
+               });
+            };
+        }
 
-            GenerateSerializers();
-            Helper.Events.GameLoop.DayStarted += (s, e) => saveWasLoaded = true;
-            Helper.Events.GameLoop.ReturnedToTitle += (s, e) => saveWasLoaded = false;
-            Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted; 
-                
+        public static bool saveWasLoaded = false;
+
+        public static void saveLoadedXMLFix()
+        {
+            if (saveWasLoaded)
+                return;
+
+            lock (waitForIt)
+            {
+                saveWasLoaded = true;
+            }
+        }
+
+        public void SetUpAssemblyPatch(HarmonyInstance instance, IEnumerable<XmlSerializer> serializers)
+        {
+            foreach (var serializer in serializers)
+            {
+                var cache = serializer.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                Hashtable cacheTable = (Hashtable)cache.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cache);
+
+                foreach (var c in cacheTable.Values)
+                {
+                    var a = (Assembly)c.GetType().GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
+                    PatchGeneratedSerializers(new Assembly[] { a });
+                }
+
+                instance.Patch(cache.GetType().GetMethod("Add", BindingFlags.NonPublic | BindingFlags.Instance), postfix: new HarmonyMethod(typeof(PyTKMod).GetMethod("AssemblyCachePatch", BindingFlags.Static | BindingFlags.Public)));
+            }
+        }
+
+        public static void AssemblyCachePatch(string ns, object o, object assembly)
+        {
+            PatchGeneratedSerializers(new Assembly[] { (Assembly)assembly.GetType().GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(assembly) });
         }
 
         public static void serializeFix(ref System.Object o)
@@ -342,87 +328,42 @@ namespace PyTK
 
         private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
         {
-            Thread thread = new Thread(PatchGeneratedSerializers);
-            thread.Start();
             Helper.Events.GameLoop.DayStarted -= GameLoop_DayStarted;
         }
 
-        public static bool saveWasLoaded = false;
-
-        public static void saveLoadedXMLFix()
+        public static void PatchGeneratedSerializers(IEnumerable<Assembly> assemblies)
         {
-            if (saveWasLoaded)
-                return;
-
-            lock (waitForIt)
-            {
-                saveWasLoaded = true;
-            }
-        }
-
-
-        public static List<string> patchedMethods = new List<string>();
-        public void GenerateSerializers()
-        {
-            Thread thread = new Thread(GenerateSerializersThread);
-            thread.Start();
-        }
-
-        public void GenerateSerializersThread()
-        {
-            lock (waitForIt)
-            {
-                List<Type> AddedTypes = new List<Type>()
-            {
-               typeof(StardewValley.Object),
-                typeof(StardewValley.Objects.Chest),
-                typeof(StardewValley.Objects.Furniture),
-                typeof(StardewValley.TerrainFeatures.FruitTree),
-                typeof(StardewValley.Objects.TV),
-                typeof(StardewValley.Objects.Hat),
-                typeof(StardewValley.Item),
-                 typeof(StardewValley.Tool),
-                 typeof(StardewValley.Farm),
-                 typeof(StardewValley.FarmAnimal),
-                 typeof(StardewValley.Farmer),
-                 typeof(StardewValley.AnimalHouse),
-                 typeof(StardewValley.Character),
-                 typeof(StardewValley.NPC),
-                 typeof(StardewValley.GameLocation),
-                 typeof(StardewValley.Locations.FarmHouse),
-                 typeof(SaveGame)
-            };
-
-                SaveGame sg = new SaveGame();
-                DecoratableLocation d = new DecoratableLocation();
-                Farm ff = new Farm();
-
-                foreach (Type type in AddedTypes)
-                    SaveGame.GetSerializer(type);
-
-                PatchGeneratedSerializers();
-            }
-        }
-
-
-        public static void PatchGeneratedSerializers()
-        {
-            lock (waitForPatching)
-            {
-                foreach (var ass in AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains("Microsoft.GeneratedCode")))
-                    foreach (var ty in ass.GetTypes().Where(t => t.Name.StartsWith("XmlSerializationWriter") || t.Name.StartsWith("XmlSerializationReader")))
-                        PatchGeneratedSerializerType(ty);
-            }
+            foreach (var ass in assemblies)
+                foreach (var ty in ass.GetTypes().Where(t => t.Name.StartsWith("XmlSerializer1") || t.Name.StartsWith("XmlSerializationWriter") || t.Name.StartsWith("XmlSerializationReader")))
+                    PatchGeneratedSerializerType(ty);
         }
 
         public static void PatchGeneratedSerializerType(Type ty)
         {
-            foreach (var met in ty.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
-                   if (met.Name.Contains("_") && (met.Name.StartsWith("Write") || met.Name.StartsWith("Read")))
-                       if (met.Name.StartsWith("Write") && (new List<ParameterInfo>(met.GetParameters()).Exists(p => p.Name == "o" && p.ParameterType.IsClass && p.ParameterType.FullName.Contains("Stardew"))))
-                           instance.Patch(met, prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLReplacer", BindingFlags.Static | BindingFlags.Public)));
-                       else if (met.Name.StartsWith("Read") && met.ReturnType != null && met.ReturnType.IsClass && met.ReturnType.FullName.Contains("Stardew"))
-                           instance.Patch(met, postfix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLRebuilder", BindingFlags.Static | BindingFlags.Public)));
+            if (ty.FullName.Contains("XmlSerializer1"))
+            {
+                if (Constants.TargetPlatform != GamePlatform.Android && ty.GetField("cache", BindingFlags.NonPublic | BindingFlags.Static) is FieldInfo field && field.GetValue(null) is object cache)
+                    if (cache.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Instance) is FieldInfo cField && cField.GetValue(cache) is Hashtable cacheTable)
+                    {
+                        foreach (var c in cacheTable.Values)
+                        {
+                            var a = (Assembly)c.GetType().GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
+                            PatchGeneratedSerializers(new Assembly[] { a });
+                        }
+
+                        instance.Patch(cache.GetType().GetMethod("Add", BindingFlags.NonPublic | BindingFlags.Instance), postfix: new HarmonyMethod(typeof(PyTKMod).GetMethod("AssemblyCachePatch", BindingFlags.Static | BindingFlags.Public)));
+                    }
+            }
+            else
+            {
+                foreach (var met in ty.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
+                    if (met.Name.Contains("_") && (met.Name.StartsWith("Write") || met.Name.StartsWith("Read")))
+                        if (met.Name.StartsWith("Write") && (new List<ParameterInfo>(met.GetParameters()).Exists(p => p.Name == "o" && p.ParameterType.IsClass && p.ParameterType.FullName.Contains("Stardew"))))
+                            instance.Patch(met, prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLReplacer", BindingFlags.Static | BindingFlags.Public)));
+                        else if (met.Name.StartsWith("Read") && met.ReturnType != null && met.ReturnType.IsClass && met.ReturnType.FullName.Contains("Stardew"))
+                            instance.Patch(met, postfix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLRebuilder", BindingFlags.Static | BindingFlags.Public)));
+                        
+            }
         }
 
         public static void saveXMLReplacer(ref object o)
@@ -449,12 +390,10 @@ namespace PyTK
                 }
                 catch (Exception e)
                 {
-                    if (saveWasLoaded)
-                    {
+                  
                         _monitor.Log("Error during serialization: " + serializer.Name, LogLevel.Error);
                         _monitor.Log(e.Message);
                         _monitor.Log(e.StackTrace);
-                    }
                 }
         }
 
