@@ -35,7 +35,6 @@ namespace PyTK
         internal static string sdvContentFolder => PyUtils.ContentPath;
         internal static List<IPyResponder> responders;
         internal static PyTKSaveData saveData = new PyTKSaveData();
-
         internal static Dictionary<string, string> tokenStrings = new Dictionary<string, string>();
         internal static Dictionary<string, bool> tokenBoleans = new Dictionary<string, bool>();
         internal static bool UpdateCustomObjects = false;
@@ -190,7 +189,7 @@ namespace PyTK
                 UpdateLuaTokens = true;
             };
 
-            helper.Events.GameLoop.UpdateTicked += (s, e) => AnimatedTexture2D.ticked = false;
+            helper.Events.GameLoop.UpdateTicked += (s, e) => AnimatedTexture2D.ticked = e.Ticks;
 
         }       
     

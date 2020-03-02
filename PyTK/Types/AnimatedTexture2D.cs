@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PyTK.Extensions;
 using Microsoft.Xna.Framework;
 
@@ -11,28 +7,35 @@ namespace PyTK.Types
 {
     public class AnimatedTexture2D : ScaledTexture2D
     {
-        public static bool ticked = false;
-        private List<Texture2D> Frames = new List<Texture2D>();
+        public static uint ticked = 0;
+        public List<Texture2D> Frames = new List<Texture2D>();
         public int CurrentFrame = 0;
         private int SkipFrame = 0;
-        private int Counter = 0;
         public bool Paused { get; set; } = false;
         private bool Loop = true;
+        private uint lastTick = 0;
+
+        public void Tick()
+        {
+            if (CurrentFrame == Frames.Count - 1 && !Loop)
+                Paused = true;
+
+            if (Paused)
+                return;
+
+            if (lastTick == ticked)
+                return;
+            else
+                lastTick = ticked;
+
+            if (ticked % SkipFrame == 0)
+                CurrentFrame++;
+
+            CurrentFrame = CurrentFrame >= Frames.Count ? 0 : CurrentFrame;
+        }
 
         public override Texture2D STexture {
             get {
-                if (Paused || ticked)
-                    return Frames[CurrentFrame];
-
-                ticked = true;
-                Counter++;
-                Counter = Counter > SkipFrame ? 0 : Counter;
-                if (Counter % SkipFrame == 0)
-                {
-                    CurrentFrame++;
-                    Counter = 0;
-                }
-                CurrentFrame = CurrentFrame >= Frames.Count ? Loop ? 0 : Frames.Count - 1 : CurrentFrame;
                 return Frames[CurrentFrame];
             }
             set => base.STexture = value;

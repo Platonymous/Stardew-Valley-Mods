@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PyTK.Extensions;
 
 namespace PyTK.Types
 {
@@ -9,6 +10,8 @@ namespace PyTK.Types
         public float Scale{ get; set; }
         public virtual Texture2D STexture { get; set; }
         public Rectangle? ForcedSourceRectangle { get; set; } = null;
+
+        public bool AsOverlay { get; set; } = false;
 
         public ScaledTexture2D(GraphicsDevice graphicsDevice, int width, int height)
             : base(graphicsDevice, width, height)
