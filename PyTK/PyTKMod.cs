@@ -24,6 +24,8 @@ using System.Threading.Tasks;
 using StardewValley.Buildings;
 using System.Collections;
 using System.Xml.Serialization;
+using Microsoft.Xna.Framework.Graphics;
+using System.IO;
 
 namespace PyTK
 {
@@ -42,6 +44,7 @@ namespace PyTK
         internal static bool UpdateLuaTokens = false;
         public static Dictionary<IManifest, Func<object, object>> PreSerializer = new Dictionary<IManifest, Func<object, object>>();
         public static Dictionary<IManifest, Func<object, object>> PostSerializer = new Dictionary<IManifest, Func<object, object>>();
+        public static List<IInterceptor> ContentInterceptors = new List<IInterceptor>();
 
         internal static List<GameLocation> RecheckedLocations = new List<GameLocation>();
 
@@ -273,6 +276,104 @@ namespace PyTK
                        PatchGeneratedSerializers(AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains("Microsoft.GeneratedCode")));
                });
             };
+
+            setupLoadIntercepter(instance);
+        }
+
+        private void setupLoadIntercepter(HarmonyInstance harmony)
+        {
+            harmony.Patch(
+                original:AccessTools.DeclaredMethod(typeof(Texture2D), "FromStream", new Type[] { typeof(GraphicsDevice), typeof(Stream) }), 
+                postfix: new HarmonyMethod(this.GetType().GetMethod("FromStreamIntercepter", BindingFlags.Public | BindingFlags.Static)));
+            harmony.Patch(
+                original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.Content.AssetDataForImage, StardewModdingAPI"), "PatchImage"),
+                prefix: new HarmonyMethod(this.GetType().GetMethod("PatchImage", BindingFlags.Public | BindingFlags.Static))
+            );
+
+            ContentInterceptors.Add(new TextureInterceptor<ScaleUpData>(ModManifest, (texture, data, path) =>
+             {
+                 if (data is ScaleUpData)
+                 {
+                     bool scaled = false, animated = false, loop = true;
+                     float scale = 1f;
+                     int tileWidth = 0, tileHeight = 0, fps = 0;
+
+                     if (data.SourceArea is int[] area && area.Length == 4)
+                         texture = texture.getArea(new Rectangle(area[0], area[1], area[2], area[3]));
+
+                     if (data.Scale != 1f)
+                     {
+                         scale = data.Scale;
+                         scaled = true;
+                     }
+
+                     if (data.Animation is Animation anim)
+                     {
+                         tileHeight = anim.FrameHeight == -1 ? texture.Height : anim.FrameHeight;
+                         tileWidth = anim.FrameWidth == -1 ? texture.Width : anim.FrameWidth;
+                         fps = anim.FPS;
+                         loop = anim.Loop;
+
+                         if (!(tileWidth == texture.Width && tileHeight == texture.Height))
+                             animated = true;
+                     }
+
+                     if (animated)
+                         return new AnimatedTexture2D(texture, tileWidth, tileHeight, fps, loop, !scaled ? 1f : scale);
+                     else if (scaled)
+                         return ScaledTexture2D.FromTexture(texture.ScaleUpTexture(1f / scale, false), texture, scale);
+                 }
+
+                 return texture;
+             }));
+        }
+
+        public static void PatchImage(IAssetDataForImage __instance, Texture2D source, Rectangle? sourceArea, Rectangle? targetArea, PatchMode patchMode)
+        {
+            if (source is ScaledTexture2D scaled)
+            {
+                var a = new Rectangle(0, 0, __instance.Data.Width, __instance.Data.Height);
+                var s = new Rectangle(0, 0, source.Width, source.Height);
+                var sr = !sourceArea.HasValue ? s : sourceArea.Value;
+                var tr = !targetArea.HasValue ? sr : targetArea.Value;
+
+                if (a == tr && patchMode == PatchMode.Replace)
+                {
+                    __instance.ReplaceWith(source);
+                    return;
+                }
+
+                if (patchMode == PatchMode.Overlay)
+                    scaled.AsOverlay = true;
+
+                if (scaled.AsOverlay)
+                {
+                    Color[] data = new Color[(int)(tr.Width) * (int)(tr.Height)];
+                    __instance.Data.getArea(tr).GetData(data);
+                    scaled.SetData<Color>(data);
+                }
+
+                if (__instance.Data is MappedTexture2D map)
+                    map.Set(tr, scaled);
+                else
+                    __instance.ReplaceWith(new MappedTexture2D(__instance.Data, new Dictionary<Rectangle?, Texture2D>() { { tr, scaled } }));
+
+            }
+        }
+
+        public static void FromStreamIntercepter(Stream stream, ref Texture2D __result)
+        {
+            if (stream is FileStream fs
+                && Path.GetFileNameWithoutExtension(fs.Name) is string key
+                && Path.GetDirectoryName(fs.Name) is string dir
+                && Path.Combine(dir, key + ".pytk.json") is string pytkDataFile
+                && File.Exists(pytkDataFile)
+                && Newtonsoft.Json.JsonConvert.DeserializeObject<InterceptorData>(File.ReadAllText(pytkDataFile)) is InterceptorData idata)
+                foreach (IInterceptor<Texture2D> interceptor in ContentInterceptors
+                .Where(i => i is IInterceptor<Texture2D>
+                && i.DataType != null && idata.Mods.Contains(i.Mod.UniqueID)))
+                    if (Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(pytkDataFile), interceptor.DataType) is object o && o.GetType() == interceptor.DataType)
+                        __result = interceptor.Handler(__result, o, fs.Name);
         }
 
         public static bool saveWasLoaded = false;
