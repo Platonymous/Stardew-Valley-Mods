@@ -1,7 +1,7 @@
 ﻿{
   "Name": "ScaleUp",
   "Author": "Platonymous",
-  "Version": "1.3.1",
+  "Version": "1.4.3",
   "Description": "Allows adding higher resolution textures via ContentPatcher",
   "UniqueID": "Platonymous.ScaleUp",
   "EntryDll": "ScaleUp.dll",
@@ -10,7 +10,7 @@
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.12.33"
+      "MinimumVersion": "1.12.40"
     },
     {
       "UniqueID": "Pathoschild.ContentPatcher",
