@@ -259,15 +259,15 @@ namespace PyTK
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("Load", BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
 
-            foreach(ConstructorInfo mc in typeof(GameLocation).GetConstructors())
+            foreach (ConstructorInfo mc in typeof(GameLocation).GetConstructors())
                 instance.Patch(mc, postfix: new HarmonyMethod(typeof(OvLocations).GetMethod("GameLocationConstructor", BindingFlags.Static | BindingFlags.Public)));
 
 
             Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 
-            if(Constants.TargetPlatform != GamePlatform.Android)
+            if (Constants.TargetPlatform != GamePlatform.Android)
                 SetUpAssemblyPatch(instance, new XmlSerializer[] { SaveGame.farmerSerializer, SaveGame.locationSerializer, SaveGame.serializer });
-            
+
             Helper.Events.GameLoop.GameLaunched += (s, e) =>
             {
                 Task.Run(() =>
@@ -277,7 +277,23 @@ namespace PyTK
                });
             };
 
+            instance.Patch(
+               original: AccessTools.DeclaredMethod(typeof(xTile.Display.XnaDisplayDevice), "DrawTile", new Type[] { typeof(xTile.Tiles.Tile), typeof(xTile.Dimensions.Location), typeof(float) }),
+               prefix: new HarmonyMethod(this.GetType().GetMethod("DrawTilePre", BindingFlags.Public | BindingFlags.Static)),
+               postfix: new HarmonyMethod(this.GetType().GetMethod("DrawTilePost", BindingFlags.Public | BindingFlags.Static))
+               );
+
             setupLoadIntercepter(instance);
+        }
+
+        public static void DrawTilePre(xTile.Tiles.Tile tile)
+        {
+            OvSpritebatchNew.CurrentTile = tile;
+        }
+
+        public static void DrawTilePost()
+        {
+            OvSpritebatchNew.CurrentTile = null;
         }
 
         private void setupLoadIntercepter(HarmonyInstance harmony)
