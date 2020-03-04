@@ -26,6 +26,7 @@ using System.Collections;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
+using TMXTile;
 
 namespace PyTK
 {
@@ -70,6 +71,12 @@ namespace PyTK
         public override void Entry(IModHelper helper)
         {
             _instance = this;
+
+            if (xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
+                tmxf.DrawImageLayer = PyMaps.drawImageLayer;
+
+            Game1.mapDisplayDevice = new SDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice);
+
             PostSerializer.Add(ModManifest, Rebuilder);
             PreSerializer.Add(ModManifest, Replacer);
 
@@ -193,9 +200,8 @@ namespace PyTK
             };
 
             helper.Events.GameLoop.UpdateTicked += (s, e) => AnimatedTexture2D.ticked = e.Ticks;
+        }
 
-        }       
-    
         public static void syncCounter(string id, int value)
         {
             if (Game1.IsMultiplayer)
@@ -282,7 +288,7 @@ namespace PyTK
                prefix: new HarmonyMethod(this.GetType().GetMethod("DrawTilePre", BindingFlags.Public | BindingFlags.Static)),
                postfix: new HarmonyMethod(this.GetType().GetMethod("DrawTilePost", BindingFlags.Public | BindingFlags.Static))
                );
-
+            
             setupLoadIntercepter(instance);
         }
 

@@ -1,7 +1,7 @@
 {
   "Name": "TMXL Map Toolkit",
   "Author": "Platonymous",
-  "Version": "1.10.23",
+  "Version": "1.10.26",
   "Description": "Load TMX Maps into the Game",
   "UniqueID": "Platonymous.TMXLoader",
   "EntryDll": "TMXLoader.dll",
@@ -10,7 +10,7 @@
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.12.38"
+      "MinimumVersion": "1.13.3"
     }
   ]
 }

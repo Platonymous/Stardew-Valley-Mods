@@ -29,6 +29,7 @@ using StardewValley.Monsters;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
 using StardewValley.Buildings;
+using TMXTile;
 
 namespace TMXLoader
 {
@@ -520,7 +521,29 @@ namespace TMXLoader
                 PyNet.sendRequestToAllFarmers<bool>(buildableReceiverName, sav, null, SerializationType.JSON, -1);
 
             location.map = map.mergeInto(location.Map,position.GetVector2(),null,edit.removeEmpty);
+
             location.map.LoadTileSheets(Game1.mapDisplayDevice);
+
+            foreach (Layer layer in map.Layers.Where(l => l.IsImageLayer()))
+                if (location.map.Layers.FirstOrDefault(ll => ll.Id == layer.Id) is Layer il && xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
+                {
+                    var pos = il.GetOffset();
+                    pos.X = pos.X + position.X * Game1.tileSize;
+                    pos.Y = pos.Y + position.Y * Game1.tileSize;
+                    il.SetOffset(pos);
+                    if (!(il.GetTileSheetForImageLayer() is TileSheet))
+                    {
+                        Monitor.Log(il.Id + " missing Image", LogLevel.Error);
+                        if(il.Properties.ContainsKey("@ImageLayerTileSheet"))
+                        Monitor.Log(il.Id + " Not found:" + il.Properties["@ImageLayerTileSheet"], LogLevel.Error);
+                        else
+                            Monitor.Log(il.Id + " Missing @ImageLayerTileSheet", LogLevel.Error);
+
+
+                    }
+                    il.AfterDraw += (s, args) => tmxf.DrawImageLayer?.Invoke(args.Layer, args.Viewport);
+                }
+                    
             location.updateSeasonalTileSheets();
             location.map.enableMoreMapLayers();
             fixWaterTiles(location);
@@ -603,15 +626,13 @@ namespace TMXLoader
 
                 if (layer.Id.Contains("UNIQUEID"))
                 {
-                    if (layer.Properties.ContainsKey("isImageLayer"))
+                    if (layer.IsImageLayer())
                     {
-                        if (layer.Properties.ContainsKey("offsetx"))
-                            layer.Properties["offsetx"] = (int.Parse(layer.Properties["offsetx"].ToString()) + position.X * 64).ToString();
-
-                        if (layer.Properties.ContainsKey("offsety"))
-                            layer.Properties["offsety"] = (int.Parse(layer.Properties["offsety"].ToString()) + position.Y * 64).ToString();
-
-                        layer.Properties.Add("UseImageFrom", layer.Id);
+                        var offset = layer.GetOffset();
+                        offset.X += position.X * 64;
+                        offset.Y += position.Y * 64;
+                        if (layer.Map.TileSheets.FirstOrDefault(t => t.Id == "zImageSheet_" + layer.Id) is TileSheet zs)
+                            layer.SetTileSheetForImageLayer(zs);
                     }
                     layer.Id = layer.Id.Replace("UNIQUEID", uniqueId);
                 }

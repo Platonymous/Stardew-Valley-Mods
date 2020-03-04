@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using TMXTile;
 using xTile.Tiles;
 
 namespace PyTK.Overrides
@@ -51,7 +52,8 @@ namespace PyTK.Overrides
 
             if (CurrentTile is Tile t)
             {
-
+                return true;
+                /*
                 bool horizontal = t.Properties.ContainsKey("FLIPPED_HORIZONTALLY") && t.Properties["FLIPPED_HORIZONTALLY"] == true;
                 bool vertical = t.Properties.ContainsKey("FLIPPED_VERTICALLY") && t.Properties["FLIPPED_VERTICALLY"] == true;
                 bool diagonal = t.Properties.ContainsKey("FLIPPED_DIAGONALLY") && t.Properties["FLIPPED_DIAGONALLY"] == true;
@@ -90,9 +92,14 @@ namespace PyTK.Overrides
                     effects = SpriteEffects.FlipHorizontally;
                 else
                     return true;
+                    */
+
+                DrawInstructions d = t.GetDrawInstructions();
+                destinationRectangle.X += d.Offset.X;
+                destinationRectangle.Y += d.Offset.Y;
 
                 skip = true;
-                __instance.Draw(texture, destinationRectangle, sourceRectangle, color, rotation, origin, effects, layerDepth);
+                __instance.Draw(texture, destinationRectangle, sourceRectangle, (d.Color == null ? color : new Color(d.Color.R,d.Color.G,d.Color.B)) * d.Opacity, d.Rotation, origin, effects, layerDepth);
                 return false;
             }
 

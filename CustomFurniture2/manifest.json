@@ -1,0 +1,10 @@
+﻿{
+  "Name": "CustomFurniture2",
+  "Author": "ModAuthor",
+  "Version": "1.0.0",
+  "Description": "Mod Template",
+  "UniqueID": "ModAuthor.CustomFurniture2",
+  "EntryDll": "CustomFurniture2.dll",
+  "MinimumApiVersion": "2.11",
+  "UpdateKeys": [ "Nexus:" ]
+}
