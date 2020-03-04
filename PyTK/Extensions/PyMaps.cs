@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using StardewValley;
 using SObject = StardewValley.Object;
 using Microsoft.Xna.Framework;
@@ -368,10 +369,30 @@ namespace PyTK.Extensions
         public static Map mergeInto(this Map t, Map map, Vector2 position, Microsoft.Xna.Framework.Rectangle? sourceArea = null, bool includeEmpty = true, bool properties = true)
         {
             Microsoft.Xna.Framework.Rectangle sourceRectangle = sourceArea.HasValue ? sourceArea.Value : new Microsoft.Xna.Framework.Rectangle(0, 0, t.DisplayWidth / Game1.tileSize, t.DisplayHeight / Game1.tileSize);
-
+            
+            //tilesheet normalizing taken with permission from Content Patcher 
+            // https://github.com/Pathoschild/StardewMods/blob/stable/ContentPatcher/Framework/Patches/EditMapPatch.cs
             foreach (TileSheet tilesheet in t.TileSheets)
-                if (!map.hasTileSheet(tilesheet))
+            {
+                TileSheet mapSheet = map.GetTileSheet(tilesheet.Id);
+
+                if (mapSheet == null || mapSheet.ImageSource != tilesheet.ImageSource)
+                {
+                    // change ID if needed so new tilesheets are added after vanilla ones (to avoid errors in hardcoded game logic)
+                    string id = tilesheet.Id;
+                    if (!id.StartsWith("z_", StringComparison.InvariantCultureIgnoreCase))
+                        id = $"z_{id}";
+
+                    // change ID if it conflicts with an existing tilesheet
+                    if (map.GetTileSheet(id) != null)
+                    {
+                        int disambiguator = Enumerable.Range(2, int.MaxValue - 1).First(p => map.GetTileSheet($"{id}_{p}") == null);
+                        id = $"{id}_{disambiguator}";
+                    }
+                    //add tilesheet
                     map.AddTileSheet(new TileSheet(tilesheet.Id, map, tilesheet.ImageSource, tilesheet.SheetSize, tilesheet.TileSize));
+                }
+            }
 
             if(properties)
             foreach (KeyValuePair<string, PropertyValue> p in t.Properties)
