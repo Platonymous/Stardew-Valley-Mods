@@ -289,7 +289,6 @@ namespace PyTK.Extensions
                     color = new Color(c.R, c.G, c.B, c.A);
 
                 Vector2 pos = Game1.GlobalToLocal(new Vector2(posGlobal.X, posGlobal.Y));
-                Microsoft.Xna.Framework.Rectangle view = new Microsoft.Xna.Framework.Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height);
                 Microsoft.Xna.Framework.Rectangle dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, texture.Width * Game1.pixelZoom, texture.Height * Game1.pixelZoom);
 
                 Game1.spriteBatch.Draw(texture, dest, color * opacity);
