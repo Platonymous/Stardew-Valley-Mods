@@ -77,6 +77,12 @@ namespace PyTK
 
             Game1.mapDisplayDevice = new SDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice);
 
+            helper.Events.Display.RenderingWorld += (s,e) =>
+            {
+                if (Game1.currentLocation is GameLocation location && location.Map is Map map && map.GetBackgroundColor() is TMXColor tmxColor)
+                    Game1.graphics.GraphicsDevice.Clear(tmxColor.toColor());
+            };
+
             PostSerializer.Add(ModManifest, Rebuilder);
             PreSerializer.Add(ModManifest, Replacer);
 
@@ -202,6 +208,11 @@ namespace PyTK
             helper.Events.GameLoop.UpdateTicked += (s, e) => AnimatedTexture2D.ticked = e.Ticks;
         }
 
+        private void Display_RenderingWorld(object sender, RenderingWorldEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         public static void syncCounter(string id, int value)
         {
             if (Game1.IsMultiplayer)
@@ -215,8 +226,9 @@ namespace PyTK
 
         private void Player_Warped(object sender, WarpedEventArgs e)
         {
-            PyMaps.ImageLayerCache.Clear();
-            
+            if (e.NewLocation.Map.Properties.ContainsKey("@WaterColor") && TMXColor.FromString(e.NewLocation.Map.Properties["@WaterColor"]) is TMXColor color)
+                e.NewLocation.waterColor.Value = new Color(color.R, color.G, color.B, color.A);
+
             if (!e.IsLocalPlayer)
                 return;
 
@@ -283,23 +295,7 @@ namespace PyTK
                });
             };
 
-            instance.Patch(
-               original: AccessTools.DeclaredMethod(typeof(xTile.Display.XnaDisplayDevice), "DrawTile", new Type[] { typeof(xTile.Tiles.Tile), typeof(xTile.Dimensions.Location), typeof(float) }),
-               prefix: new HarmonyMethod(this.GetType().GetMethod("DrawTilePre", BindingFlags.Public | BindingFlags.Static)),
-               postfix: new HarmonyMethod(this.GetType().GetMethod("DrawTilePost", BindingFlags.Public | BindingFlags.Static))
-               );
-            
             setupLoadIntercepter(instance);
-        }
-
-        public static void DrawTilePre(xTile.Tiles.Tile tile)
-        {
-            OvSpritebatchNew.CurrentTile = tile;
-        }
-
-        public static void DrawTilePost()
-        {
-            OvSpritebatchNew.CurrentTile = null;
         }
 
         private void setupLoadIntercepter(HarmonyInstance harmony)

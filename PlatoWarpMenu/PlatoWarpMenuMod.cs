@@ -56,18 +56,17 @@ namespace PlatoWarpMenu
             intercept = true;
             var g = Game1.currentLocation;
 
-                Game1.currentLocation = CurrentLocation;
-                try
-                {
-                    Game1.spriteBatch.End();
-                    Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name);
-                    Game1.spriteBatch.Begin();
-                }
-                catch
-                {
+            Game1.currentLocation = CurrentLocation;
+            try
+            {
+                Game1.spriteBatch.End();
+                Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name);
+                Game1.spriteBatch.Begin();
+            }
+            catch
+            {
 
-                }
-
+            }
             Game1.currentLocation = g;
             _helper.Events.Display.RenderedActiveMenu -= Display_Rendered;
             intercept = false;

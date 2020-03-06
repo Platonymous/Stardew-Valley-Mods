@@ -3,15 +3,11 @@ using Microsoft.Xna.Framework.Graphics;
 using PyTK.CustomElementHandler;
 using PyTK.Extensions;
 using PyTK.Types;
-using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using TMXTile;
 using xTile.Tiles;
 
 namespace PyTK.Overrides
@@ -20,7 +16,6 @@ namespace PyTK.Overrides
     {
         internal static Dictionary<Rectangle, CustomObjectData> recCache = new Dictionary<Rectangle, CustomObjectData>();
         internal static Dictionary<string, Dictionary<Rectangle?, Texture2D>> repTextures = new Dictionary<string, Dictionary<Rectangle?, Texture2D>>();
-        internal static Tile CurrentTile = null;
 
         internal static bool skip = false;
 
@@ -48,59 +43,6 @@ namespace PyTK.Overrides
             {
                 skip = false;
                 return true;
-            }
-
-            if (CurrentTile is Tile t)
-            {
-                return true;
-                /*
-                bool horizontal = t.Properties.ContainsKey("FLIPPED_HORIZONTALLY") && t.Properties["FLIPPED_HORIZONTALLY"] == true;
-                bool vertical = t.Properties.ContainsKey("FLIPPED_VERTICALLY") && t.Properties["FLIPPED_VERTICALLY"] == true;
-                bool diagonal = t.Properties.ContainsKey("FLIPPED_DIAGONALLY") && t.Properties["FLIPPED_DIAGONALLY"] == true;
-                if (diagonal)
-                {
-                    effects = SpriteEffects.None;
-
-                    if (vertical == horizontal)
-                        effects = SpriteEffects.FlipVertically;
-
-                    if (!vertical)
-                    {
-                        rotation += (float)Math.PI / 2;
-                        destinationRectangle.X += Game1.tileSize;
-                    }
-                    else
-                    {
-                        rotation -= (float)Math.PI / 2;
-                        destinationRectangle.Y += Game1.tileSize;
-                    }
-                }
-                else if (vertical)
-                {
-                    effects = SpriteEffects.FlipVertically;
-
-                    if (horizontal)
-                    {
-                        effects = SpriteEffects.None;
-                        rotation += (float)Math.PI;
-                        destinationRectangle.X += Game1.tileSize;
-                        destinationRectangle.Y += Game1.tileSize;
-                    }
-
-                }
-                else if (horizontal)
-                    effects = SpriteEffects.FlipHorizontally;
-                else
-                    return true;
-                    */
-
-                DrawInstructions d = t.GetDrawInstructions();
-                destinationRectangle.X += d.Offset.X;
-                destinationRectangle.Y += d.Offset.Y;
-
-                skip = true;
-                __instance.Draw(texture, destinationRectangle, sourceRectangle, (d.Color == null ? color : new Color(d.Color.R,d.Color.G,d.Color.B)) * d.Opacity, d.Rotation, origin, effects, layerDepth);
-                return false;
             }
 
             if (texture == null || destinationRectangle == null)

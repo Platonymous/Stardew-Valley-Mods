@@ -5,6 +5,7 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TMXTile;
 
 namespace PyTK.Extensions
 {
@@ -45,6 +46,16 @@ namespace PyTK.Extensions
         public static Color clone(this Color t)
         {
             return new Color(t.ToVector4());
+        }
+
+        public static Color toColor(this TMXColor color)
+        {
+            return new Color(color.R, color.G, color.B, color.A);
+        }
+
+        public static TMXColor toTMXColor(this Color color)
+        {
+            return new TMXColor() { R = color.R, G = color.G, B = color.B, A = color.A };
         }
 
         public static int getDistanceTo(this Color current, Color match)

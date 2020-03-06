@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using TMXTile;
 using xTile.Dimensions;
 using xTile.Display;
@@ -45,6 +46,9 @@ namespace PyTK.Types
 
         private void LoadTileSheet2(TileSheet tileSheet)
         {
+            if(string.IsNullOrWhiteSpace(Path.GetDirectoryName(tileSheet.ImageSource)))
+                    tileSheet.ImageSource = Path.Combine("Maps", Path.GetFileName(tileSheet.ImageSource));
+
             if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture)
                 if (m_tileSheetTextures.ContainsKey(tileSheet.ImageSource))
                     m_tileSheetTextures[tileSheet.ImageSource] = texture;
@@ -91,9 +95,9 @@ namespace PyTK.Types
             this.m_sourceRectangle.Height = tileImageBounds.Height;
 
             if (this.m_instructions.Color is TMXColor color)
-                this.m_modulationColour = new Color(color.R, color.G, color.B) * this.m_instructions.Opacity;
+                this.m_modulationColour = new Color(color.R, color.G, color.B, color.A);
 
-            this.m_spriteBatchAlpha.Draw(tileSheetTexture, this.m_tilePosition, new Microsoft.Xna.Framework.Rectangle?(this.m_sourceRectangle), this.m_modulationColour, this.m_instructions.Rotation, Vector2.Zero, (float)Layer.zoom, (SpriteEffects) m_instructions.Effect, layerDepth);
+            this.m_spriteBatchAlpha.Draw(tileSheetTexture, this.m_tilePosition, new Microsoft.Xna.Framework.Rectangle?(this.m_sourceRectangle), this.m_modulationColour * this.m_instructions.Opacity, this.m_instructions.Rotation, Vector2.Zero, (float)Layer.zoom, (SpriteEffects) m_instructions.Effect, layerDepth);
         }
 
         public void EndScene()

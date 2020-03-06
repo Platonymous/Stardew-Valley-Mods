@@ -6,6 +6,7 @@ using StardewValley.Minigames;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using TMXTile;
 using xTile;
 using xTile.Layers;
 using xTile.ObjectModel;
@@ -241,6 +242,59 @@ namespace PyTK.Lua
             if (bigCraftable)
                 return new SObject(Vector2.Zero, index);
             return new SObject(index, 1);
-        }     
+        }
+
+        public static Color? getColorFromProperty(Map map, string property)
+        {
+            if (map.Properties.ContainsKey(property) && TMXColor.FromString(map.Properties[property]) is TMXColor color)
+                return color.toColor();
+
+            return null;
+        }
+
+        public static Color? getColorFromProperty(Layer layer, string property)
+        {
+            if (layer.Properties.ContainsKey(property) && TMXColor.FromString(layer.Properties[property]) is TMXColor color)
+                return color.toColor();
+
+            return null;
+        }
+
+        public static Color? getColorFromProperty(Tile tile, string property)
+        {
+            if (tile.Properties.ContainsKey(property) && TMXColor.FromString(tile.Properties[property]) is TMXColor color)
+                return color.toColor();
+
+            return null;
+        }
+
+        public static Color getColor(int r, int g, int b, int a)
+        {
+            return new Color(r, g, b, a);
+        }
+
+        public static void setColorProperty(Tile tile, Color color, string property)
+        {
+            tile.Properties[property] = color.toTMXColor().ToString();
+        }
+
+        public static void setColorProperty(Layer layer, Color color, string property)
+        {
+            layer.Properties[property] = color.toTMXColor().ToString();
+        }
+
+        public static void setColorProperty(Map map, Color color, string property)
+        {
+            map.Properties[property] = color.toTMXColor().ToString();
+        }
+
+        public static Color safeColor(Color? color)
+        {
+            if (color.HasValue)
+                return color.Value;
+
+            return Color.White;
+        }
+
     }
 }

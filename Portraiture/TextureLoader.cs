@@ -53,11 +53,19 @@ namespace Portraiture
 
             try
             {
+                string season = Game1.currentSeason?.ToLower() ?? "spring";
                 activeFolder = Math.Max(activeFolder, 0);
 
-                if (Game1.currentLocation is GameLocation gl && pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + gl.Name))
-                    return pTextures[folders[activeFolder] + ">" + name + "_" + gl.Name];
-                else if (pTextures.ContainsKey(folders[activeFolder] + ">" + name))
+                if (Game1.currentLocation is GameLocation gl)
+                    if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + gl.Name + "_" + season))
+                        return pTextures[folders[activeFolder] + ">" + name + "_" + gl.Name + "_" + season];
+                    else if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + gl.Name))
+                        return pTextures[folders[activeFolder] + ">" + name + "_" + gl.Name];
+
+                if (pTextures.ContainsKey(folders[activeFolder] + ">" + name + "_" + season))
+                    return pTextures[folders[activeFolder] + ">" + name + "_" + season];
+
+                if (pTextures.ContainsKey(folders[activeFolder] + ">" + name))
                     return pTextures[folders[activeFolder] + ">" + name];
             }
             catch

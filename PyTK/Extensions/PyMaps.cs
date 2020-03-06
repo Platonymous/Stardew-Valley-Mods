@@ -29,8 +29,6 @@ namespace PyTK.Extensions
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
-        internal static Dictionary<string, Texture2D> ImageLayerCache = new Dictionary<string, Texture2D>();
-
         /// <summary>Looks for an object of the requested type on this map position.</summary>
         /// <returns>Return the object or null.</returns>
         public static T sObjectOnMap<T>(this Vector2 t) where T : SObject
@@ -240,39 +238,26 @@ namespace PyTK.Extensions
 
             }
 
-           
-            float opacity = layer.GetOpacity();
 
             if (!wrap)
-                drawImageLayer(layer,viewport);
-
-            string ts = "";
-
-            if (layer.GetTileSheetForImageLayer() is TileSheet tsheet)
-                ts = tsheet.ImageSource;
-            else
-                return;
-
-            Texture2D texture = null;
-
-            if (ImageLayerCache.ContainsKey(ts))
-                texture = ImageLayerCache[ts];
-            else
             {
-                texture = Helper.Content.Load<Texture2D>(ts, ContentSource.GameContent);
-                ImageLayerCache.Add(ts, texture);
+                drawImageLayer(layer, viewport);
+                return;
             }
 
-            Microsoft.Xna.Framework.Rectangle dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, texture.Width * Game1.pixelZoom, texture.Height * Game1.pixelZoom);
-            
-            Color color = Color.White;
-
-            if (layer.GetColor() is TMXColor c)
-                color = new Color(c.R, c.G, c.B);
-
-            var vp = new Microsoft.Xna.Framework.Rectangle(Game1.viewport.X, Game1.viewport.Y, Game1.viewport.Width, Game1.viewport.Height);
-            if (wrap)
+            if (layer.GetTileSheetForImageLayer() is TileSheet ts
+                && device is SDisplayDevice sDevice
+                && sDevice.GetTexture(ts) is Texture2D texture
+                && layer.GetOpacity() is float opacity)
             {
+                Color color = Color.White;
+
+                if (layer.GetColor() is TMXColor c)
+                    color = new Color(c.R, c.G, c.B, c.A);
+
+                var vp = new Microsoft.Xna.Framework.Rectangle(Game1.viewport.X, Game1.viewport.Y, Game1.viewport.Width, Game1.viewport.Height);
+                Microsoft.Xna.Framework.Rectangle dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, texture.Width * Game1.pixelZoom, texture.Height * Game1.pixelZoom);
+
                 Vector2 s = pos;
 
                 while (s.X > (vp.X - (dest.Width * 2)) || s.Y > (vp.Y - (dest.Height * 2)))
@@ -292,32 +277,23 @@ namespace PyTK.Extensions
 
         public static void drawImageLayer(Layer layer, xTile.Dimensions.Rectangle viewport)
         {
-            string ts = "";
-
-            if (layer.GetTileSheetForImageLayer() is TileSheet tsheet)
-                ts = tsheet.ImageSource;
-            else
-                return;
-
-            Texture2D texture = null;
-
-            if (ImageLayerCache.ContainsKey(ts))
-                texture = ImageLayerCache[ts];
-            else
+            if (layer.GetTileSheetForImageLayer() is TileSheet ts
+                && Game1.mapDisplayDevice is SDisplayDevice device
+                && device.GetTexture(ts) is Texture2D texture
+                && layer.GetOffset() is Location posGlobal
+                && layer.GetOpacity() is float opacity)
             {
-                texture = Helper.Content.Load<Texture2D>(ts, ContentSource.GameContent);
-                ImageLayerCache.Add(ts, texture);
+                Color color = Color.White;
+
+                if (layer.GetColor() is TMXColor c)
+                    color = new Color(c.R, c.G, c.B, c.A);
+
+                Vector2 pos = Game1.GlobalToLocal(new Vector2(posGlobal.X, posGlobal.Y));
+                Microsoft.Xna.Framework.Rectangle view = new Microsoft.Xna.Framework.Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height);
+                Microsoft.Xna.Framework.Rectangle dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, texture.Width * Game1.pixelZoom, texture.Height * Game1.pixelZoom);
+
+                Game1.spriteBatch.Draw(texture, dest, color * opacity);
             }
-
-            Color color = Color.White;
-
-            if (layer.GetColor() is TMXColor c)
-                color = new Color(c.R, c.G, c.B);
-
-            Location posGlobal = layer.GetOffset();
-            Vector2 pos = Game1.GlobalToLocal(new Vector2(posGlobal.X, posGlobal.Y));
-            Microsoft.Xna.Framework.Rectangle dest = new Microsoft.Xna.Framework.Rectangle((int)pos.X, (int)pos.Y, texture.Width * Game1.pixelZoom, texture.Height * Game1.pixelZoom);
-            Game1.spriteBatch.Draw(texture, dest, color * layer.GetOpacity());
         }
 
 
