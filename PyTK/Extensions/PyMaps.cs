@@ -241,7 +241,7 @@ namespace PyTK.Extensions
 
             if (!wrap)
             {
-                drawImageLayer(layer, viewport);
+                layer.Draw(device,viewport,offset,wrap,pixelZoom);
                 return;
             }
 
@@ -284,7 +284,6 @@ namespace PyTK.Extensions
                 && layer.GetOpacity() is float opacity)
             {
                 Color color = Color.White;
-
                 if (layer.GetColor() is TMXColor c)
                     color = new Color(c.R, c.G, c.B, c.A);
 
@@ -396,6 +395,9 @@ namespace PyTK.Extensions
                             map.InsertLayer(new Layer(layer.Id, map, map.Layers[0].LayerSize, map.Layers[0].TileSize), map.Layers.Count);
                             mapLayer = map.GetLayer(layer.Id);
                         }
+
+                        if (mapLayer.IsImageLayer())
+                            mapLayer.SetupImageLayer();
 
                         if (properties)
                             foreach (var prop in layer.Properties)

@@ -525,23 +525,12 @@ namespace TMXLoader
             location.map.LoadTileSheets(Game1.mapDisplayDevice);
 
             foreach (Layer layer in map.Layers.Where(l => l.IsImageLayer()))
-                if (location.map.Layers.FirstOrDefault(ll => ll.Id == layer.Id) is Layer il && xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
+                if (location.map.Layers.FirstOrDefault(ll => ll.Id == layer.Id) is Layer il)
                 {
                     var pos = il.GetOffset();
                     pos.X = pos.X + position.X * Game1.tileSize;
                     pos.Y = pos.Y + position.Y * Game1.tileSize;
                     il.SetOffset(pos);
-                    if (!(il.GetTileSheetForImageLayer() is TileSheet))
-                    {
-                        Monitor.Log(il.Id + " missing Image", LogLevel.Error);
-                        if(il.Properties.ContainsKey("@ImageLayerTileSheet"))
-                        Monitor.Log(il.Id + " Not found:" + il.Properties["@ImageLayerTileSheet"], LogLevel.Error);
-                        else
-                            Monitor.Log(il.Id + " Missing @ImageLayerTileSheet", LogLevel.Error);
-
-
-                    }
-                    il.AfterDraw += (s, args) => tmxf.DrawImageLayer?.Invoke(args.Layer, args.Viewport);
                 }
                     
             location.updateSeasonalTileSheets();
