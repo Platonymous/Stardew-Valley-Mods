@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -96,8 +97,19 @@ namespace PyTK.Types
 
             if (this.m_instructions.Color is TMXColor color)
                 this.m_modulationColour = new Color(color.R, color.G, color.B, color.A);
+            else
+                this.m_modulationColour = Color.White;
 
-            this.m_spriteBatchAlpha.Draw(tileSheetTexture, this.m_tilePosition, new Microsoft.Xna.Framework.Rectangle?(this.m_sourceRectangle), this.m_modulationColour * this.m_instructions.Opacity, this.m_instructions.Rotation, Vector2.Zero, (float)Layer.zoom, (SpriteEffects) m_instructions.Effect, layerDepth);
+            var origin = new Vector2(tileImageBounds.Width / 2, tileImageBounds.Height / 2);
+            m_tilePosition += new Vector2(tileImageBounds.Width * Game1.pixelZoom / 2, tileImageBounds.Height * Game1.pixelZoom / 2);
+            this.m_spriteBatchAlpha.Draw(
+                texture:tileSheetTexture, 
+                destinationRectangle:new Microsoft.Xna.Framework.Rectangle((int)this.m_tilePosition.X, (int) this.m_tilePosition.Y, Game1.tileSize, Game1.tileSize), 
+                sourceRectangle: new Microsoft.Xna.Framework.Rectangle?(this.m_sourceRectangle), this.m_modulationColour * this.m_instructions.Opacity, 
+                rotation: this.m_instructions.Rotation, 
+                origin:origin, 
+                effects:(SpriteEffects) m_instructions.Effect, 
+                layerDepth);
         }
 
         public void EndScene()
