@@ -75,7 +75,7 @@ namespace PyTK
             if (xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
                 tmxf.DrawImageLayer = PyMaps.drawImageLayer;
 
-            Game1.mapDisplayDevice = new SDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice);
+            Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice);
 
             helper.Events.Display.RenderingWorld += (s,e) =>
             {

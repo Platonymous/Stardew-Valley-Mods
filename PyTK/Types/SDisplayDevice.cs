@@ -8,12 +8,11 @@ using System.IO;
 using TMXTile;
 using xTile.Dimensions;
 using xTile.Display;
-using xTile.Layers;
 using xTile.Tiles;
 
 namespace PyTK.Types
 {
-    internal class SDisplayDevice : IDisplayDevice
+    internal class PyDisplayDevice : IDisplayDevice
     {
         private ContentManager m_contentManager;
         private GraphicsDevice m_graphicsDevice;
@@ -24,7 +23,7 @@ namespace PyTK.Types
         private DrawInstructions m_instructions;
         private Dictionary<string, Texture2D> m_tileSheetTextures;
 
-        public SDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice)
+        public PyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             this.m_contentManager = contentManager;
             this.m_graphicsDevice = graphicsDevice;
