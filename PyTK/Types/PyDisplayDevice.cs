@@ -12,7 +12,7 @@ using xTile.Tiles;
 
 namespace PyTK.Types
 {
-    internal class PyDisplayDevice : IDisplayDevice
+    public class PyDisplayDevice : IDisplayDevice
     {
         private ContentManager m_contentManager;
         private GraphicsDevice m_graphicsDevice;
@@ -118,7 +118,7 @@ namespace PyTK.Types
 
         public void LoadTileSheet(TileSheet tileSheet)
         {
-            
+            LoadTileSheet2(tileSheet);
         }
 
         public void SetClippingRegion(xTile.Dimensions.Rectangle clippingRegion)

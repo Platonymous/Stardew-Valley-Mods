@@ -203,18 +203,6 @@ namespace TMXLoader
                     Game1.locations.Add(loc);
             };
 
-            helper.Events.GameLoop.SaveLoaded += (s, e) =>
-            {/*
-                foreach (var edit in addedLocations)
-                {
-                    Monitor.Log("Add Location: " + edit.name);
-                    if (!(Game1.getLocationFromName(edit.name) is GameLocation))
-                        addLocation(edit);
-                }
-
-                restoreAllSavedBuildables();*/               
-            };
-
             helper.Events.GameLoop.DayStarted += (s, e) =>
             {
                 if (!helper.ModRegistry.IsLoaded("Entoarox.FurnitureAnywhere"))
