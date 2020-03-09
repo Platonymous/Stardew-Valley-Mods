@@ -21,14 +21,14 @@ namespace PyTK.Types
         private SpriteBatch m_spriteBatchAlpha;
         private Color m_modulationColour;
         private DrawInstructions m_instructions;
-        private Dictionary<string, Texture2D> m_tileSheetTextures;
+        private Dictionary<TileSheet, Texture2D> m_tileSheetTextures2;
 
         public PyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             this.m_contentManager = contentManager;
             this.m_graphicsDevice = graphicsDevice;
             this.m_spriteBatchAlpha = new SpriteBatch(graphicsDevice);
-            this.m_tileSheetTextures = new Dictionary<string, Texture2D>();
+            this.m_tileSheetTextures2 = new Dictionary<TileSheet, Texture2D>();
             this.m_tilePosition = new Vector2();
             this.m_sourceRectangle = new Microsoft.Xna.Framework.Rectangle();
             this.m_modulationColour = Color.White;
@@ -36,7 +36,7 @@ namespace PyTK.Types
 
         public void Clear()
         {
-            m_tileSheetTextures.Clear();
+            m_tileSheetTextures2.Clear();
         }
 
         public void BeginScene(SpriteBatch b)
@@ -44,26 +44,14 @@ namespace PyTK.Types
             m_spriteBatchAlpha = b;
         }
 
-        private void LoadTileSheet2(TileSheet tileSheet)
-        {
-            if(string.IsNullOrWhiteSpace(Path.GetDirectoryName(tileSheet.ImageSource)))
-                    tileSheet.ImageSource = Path.Combine("Maps", Path.GetFileName(tileSheet.ImageSource));
-
-            if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture)
-                if (m_tileSheetTextures.ContainsKey(tileSheet.ImageSource))
-                    m_tileSheetTextures[tileSheet.ImageSource] = texture;
-                else
-                    m_tileSheetTextures.Add(tileSheet.ImageSource, texture);
-        }
-
         public Texture2D GetTexture(TileSheet tilesheet)
         {
-            if (m_tileSheetTextures.TryGetValue(tilesheet.ImageSource, out Texture2D texture))
+            if (m_tileSheetTextures2.TryGetValue(tilesheet, out Texture2D texture))
                 return texture;
             else
             {
-                LoadTileSheet2(tilesheet);
-                if (m_tileSheetTextures.TryGetValue(tilesheet.ImageSource, out Texture2D texture2))
+                LoadTileSheet(tilesheet);
+                if (m_tileSheetTextures2.TryGetValue(tilesheet, out Texture2D texture2))
                     return texture2;
                 else
                     return null;
@@ -72,7 +60,7 @@ namespace PyTK.Types
 
         public void DisposeTileSheet(TileSheet tileSheet)
         {
-            m_tileSheetTextures.Remove(tileSheet.ImageSource);
+            m_tileSheetTextures2.Remove(tileSheet);
         }
 
         public void DrawTile(Tile tile, Location location, float layerDepth)
@@ -118,7 +106,14 @@ namespace PyTK.Types
 
         public void LoadTileSheet(TileSheet tileSheet)
         {
-            LoadTileSheet2(tileSheet);
+            if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(tileSheet.ImageSource)))
+                tileSheet.ImageSource = Path.Combine("Maps", Path.GetFileName(tileSheet.ImageSource));
+
+            if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture)
+                if (m_tileSheetTextures2.ContainsKey(tileSheet))
+                    m_tileSheetTextures2[tileSheet] = texture;
+                else
+                    m_tileSheetTextures2.Add(tileSheet, texture);
         }
 
         public void SetClippingRegion(xTile.Dimensions.Rectangle clippingRegion)

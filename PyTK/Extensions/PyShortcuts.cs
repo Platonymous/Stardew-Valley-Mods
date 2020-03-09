@@ -22,25 +22,25 @@ namespace PyTK.Extensions
         public static object GetFieldValue (this object obj, string field, bool isStatic = false)
         {
             Type t = obj is Type ? (Type)obj : obj.GetType();
-            return t.GetField(field, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).GetValue(isStatic ? null : obj);
+            return t.GetField(field, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(isStatic ? null : obj);
         }
 
         public static void SetFieldValue(this object obj, object value, string field, bool isStatic = false)
         {
             Type t = obj is Type ? (Type)obj : obj.GetType();
-            t.GetField(field, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).SetValue(isStatic ? null : obj, value);
+            t.GetField(field, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.SetValue(isStatic ? null : obj, value);
         }
 
         public static object GetPropertyValue(this object obj, string property, bool isStatic = false)
         {
             Type t = obj is Type ? (Type)obj : obj.GetType();
-            return t.GetProperty(property, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).GetValue(isStatic ? null : obj);
+            return t.GetProperty(property, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(isStatic ? null : obj);
         }
 
         public static void SetPropertyValue(this object obj, object value, string property, bool isStatic = false)
         {
             Type t = obj is Type ? (Type) obj : obj.GetType();
-            t.GetProperty(property, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).SetValue(isStatic ? null : obj, value);
+            t.GetProperty(property, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.SetValue(isStatic ? null : obj, value);
         }
 
         public static bool isDown(this Keys k)

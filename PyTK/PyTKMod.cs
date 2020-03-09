@@ -300,53 +300,58 @@ namespace PyTK
 
         private void setupLoadIntercepter(HarmonyInstance harmony)
         {
-            harmony.Patch(
-                original:AccessTools.DeclaredMethod(typeof(Texture2D), "FromStream", new Type[] { typeof(GraphicsDevice), typeof(Stream) }), 
-                postfix: new HarmonyMethod(this.GetType().GetMethod("FromStreamIntercepter", BindingFlags.Public | BindingFlags.Static)));
+            foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(gm => gm.Name.Contains("FromStream")))
+                harmony.Patch(
+                    original: m,
+                    postfix: new HarmonyMethod(this.GetType().GetMethod("FromStreamIntercepter", BindingFlags.Public | BindingFlags.Static)));
+
             harmony.Patch(
                 original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.Content.AssetDataForImage, StardewModdingAPI"), "PatchImage"),
                 prefix: new HarmonyMethod(this.GetType().GetMethod("PatchImage", BindingFlags.Public | BindingFlags.Static))
             );
 
-            ContentInterceptors.Add(new TextureInterceptor<ScaleUpData>(ModManifest, (texture, data, path) =>
-             {
-                 if (data is ScaleUpData)
-                 {
-                     bool scaled = false, animated = false, loop = true;
-                     float scale = 1f;
-                     int tileWidth = 0, tileHeight = 0, fps = 0;
-
-                     if (data.SourceArea is int[] area && area.Length == 4)
-                         texture = texture.getArea(new Rectangle(area[0], area[1], area[2], area[3]));
-
-                     if (data.Scale != 1f)
-                     {
-                         scale = data.Scale;
-                         scaled = true;
-                     }
-
-                     if (data.Animation is Animation anim)
-                     {
-                         tileHeight = anim.FrameHeight == -1 ? texture.Height : anim.FrameHeight;
-                         tileWidth = anim.FrameWidth == -1 ? texture.Width : anim.FrameWidth;
-                         fps = anim.FPS;
-                         loop = anim.Loop;
-
-                         if (!(tileWidth == texture.Width && tileHeight == texture.Height))
-                             animated = true;
-                     }
-
-                     if (animated)
-                         return new AnimatedTexture2D(texture, tileWidth, tileHeight, fps, loop, !scaled ? 1f : scale);
-                     else if (scaled)
-                         return ScaledTexture2D.FromTexture(texture.ScaleUpTexture(1f / scale, false), texture, scale);
-                 }
-
-                 return texture;
-             }));
+            ContentInterceptors.Add(new TextureInterceptor<ScaleUpData>(ModManifest, ScaleUpInterceptor));
         }
 
-        public static void PatchImage(IAssetDataForImage __instance, Texture2D source, Rectangle? sourceArea, Rectangle? targetArea, PatchMode patchMode)
+        public static Texture2D ScaleUpInterceptor(Texture2D texture, ScaleUpData data, string path)
+        {
+       
+                if (data is ScaleUpData)
+                {
+                bool scaled = false, animated = false, loop = true;
+                    float scale = 1f;
+                    int tileWidth = 0, tileHeight = 0, fps = 0;
+
+                    if (data.SourceArea is int[] area && area.Length == 4)
+                        texture = texture.getArea(new Rectangle(area[0], area[1], area[2], area[3]));
+
+                    if (data.Scale != 1f)
+                    {
+                        scale = data.Scale;
+                        scaled = true;
+                    }
+
+                    if (data.Animation is Animation anim)
+                    {
+                        tileHeight = anim.FrameHeight == -1 ? texture.Height : anim.FrameHeight;
+                        tileWidth = anim.FrameWidth == -1 ? texture.Width : anim.FrameWidth;
+                        fps = anim.FPS;
+                        loop = anim.Loop;
+
+                        if (!(tileWidth == texture.Width && tileHeight == texture.Height))
+                            animated = true;
+                    }
+
+                    if (animated)
+                        return new AnimatedTexture2D(texture, tileWidth, tileHeight, fps, loop, !scaled ? 1f : scale);
+                    else if (scaled)
+                        return ScaledTexture2D.FromTexture(texture.ScaleUpTexture(1f / scale, false), texture, scale);
+                }
+
+                return texture;
+        }
+
+        public static void PatchImage(IAssetDataForImage __instance, ref Texture2D source, ref Rectangle? sourceArea, Rectangle? targetArea, PatchMode patchMode)
         {
             if (source is ScaledTexture2D scaled)
             {
@@ -372,11 +377,11 @@ namespace PyTK
                 }
 
                 if (__instance.Data is MappedTexture2D map)
-                    map.Set(tr, scaled);
+                    map.Set(tr, source);
                 else
-                    __instance.ReplaceWith(new MappedTexture2D(__instance.Data, new Dictionary<Rectangle?, Texture2D>() { { tr, scaled } }));
-
+                    __instance.ReplaceWith(new MappedTexture2D(__instance.Data, new Dictionary<Rectangle?, Texture2D>() { { tr, source } }));
             }
+
         }
 
         public static void FromStreamIntercepter(Stream stream, ref Texture2D __result)
