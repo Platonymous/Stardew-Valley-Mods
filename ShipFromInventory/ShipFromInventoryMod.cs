@@ -12,6 +12,8 @@ namespace ShipFromInventory
     {
         public bool LidAnimation { get; set; } = true;
         public bool LidSound { get; set; } = true;
+
+        public SButton ShortcutKey { get; set; } = SButton.OemPlus;
     }
 
     public class ShipFromInventoryMod : Mod
@@ -45,6 +47,15 @@ namespace ShipFromInventory
 
             if (config.LidAnimation)
                 helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
+
+            helper.Events.Input.ButtonPressed += Input_ButtonPressed;
+            
+        }
+
+        private void Input_ButtonPressed(object sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
+        {
+            if (e.Button.Equals(config.ShortcutKey) && Game1.activeClickableMenu is GameMenu menu && Game1.player.CursorSlotItem is StardewValley.Object obj && obj.canBeShipped())
+                ShipObject(obj);
         }
 
         private void GameLoop_UpdateTicked(object sender, StardewModdingAPI.Events.UpdateTickedEventArgs e)
@@ -100,17 +111,20 @@ namespace ShipFromInventory
         public static bool InventoryPageLeftClick(InventoryPage __instance, int x, int y, bool playSound = true)
         {
             if ((shippingBin.containsPoint(x, y) || shippingBinLid.containsPoint(x, y)) && Game1.player.CursorSlotItem is StardewValley.Object obj && obj.canBeShipped())
-            {
-                StardewValley.Object shipment = obj;
-                Farm farm = Game1.getFarm();
-                farm.getShippingBin(Game1.player).Add(shipment);
-                farm.lastItemShipped = shipment;
-                Game1.playSound("Ship");
-                Game1.player.CursorSlotItem = null;
-                return false;
-            }
+                return ShipObject(obj);
 
             return true;
+        }
+
+        public static bool ShipObject(StardewValley.Object obj)
+        {
+            StardewValley.Object shipment = obj;
+            Farm farm = Game1.getFarm();
+            farm.getShippingBin(Game1.player).Add(shipment);
+            farm.lastItemShipped = shipment;
+            Game1.playSound("Ship");
+            Game1.player.CursorSlotItem = null;
+            return false;
         }
     }
 }
