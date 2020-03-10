@@ -164,15 +164,15 @@ namespace TMXLoader
                     saveData.Buildables = new List<SaveBuildable>();
 
                     foreach (var l in addedLocations)
-                        if (Game1.getLocationFromName(l.name) is GameLocation location)
-                            saveData.Locations.Add(getLocationSaveData(location));
+                        if (Game1.getLocationFromName(l.name) is GameLocation location && getLocationSaveData(location) is SaveLocation sav)
+                            saveData.Locations.Add(sav);
 
                     foreach (var b in buildablesBuild)
                     {
                         BuildableEdit edit = buildables.Find(be => be.id == b.Id);
 
-                        if (edit.indoorsFile != null && Game1.getLocationFromName(getLocationName(b.UniqueId)) is GameLocation location)
-                            b.Indoors = getLocationSaveData(location);
+                        if (edit.indoorsFile != null && Game1.getLocationFromName(getLocationName(b.UniqueId)) is GameLocation location && getLocationSaveData(location) is SaveLocation sav)
+                            b.Indoors = sav;
 
                         saveData.Buildables.Add(b);
                     }
@@ -493,9 +493,9 @@ namespace TMXLoader
                 {
                     BuildableEdit sbedit = buildables.Find(be => be.id == sb.Id);
 
-                    if (sbedit.indoorsFile != null && Game1.getLocationFromName(getLocationName(sb.UniqueId)) is GameLocation sblocation)
+                    if (sbedit.indoorsFile != null && Game1.getLocationFromName(getLocationName(sb.UniqueId)) is GameLocation sblocation && getLocationSaveData(sblocation) is SaveLocation savd)
                     {
-                        var locSaveData = getLocationSaveData(sblocation);
+                        var locSaveData = savd;
                         locSaveData.Name = getLocationName(uniqueId);
                         setLocationObejcts(locSaveData);
                     }
@@ -661,7 +661,20 @@ namespace TMXLoader
             GameLocation saved;
 
             using (var reader = XmlReader.Create(objReader, settings))
-                saved = (GameLocation)SaveGame.locationSerializer.Deserialize(reader);
+            {
+                try
+                {
+                    saved = (GameLocation)SaveGame.locationSerializer.Deserialize(reader);
+                }
+                catch (Exception e)
+                {
+                    Monitor.Log("Failed to deserialize: " + loc.Name, LogLevel.Trace);
+                    Monitor.Log(e.Message);
+                    monitor.Log(e.StackTrace);
+                    return false;
+                }
+
+            }
 
             if (saved != null)
             {
@@ -699,8 +712,31 @@ namespace TMXLoader
             settings.ConformanceLevel = ConformanceLevel.Auto;
             settings.CloseOutput = true;
             StringWriter objWriter = new StringWriter();
+
+            foreach (Monster monster in location.characters.Where(c => c is Monster && c.GetType().Name.Contains("FTM")).ToList())
+                location.characters.Remove(monster);
+
+            foreach (LargeTerrainFeature feature in location.largeTerrainFeatures.Where(t => t.GetType().Name.Contains("LargeResourceClump")).ToList())
+                location.largeTerrainFeatures.Remove(feature);
+
+            foreach (Vector2 key in location.Objects.Keys.Where(k => location.Objects[k].GetType().Name.Contains("FTM")).ToList())
+                location.Objects.Remove(key);
+
             using (var writer = XmlWriter.Create(objWriter, settings))
-                SaveGame.locationSerializer.Serialize(writer, location);
+            {
+                try
+                {
+
+                    SaveGame.locationSerializer.Serialize(writer, location);
+                }
+                catch (Exception e)
+                {
+                    Monitor.Log("Failed to serialize: " + location.Name, LogLevel.Trace);
+                    Monitor.Log(e.Message);
+                    monitor.Log(e.StackTrace);
+                    return null;
+                }
+            }
             objects = objWriter.ToString();
 
             return new SaveLocation(location.Name, objects);
@@ -749,8 +785,8 @@ namespace TMXLoader
                                     buildablesBuild.Remove(buildable);
                                     BuildableEdit edit = buildables.Find(be => be.id == buildable.Id);
 
-                                    if (edit.indoorsFile != null && Game1.getLocationFromName(getLocationName(buildable.UniqueId)) is GameLocation location)
-                                        buildable.Indoors = getLocationSaveData(location);
+                                    if (edit.indoorsFile != null && Game1.getLocationFromName(getLocationName(buildable.UniqueId)) is GameLocation location && getLocationSaveData(location) is SaveLocation sav)
+                                        buildable.Indoors = sav;
 
                                     loadSavedBuildable(buildable);
                                 }
