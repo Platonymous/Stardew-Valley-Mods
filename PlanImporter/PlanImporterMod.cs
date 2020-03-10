@@ -121,7 +121,8 @@ namespace PlanImporter
                 if (tile.type == "large-rock")
                     farm.addResourceClumpAndRemoveUnderlyingTerrain(752, 2, 2, pos);
 
-
+                if (!tile.type.StartsWith("large-") && building == null && obj == null && tf == null)
+                    Monitor.Log("Could not place tile: " + tile.type + " (unknown type)", LogLevel.Warn);
             }
         }
 
@@ -190,6 +191,8 @@ namespace PlanImporter
                 case "yam": Crop yam = new Crop(492, (int)pos.X, (int)pos.Y); yam.growCompletely(); return new HoeDirt(0, yam);
                 case "grass": return new Grass(1, 4);
                 case "farmland": return new HoeDirt(0);
+                case "mushroom-tree": return new Tree(7, 5);
+                case "palm-tree": return new Tree(6, 5);
                 default: return null;
             }
         }
@@ -231,6 +234,12 @@ namespace PlanImporter
                 case "stone": return new SObject(pos, 449,1);
                 case "twig": return new SObject(pos,294, 1);
                 case "wood-sign": return new Sign(pos, 37);
+                case "stone-sign": return new Sign(pos, 38);
+                case "wood-chipper": return new SObject(pos, 211);
+                case "mini-jukebox": return new SObject(pos, 209);
+                case "mini-fridge": return new SObject(pos, 216);
+                case "workbench": return new SObject(pos, 208);
+                case "deluxe-scarecrow": return new SObject(pos, 167);
                 default: return null;
             }
         }
@@ -255,6 +264,8 @@ namespace PlanImporter
                 case "stone-cabin": return new Building(new BluePrint("Stone Cabin"), pos);
                 case "plank-cabin": return new Building(new BluePrint("Plank Cabin"), pos);
                 case "log-cabin": return new Building(new BluePrint("Log Cabin"), pos);
+                case "fish-pond": return new FishPond(new BluePrint("Fish Pond"), pos);
+                case "desert-obelisk": return new Building(new BluePrint("Desert Obelisk"), pos);
                 default: return null;
             }
         }
