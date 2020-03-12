@@ -310,13 +310,38 @@ namespace PyTK
                 prefix: new HarmonyMethod(this.GetType().GetMethod("PatchImage", BindingFlags.Public | BindingFlags.Static))
             );
 
+            foreach (ConstructorInfo constructor in typeof(FileStream).GetConstructors().Where(c => c.GetParameters().ToList().Exists(p => p.ParameterType == typeof(string) && p.Name == "path")))
+            {
+                harmony.Patch(
+               original: constructor,
+               prefix: new HarmonyMethod(this.GetType().GetMethod("FileStreamConstructorPre", BindingFlags.Public | BindingFlags.Static))
+                );
+            }
+
+            harmony.Patch(
+                original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "PremultiplyTransparency"),
+                prefix: new HarmonyMethod(this.GetType().GetMethod("PremultiplyTransparencyPre", BindingFlags.Public | BindingFlags.Static))
+            );
+
             ContentInterceptors.Add(new TextureInterceptor<ScaleUpData>(ModManifest, ScaleUpInterceptor));
+        }
+
+        private static string openPath = "";
+
+        public static void PremultiplyTransparencyPre(object __instance, ref Texture2D texture)
+        {
+            if (openPath != "")
+                FromPathIntercepter(openPath, ref texture);
+        }
+
+        public static void FileStreamConstructorPre(string path)
+        {
+            openPath = path;
         }
 
         public static Texture2D ScaleUpInterceptor(Texture2D texture, ScaleUpData data, string path)
         {
-       
-                if (data is ScaleUpData)
+            if (data is ScaleUpData && !(texture is ScaledTexture2D))
                 {
                 bool scaled = false, animated = false, loop = true;
                     float scale = 1f;
@@ -343,12 +368,27 @@ namespace PyTK
                     }
 
                     if (animated)
-                        return new AnimatedTexture2D(texture, tileWidth, tileHeight, fps, loop, !scaled ? 1f : scale);
+                        return new AnimatedTexture2D(Premultiply(texture), tileWidth, tileHeight, fps, loop, !scaled ? 1f : scale);
                     else if (scaled)
-                        return ScaledTexture2D.FromTexture(texture.ScaleUpTexture(1f / scale, false), texture, scale);
+                        return ScaledTexture2D.FromTexture(texture.ScaleUpTexture(1f / scale, false), Premultiply(texture), scale);
                 }
-
                 return texture;
+        }
+
+        public static Texture2D Premultiply(Texture2D texture)
+        {
+            Color[] data = new Color[texture.Width * texture.Height];
+            texture.GetData(data);
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (data[i].A == 0)
+                    continue;
+
+                data[i] = Color.FromNonPremultiplied(data[i].ToVector4());
+            }
+
+            texture.SetData(data);
+            return texture;
         }
 
         public static void PatchImage(IAssetDataForImage __instance, ref Texture2D source, ref Rectangle? sourceArea, Rectangle? targetArea, PatchMode patchMode)
@@ -386,9 +426,15 @@ namespace PyTK
 
         public static void FromStreamIntercepter(Stream stream, ref Texture2D __result)
         {
-            if (stream is FileStream fs
-                && Path.GetFileNameWithoutExtension(fs.Name) is string key
-                && Path.GetDirectoryName(fs.Name) is string dir
+            if (stream is FileStream fs)
+                FromPathIntercepter(fs.Name, ref __result);
+        }
+
+        public static void FromPathIntercepter(string path, ref Texture2D __result)
+        {
+            openPath = "";
+            if (Path.GetFileNameWithoutExtension(path) is string key
+                && Path.GetDirectoryName(path) is string dir
                 && Path.Combine(dir, key + ".pytk.json") is string pytkDataFile
                 && File.Exists(pytkDataFile)
                 && Newtonsoft.Json.JsonConvert.DeserializeObject<InterceptorData>(File.ReadAllText(pytkDataFile)) is InterceptorData idata)
@@ -396,7 +442,7 @@ namespace PyTK
                 .Where(i => i is IInterceptor<Texture2D>
                 && i.DataType != null && idata.Mods.Contains(i.Mod.UniqueID)))
                     if (Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(pytkDataFile), interceptor.DataType) is object o && o.GetType() == interceptor.DataType)
-                        __result = interceptor.Handler(__result, o, fs.Name);
+                        __result = interceptor.Handler(__result, o, path);
         }
 
         public static bool saveWasLoaded = false;

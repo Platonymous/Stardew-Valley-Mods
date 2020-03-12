@@ -65,7 +65,7 @@ namespace PyTK.Types
                 Frames.Add(spriteSheet.getTile(t, tileWidth, tileHeight));
 
             Color[] data = new Color[(int)((int)(tileWidth/scale) * (int)(tileHeight/scale))];
-            PyUtils.getRectangle((int)(tileWidth / scale), (int)(tileHeight / scale),Color.White).GetData(data);
+            spriteSheet.getArea(new Rectangle(0,0,tileWidth,tileHeight)).ScaleUpTexture(1f / scale, false).GetData(data);
             SetData(data);
         }
     }
