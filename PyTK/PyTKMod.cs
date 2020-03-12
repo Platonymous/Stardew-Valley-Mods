@@ -276,8 +276,10 @@ namespace PyTK
             // PyUtils.initOverride("TemporaryAnimatedSprite", PyUtils.getTypeSDV("TemporaryAnimatedSprite"),typeof(DrawFix2), new List<string>() { "draw" });
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("Load", BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
+            PatchGeneratedSerializers(new Assembly[] { Assembly.GetExecutingAssembly() });
 
-            foreach (ConstructorInfo mc in typeof(GameLocation).GetConstructors())
+
+                foreach (ConstructorInfo mc in typeof(GameLocation).GetConstructors())
                 instance.Patch(mc, postfix: new HarmonyMethod(typeof(OvLocations).GetMethod("GameLocationConstructor", BindingFlags.Static | BindingFlags.Public)));
 
 
