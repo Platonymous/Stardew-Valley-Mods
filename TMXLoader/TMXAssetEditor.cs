@@ -111,8 +111,17 @@ namespace TMXLoader
                     spring = new TileSheet("ztemp", original, "Maps/spring_outdoorsTileSheet", new xTile.Dimensions.Size(springTex.Width, springTex.Height), original.TileSheets[0].TileSize);
                     original.AddTileSheet(spring);
                 }
-                if(index >= 0)
+                if (index >= 0)
+                {
                     original.GetLayer("Set-Up").Tiles[npcedit.position[0], npcedit.position[1]] = new StaticTile(original.GetLayer("Set-Up"), spring, BlendMode.Alpha, (index * 4) + npcedit.direction);
+                    if (original.GetLayer("MainEvent") is Layer mLayer)
+                    {
+                        if(npcedit.position2[0] == -1 || npcedit.position2[1] == -1)
+                            mLayer.Tiles[npcedit.position[0], npcedit.position[1]] = new StaticTile(original.GetLayer("MainEvent"), spring, BlendMode.Alpha, (index * 4) + npcedit.direction);
+                        else
+                            mLayer.Tiles[npcedit.position2[0], npcedit.position2[1]] = new StaticTile(original.GetLayer("MainEvent"), spring, BlendMode.Alpha, (index * 4) + npcedit.direction2);
+                    }
+                }
             }else if(type == EditType.SpouseRoom)
             {
                 if (edit.info != "none")
