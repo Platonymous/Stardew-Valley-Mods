@@ -282,7 +282,6 @@ namespace PyTK
                 foreach (ConstructorInfo mc in typeof(GameLocation).GetConstructors())
                 instance.Patch(mc, postfix: new HarmonyMethod(typeof(OvLocations).GetMethod("GameLocationConstructor", BindingFlags.Static | BindingFlags.Public)));
 
-
             Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 
             if (Constants.TargetPlatform != GamePlatform.Android)
@@ -302,10 +301,17 @@ namespace PyTK
 
         private void setupLoadIntercepter(HarmonyInstance harmony)
         {
-            foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(gm => gm.Name.Contains("FromStream")))
-                harmony.Patch(
-                    original: m,
-                    postfix: new HarmonyMethod(this.GetType().GetMethod("FromStreamIntercepter", BindingFlags.Public | BindingFlags.Static)));
+            try
+            {
+                foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(gm => gm.Name.Contains("FromStream") && gm.GetParameters().ToList().Exists(p => p.Name == "stream")))
+                    harmony.Patch(
+                        original: m,
+                        postfix: new HarmonyMethod(this.GetType().GetMethod("FromStreamIntercepter", BindingFlags.Public | BindingFlags.Static)));
+            }
+            catch
+            {
+
+            }
 
             harmony.Patch(
                 original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.Content.AssetDataForImage, StardewModdingAPI"), "PatchImage"),
