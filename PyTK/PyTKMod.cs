@@ -72,10 +72,6 @@ namespace PyTK
         {
             _instance = this;
 
-            if (xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
-                tmxf.DrawImageLayer = PyMaps.drawImageLayer;
-
-            Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice);
 
             helper.Events.Display.RenderingWorld += (s,e) =>
             {
@@ -98,6 +94,15 @@ namespace PyTK
             SaveHandler.setUpEventHandlers();
             CustomObjectData.CODSyncer.start();
             ContentSync.ContentSyncHandler.initialize();
+
+            helper.Events.GameLoop.GameLaunched += (s, e) =>
+            {
+
+                if (xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
+                    tmxf.DrawImageLayer = PyMaps.drawImageLayer;
+
+                Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice);
+            };
 
             helper.Events.GameLoop.DayStarted += (s, e) =>
             {
