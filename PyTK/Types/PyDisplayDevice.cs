@@ -22,9 +22,11 @@ namespace PyTK.Types
         private Color m_modulationColour;
         private DrawInstructions m_instructions;
         private Dictionary<TileSheet, Texture2D> m_tileSheetTextures2;
+        private bool adjustOrigin = false;
 
-        public PyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice)
+        public PyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice, bool compatability = false)
         {
+            adjustOrigin = compatability;
             this.m_contentManager = contentManager;
             this.m_graphicsDevice = graphicsDevice;
             this.m_spriteBatchAlpha = new SpriteBatch(graphicsDevice);
@@ -86,17 +88,42 @@ namespace PyTK.Types
                 this.m_modulationColour = new Color(color.R, color.G, color.B, color.A);
             else
                 this.m_modulationColour = Color.White;
+            var origin = Vector2.Zero;
+            if (this.m_instructions.Rotation != 0f)
+            {
+                if (!adjustOrigin)
+                {
+                    origin = new Vector2(tileImageBounds.Width / 2, tileImageBounds.Height / 2);
+                    m_tilePosition += new Vector2(tileImageBounds.Width * Game1.pixelZoom / 2, tileImageBounds.Height * Game1.pixelZoom / 2);
+                }
+                else
+                    m_tilePosition += GetOffsetForFlippedTile(tile.GetRotationValue());
+            }
 
-            var origin = new Vector2(tileImageBounds.Width / 2, tileImageBounds.Height / 2);
-            m_tilePosition += new Vector2(tileImageBounds.Width * Game1.pixelZoom / 2, tileImageBounds.Height * Game1.pixelZoom / 2);
             this.m_spriteBatchAlpha.Draw(
-                texture:tileSheetTexture, 
-                destinationRectangle:new Microsoft.Xna.Framework.Rectangle((int)this.m_tilePosition.X, (int) this.m_tilePosition.Y, Game1.tileSize, Game1.tileSize), 
-                sourceRectangle: new Microsoft.Xna.Framework.Rectangle?(this.m_sourceRectangle), this.m_modulationColour * this.m_instructions.Opacity, 
-                rotation: this.m_instructions.Rotation, 
-                origin:origin, 
-                effects:(SpriteEffects) m_instructions.Effect, 
-                layerDepth);
+            texture: tileSheetTexture,
+            destinationRectangle: new Microsoft.Xna.Framework.Rectangle((int)this.m_tilePosition.X, (int)this.m_tilePosition.Y, Game1.tileSize, Game1.tileSize),
+            sourceRectangle: new Microsoft.Xna.Framework.Rectangle?(this.m_sourceRectangle), this.m_modulationColour * this.m_instructions.Opacity,
+            rotation: this.m_instructions.Rotation,
+            origin: origin,
+            effects: (SpriteEffects)m_instructions.Effect,
+            layerDepth);
+        }
+
+        private Vector2 GetOffsetForFlippedTile(int rotation)
+        {
+            Vector2 offset = Vector2.Zero;
+
+            if (rotation == 90)
+                offset.X = Game1.tileSize;
+            else if (rotation == -90)
+                offset.Y = Game1.tileSize;
+            else if (rotation == 180)
+            {
+                offset.X = Game1.tileSize;
+                offset.Y = Game1.tileSize;
+            }
+            return offset;
         }
 
         public void EndScene()

@@ -101,7 +101,8 @@ namespace PyTK
                 if (xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
                     tmxf.DrawImageLayer = PyMaps.drawImageLayer;
 
-                Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice);
+                bool adjustForCompat = helper.ModRegistry.IsLoaded("DigitalCarbide.SpriteMaster");
+                Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat);
             };
 
             helper.Events.GameLoop.DayStarted += (s, e) =>
