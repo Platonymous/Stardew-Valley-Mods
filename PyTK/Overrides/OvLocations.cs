@@ -215,7 +215,7 @@ namespace PyTK.Overrides
 
             internal static void Prefix(string locationName, bool isStructure = false)
             {
-                if (locationName == null || isStructure)
+                if (locationName == null || isStructure || locationName.ToLower().Contains("mine"))
                     return;
 
                 GameLocation location = null;
@@ -230,21 +230,27 @@ namespace PyTK.Overrides
 
                 if (location == null)
                 {
-
-                    string locationMap = Path.Combine("Maps", locationName);
-
-                    if (locationName.Contains(":"))
+                    try
                     {
-                        locationMap = Path.Combine("Maps", locationName.Split(':')[0]);
-                        locationName = locationMap + "_" + locationName.Split(':')[1];
-                    }
+                        string locationMap = Path.Combine("Maps", locationName);
 
-                    if (locationName.Contains("FarmHouse"))
-                        Game1.locations.Add(new FarmHouse(locationMap, locationName));
-                    else if (locationName.Contains("Farm"))
-                        Game1.locations.Add(new Farm(locationMap, locationName));
-                    else
-                        Game1.locations.Add(new GameLocation(locationMap, locationName));
+                        if (locationName.Contains(":"))
+                        {
+                            locationMap = Path.Combine("Maps", locationName.Split(':')[0]);
+                            locationName = locationMap + "_" + locationName.Split(':')[1];
+                        }
+
+                        if (locationName.Contains("FarmHouse"))
+                            Game1.locations.Add(new FarmHouse(locationMap, locationName));
+                        else if (locationName.Contains("Farm"))
+                            Game1.locations.Add(new Farm(locationMap, locationName));
+                        else
+                            Game1.locations.Add(new GameLocation(locationMap, locationName));
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
         }

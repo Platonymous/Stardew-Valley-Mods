@@ -348,9 +348,13 @@ namespace PyTK
                 FromPathIntercepter(openPath, ref texture);
         }
 
-        public static void FileStreamConstructorPre(string path)
+        public static void FileStreamConstructorPre(ref string path)
         {
+            if (path.Contains(@"Maps/Maps"))
+                path = path.Replace(@"Maps/Maps", "Maps");
+
             openPath = path;
+            
         }
 
         public static Texture2D ScaleUpInterceptor(Texture2D texture, ScaleUpData data, string path)

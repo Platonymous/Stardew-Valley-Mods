@@ -342,7 +342,7 @@ namespace PyTK.Extensions
         public static Map mergeInto(this Map t, Map map, Vector2 position, Microsoft.Xna.Framework.Rectangle? sourceArea = null, bool includeEmpty = true, bool properties = true)
         {
             Microsoft.Xna.Framework.Rectangle sourceRectangle = sourceArea.HasValue ? sourceArea.Value : new Microsoft.Xna.Framework.Rectangle(0, 0, t.DisplayWidth / Game1.tileSize, t.DisplayHeight / Game1.tileSize);
-            
+
             //tilesheet normalizing taken with permission from Content Patcher 
             // https://github.com/Pathoschild/StardewMods/blob/stable/ContentPatcher/Framework/Patches/EditMapPatch.cs
             foreach (TileSheet tilesheet in t.TileSheets)
@@ -363,23 +363,41 @@ namespace PyTK.Extensions
                         id = $"{id}_{disambiguator}";
                     }
                     //add tilesheet
-                    map.AddTileSheet(new TileSheet(tilesheet.Id, map, tilesheet.ImageSource, tilesheet.SheetSize, tilesheet.TileSize));
+                    
+                    if(!map.TileSheets.ToList().Exists(ts => ts.Id == tilesheet.Id))
+                        map.AddTileSheet(new TileSheet(tilesheet.Id, map, tilesheet.ImageSource, tilesheet.SheetSize, tilesheet.TileSize));
                 }
             }
 
-            if(properties)
-            foreach (KeyValuePair<string, PropertyValue> p in t.Properties)
-                if (map.Properties.ContainsKey(p.Key))
-                    if (p.Key == "EntryAction")
-                        map.Properties[p.Key] = map.Properties[p.Key] + ";" + p.Value;
+            if (properties)
+                foreach (KeyValuePair<string, PropertyValue> p in t.Properties)
+                    if (map.Properties.ContainsKey(p.Key))
+                        if (p.Key == "EntryAction")
+                            map.Properties[p.Key] = map.Properties[p.Key] + ";" + p.Value;
+                        else
+                            map.Properties[p.Key] = p.Value;
                     else
-                        map.Properties[p.Key] = p.Value;
-                else
-                    map.Properties.Add(p);
+                        map.Properties.Add(p);
 
-            for(int x = 0; x < sourceRectangle.Width; x++)
-                for(int y = 0; y < sourceRectangle.Height; y++)
-                    foreach(Layer layer in t.Layers)
+            /*
+            int w = (int)position.X + sourceRectangle.Width;
+            int h = (int)position.Y + sourceRectangle.Height;
+
+            foreach (Layer l in map.Layers.Where(ly => ly.LayerWidth < w || ly.LayerHeight < h))
+            {
+                Monitor.Log("Expanding Map " + l.LayerWidth + "x" + l.LayerHeight + "->" + w + "x" + h, LogLevel.Warn);
+
+                if (l.LayerWidth < w)
+                    l.LayerWidth = w;
+
+                if (l.LayerHeight < h)
+                    l.LayerHeight = h;
+
+            }
+            */
+            for (int x = 0; x < sourceRectangle.Width; x++)
+                for (int y = 0; y < sourceRectangle.Height; y++)
+                    foreach (Layer layer in t.Layers)
                     {
                         int px = (int)position.X + x;
                         int py = (int)position.Y + y;
@@ -418,7 +436,7 @@ namespace PyTK.Extensions
                             }
                             continue;
                         }
-                        
+
                         TileSheet tilesheet = map.GetTileSheet(sourceTile.TileSheet.Id);
                         Tile newTile = new StaticTile(mapLayer, tilesheet, BlendMode.Additive, sourceTile.TileIndex);
 
@@ -447,14 +465,14 @@ namespace PyTK.Extensions
                             foreach (var prop in sourceTile.Properties)
                                 if (newTile.Properties.ContainsKey(prop.Key))
                                     newTile.Properties[prop.Key] = prop.Value;
-                            else
+                                else
                                     newTile.Properties.Add(prop);
 
                             foreach (var prop in sourceTile.TileIndexProperties)
                                 if (newTile.TileIndexProperties.ContainsKey(prop.Key))
                                     newTile.TileIndexProperties[prop.Key] = prop.Value;
-                            else
-                                newTile.TileIndexProperties.Add(prop);
+                                else
+                                    newTile.TileIndexProperties.Add(prop);
                         }
                         try
                         {
@@ -462,10 +480,10 @@ namespace PyTK.Extensions
                         }
                         catch (Exception e)
                         {
-                          Monitor.Log($"{e.Message} ({map.DisplayWidth} -> {layer.Id} -> {px}:{py})");
+                            Monitor.Log($"{e.Message} ({map.DisplayWidth} -> {layer.Id} -> {px}:{py})");
                         }
                     }
-           
+
             return map;
         }
 

@@ -30,6 +30,7 @@ using System.Xml.Serialization;
 using System.Threading.Tasks;
 using StardewValley.Buildings;
 using TMXTile;
+using StardewValley.Network;
 
 namespace TMXLoader
 {
@@ -891,12 +892,55 @@ namespace TMXLoader
             HarmonyInstance instance = HarmonyInstance.Create("Platonymous.TMXLoader");
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("loadDataToLocations"), postfix: new HarmonyMethod(this.GetType().GetMethod("SavePatch", BindingFlags.Public | BindingFlags.Static)));
+            instance.Patch(typeof(GameLocation).GetMethod("setMapTile"), prefix: new HarmonyMethod(this.GetType().GetMethod("trySetMapTile", BindingFlags.Public | BindingFlags.Static)));
 
 
             if (!helper.ModRegistry.IsLoaded("Entoarox.FurnitureAnywhere"))
                 return;
             if (Type.GetType("Entoarox.FurnitureAnywhere.ModEntry, FurnitureAnywhere") is Type Me && Me.GetMethod("SleepFurniture", BindingFlags.NonPublic | BindingFlags.Instance) is MethodInfo SF)
                 instance.Patch(SF, new HarmonyMethod(this.GetType().GetMethod("GetFA", BindingFlags.Public | BindingFlags.Static)));
+        }
+
+        private static bool skipTrySetMapTile = false;
+
+        public static bool trySetMapTile(GameLocation __instance, int tileX, int tileY, int index, string layer, string action, int whichTileSheet = 0)
+        {
+            if (skipTrySetMapTile)
+            {
+                skipTrySetMapTile = false;
+                return true;
+            }
+
+            try
+            {
+
+                skipTrySetMapTile = true;
+                __instance.setMapTile(tileX, tileY, index, layer, action, whichTileSheet);
+                monitor.Log("Setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " ("+ whichTileSheet + ") Location:" + __instance.Name, LogLevel.Trace);
+                return false;
+            }
+            catch
+            {
+                monitor.Log("Error setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " (" + whichTileSheet + ") Location:" + __instance.Name, LogLevel.Warn);
+                monitor.Log("----Tilesheets----", LogLevel.Trace);
+                int i = 0;
+                foreach (TileSheet ts in __instance.Map.TileSheets)
+                    monitor.Log(ts.Id + " ("+ i++ +")", LogLevel.Trace);
+
+                try {
+                    skipTrySetMapTile = true;
+                    monitor.Log("Trying to save it...", LogLevel.Info);
+                    __instance.setMapTile(tileX, tileY, index, layer, action, whichTileSheet + 1);
+                    monitor.Log("...Done", LogLevel.Info);
+
+                }
+                catch
+                {
+                    monitor.Log("...Failed", LogLevel.Error);
+                }
+
+                return false;
+            }
         }
 
         public static void GetFA(Mod __instance)
@@ -906,14 +950,21 @@ namespace TMXLoader
 
         public static void SavePatch()
         {
-             foreach (var edit in addedLocations)
+            try
+            {
+                foreach (var edit in addedLocations)
                 {
-                _instance.Monitor.Log("Add Location: " + edit.name);
+                    _instance.Monitor.Log("Add Location: " + edit.name);
                     if (!(Game1.getLocationFromName(edit.name) is GameLocation))
                         addLocation(edit);
                 }
 
-            _instance.restoreAllSavedBuildables();
+                _instance.restoreAllSavedBuildables();
+            }
+            catch
+            {
+
+            }
         }
 
         private void setTileActions()

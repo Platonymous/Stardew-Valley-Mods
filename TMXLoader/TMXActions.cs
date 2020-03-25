@@ -631,7 +631,7 @@ namespace TMXLoader
                 }
 
 
-                if (fh.upgradeLevel > 2)
+                if (fh.upgradeLevel >= 2)
                     return new Point(35, 10);
                 else
                     return new Point(29, 1);
