@@ -133,7 +133,7 @@ namespace PyTK.Types
 
         public void LoadTileSheet(TileSheet tileSheet)
         {
-            if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(tileSheet.ImageSource)))
+            if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(tileSheet.ImageSource?.Replace('\\', '/'))))
                 tileSheet.ImageSource = Path.Combine("Maps", Path.GetFileName(tileSheet.ImageSource));
 
             if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture)
