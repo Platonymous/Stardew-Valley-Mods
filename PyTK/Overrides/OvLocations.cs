@@ -213,10 +213,13 @@ namespace PyTK.Overrides
                 return AccessTools.Method(PyUtils.getTypeSDV("Game1"), "getLocationRequest");
             }
 
-            internal static void Prefix(string locationName, bool isStructure = false)
+            internal static void Prefix(ref string locationName, bool isStructure = false)
             {
-                if (locationName == null || isStructure || locationName.ToLower().Contains("mine"))
+                if (!locationName.Contains(":") || locationName == null || isStructure)
                     return;
+
+                string locationMap = Path.Combine("Maps", locationName.Split(':')[0]);
+                locationName = locationMap + "_" + locationName.Split(':')[1];
 
                 GameLocation location = null;
                 try
@@ -232,18 +235,12 @@ namespace PyTK.Overrides
                 {
                     try
                     {
-                        string locationMap = Path.Combine("Maps", locationName);
-
-                        if (locationName.Contains(":"))
-                        {
-                            locationMap = Path.Combine("Maps", locationName.Split(':')[0]);
-                            locationName = locationMap + "_" + locationName.Split(':')[1];
-                        }
-
                         if (locationName.Contains("FarmHouse"))
                             Game1.locations.Add(new FarmHouse(locationMap, locationName));
                         else if (locationName.Contains("Farm"))
                             Game1.locations.Add(new Farm(locationMap, locationName));
+                        else if (locationName.Contains("FarmCave"))
+                            Game1.locations.Add(new FarmCave(locationMap, locationName));
                         else
                             Game1.locations.Add(new GameLocation(locationMap, locationName));
                     }
