@@ -29,21 +29,31 @@ namespace PlatoWarpMenu
 
         internal static Texture2D CircleMarker { get; set; }
 
-
-        const int menuWidth = 1260;
-        const int menuHeight = 700;
-        const int margins = 10;
-        const int options = 20;
-        const int optionWidth = menuWidth / 10;
-        const int optionHeight = ((menuHeight - (2 * margins) - options)) / options;
+        public static float menuScale = 1f;
+        public static int menuWidth => (int)(1260 * menuScale);
+        public static int menuHeight => (int) (700 * menuScale);
+        public static int margins => (int)(10 * menuScale);
+        public static int options = 20;
+        public static int optionWidth => menuWidth / 10;
+        public static int optionHeight => ((menuHeight - (2 * margins) - options)) / options;
         List<MenuItem> menuItems = new List<MenuItem>();
 
         public WarpMenu()
             : base("WarpMenu", null, false, null, null, false)
         {
-
+            menuScale = 1f;
+            menuScale = Math.Max(1f, Game1.game1.Window.ClientBounds.Width / (menuWidth + 40f));
+            menuScale = Math.Min(Game1.game1.Window.ClientBounds.Height / ((menuHeight/menuScale) + 40f), menuScale);
+            Console.WriteLine(menuScale + " menuScale");
+            menuScale /= Game1.options.zoomLevel;
             Menu = SetUpMenu();
             BaseMenu.Add(Menu);
+        }
+
+        public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
+        {
+            if (Game1.activeClickableMenu is WarpMenu)
+                Game1.activeClickableMenu = new WarpMenu();
         }
 
         public static void Open()
@@ -107,7 +117,7 @@ namespace PlatoWarpMenu
 
             index = index % options;
             UIElement button = UIElement.GetImage(PyDraw.getBorderedRectangle(optionWidth, optionHeight - 1, Color.White * 0.2f, 1, Color.White), row == 0 ? Color.CornflowerBlue : Color.LightGreen, item.Id, 1, 0,UIHelper.GetTopLeft(placeRow * (optionWidth + 1), index * (optionHeight + 1), optionWidth, optionHeight - 1)).WithInteractivity(update: UpdateItem, click: ClickItem);
-            UIElement text = new UITextElement(placeText, Game1.smallFont, Color.White, 0.5f, 1, positioner: UIHelper.GetCentered());
+            UIElement text = new UITextElement(placeText, Game1.smallFont, Color.White, 0.5f * menuScale, 1, positioner: UIHelper.GetCentered());
             button.Z = row;
             button.Add(text);
             leftMenu.Add(button);
