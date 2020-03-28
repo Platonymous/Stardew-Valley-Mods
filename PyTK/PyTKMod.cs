@@ -324,6 +324,11 @@ namespace PyTK
                 prefix: new HarmonyMethod(this.GetType().GetMethod("PatchImage", BindingFlags.Public | BindingFlags.Static))
             );
 
+            harmony.Patch(
+               original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.Content.AssetDataForImage, StardewModdingAPI"), "ExtendImage"),
+               prefix: new HarmonyMethod(this.GetType().GetMethod("ExtendImage", BindingFlags.Public | BindingFlags.Static))
+           );
+
             foreach (ConstructorInfo constructor in typeof(FileStream).GetConstructors().Where(c => c.GetParameters().ToList().Exists(p => p.ParameterType == typeof(string) && p.Name == "path")))
             {
                 harmony.Patch(
@@ -409,19 +414,24 @@ namespace PyTK
             return texture;
         }
 
-        public static void PatchImage(IAssetDataForImage __instance, ref Texture2D source, ref Rectangle? sourceArea, Rectangle? targetArea, PatchMode patchMode)
+
+        public static bool ExtendImage(IAssetDataForImage __instance, int minWidth, int minHeight)
         {
+            return !(__instance.Data is ScaledTexture2D || __instance.Data is MappedTexture2D);
+        }
+        public static bool PatchImage(IAssetDataForImage __instance, ref Texture2D source, ref Rectangle? sourceArea, Rectangle? targetArea, PatchMode patchMode)
+        {
+            var a = new Rectangle(0, 0, __instance.Data.Width, __instance.Data.Height);
+            var s = new Rectangle(0, 0, source.Width, source.Height);
+            var sr = !sourceArea.HasValue ? s : sourceArea.Value;
+            var tr = !targetArea.HasValue ? sr : targetArea.Value;
+
             if (source is ScaledTexture2D scaled)
             {
-                var a = new Rectangle(0, 0, __instance.Data.Width, __instance.Data.Height);
-                var s = new Rectangle(0, 0, source.Width, source.Height);
-                var sr = !sourceArea.HasValue ? s : sourceArea.Value;
-                var tr = !targetArea.HasValue ? sr : targetArea.Value;
-
                 if (a == tr && patchMode == PatchMode.Replace)
                 {
                     __instance.ReplaceWith(source);
-                    return;
+                    return true;
                 }
 
                 if (patchMode == PatchMode.Overlay)
@@ -439,7 +449,17 @@ namespace PyTK
                 else
                     __instance.ReplaceWith(new MappedTexture2D(__instance.Data, new Dictionary<Rectangle?, Texture2D>() { { tr, source } }));
             }
+            else if (__instance.Data is MappedTexture2D map)
+            {
+                map.Set(tr, (sr.Width != source.Width || sr.Height != source.Height) ? source.getArea(sr) : source);
+                return false;
+            }else if(__instance.Data is ScaledTexture2D sc)
+            {
+                __instance.ReplaceWith(new MappedTexture2D(__instance.Data, new Dictionary<Rectangle?, Texture2D>() { { tr, (sr.Width != source.Width || sr.Height != source.Height) ? source.getArea(sr) : source } }));
+                return false;
+            }
 
+            return true;
         }
 
         public static void FromStreamIntercepter(Stream stream, ref Texture2D __result)
