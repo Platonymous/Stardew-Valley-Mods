@@ -61,6 +61,8 @@ namespace PyTK.Types
         {
             bool result = true;
             string[] tileActions = actionString.Split(';');
+            PyTKMod._monitor.Log("InvokeAction:" + actionString, StardewModdingAPI.LogLevel.Trace);
+
             foreach (string action in tileActions)
             {
                 string nextAction = action.Replace(" § ", "§");

@@ -133,9 +133,6 @@ namespace PyTK.Types
 
         public void LoadTileSheet(TileSheet tileSheet)
         {
-            if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(tileSheet.ImageSource)))
-                tileSheet.ImageSource = Path.Combine("Maps", Path.GetFileName(tileSheet.ImageSource));
-
             if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture)
                 if (m_tileSheetTextures2.ContainsKey(tileSheet))
                     m_tileSheetTextures2[tileSheet] = texture;
