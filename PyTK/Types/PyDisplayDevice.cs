@@ -133,11 +133,40 @@ namespace PyTK.Types
 
         public void LoadTileSheet(TileSheet tileSheet)
         {
-            if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture)
-                if (m_tileSheetTextures2.ContainsKey(tileSheet))
-                    m_tileSheetTextures2[tileSheet] = texture;
-                else
-                    m_tileSheetTextures2.Add(tileSheet, texture);
+            try
+            {
+
+                if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture)
+                {
+                    if (m_tileSheetTextures2.ContainsKey(tileSheet))
+                        m_tileSheetTextures2[tileSheet] = texture;
+                    else
+                        m_tileSheetTextures2.Add(tileSheet, texture);
+                }
+                else if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(tileSheet.ImageSource)))
+                {
+                    tileSheet.ImageSource = Path.Combine("Maps", Path.GetFileName(tileSheet.ImageSource));
+                    
+                    if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture2)
+                        if (m_tileSheetTextures2.ContainsKey(tileSheet))
+                            m_tileSheetTextures2[tileSheet] = texture2;
+                        else
+                            m_tileSheetTextures2.Add(tileSheet, texture2);
+                }
+            }
+            catch
+            {
+                if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(tileSheet.ImageSource)))
+                {
+                    tileSheet.ImageSource = Path.Combine("Maps", Path.GetFileName(tileSheet.ImageSource));
+
+                    if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture)
+                        if (m_tileSheetTextures2.ContainsKey(tileSheet))
+                            m_tileSheetTextures2[tileSheet] = texture;
+                        else
+                            m_tileSheetTextures2.Add(tileSheet, texture);
+                }
+            }
         }
 
         public void SetClippingRegion(xTile.Dimensions.Rectangle clippingRegion)

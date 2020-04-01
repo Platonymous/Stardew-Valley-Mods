@@ -1,7 +1,7 @@
 {
   "Name": "PyTK",
   "Author": "Platonymous",
-  "Version": "1.13.31",
+  "Version": "1.13.35",
   "Description": "Platonymous Toolkit",
   "UniqueID": "Platonymous.Toolkit",
   "EntryDll": "PyTK.dll",
