@@ -302,8 +302,53 @@ namespace PyTK
                });
             };
 
+            instance.Patch(
+               original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "GetModFile"),
+               prefix: new HarmonyMethod(this.GetType().GetMethod("GetModFile", BindingFlags.Public | BindingFlags.Static))
+           );
+
+            instance.Patch(
+               original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "NormalizeTilesheetPaths"),
+               postfix: new HarmonyMethod(this.GetType().GetMethod("NormalizeTilesheetPaths", BindingFlags.Public | BindingFlags.Static))
+           );
+
             setupLoadIntercepter(instance);
         }
+
+        private static List<string> excludeTileSheetsFromModFolder = new List<string>();
+
+        public static void GetModFile(ref string path)
+        {
+            if (excludeTileSheetsFromModFolder.Contains(Path.GetFileNameWithoutExtension(path)))
+                path = "Excluded_" + path;
+        }
+
+        public static void NormalizeTilesheetPaths(Map map)
+        {
+            excludeTileSheetsFromModFolder.Clear();
+
+            if (!map.TileSheets.Any())
+                return;
+
+            foreach (xTile.Tiles.TileSheet tilesheet in map.TileSheets)
+            {
+                if (tilesheet.Properties.TryGetValue("@Vanilla", out xTile.ObjectModel.PropertyValue vanillaProperty) && vanillaProperty != null)
+                {
+                    bool isOutdoors = map.Properties.TryGetValue("Outdoors", out xTile.ObjectModel.PropertyValue outdoorsProperty) && outdoorsProperty != null;
+
+                    string filename = Path.GetFileNameWithoutExtension(tilesheet.ImageSource);
+                    bool isSeasonal = filename.StartsWith("spring_", StringComparison.CurrentCultureIgnoreCase)
+                        || filename.StartsWith("summer_", StringComparison.CurrentCultureIgnoreCase)
+                        || filename.StartsWith("fall_", StringComparison.CurrentCultureIgnoreCase)
+                        || filename.StartsWith("winter_", StringComparison.CurrentCultureIgnoreCase);
+                    if (isOutdoors && isSeasonal)
+                        filename = $"{Game1.currentSeason}_{filename.Substring(filename.IndexOf("_", StringComparison.CurrentCultureIgnoreCase) + 1)}";
+
+                    excludeTileSheetsFromModFolder.AddOrReplace(filename);
+                }
+            }
+        }
+
 
         private void setupLoadIntercepter(HarmonyInstance harmony)
         {
