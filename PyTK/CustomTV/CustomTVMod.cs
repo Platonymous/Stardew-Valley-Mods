@@ -49,6 +49,7 @@ namespace PyTK.CustomTV
 
         private static TV tv;
 
+        private static int channelsPerPage = (Constants.TargetPlatform == GamePlatform.Android) ? 3 : 8;
         private static int currentpage = 0;
         private static List<List<Response>> pages = new List<List<Response>>();
         internal static Dictionary<string, TVChannel> channels = new Dictionary<string, TVChannel>();
@@ -139,7 +140,7 @@ namespace PyTK.CustomTV
             {
                 if (defaults.Contains(id)) { continue; }
 
-                if (responses.Count > 7)
+                if (responses.Count >= channelsPerPage)
                 {
                     if (!responses.Contains(more))
                         responses.Add(more);
