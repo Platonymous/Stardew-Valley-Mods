@@ -123,9 +123,13 @@ namespace PlatoWarpMenu
                 Helper.WriteConfig<Config>(config);
             });
 
+            var fonts = new string[] { "vanilla", "opensans", "escrita" };
+
             api.RegisterLabel(ModManifest, ModManifest.Name, ModManifest.Description);
             api.RegisterSimpleOption(ModManifest, i18n.Get("MenuButton"), "", () => config.MenuButton, (SButton b) => config.MenuButton = b);
             api.RegisterSimpleOption(ModManifest, i18n.Get("UseTempFolder"), "", () => config.UseTempFolder, (bool b) => config.UseTempFolder = b);
+            api.RegisterChoiceOption(ModManifest, i18n.Get("MenuFont1"), "", () => config.MenuFont1, (string m) => config.MenuFont1 = m == "vanilla" ? "" : m, fonts);
+            api.RegisterChoiceOption(ModManifest, i18n.Get("MenuFont2"), "", () => config.MenuFont2, (string m) => config.MenuFont2 = m == "vanilla" ? "" : m, fonts);
 
         }
     }

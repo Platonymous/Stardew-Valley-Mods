@@ -1,6 +1,8 @@
 ﻿{
   "MenuButton": "Open Menu Button",
   "UseTempFolder": "Use Temp Folder",
+  "MenuFont1": "Menu Font 1",
+  "MenuFont2": "Menu Font 2",
   "menu.artifacts": "Artifact Spots",
   "menu.characters": "Characters",
   "menu.outdoors": "Outdoors",

@@ -50,6 +50,10 @@
     <HintPath>$(GamePath)\smapi-internal\TMXTile.dll</HintPath>
     <Private>False</Private>
   </Reference>
+    <Reference Include="BmFont">
+      <HintPath>$(GamePath)\BmFont.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

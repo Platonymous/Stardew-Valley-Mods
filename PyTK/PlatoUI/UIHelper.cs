@@ -1,10 +1,14 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BmFont;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PyTK.Extensions;
 using PyTK.Types;
+using StardewModdingAPI;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PyTK.PlatoUI
@@ -261,7 +265,14 @@ namespace PyTK.PlatoUI
                 {
                     string t = text.GetText();
                     if (t != null && t != "")
-                        b.DrawString(text.Font, text.Text, new Vector2(element.Bounds.X, element.Bounds.Y), text.TextColor * element.Opacity * opacity,0f, Vector2.Zero,text.Scale,SpriteEffects.None,0);
+                    {
+                        if (text.FontId == "")
+                            b.DrawString(text.Font, text.Text, new Vector2(element.Bounds.X, element.Bounds.Y), text.TextColor * element.Opacity * opacity, 0f, Vector2.Zero, text.Scale, SpriteEffects.None, 0);
+                        else
+                        {
+                            UIFontRenderer.DrawText(text.FontId, b, element.Bounds.X, element.Bounds.Y, text.Text, text.TextColor * element.Opacity * opacity, text.Scale, 0f, Vector2.Zero);
+                        }
+                    }
                 }
             }
 
@@ -377,8 +388,8 @@ namespace PyTK.PlatoUI
 
         internal static Point GetSize(UIElement t, UIElement p, params object[] rectangle)
         {
-            int rwidth = t is UITextElement tx ? (int)(tx.TextSize.X * tx.Scale) : GetAbs(rectangle, 2, p.Bounds.Width);
-            int rheight = t is UITextElement ty ? (int)(ty.TextSize.Y * ty.Scale) : GetAbs(rectangle, 3, p.Bounds.Height);
+            int rwidth = t is UITextElement tx ? tx.TextSize.X : GetAbs(rectangle, 2, p.Bounds.Width);
+            int rheight = t is UITextElement ty ? ty.TextSize.Y : GetAbs(rectangle, 3, p.Bounds.Height);
 
             if (t.Theme != null)
             {

@@ -108,14 +108,36 @@ namespace PyTK.Extensions
         {
             Color[] colorData = new Color[t.Width * t.Height];
             t.GetData(colorData);
-            Texture2D newTexture = new Texture2D(t.GraphicsDevice, t.Width, t.Height);
-
             for (int x = 0; x < t.Width; x++)
                 for (int y = 0; y < t.Height; y++)
                     colorData[x * t.Height + y] = changeColor(colorData[x * t.Height + y], manipulation);
 
             t.SetData(colorData);
 
+            return t;
+        }
+
+        public static Texture2D switchColor(this Texture2D t, Color from, Color to)
+        {
+            Color[] colorData = new Color[t.Width * t.Height];
+            t.GetData(colorData);
+            for (int x = 0; x < t.Width; x++)
+                for (int y = 0; y < t.Height; y++)
+                    if(colorData[x * t.Height + y] == from)
+                        colorData[x * t.Height + y] = to;
+            t.SetData(colorData);
+            return t;
+        }
+
+        public static Texture2D switchOtherColor(this Texture2D t, Color from, Color to)
+        {
+            Color[] colorData = new Color[t.Width * t.Height];
+            t.GetData(colorData);
+            for (int x = 0; x < t.Width; x++)
+                for (int y = 0; y < t.Height; y++)
+                    if (colorData[x * t.Height + y] != from)
+                        colorData[x * t.Height + y] = to;
+            t.SetData(colorData);
             return t;
         }
 

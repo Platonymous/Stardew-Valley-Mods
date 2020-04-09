@@ -1,7 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BmFont;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PyTK.Extensions;
+using StardewModdingAPI;
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace PyTK.PlatoUI
 {
@@ -9,6 +13,9 @@ namespace PyTK.PlatoUI
     {
         protected string _text;
         public virtual Point TextSize { get; set; }
+
+        public virtual string FontId { get; set; } = "";
+
         public virtual string Text
         {
             get
@@ -18,12 +25,25 @@ namespace PyTK.PlatoUI
             set
             {
                 _text = value;
-                TextSize = Font.MeasureString(_text).toPoint();
+                MeasureString();
                 UpdateBounds();
             }
         }
 
-        public virtual float Scale { get; set; } = 1f;
+        protected float _scale = 1f;
+
+        public virtual float Scale
+        {
+            get
+            {
+                return _scale;
+            }
+            set
+            {
+                _scale = value;
+                MeasureString();
+            }
+        }
 
         public virtual SpriteFont Font { get; set; }
         public virtual Color TextColor { get; set; } = Color.Black;
@@ -56,6 +76,19 @@ namespace PyTK.PlatoUI
             return r;
         }
 
+        public virtual Point MeasureString()
+        {
+            if (FontId == "" && Font != null)
+            {
+                var p = Font.MeasureString(_text).toPoint();
+                TextSize = new Point((int)(p.X * Scale), (int)(p.Y * Scale));
+            }
+            else if(FontId != "")
+                TextSize = UIFontRenderer.MeasureString(FontId, _text, Scale);
+
+            return TextSize;
+        }
+
         public override UIElement Clone(string id = null)
         {
             if (id == null)
@@ -69,6 +102,13 @@ namespace PyTK.PlatoUI
                 e.Add(child.Clone());
 
             return e;
+        }
+
+        public virtual UITextElement WithFont(string id)
+        {
+            FontId = id;
+            MeasureString();
+            return this;
         }
     }
 }
