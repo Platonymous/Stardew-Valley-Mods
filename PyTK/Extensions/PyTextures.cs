@@ -247,7 +247,6 @@ namespace PyTK.Extensions
 
                 return sTexture;
         }
-
     }
 }
 

@@ -1,5 +1,4 @@
-﻿using PyTK.Extensions;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 
 namespace TMXLoader
 {
@@ -19,7 +18,7 @@ namespace TMXLoader
             TMXLoaderMod.AddedContentPacks.Add(pack);
 
             if (TMXLoaderMod.contentPacksLoaded)
-                TMXLoaderMod._instance.loadPack(pack);
+                TMXLoaderMod._instance.loadPack(pack,"content");
         }
 
     }

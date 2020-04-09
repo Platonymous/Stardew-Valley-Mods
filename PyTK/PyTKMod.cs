@@ -17,11 +17,7 @@ using PyTK.Lua;
 using xTile;
 using PyTK.Overrides;
 using PyTK.APIs;
-using System.Threading;
-using StardewValley.Objects;
-using StardewValley.Locations;
 using System.Threading.Tasks;
-using StardewValley.Buildings;
 using System.Collections;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Graphics;
@@ -71,7 +67,6 @@ namespace PyTK
         public override void Entry(IModHelper helper)
         {
             _instance = this;
-
 
             helper.Events.Display.RenderingWorld += (s,e) =>
             {
@@ -283,8 +278,7 @@ namespace PyTK
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("Load", BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
             PatchGeneratedSerializers(new Assembly[] { Assembly.GetExecutingAssembly() });
-
-
+           
                 foreach (ConstructorInfo mc in typeof(GameLocation).GetConstructors())
                 instance.Patch(mc, postfix: new HarmonyMethod(typeof(OvLocations).GetMethod("GameLocationConstructor", BindingFlags.Static | BindingFlags.Public)));
 
@@ -332,7 +326,8 @@ namespace PyTK
 
             foreach (xTile.Tiles.TileSheet tilesheet in map.TileSheets)
             {
-                if (tilesheet.Properties.TryGetValue("@Vanilla", out xTile.ObjectModel.PropertyValue vanillaProperty) && vanillaProperty != null)
+                if ((tilesheet.Properties.TryGetValue("@Vanilla", out xTile.ObjectModel.PropertyValue vanillaProperty) && vanillaProperty != null) ||
+                    (tilesheet.Properties.TryGetValue("@IgnoreLocalFile", out xTile.ObjectModel.PropertyValue ignoreProperty) && ignoreProperty != null))
                 {
                     bool isOutdoors = map.Properties.TryGetValue("Outdoors", out xTile.ObjectModel.PropertyValue outdoorsProperty) && outdoorsProperty != null;
 

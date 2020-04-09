@@ -12,6 +12,7 @@ using Harmony;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using PyTK.Extensions;
+using PyTK.Types;
 
 namespace CustomFurniture
 {
@@ -130,7 +131,7 @@ namespace CustomFurniture
 
                 foreach (string file in cfiles)
                 {
-                    if (file.ToLower().Contains("manifest.json"))
+                    if (file.ToLower().Contains("manifest.json") || file.ToLower().EndsWith("pytk.json"))
                         continue;
 
                     CustomFurniturePack pack = cpack.ReadJsonFile<CustomFurniturePack>(Path.GetFileName(file));

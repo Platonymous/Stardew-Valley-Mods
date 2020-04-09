@@ -112,6 +112,8 @@ namespace CustomMusic
                 activeSound?.Stop(true);
             }, () => SaveHandler.Invoke("save","file"));
 
+            Api.RegisterClampedOption(Manifest, "MusicVolume", "", () => CustomMusicMod.config.MusicVolume, (f) => CustomMusicMod.config.MusicVolume = f, 0f, 1f);
+            Api.RegisterClampedOption(Manifest, "SoundVolume", "", () => CustomMusicMod.config.SoundVolume, (f) => CustomMusicMod.config.SoundVolume = f, 0f, 1f);
 
             if (Label != null)
                 Api.RegisterLabel(Manifest, Label.Name, Label.Description);

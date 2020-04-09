@@ -52,10 +52,12 @@ namespace TMXLoader
         internal static Dictionary<string, Warp> buildablesExits = new Dictionary<string, Warp>();
         internal static List<GameLocation> locationStorage = new List<GameLocation>();
         internal static Dictionary<string, ITranslationHelper> translators = new Dictionary<string, ITranslationHelper>();
+        internal static List<TMXContentPack> latePacks = new List<TMXContentPack>(); 
         internal static TMXLoaderMod _instance;
         internal static Mod faInstance;
 
         internal static bool contentPacksLoaded = false;
+
 
         public static List<IContentPack> AddedContentPacks = new List<IContentPack>();
         internal ITranslationHelper i18n => Helper.Translation;
@@ -364,6 +366,7 @@ namespace TMXLoader
             if (edit.indoorsFile != null && edit._pack != null)
             {
                 string buildFile = edit.indoorsFile;
+
                 helper.Content.InvalidateCache(edit._pack.GetActualAssetKey(buildFile));
 
                 Map map = TMXContent.Load(buildFile, Helper, edit._pack);
@@ -406,7 +409,7 @@ namespace TMXLoader
         private void buildBuildableEdit(bool pay, BuildableEdit edit, GameLocation location, Point position, Dictionary<string, string> colors,  string uniqueId = null, string playerName = null, long playerId = -1, bool distribute = true)
         {
             if (uniqueId == null)
-                uniqueId = ((ulong)Helper.Multiplayer.GetNewID()).ToString();
+                    uniqueId = ((ulong)Helper.Multiplayer.GetNewID()).ToString();
 
             if(playerName == null || playerId == -1)
             {
@@ -821,8 +824,8 @@ namespace TMXLoader
             if (config.converter)
                 exportAllMaps();
 
-            loadContentPacks();
             setTileActions();
+            loadContentPacks();
 
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
@@ -863,6 +866,14 @@ namespace TMXLoader
 
             fixCompatibilities();
             harmonyFix();
+
+            helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
+        }
+
+        private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
+        {
+            loadContentPacksLate();
+            helper.Events.GameLoop.UpdateTicked -= GameLoop_UpdateTicked;
         }
 
         private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
@@ -961,9 +972,10 @@ namespace TMXLoader
 
                 _instance.restoreAllSavedBuildables();
             }
-            catch
+            catch(Exception e)
             {
-
+                _instance.Monitor.Log(e.Message, LogLevel.Trace);
+                _instance.Monitor.Log(e.StackTrace, LogLevel.Trace);
             }
         }
 
@@ -1100,6 +1112,24 @@ namespace TMXLoader
         {
             TMXContentPack tmxPack = pack.ReadJsonFile<TMXContentPack>(contentFile + ".json");
 
+            tmxPack.parent = pack;
+
+            if (tmxPack.loadLate)
+            {
+                latePacks.Add(tmxPack);
+                return;
+            }
+
+            loadPack(tmxPack);
+
+            foreach (string alsoLoad in tmxPack.alsoLoad)
+                loadPack(pack, alsoLoad);
+        }
+
+        internal void loadPack(TMXContentPack tmxPack) 
+        {
+            var pack = tmxPack.parent;
+
             foreach (string mod in tmxPack.hasMods)
                 if (!helper.ModRegistry.IsLoaded(mod))
                     return;
@@ -1233,19 +1263,24 @@ namespace TMXLoader
                 edit._pack = pack;
                 buildables.Add(edit);
             }
-
-            foreach (string alsoLoad in tmxPack.alsoLoad)
-                loadPack(pack, alsoLoad);
         }
 
         private void loadContentPacks()
         {
             PyDraw.getRectangle(64, 64, Color.Transparent).inject(@"Portraits/PlayerShop");
 
-            foreach (StardewModdingAPI.IContentPack pack in GetContentPacks())
-                loadPack(pack);
+            foreach (IContentPack pack in GetContentPacks())
+                loadPack(pack,"content");
 
             contentPacksLoaded = true;
+        }
+
+        private void loadContentPacksLate()
+        {
+            foreach (TMXContentPack pack in latePacks)
+                loadPack(pack);
+
+            latePacks.Clear();
         }
 
         private TMXAssetEditor addAssetEditor(TMXAssetEditor editor)

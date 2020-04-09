@@ -46,6 +46,9 @@ namespace CustomMusic
             harmony.Patch(typeof(Cue).GetProperty("IsPlaying").GetGetMethod(false), new HarmonyMethod(typeof(Overrides), "IsPlaying"));
             harmony.Patch(typeof(SoundBank).GetMethod("GetCue"), new HarmonyMethod(typeof(Overrides), "GetCue"));
 
+            foreach(var playCue in typeof(SoundBank).GetMethods().Where(m => m.Name == "PlayCue"))
+            harmony.Patch(playCue, new HarmonyMethod(typeof(Overrides), "PlayCue"));
+
             try
             {
                 var PyUtils = Type.GetType("PyTK.PyUtils, PyTK");

@@ -255,7 +255,17 @@ namespace TMXLoader
 
             List<TileShopItem> items = new List<TileShopItem>();
             Dictionary<ISalable, int[]> priceAndStock = new Dictionary<ISalable, int[]>();
+            {
+                TMXLoaderMod.monitor.Log("Key:->" + text[1] + "<-");
+                foreach(TileShop tss in TMXLoaderMod.tileShops.Keys)
+                    TMXLoaderMod.monitor.Log(tss.id + " == " + text[1] + "> " +(tss.id == text[1]));
 
+
+                if (TMXLoaderMod.tileShops.Find(kvp => kvp.Key.id == text[1]) is KeyValuePair<TileShop, List<TileShopItem>> tsx)
+                    TMXLoaderMod.monitor.Log(tsx.Key + "-" + tsx.Value);
+                else
+                    TMXLoaderMod.monitor.Log("not found");
+            }
             if (TMXLoaderMod.tileShops.Find(kvp => kvp.Key.id == text[1] || (text[1].StartsWith("EmptyShop_") && kvp.Key.id == "EmptyShop")) is KeyValuePair<TileShop, List<TileShopItem>> ts && TMXLoaderMod.tileShops.TryGetValue(ts.Key, out items))
             {
                 if (text[1].StartsWith("EmptyShop_"))

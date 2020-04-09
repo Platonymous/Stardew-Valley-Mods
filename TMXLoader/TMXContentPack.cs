@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using StardewModdingAPI;
+using System.Collections.Generic;
 
 namespace TMXLoader
 {
@@ -19,5 +20,8 @@ namespace TMXLoader
         public List<NPCPlacement> festivalSpots { get; set; } = new List<NPCPlacement>();
         public List<NPCPlacement> placeNPCs { get; set; } = new List<NPCPlacement>();
         public List<string> scripts { get; set; } = new List<string>();
+        public bool loadLate { get; set; } = false;
+
+        internal IContentPack parent = null;
     }
 }

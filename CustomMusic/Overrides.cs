@@ -50,10 +50,78 @@ namespace CustomMusic
             CustomMusicMod.Active.RemoveWhere(m => m.Id == __instance.Name);
         }
 
+        public static bool PlayCue(SoundBank __instance, string name)
+        {
+            return Play3(name, __instance);
+        }
+
         public static bool Play(ref Cue __instance)
         {
             string name = __instance.Name;
+            return Play2(name, ref __instance);
+        }
+        public static bool Play3(string name, SoundBank soundbank)
+        {
+            bool custom = false;
+            if (nextCue.Key == name)
+            {
+                custom = true;
+                name = nextCue.Value;
+                nextCue = new KeyValuePair<string, string>("none", "none");
+            }
+            bool ret = true;
+            try
+            {
+                string preset = "Default";
 
+                if (CustomMusicMod.config.Presets.ContainsKey(name))
+                    preset = CustomMusicMod.config.Presets[name];
+
+                if (preset == "Vanilla")
+                    return ret;
+
+                List<StoredMusic> songs = null;
+
+                if (preset != "Default" && preset != "Random" && preset != "Any")
+                    songs = CustomMusicMod.Music.Where(m => Path.GetFileNameWithoutExtension(m.Path) == preset).ToList();
+
+                if (preset == "Any")
+                    songs = CustomMusicMod.Music.ToList();
+
+                if (songs == null || songs.Count() == 0)
+                    songs = CustomMusicMod.Music.Where(m => m.Id == name && CustomMusicMod.checkConditions(m.Conditions)).ToList();
+
+                if (preset == "Random" || preset == "Any")
+                    songs.Add(new StoredMusic() { Id = "Vanilla" });
+
+                if (songs.Count > 0 && songs.First() is StoredMusic music)
+                {
+                    if (songs.Count > 1)
+                        music = songs[Game1.random.Next(songs.Count())];
+
+                    if (music.Id == "Vanilla")
+                        return ret;
+
+                    music.Sound.Play(CustomMusicMod.config.SoundVolume, 0f,0f);
+
+                    if (CustomMusicMod.config.Debug)
+                        CustomMusicMod.SMonitor.Log("Playing: " + name + (custom ? " (custom)" : " (Changed)"), StardewModdingAPI.LogLevel.Trace);
+                    ret = false;
+                }
+                else if (CustomMusicMod.config.Debug)
+                    CustomMusicMod.SMonitor.Log("Playing: " + name, StardewModdingAPI.LogLevel.Trace);
+            }
+            catch
+            {
+
+            }
+
+            return ret;
+        }
+
+
+        public static bool Play2(string name, ref Cue __instance)
+        {
             foreach (ActiveMusic a in CustomMusicMod.Active.Where(m => m.Id == name))
                 a.Dispose();
 
@@ -85,7 +153,7 @@ namespace CustomMusic
                 if (preset == "Any")
                     songs = CustomMusicMod.Music.ToList();
 
-                if(songs == null || songs.Count() == 0)
+                if (songs == null || songs.Count() == 0)
                     songs = CustomMusicMod.Music.Where(m => m.Id == name && CustomMusicMod.checkConditions(m.Conditions)).ToList();
 
                 if (preset == "Random" || preset == "Any")
@@ -119,7 +187,7 @@ namespace CustomMusic
         public static void SetVariable(Cue __instance, string name, ref float value)
         {
             if (CustomMusicMod.Active.ToList().Find(a => a.Id == __instance.Name) is ActiveMusic am)
-                am.SetVolume(value);
+                am.SetVolume(value * CustomMusicMod.config.MusicVolume);
         }
 
        
