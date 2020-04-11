@@ -30,7 +30,7 @@ namespace CustomMusic
 
         public static bool GetCue(SoundBank __instance, string name, ref Cue __result)
         {
-            if (name.StartsWith("cm:"))
+            if (name.ToLower().StartsWith("cm:"))
             {
                 string[] n = name.Split(':');
                 string next = n.Length > 2 ? n[2] : "MainTheme";
@@ -167,7 +167,7 @@ namespace CustomMusic
                     if (music.Id == "Vanilla")
                         return ret;
 
-                    ActiveMusic active = new ActiveMusic(__instance.Name, music.Sound.CreateInstance(), ref __instance, music.Ambient, music.Loop);
+                    ActiveMusic active = new ActiveMusic(__instance.Name, music.Sound.CreateInstance(), music.Ambient, music.Loop);
                     CustomMusicMod.Active.Add(active);
                     if (CustomMusicMod.config.Debug)
                         CustomMusicMod.SMonitor.Log("Playing: " + name + (custom ? " (custom)" : " (Changed)"), StardewModdingAPI.LogLevel.Trace);

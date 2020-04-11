@@ -9,6 +9,10 @@ namespace CustomMusic
         public bool Ambient { get; set; }
         public string Path { get; set; }
         public SoundEffect _sound = null;
+
+        public bool IsEmitter { get; set; } = false;
+
+        public int Distance { get; set; } = -1;
         public SoundEffect Sound
         {
             get

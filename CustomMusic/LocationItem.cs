@@ -10,5 +10,6 @@ namespace CustomMusic
     {
         public string Location { get; set; }
         public string MusicId { get; set; }
+        public List<SoundEmitterPlacement> Emitters { get; set; } = new List<SoundEmitterPlacement>(); 
     }
 }

@@ -148,7 +148,7 @@ namespace CustomMusic
         {
             List<string> choicesc = new List<string>((string[])__instance.GetType().GetProperty("Choices").GetValue(__instance));
 
-            if (!choicesc[0].StartsWith("CM:"))
+            if (!choicesc[0].ToLower().StartsWith("cm:"))
                 return true;
 
             Vector2 pos = (Vector2)__instance.GetType().GetProperty("Position").GetValue(__instance);
@@ -191,7 +191,7 @@ namespace CustomMusic
         {
             List<string> choices = new List<string>((string[])__instance.GetType().GetProperty("Choices").GetValue(__instance));
 
-            if (!choices[0].StartsWith("CM:"))
+            if (!choices[0].ToLower().StartsWith("cm:"))
                 return true;
 
             if (!currentIndex.ContainsKey(__instance))

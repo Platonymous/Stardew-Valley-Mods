@@ -12,6 +12,9 @@ using System.Reflection;
 using OggSharp;
 using StardewModdingAPI.Events;
 using System.Threading;
+using Microsoft.Xna.Framework;
+using xTile;
+using xTile.ObjectModel;
 
 namespace CustomMusic
 {
@@ -23,6 +26,7 @@ namespace CustomMusic
         internal static IModHelper SHelper;
         internal static MethodInfo checkEventConditions = null;
         internal static Dictionary<string, string> locations = new Dictionary<string, string>();
+        internal static Dictionary<string, List<SoundEmitterPlacement>> emitterPlacements = new Dictionary<string, List<SoundEmitterPlacement>>();
         public static Config config;
         internal static int loads = 0;
         internal static int simLoad = 0;
@@ -30,6 +34,7 @@ namespace CustomMusic
         internal const int ti = 32;
         internal const int simuMax = 8;
         internal const int slp = 500;
+        internal List<ActiveMusic> CurrentEmitters = new List<ActiveMusic>();
 
         public override void Entry(IModHelper helper)
         {
@@ -76,7 +81,7 @@ namespace CustomMusic
 
             var name = locations[Game1.currentLocation.Name];
 
-            if (name.StartsWith("cm:"))
+            if (name.ToLower().StartsWith("cm:"))
             {
                 string[] n = name.Split(':');
                 if (n.Length <= 2 && Game1.currentSong != null && Game1.currentSong.Name is string s && s.Length > 0)
@@ -89,14 +94,15 @@ namespace CustomMusic
 
         private void OnWarped(object sender, WarpedEventArgs e)
         {
-            if (e.NewLocation == null || !e.IsLocalPlayer)
+
+            if (!(e.NewLocation is GameLocation) || !e.IsLocalPlayer)
                 return;
+            CurrentEmitters.ForEach(a => a.Dispose());
+            CurrentEmitters.Clear();
 
-            if (locations.ContainsKey(e.NewLocation.Name))
+            if (locations.TryGetValue(e.NewLocation.Name, out string name))
             {
-                var name = locations[e.NewLocation.Name];
-
-                if (name.StartsWith("cm:"))
+                if (name.ToLower().StartsWith("cm:"))
                 {
                     string[] n = name.Split(':');
                     if (n.Length <= 2 && Game1.currentSong != null && Game1.currentSong.Name is string s && s.Length > 0)
@@ -104,6 +110,63 @@ namespace CustomMusic
                 }
                 Game1.changeMusicTrack(name);
             }
+
+            if (emitterPlacements.TryGetValue(e.NewLocation.Name, out List<SoundEmitterPlacement> placements))
+            {
+                foreach(SoundEmitterPlacement emitter in placements.Where(p => CustomMusicMod.checkConditions(p.Conditions)))
+                {
+                    if (emitter.SoundId.ToLower().StartsWith("cm:"))
+                        emitter.SoundId = emitter.SoundId.Substring(3);
+
+                    var songs = CustomMusicMod.Music.Where(m => m.Id == emitter.SoundId && CustomMusicMod.checkConditions(m.Conditions)).ToList();
+                    if (songs.FirstOrDefault() is StoredMusic music)
+                    {
+                        var pos = emitter.GetPosition();
+                        ActiveMusic active = new ActiveMusic(emitter.SoundId + "_" + pos.X + "_" + pos.Y, music.Sound.CreateInstance(), music.Ambient, music.Loop, pos, emitter.DistanceModifier, emitter.VolumeModifier, emitter.MaxTileDistance);
+                        CurrentEmitters.Add(active);
+                    }
+                }
+            }
+
+            if(e.NewLocation.Map is Map map && map.Properties.TryGetValue("SoundEmitters", out PropertyValue emittersValue) 
+                && emittersValue != null 
+                && emittersValue.ToString() is string emittersText
+                && emittersText != "")
+            {
+                var emittersData = emittersText.Split(';');
+                foreach (string data in emittersData)
+                {
+                    if(data.Split(' ') is string[] emitter && emitter.Length >= 3 
+                        && float.TryParse(emitter[0], out float x)
+                        && float.TryParse(emitter[1], out float y)
+                        && emitter[2] is string aname)
+                    {
+                        float distance = SoundEmitterPlacement.DefaultDistanceModifier;
+                        float volume = SoundEmitterPlacement.DefaultVolumeModifier;
+                        int maxDistance = SoundEmitterPlacement.DefaultMaxDistance;
+
+                        if (aname.ToLower().StartsWith("cm:"))
+                            aname = aname.Substring(3);
+
+                        if (emitter.Length >= 4)
+                            float.TryParse(emitter[3], out distance);
+
+                        if (emitter.Length >= 5)
+                            float.TryParse(emitter[4], out volume);
+
+                        if (emitter.Length >= 6)
+                            int.TryParse(emitter[5], out maxDistance);
+
+                        var songs = CustomMusicMod.Music.Where(m => m.Id == aname && CustomMusicMod.checkConditions(m.Conditions)).ToList();
+                        if (songs.FirstOrDefault() is StoredMusic music)
+                        {
+                            ActiveMusic active = new ActiveMusic(aname + "_" + x + "_" + y, music.Sound.CreateInstance(), music.Ambient, music.Loop, new Vector2(x,y), distance, volume, maxDistance);
+                            CurrentEmitters.Add(active);
+                        }
+                    }
+                }
+            }
+
         }
 
         public static Type getTypeSDV(string type)
@@ -126,8 +189,12 @@ namespace CustomMusic
             foreach (IContentPack pack in Helper.ContentPacks.GetOwned())
             {
                 MusicContent content = pack.ReadJsonFile<MusicContent>("content.json");
-                loads += content.Music.Count;
-                foreach (MusicItem music in content.Music)
+                List<MusicItem> all = new List<MusicItem>();
+                all.AddRange(content.Music);
+                all.AddRange(content.Sounds);
+                all.AddRange(content.Emitters);
+                loads += all.Count;
+                foreach (MusicItem music in all)
                 {
                     string path = Path.Combine(pack.DirectoryPath, music.File);
                     addMusic(path, music);
@@ -140,10 +207,19 @@ namespace CustomMusic
 
                 foreach (LocationItem location in content.Locations)
                 {
-                    if (locations.ContainsKey(location.Location))
-                        locations.Remove(location.Location);
+                    if (location.MusicId != null && location.MusicId != "")
+                    {
+                        if (locations.ContainsKey(location.Location))
+                            locations.Remove(location.Location);
 
-                    locations.Add(location.Location, location.MusicId);
+                        locations.Add(location.Location, location.MusicId);
+                    }
+
+                    if (location.Emitters.Count > 0)
+                        if (!emitterPlacements.ContainsKey(location.Location))
+                            emitterPlacements.Add(location.Location, location.Emitters);
+                        else
+                            emitterPlacements[location.Location].AddRange(location.Emitters);
                 }
             }
 
@@ -212,7 +288,7 @@ namespace CustomMusic
                 Monitor.Log(music.File + " Loaded", LogLevel.Trace);
                 string[] ids = music.Id.Split(',').Select(p => p.Trim()).ToArray();
                 foreach (string id in ids)
-                    Music.Add(new StoredMusic(id,music.Preload ? soundEffect :null, music.Ambient, music.Loop, music.Conditions, path));
+                    Music.Add(new StoredMusic(id, music.Preload ? soundEffect : null, music.Ambient, music.Loop, music.Conditions, path));
             }
             else
             {
