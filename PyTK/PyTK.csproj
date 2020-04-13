@@ -49,10 +49,12 @@
   <Reference Include="TMXTile">
     <HintPath>$(GamePath)\smapi-internal\TMXTile.dll</HintPath>
     <Private>False</Private>
+    <SpecificVersion>false</SpecificVersion>
   </Reference>
     <Reference Include="BmFont">
       <HintPath>$(GamePath)\BmFont.dll</HintPath>
-      <Private>False</Private>
+      <Private>true</Private>
+      <SpecificVersion>false</SpecificVersion>
     </Reference>
   </ItemGroup>
 
@@ -68,5 +70,11 @@
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
+
+  <ItemGroup>
+    <Reference Update="0Harmony">
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+  </ItemGroup>
 
 </Project>

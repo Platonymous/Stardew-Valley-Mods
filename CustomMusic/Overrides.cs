@@ -141,7 +141,7 @@ namespace CustomMusic
 
                 if (CustomMusicMod.config.Presets.ContainsKey(name))
                     preset = CustomMusicMod.config.Presets[name];
-
+                
                 if (preset == "Vanilla")
                     return ret;
 

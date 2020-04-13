@@ -1,5 +1,6 @@
 ﻿using PyTK.PlatoUI;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PlatoWarpMenu
 {
@@ -22,6 +23,8 @@ namespace PlatoWarpMenu
 
             if (name == "")
                 name = WarpMenu.i18n.Get(Id);
+            else if (WarpMenu.i18n.GetTranslations().ToList().Exists(t => t.Key == "location."+name))
+                name = WarpMenu.i18n.Get("location." + name);
 
             Special = special;
 

@@ -51,6 +51,8 @@ namespace PyTK
         internal static object waitForPatching = new object();
         internal static object waitForItems = new object();
 
+        internal static UpdateTickedEventArgs updateTicked;
+
         internal static PyTKMod _instance { get; set; }
         internal static IMonitor _monitor {
             get {
@@ -108,6 +110,11 @@ namespace PyTK
                     CustomObjectData.injector?.Invalidate();
                     CustomObjectData.injectorBig?.Invalidate();
                 }
+            };
+
+            helper.Events.GameLoop.UpdateTicked += (s, e) =>
+            {
+                updateTicked = e;
             };
 
             this.Helper.Events.Player.Warped += Player_Warped;
@@ -278,8 +285,8 @@ namespace PyTK
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("Load", BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
             PatchGeneratedSerializers(new Assembly[] { Assembly.GetExecutingAssembly() });
-           
-                foreach (ConstructorInfo mc in typeof(GameLocation).GetConstructors())
+
+            foreach (ConstructorInfo mc in typeof(GameLocation).GetConstructors())
                 instance.Patch(mc, postfix: new HarmonyMethod(typeof(OvLocations).GetMethod("GameLocationConstructor", BindingFlags.Static | BindingFlags.Public)));
 
             Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
@@ -305,7 +312,7 @@ namespace PyTK
                original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "NormalizeTilesheetPaths"),
                postfix: new HarmonyMethod(this.GetType().GetMethod("NormalizeTilesheetPaths", BindingFlags.Public | BindingFlags.Static))
            );
-
+          
             setupLoadIntercepter(instance);
         }
 

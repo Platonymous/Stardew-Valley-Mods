@@ -96,6 +96,8 @@ namespace PyTK.Types
 
         public static bool invokeCustomTileActions(string key, GameLocation location, Vector2 tile, string layer)
         {
+            tile = new Vector2((int)tile.X, (int)tile.Y);
+
             bool standartAction = (key == "Action" || key == "TouchAction");
             bool mapAction = (layer == "Map");
             string conditions = standartAction ? location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Conditions", layer) : mapAction ? location.map.Properties.ContainsKey("Conditions") ? location.map.Properties["Conditions"].ToString() : "" :"";

@@ -128,12 +128,12 @@ namespace PlatoWarpMenu
             UIElement button = UIElement.GetImage(PyDraw.getBorderedRectangle(optionWidth, optionHeight - 1, Color.White * 0.2f, 1, Color.White), row == 0 ? Color.CornflowerBlue : Color.LightGreen, item.Id, 1, 0,UIHelper.GetTopLeft(placeRow * (optionWidth + 1), index * (optionHeight + 1), optionWidth, optionHeight - 1)).WithInteractivity(update: UpdateItem, click: ClickItem);
             float textScale = Math.Min(0.5f * menuScale,0.7f);
 
-            if (menuFont1 != "")
+            if (LocalizedContentManager.CurrentLanguageLatin && menuFont1 != "" && menuFont1 != null)
                 textScale *= cFontAdjust;
 
             UITextElement text = new UITextElement(placeText, Game1.smallFont, Color.White, textScale, 1, positioner: UIHelper.GetCentered());
             
-            if (menuFont1 != "" && menuFont1 != null)
+            if (LocalizedContentManager.CurrentLanguageLatin && menuFont1 != "" && menuFont1 != null)
                 text.WithFont(menuFont1);
 
             button.Z = row;
@@ -329,10 +329,13 @@ namespace PlatoWarpMenu
             var lmenu = UIElement.GetContainer("Location Menu " + location.Name, positioner: UIHelper.GetCentered(0, 0, 1f, 1f));
             float textScale = 1.4f;
 
-            if (menuFont2 != "" && menuFont2 != null)
+            if (LocalizedContentManager.CurrentLanguageLatin && menuFont2 != "" && menuFont2 != null)
                 textScale *= cFontAdjust;
+            var lname = !structure ? location.Name : location.uniqueName.Value;
+            if (i18n.GetTranslations().ToList().Exists(t => t.Key == "location."+lname))
+                lname = i18n.Get("location." + lname);
 
-            var lmenuHead = new UITextElement(!structure ? location.Name : location.uniqueName.Value, Game1.dialogueFont, Color.White, textScale, positioner: UIHelper.GetTopCenter(0, 5));
+            var lmenuHead = new UITextElement(lname, Game1.dialogueFont, Color.White, textScale, positioner: UIHelper.GetTopCenter(0, 5));
 
 
             var back = location.Map.GetLayer("Back");
@@ -357,7 +360,7 @@ namespace PlatoWarpMenu
             var lmenuLoading = new UITextElement(i18n.Get("menu.locations.loading"), Game1.dialogueFont, Color.White, textScale, positioner: UIHelper.GetCentered());
             lmenuViewer.Add(lmenuLoading);
 
-            if (menuFont2 != "" && menuFont2 != null)
+            if (LocalizedContentManager.CurrentLanguageLatin && menuFont2 != "" && menuFont2 != null)
             {
                 lmenuHead.WithFont(menuFont2);
                 lmenuWarp.WithFont(menuFont2);

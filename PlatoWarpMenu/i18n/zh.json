@@ -1,0 +1,14 @@
+﻿{
+  "MenuButton": "開啟按鍵",
+  "UseTempFolder": "使用暫存資料夾",
+  "MenuFont1": "Menu Font 1",
+  "MenuFont2": "Menu Font 2",
+  "menu.artifacts": "挖掘點",
+  "menu.characters": "角色",
+  "menu.outdoors": "戶外",
+  "menu.indoors": "室內",
+  "menu.buildings": "建築",
+  "menu.farm": "農場",
+  "menu.locations.warp": "傳送至",
+  "menu.locations.loading": "讀取中..."
+}

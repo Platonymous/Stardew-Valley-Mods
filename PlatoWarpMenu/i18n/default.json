@@ -10,5 +10,11 @@
   "menu.buildings": "Buildings",
   "menu.farm": "Farm",
   "menu.locations.warp": "Warp to",
-  "menu.locations.loading": "Loading.."
+  "menu.locations.loading": "Loading..",
+  "location.BusStop": "Bus Stop",
+  "location.BeachNightMarket": "Beach (Night Market)",
+  "location.AbandonedJojaMart": "Joja Mart (Abandoned)",
+  "location.AdventureGuild": "Adventurers Guild",
+  "location.AnimalShop": "Marnie's Animal Shop",
+  "location.ArchaeologyHouse": "Museum"
 }

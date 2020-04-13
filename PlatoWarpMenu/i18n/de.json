@@ -1,0 +1,14 @@
+﻿{
+  "MenuButton": "Menü Button",
+  "UseTempFolder": "Benutze Temp Ordner",
+  "MenuFont1": "Menü Font 1",
+  "MenuFont2": "Menü Font 2",
+  "menu.artifacts": "Artefakte",
+  "menu.characters": "Charaktere",
+  "menu.outdoors": "Aussen",
+  "menu.indoors": "Innen",
+  "menu.buildings": "Gebäude",
+  "menu.farm": "Farm",
+  "menu.locations.warp": "Spring zu",
+  "menu.locations.loading": "Läd.."
+}
