@@ -31,6 +31,7 @@ using System.Threading.Tasks;
 using StardewValley.Buildings;
 using TMXTile;
 using StardewValley.Network;
+using StardewValley.Characters;
 
 namespace TMXLoader
 {
@@ -165,6 +166,7 @@ namespace TMXLoader
                     saveData = new SaveData();
                     saveData.Locations = new List<SaveLocation>();
                     saveData.Buildables = new List<SaveBuildable>();
+                    saveData.Data = new List<PersistentData>();
 
                     foreach (var l in addedLocations)
                         if (Game1.getLocationFromName(l.name) is GameLocation location && getLocationSaveData(location) is SaveLocation sav)
@@ -179,6 +181,12 @@ namespace TMXLoader
 
                         saveData.Buildables.Add(b);
                     }
+
+                    foreach (GameLocation location in Game1.locations)
+                        if (location.Map.Properties.TryGetValue("PersistentData", out PropertyValue dataString)
+                        && dataString != null
+                        && dataString.ToString().Split(':') is string[] data && data.Length == 3)
+                            saveData.Data.Add(new PersistentData(data[0], data[1], data[2]));
 
                     Helper.Data.WriteSaveData<SaveData>("Locations", saveData);
                 }
@@ -208,6 +216,10 @@ namespace TMXLoader
 
             helper.Events.GameLoop.DayStarted += (s, e) =>
             {
+                if(Game1.IsMasterGame)
+                    foreach(GameLocation loc in Game1.locations)
+                        setupCrops(loc);
+
                 if (!helper.ModRegistry.IsLoaded("Entoarox.FurnitureAnywhere"))
                     return;
 
@@ -268,6 +280,9 @@ namespace TMXLoader
 
                     }
                 }
+
+                foreach (GameLocation location in Game1.locations)
+                    loadPersistentDataToLocation(location);
             }
         }
 
@@ -753,7 +768,7 @@ namespace TMXLoader
 
         private void Player_Warped(object sender, WarpedEventArgs e)
         {
-            if (!e.IsLocalPlayer)
+            if (!e.IsLocalPlayer || !(e.NewLocation is GameLocation))
                 return;
 
             foreach (TMXAssetEditor editor in conditionals)
@@ -777,7 +792,7 @@ namespace TMXLoader
                             try
                             {
                                 Game1.currentLocation.reloadMap();
-                                Game1.currentLocation.GetType().GetField("_appliedMapOverrides", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation,new HashSet<string>());
+                                Game1.currentLocation.GetType().GetField("_appliedMapOverrides", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation, new HashSet<string>());
                                 Game1.currentLocation.GetType().GetField("ccRefurbished", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation, false);
                                 Game1.currentLocation.GetType().GetField("isShowingDestroyedJoja", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation, false);
                                 Game1.currentLocation.GetType().GetField("isShowingUpgradedPamHouse", BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(Game1.currentLocation, false);
@@ -803,20 +818,76 @@ namespace TMXLoader
 
                             PyUtils.checkDrawConditions(e.NewLocation.map);
 
-                        e.NewLocation.map.enableMoreMapLayers();
+                            e.NewLocation.map.enableMoreMapLayers();
 
                         }
                     }
 
 
                 }
-            
+
             foreach (string map in festivals)
                 if (e.NewLocation is GameLocation gl && gl.mapPath.Value is string mp && mp.Contains(map))
                     Helper.Content.InvalidateCache(e.NewLocation.mapPath.Value);
 
+            if(Game1.IsMasterGame)
+                loadPersistentDataToLocation(e.NewLocation);
+
             if (e.NewLocation is GameLocation && e.NewLocation.Map is Map m)
-              m.enableMoreMapLayers();
+                m.enableMoreMapLayers();
+        }
+
+        private static void loadPersistentDataToLocation(GameLocation location)
+        {
+            foreach (var d in saveData.Data.Where(p => p.Key == location.Name))
+                try
+                {
+                    if (!location.Map.Properties.ContainsKey("PersistentData"))
+                        location.Map.Properties.Add("PersistentData", d.Type + ":" + d.Key + ":" + d.Value);
+                    else if (!location.Map.Properties["PersistentData"].ToString().Split(';').Contains(d.Type + ":" + d.Key + ":" + d.Value))
+                        location.Map.Properties["PersistentData"] = location.Map.Properties["PersistentData"].ToString() + ";" + d.Type + ":" + d.Key + ":" + d.Value;
+
+                    if (
+                        d.Type == "lock" &&
+                        (!location.Map.Properties.TryGetValue("Unlocked", out PropertyValue unlocked)
+                        || !unlocked.ToString().Split(';').ToList().Contains(d.Value))
+                        )
+                    {
+                        if (location.Map.Properties.TryGetValue("Unlocked", out PropertyValue unlocked2))
+                            location.Map.Properties["Unlocked"] = location.Map.Properties["Unlocked"].ToString() + ";" + d.Value;
+                        else
+                            location.Map.Properties.Add("Unlocked", d.Value);
+
+                        string[] lockData = d.Value.Split('_');
+                        int x = int.Parse(lockData[1]);
+                        int y = int.Parse(lockData[2]);
+                        Tile tile = location.Map.GetLayer(lockData[0]).Tiles[x, y];
+
+                        if (tile == null)
+                            continue;
+
+                        if (tile.Properties.ContainsKey("Recall"))
+                        {
+                            if (lockData.Length >= 4 && lockData[3] == "recall")
+                                tile.Properties["Action"] = tile.Properties["Recall"];
+                            else
+                                TileAction.invokeCustomTileActions("Recall", location, new Vector2(x, y), lockData[0]);
+                        }
+                        else
+                        {
+                            if (lockData.Length >= 4 && lockData[3] == "recall")
+                                tile.Properties["Action"] = tile.Properties["Success"];
+                            else
+                                TileAction.invokeCustomTileActions("Success", location, new Vector2(x, y), lockData[0]);
+                        }
+                    }
+
+                    
+                }
+                catch
+                {
+
+                }
         }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -904,7 +975,20 @@ namespace TMXLoader
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("loadDataToLocations"), postfix: new HarmonyMethod(this.GetType().GetMethod("SavePatch", BindingFlags.Public | BindingFlags.Static)));
             instance.Patch(typeof(GameLocation).GetMethod("setMapTile"), prefix: new HarmonyMethod(this.GetType().GetMethod("trySetMapTile", BindingFlags.Public | BindingFlags.Static)));
+            instance.Patch(
+                original: AccessTools.Method(typeof(Crop), "harvest"),
+                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "harvest"))
+                );
 
+            instance.Patch(
+                original: AccessTools.Method(typeof(Crop), "harvest"),
+                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "harvest"))
+                );
+
+            instance.Patch(
+                original: AccessTools.Method(typeof(HoeDirt), "performToolAction"),
+                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "performToolAction"))
+                );
 
             if (!helper.ModRegistry.IsLoaded("Entoarox.FurnitureAnywhere"))
                 return;
@@ -913,6 +997,44 @@ namespace TMXLoader
         }
 
         private static bool skipTrySetMapTile = false;
+
+        public static bool performToolAction(HoeDirt __instance, ref bool __result)
+        {
+            if (__instance.crop is Crop crop && !crop.forageCrop.Value && crop.whichForageCrop.Value == 99)
+            {
+                __result = false;
+                return false;
+            }
+
+            return true;
+        }
+
+                public static bool harvest(Crop __instance, int xTile, int yTile, JunimoHarvester junimoHarvester, ref bool __result)
+        {
+            if (!__instance.forageCrop.Value && __instance.whichForageCrop.Value == 99)
+            {
+                __result = false;
+
+                Vector2 pos = new Vector2(xTile, yTile);
+
+                if(junimoHarvester == null 
+                    && Game1.currentLocation.terrainFeatures.TryGetValue(pos, out TerrainFeature f) 
+                    && f is HoeDirt h 
+                    && h.crop == __instance)
+                    foreach(Layer layer in Game1.currentLocation.Map.Layers.Where(l => l.Id.ToLower().StartsWith(Game1.currentSeason.ToLower() + "_crops")))
+                        if(layer.Tiles[xTile,yTile] is Tile tile && layer.Properties.ContainsKey("HarvestAction"))
+                        {
+                            tile.Properties["HarvestAction"] = layer.Properties["HarvestAction"];
+                            TileAction.invokeCustomTileActions("HarvestAction", Game1.currentLocation, pos, layer.Id);
+                            break;
+                        }
+
+
+                return false;
+            }
+
+            return true;
+        }
 
         public static bool trySetMapTile(GameLocation __instance, int tileX, int tileY, int index, string layer, string action, int whichTileSheet = 0)
         {
@@ -1037,7 +1159,9 @@ namespace TMXLoader
             monitor.Log("Adding:" + edit.name, LogLevel.Trace);
             if (edit.type == "Deco")
                 location = new DecoratableLocation(Path.Combine("Maps", edit.name), edit.name);
-            if (edit.type == "Farm")
+            else if (edit.type == "Summit")
+                location = new Summit(Path.Combine("Maps", edit.name), edit.name);
+            else if (edit.type == "Farm")
                 location = new Farm(Path.Combine("Maps", edit.name), edit.name);
             else if (edit.type == "Cellar")
                 location = new Cellar(Path.Combine("Maps", edit.name), edit.name);
@@ -1092,6 +1216,106 @@ namespace TMXLoader
 
             return location;
 
+        }
+
+        public static void setupCrops(GameLocation location)
+        {
+            Dictionary<int, string> cropsDict = Game1.content.Load<Dictionary<int, string>>("Data\\Crops");
+            Dictionary<int, string> fruitsDict = Game1.content.Load<Dictionary<int, string>>("Data\\fruitTrees");
+
+            foreach (Layer layer in location.Map.Layers)
+                if (layer.Id.ToLower().StartsWith(Game1.currentSeason.ToLower() + "_crops"))
+                {
+                    int startPhase = 0;
+
+                    if (layer.Properties.TryGetValue("StartPhase", out PropertyValue sp))
+                        int.TryParse(sp.ToString(), out startPhase);
+
+                    bool canBeHarvested =
+                            layer.Properties.TryGetValue("CanBeHarvested", out PropertyValue ch)
+                            && (ch.ToString().ToLower() == "t" || ch.ToString().ToLower() == "true");
+
+                    bool autoWater =
+                            layer.Properties.TryGetValue("AutoWater", out PropertyValue aw)
+                            && (aw.ToString().ToLower() == "t" || aw.ToString().ToLower() == "true");
+
+
+                    for (int x = 0; x < layer.DisplayWidth / layer.TileWidth; x++)
+                        for (int y = 0; y < layer.DisplayHeight / layer.TileHeight; y++)
+                        {
+                            Tile tile = layer.Tiles[x, y];
+                            if (tile == null)
+                                continue;
+
+                            int index = tile.TileIndex;
+
+                            if (tile.Properties.TryGetValue("name", out PropertyValue name))
+                                if (name != null)
+                                    index = Game1.objectInformation.getIndexByName(name.ToString());
+
+                            Vector2 pos = new Vector2(x, y);
+                            Crop crop = null;
+
+                            if (cropsDict.ContainsKey(index))
+                                crop = new Crop(index, x, y);
+                            else if (cropsDict.Exists(kv => int.TryParse(kv.Value.Split('/')[3], out int idx) && idx == index))
+                            {
+                                index = cropsDict.Where(kv => int.TryParse(kv.Value.Split('/')[3], out int idx) && idx == index).FirstOrDefault().Key;
+                                crop = new Crop(index, x, y);
+                            }
+                            else if (index == 770)
+                                crop = new Crop(Crop.getRandomLowGradeCropForThisSeason(Game1.currentSeason), x, y);
+                            
+
+                                if (crop != null)
+                            {
+                                if (!crop.seasonsToGrowIn.Contains(Game1.currentSeason))
+                                    continue;
+
+                                if (!canBeHarvested)
+                                    crop.whichForageCrop.Value = 99;
+
+                                if (startPhase >= crop.phaseDays.Count - 1)
+                                    crop.growCompletely();
+                                else
+                                    crop.currentPhase.Value = startPhase;
+
+                                HoeDirt hoedirt = new HoeDirt(Game1.isRaining ? 1 : 0, location);
+
+                                if (location.terrainFeatures.ContainsKey(pos))
+                                {
+                                    if (location.terrainFeatures[pos] is HoeDirt h && h.crop is Crop c && !c.dead.Value && (c.indexOfHarvest.Value == crop.indexOfHarvest.Value || (index == 770 && Game1.dayOfMonth != 1)))
+                                    {
+                                        h.dayUpdate(location, pos);
+                                        if (Game1.dayOfMonth == 1)
+                                            h.seasonUpdate(false);
+
+                                        if(c.dead.Value)
+                                            location.terrainFeatures.Remove(pos);
+                                        else if (c.currentPhase.Value < startPhase)
+                                        {
+                                            if (startPhase >= c.phaseDays.Count - 1)
+                                                c.growCompletely();
+                                            else
+                                                c.currentPhase.Value = startPhase;
+                                        }
+                                    }
+                                    else
+                                        location.terrainFeatures.Remove(pos);
+                                }
+
+                                if (location.isTileLocationTotallyClearAndPlaceable(pos))
+                                {
+                                    location.terrainFeatures.Add(pos, hoedirt);
+                                    hoedirt.crop = crop;
+                                }
+
+                                if (location.terrainFeatures[pos] is HoeDirt hd && (Game1.isRaining || autoWater))
+                                    hd.state.Value = 1;
+                            }
+                            
+                        }
+                }
         }
 
         public override object GetApi()

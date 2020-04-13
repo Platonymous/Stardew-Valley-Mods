@@ -533,6 +533,51 @@ namespace TMXLoader
                     Game1.player.removeItemFromInventory(i);
 
                 TileAction.invokeCustomTileActions("Success", location, tile, layer);
+
+                if (strings.Length >= 4 && strings[3].ToLower() == "persist")
+                {
+                    string lockid = layer + "_" + (int) tile.X + "_" + (int) tile.Y;
+
+                    if (strings.Length >= 5 && strings[4].ToLower() == "recall")
+                        lockid += "_recall";
+
+                    string lname = location.isStructure.Value ? location.uniqueName.Value : location.Name;
+                    if (!location.Map.Properties.ContainsKey("PersistentData"))
+                        location.Map.Properties.Add("PersistentData", "lock:" + lname + ":" + lockid);
+                    else
+                        location.Map.Properties["PersistentData"] = location.Map.Properties["PersistentData"].ToString() + ";" + "lock:" + lname + ":" + lockid;
+
+                    if (!location.Map.Properties.ContainsKey("Unlocked"))
+                        location.Map.Properties.Add("Unlocked", lockid);
+                    else
+                        location.Map.Properties["Unlocked"] = location.Map.Properties["Unlocked"].ToString() + ";" + lockid;
+
+                    try
+                    {
+                        Tile calledTile = location.Map.GetLayer(layer).Tiles[(int)tile.X, (int)tile.Y];
+
+                        if (calledTile != null && (calledTile.Properties.ContainsKey("Action") && calledTile.Properties["Action"].ToString().ToLower().Contains("lock") && calledTile.Properties["Action"].ToString().Contains(action)))
+                        {
+
+                            if (strings.Length >= 5 && strings[4].ToLower() == "recall")
+                            {
+                                if (calledTile.Properties.ContainsKey("Recall"))
+                                    calledTile.Properties["Action"] = calledTile.Properties["Recall"];
+                                else
+                                    calledTile.Properties["Action"] = calledTile.Properties["Success"];
+                            }
+                            else
+                                calledTile.Properties.Remove("Action");
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+            }
+
+               
+
             }
             else if (Game1.player.ActiveObject == null)
                 TileAction.invokeCustomTileActions("Default", location, tile, layer);
