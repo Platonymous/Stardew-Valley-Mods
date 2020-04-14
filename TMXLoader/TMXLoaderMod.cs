@@ -1433,6 +1433,8 @@ namespace TMXLoader
                 {
                     spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "FarmHouse1_marriage", file = room.file, position = new[] { 29, 1 } });
                     spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "FarmHouse2_marriage", file = room.file, position = new[] { 35, 10 } });
+                    spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "Cabin1_marriage", file = room.file, position = new[] { 29, 1 } });
+                    spouseRoomMaps.Add(new MapEdit() { info = room.name, name = "Cabin2_marriage", file = room.file, position = new[] { 35, 10 } });
                 }
             }
 
