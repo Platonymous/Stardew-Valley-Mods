@@ -32,6 +32,7 @@ using StardewValley.Buildings;
 using TMXTile;
 using StardewValley.Network;
 using StardewValley.Characters;
+using StardewValley.Tools;
 
 namespace TMXLoader
 {
@@ -982,13 +983,21 @@ namespace TMXLoader
 
             instance.Patch(
                 original: AccessTools.Method(typeof(Crop), "harvest"),
-                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "harvest"))
+                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "harvest")),
+                postfix: new HarmonyMethod(AccessTools.Method(this.GetType(), "harvestPost"))
                 );
+
 
             instance.Patch(
                 original: AccessTools.Method(typeof(HoeDirt), "performToolAction"),
                 prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "performToolAction"))
                 );
+
+            instance.Patch(
+               original: AccessTools.Method(typeof(HoeDirt), "draw", new Type[] { typeof(SpriteBatch),typeof(Vector2) }),
+               prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "drawHoeDirt")),
+               postfix: new HarmonyMethod(AccessTools.Method(this.GetType(), "drawHoeDirtPost"))
+               );
 
             if (!helper.ModRegistry.IsLoaded("Entoarox.FurnitureAnywhere"))
                 return;
@@ -998,9 +1007,27 @@ namespace TMXLoader
 
         private static bool skipTrySetMapTile = false;
 
+        public static void drawHoeDirt(HoeDirt __instance, ref int __state)
+        {
+            __state = -1;
+
+            if (__instance.crop is Crop crop && !crop.forageCrop.Value && (crop.whichForageCrop.Value == -91 || crop.whichForageCrop.Value == -101))
+            {
+                __state = __instance.state.Value;
+                __instance.state.Value = 2;
+            }
+        }
+
+        public static void drawHoeDirtPost(HoeDirt __instance, ref int __state)
+        {
+            if (__state != -1)
+                __instance.state.Value = __state;
+        }
+
         public static bool performToolAction(HoeDirt __instance, ref bool __result)
         {
-            if (__instance.crop is Crop crop && !crop.forageCrop.Value && crop.whichForageCrop.Value == 99)
+            if (__instance.crop is Crop crop && !crop.forageCrop.Value && 
+                (crop.whichForageCrop.Value == -90 || crop.whichForageCrop.Value == -91 || crop.whichForageCrop.Value == -100 || crop.whichForageCrop.Value == -101))
             {
                 __result = false;
                 return false;
@@ -1009,32 +1036,47 @@ namespace TMXLoader
             return true;
         }
 
-                public static bool harvest(Crop __instance, int xTile, int yTile, JunimoHarvester junimoHarvester, ref bool __result)
+        public static bool harvest(Crop __instance, int xTile, int yTile, JunimoHarvester junimoHarvester, ref bool __result)
         {
-            if (!__instance.forageCrop.Value && __instance.whichForageCrop.Value == 99)
+            if (!__instance.forageCrop.Value && (__instance.whichForageCrop.Value == -91 || __instance.whichForageCrop.Value == -90))
             {
                 __result = false;
 
                 Vector2 pos = new Vector2(xTile, yTile);
 
-                if(junimoHarvester == null 
-                    && Game1.currentLocation.terrainFeatures.TryGetValue(pos, out TerrainFeature f) 
-                    && f is HoeDirt h 
+                if (junimoHarvester == null
+                    && Game1.currentLocation.terrainFeatures.TryGetValue(pos, out TerrainFeature f)
+                    && f is HoeDirt h
                     && h.crop == __instance)
-                    foreach(Layer layer in Game1.currentLocation.Map.Layers.Where(l => l.Id.ToLower().StartsWith(Game1.currentSeason.ToLower() + "_crops")))
-                        if(layer.Tiles[xTile,yTile] is Tile tile && layer.Properties.ContainsKey("HarvestAction"))
+                    foreach (Layer layer in Game1.currentLocation.Map.Layers.Where(l => l.Id.ToLower().StartsWith(Game1.currentSeason.ToLower() + "_crops")))
+                        if (layer.Tiles[xTile, yTile] is Tile tile && layer.Properties.ContainsKey("HarvestAction"))
                         {
                             tile.Properties["HarvestAction"] = layer.Properties["HarvestAction"];
                             TileAction.invokeCustomTileActions("HarvestAction", Game1.currentLocation, pos, layer.Id);
                             break;
                         }
 
-
                 return false;
             }
 
             return true;
         }
+
+        public static void harvestPost(Crop __instance, int xTile, int yTile, JunimoHarvester junimoHarvester, ref bool __result)
+        {
+            if (!__instance.forageCrop.Value &&
+                (__instance.whichForageCrop.Value == -90 || __instance.whichForageCrop.Value == -91 || __instance.whichForageCrop.Value == -100 || __instance.whichForageCrop.Value == -101))
+            {
+
+                Vector2 pos = new Vector2(xTile, yTile);
+
+                if (Game1.currentLocation.terrainFeatures.TryGetValue(pos, out TerrainFeature f)
+                    && f is HoeDirt h
+                    && (h.crop == null || (h.crop == __instance && __instance.regrowAfterHarvest.Value == -1)))
+                    Game1.currentLocation.terrainFeatures.Remove(pos);
+            }
+        }
+
 
         public static bool trySetMapTile(GameLocation __instance, int tileX, int tileY, int index, string layer, string action, int whichTileSheet = 0)
         {
@@ -1221,11 +1263,13 @@ namespace TMXLoader
         public static void setupCrops(GameLocation location)
         {
             Dictionary<int, string> cropsDict = Game1.content.Load<Dictionary<int, string>>("Data\\Crops");
-            Dictionary<int, string> fruitsDict = Game1.content.Load<Dictionary<int, string>>("Data\\fruitTrees");
 
             foreach (Layer layer in location.Map.Layers)
-                if (layer.Id.ToLower().StartsWith(Game1.currentSeason.ToLower() + "_crops"))
+                if (layer.Id.ToLower().StartsWith(Game1.currentSeason.ToLower() + "_crops") || layer.Id.ToLower().StartsWith("all_crops"))
                 {
+                    if (layer.Properties.ContainsKey("Conditions") && !PyUtils.checkEventConditions(layer.Properties["Conditions"].ToString()))
+                        continue;
+
                     int startPhase = 0;
 
                     if (layer.Properties.TryGetValue("StartPhase", out PropertyValue sp))
@@ -1234,6 +1278,14 @@ namespace TMXLoader
                     bool canBeHarvested =
                             layer.Properties.TryGetValue("CanBeHarvested", out PropertyValue ch)
                             && (ch.ToString().ToLower() == "t" || ch.ToString().ToLower() == "true");
+
+                    bool hideSoil =
+                            layer.Properties.TryGetValue("HideSoil", out PropertyValue hs)
+                            && (hs.ToString().ToLower() == "t" || hs.ToString().ToLower() == "true");
+
+                    bool ignoreSeason =
+                            layer.Properties.TryGetValue("IgnoreSeason", out PropertyValue ise)
+                            && (ise.ToString().ToLower() == "t" || ise.ToString().ToLower() == "true");
 
                     bool autoWater =
                             layer.Properties.TryGetValue("AutoWater", out PropertyValue aw)
@@ -1269,11 +1321,13 @@ namespace TMXLoader
 
                                 if (crop != null)
                             {
-                                if (!crop.seasonsToGrowIn.Contains(Game1.currentSeason))
+                                if (!crop.seasonsToGrowIn.Contains(Game1.currentSeason) && !ignoreSeason)
                                     continue;
 
                                 if (!canBeHarvested)
-                                    crop.whichForageCrop.Value = 99;
+                                    crop.whichForageCrop.Value = hideSoil ? -91 : -90;
+                                else
+                                    crop.whichForageCrop.Value = hideSoil ? -101 : -100;
 
                                 if (startPhase >= crop.phaseDays.Count - 1)
                                     crop.growCompletely();
@@ -1281,15 +1335,11 @@ namespace TMXLoader
                                     crop.currentPhase.Value = startPhase;
 
                                 HoeDirt hoedirt = new HoeDirt(Game1.isRaining ? 1 : 0, location);
-
+                                
                                 if (location.terrainFeatures.ContainsKey(pos))
                                 {
                                     if (location.terrainFeatures[pos] is HoeDirt h && h.crop is Crop c && !c.dead.Value && (c.indexOfHarvest.Value == crop.indexOfHarvest.Value || (index == 770 && Game1.dayOfMonth != 1)))
                                     {
-                                        h.dayUpdate(location, pos);
-                                        if (Game1.dayOfMonth == 1)
-                                            h.seasonUpdate(false);
-
                                         if(c.dead.Value)
                                             location.terrainFeatures.Remove(pos);
                                         else if (c.currentPhase.Value < startPhase)
@@ -1298,6 +1348,11 @@ namespace TMXLoader
                                                 c.growCompletely();
                                             else
                                                 c.currentPhase.Value = startPhase;
+
+                                            if (!canBeHarvested)
+                                                c.whichForageCrop.Value = hideSoil ? -91 : -90;
+                                            else
+                                                c.whichForageCrop.Value = hideSoil ? -101 : -100;
                                         }
                                     }
                                     else
@@ -1310,7 +1365,7 @@ namespace TMXLoader
                                     hoedirt.crop = crop;
                                 }
 
-                                if (location.terrainFeatures[pos] is HoeDirt hd && (Game1.isRaining || autoWater))
+                                if (location.terrainFeatures.ContainsKey(pos) && location.terrainFeatures[pos] is HoeDirt hd && (Game1.isRaining || autoWater))
                                     hd.state.Value = 1;
                             }
                             
