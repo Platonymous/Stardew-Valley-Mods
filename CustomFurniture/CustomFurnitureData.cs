@@ -4,6 +4,7 @@
     {
         public int id { get; set; }
         public string texture { get; set; }
+        public bool fromContent { get; set; }
         public string name { get; set; }
         public string description { get; set; }
         public string type { get; set; }
@@ -53,6 +54,7 @@
             animationFrames = 0;
             fps = 6;
             folderName = "Example";
+            fromContent = false;
         }
     }
 }
