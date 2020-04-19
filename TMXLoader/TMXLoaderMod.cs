@@ -256,7 +256,7 @@ namespace TMXLoader
                 {
                     Monitor.Log("Restore Location objects: " + loc.Name);
 
-                    setLocationObejcts(loc);
+                    setLocationObjects(loc);
                     try
                     {
                         if (ja != null && Game1.getLocationFromName(loc.Name) is GameLocation location)
@@ -364,7 +364,7 @@ namespace TMXLoader
 
                 buildBuildableEdit(false, edit, location, new Point(b.Position[0], b.Position[1]), b.Colors, b.UniqueId, b.PlayerName, b.PlayerId, false);
                 if (b.Indoors != null)
-                    setLocationObejcts(b.Indoors);
+                    setLocationObjects(b.Indoors);
 
             }
         }
@@ -517,7 +517,7 @@ namespace TMXLoader
                     {
                         var locSaveData = savd;
                         locSaveData.Name = getLocationName(uniqueId);
-                        setLocationObejcts(locSaveData);
+                        setLocationObjects(locSaveData);
                     }
 
                     removeSavedBuildable(sb, pay, distribute);
@@ -667,7 +667,7 @@ namespace TMXLoader
             return map;
         }
 
-        private bool setLocationObejcts(SaveLocation loc)
+        private bool setLocationObjects(SaveLocation loc)
         {
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.ConformanceLevel = ConformanceLevel.Auto;
