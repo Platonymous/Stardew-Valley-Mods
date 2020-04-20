@@ -11,6 +11,7 @@ namespace TMXLoader
 {
     internal static class SerializationFix
     {
+        // This list must be kept in sync with StardewValley.SaveGame.locationSerializer.
         public static Type[] ExtraTypes = new Type[24]
         {
             typeof(Tool),
@@ -44,6 +45,7 @@ namespace TMXLoader
             Type baseType = typeof(GameLocation);
             Type customType = location.GetType();
 
+            // No need to fix types from the base game.
             if (object.ReferenceEquals(customType.Assembly, baseType.Assembly))
             {
                 SaveGame.locationSerializer.Serialize(writer, location);
@@ -52,10 +54,12 @@ namespace TMXLoader
 
             var xmlOverrides = new XmlAttributeOverrides();
 
+            // Move the base type out of the way to make its name available.
             var baseAttribs = new XmlAttributes();   
             baseAttribs.XmlType = new XmlTypeAttribute("GameLocation1");
             xmlOverrides.Add(baseType, baseAttribs);
 
+            // Make sure the custom type saves with the base name so it will deserialize correctly.
             var customAttribs = new XmlAttributes();   
             customAttribs.XmlType = new XmlTypeAttribute("GameLocation");
             xmlOverrides.Add(customType, customAttribs);
