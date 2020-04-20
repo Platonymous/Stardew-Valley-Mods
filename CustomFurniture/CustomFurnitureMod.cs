@@ -160,10 +160,10 @@ namespace CustomFurniture
                         CustomFurnitureMod.log("Load:" + objectID);
                         string tkey = $"{data.folderName}/{ data.texture}";
                         if (!CustomFurniture.Textures.ContainsKey(tkey))
-                            CustomFurniture.Textures.Add(tkey, data.fromContent ? helper.Content.Load<Texture2D>(data.texture, ContentSource.GameContent) : cpack.LoadAsset<Texture2D>(data.texture));
+                            CustomFurniture.Textures.Add(tkey, data.fromContent ? data.texture : cpack.GetActualAssetKey(data.texture));
                         CustomFurniture f = new CustomFurniture(data, objectID, Vector2.Zero);
-                        furniturePile.Add(pileID, f);
-                        furniture.Add(objectID, f);
+                        furniturePile.AddOrReplace(pileID, f);
+                        furniture.AddOrReplace(objectID, f);
                     }
                 }
 

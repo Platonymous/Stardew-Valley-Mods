@@ -15,7 +15,7 @@ namespace CustomFurniture
     public class CustomFurniture : Furniture, ISaveElement
     {
         public Texture2D texture;
-        public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+        public static Dictionary<string, string> Textures = new Dictionary<string, string>();
         private int animationFrames;
         private int frame;
         private Rectangle animatedSourceRect;
@@ -53,7 +53,6 @@ namespace CustomFurniture
             rotatedBoxHeight *= Game1.tileSize;
             this.data = data;
 
-            setTexture();
             animationFrames = data.animationFrames;
             frameWidth = data.setWidth;
             frame = 0;
@@ -64,7 +63,7 @@ namespace CustomFurniture
             CustomFurnitureMod.helper.Reflection.GetField<string>(this, "_description").SetValue(data.description);
 
             parentSheetIndex.Set(data.index);
-
+            setTexture();
             name = data.name;
             List<string> decorTypes = new List<string>();
             decorTypes.Add("chair");
@@ -96,6 +95,15 @@ namespace CustomFurniture
             price.Value = data.price;
 
             fRotation = FurnitureRotation.horizontal;
+            texture = null;
+        }
+
+        public override void DayUpdate(GameLocation location)
+        {
+            if (data.fromContent)
+                texture = CustomFurnitureMod.helper.Content.Load<Texture2D>(data.texture, StardewModdingAPI.ContentSource.GameContent);
+
+            base.DayUpdate(location);
         }
 
         private void setTexture()
@@ -104,7 +112,7 @@ namespace CustomFurniture
             string folder = new DirectoryInfo(data.folderName).Name;
             string tkey = $"{folder}/{data.texture}";
             if (Textures.ContainsKey(tkey))
-                texture = Textures[($"{folder}/{data.texture}")];
+                texture = CustomFurnitureMod.helper.Content.Load<Texture2D>(Textures[($"{folder}/{data.texture}")],StardewModdingAPI.ContentSource.GameContent);
         }
 
         protected override string loadDisplayName()
