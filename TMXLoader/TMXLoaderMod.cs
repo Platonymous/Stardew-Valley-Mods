@@ -158,62 +158,11 @@ namespace TMXLoader
 
             helper.Events.Player.Warped += Player_Warped;
 
+            helper.Events.GameLoop.SaveCreating += (s, e) => beforeSave();
+            helper.Events.GameLoop.Saving += (s, e) => beforeSave();
 
-            helper.Events.GameLoop.Saving += (s, e) =>
-            {
-
-                if (Game1.IsMasterGame)
-                {
-                    saveData = new SaveData();
-                    saveData.Locations = new List<SaveLocation>();
-                    saveData.Buildables = new List<SaveBuildable>();
-                    saveData.Data = new List<PersistentData>();
-
-                    foreach (var l in addedLocations)
-                        if (Game1.getLocationFromName(l.name) is GameLocation location && getLocationSaveData(location) is SaveLocation sav)
-                            saveData.Locations.Add(sav);
-
-                    foreach (var b in buildablesBuild)
-                    {
-                        BuildableEdit edit = buildables.Find(be => be.id == b.Id);
-
-                        if (edit.indoorsFile != null && Game1.getLocationFromName(getLocationName(b.UniqueId)) is GameLocation location && getLocationSaveData(location) is SaveLocation sav)
-                            b.Indoors = sav;
-
-                        saveData.Buildables.Add(b);
-                    }
-
-                    foreach (GameLocation location in Game1.locations)
-                        if (location.Map.Properties.TryGetValue("PersistentData", out PropertyValue dataString)
-                        && dataString != null
-                        && dataString.ToString().Split(':') is string[] data && data.Length == 3)
-                            saveData.Data.Add(new PersistentData(data[0], data[1], data[2]));
-
-                    Helper.Data.WriteSaveData<SaveData>("Locations", saveData);
-                }
-
-                locationStorage.Clear();
-
-                foreach (var l in addedLocations)
-                    if (Game1.getLocationFromName(l.name) is GameLocation location)
-                    {
-                        Game1.locations.Remove(location);
-                        locationStorage.Add(location);
-                    }
-
-                foreach (var b in buildablesBuild)
-                    if (buildables.Find(be => be.id == b.Id) is BuildableEdit edit && edit.indoorsFile != null && Game1.getLocationFromName(getLocationName(b.UniqueId)) is GameLocation location)
-                    {
-                        Game1.locations.Remove(location);
-                        locationStorage.Add(location);
-                    }
-
-            };
-
-            helper.Events.GameLoop.Saved += (s, e) => {
-                foreach (var loc in locationStorage)
-                    Game1.locations.Add(loc);
-            };
+            helper.Events.GameLoop.SaveCreated += (s, e) => afterSave();
+            helper.Events.GameLoop.Saved += (s, e) => afterSave();
 
             helper.Events.GameLoop.DayStarted += (s, e) =>
             {
@@ -231,6 +180,61 @@ namespace TMXLoader
             };
 
             helper.Events.Display.MenuChanged += TMXActions.updateItemListAfterShop;
+        }
+
+        private void beforeSave()
+        {
+            if (Game1.IsMasterGame)
+            {
+                saveData = new SaveData();
+                saveData.Locations = new List<SaveLocation>();
+                saveData.Buildables = new List<SaveBuildable>();
+                saveData.Data = new List<PersistentData>();
+
+                foreach (var l in addedLocations)
+                    if (Game1.getLocationFromName(l.name) is GameLocation location && getLocationSaveData(location) is SaveLocation sav)
+                        saveData.Locations.Add(sav);
+
+                foreach (var b in buildablesBuild)
+                {
+                    BuildableEdit edit = buildables.Find(be => be.id == b.Id);
+
+                    if (edit.indoorsFile != null && Game1.getLocationFromName(getLocationName(b.UniqueId)) is GameLocation location && getLocationSaveData(location) is SaveLocation sav)
+                        b.Indoors = sav;
+
+                    saveData.Buildables.Add(b);
+                }
+
+                foreach (GameLocation location in Game1.locations)
+                    if (location.Map.Properties.TryGetValue("PersistentData", out PropertyValue dataString)
+                    && dataString != null
+                    && dataString.ToString().Split(':') is string[] data && data.Length == 3)
+                        saveData.Data.Add(new PersistentData(data[0], data[1], data[2]));
+
+                Helper.Data.WriteSaveData<SaveData>("Locations", saveData);
+            }
+
+            locationStorage.Clear();
+
+            foreach (var l in addedLocations)
+                if (Game1.getLocationFromName(l.name) is GameLocation location)
+                {
+                    Game1.locations.Remove(location);
+                    locationStorage.Add(location);
+                }
+
+            foreach (var b in buildablesBuild)
+                if (buildables.Find(be => be.id == b.Id) is BuildableEdit edit && edit.indoorsFile != null && Game1.getLocationFromName(getLocationName(b.UniqueId)) is GameLocation location)
+                {
+                    Game1.locations.Remove(location);
+                    locationStorage.Add(location);
+                }
+        }
+
+        private void afterSave()
+        {
+            foreach (var loc in locationStorage)
+                Game1.locations.Add(loc);
         }
 
         private void restoreAllSavedBuildables()
