@@ -688,8 +688,8 @@ namespace TMXLoader
                 }
                 catch (Exception e)
                 {
-                    Monitor.Log("Failed to deserialize: " + loc.Name, LogLevel.Trace);
-                    Monitor.Log(e.Message);
+                    Monitor.Log("Failed to deserialize: " + loc.Name, LogLevel.Warn);
+                    Monitor.Log(e.Message, LogLevel.Info);
                     monitor.Log(e.StackTrace);
                     return false;
                 }
@@ -746,13 +746,12 @@ namespace TMXLoader
             {
                 try
                 {
-
-                    SaveGame.locationSerializer.Serialize(writer, location);
+                    SerializationFix.SafeSerialize(writer, location);
                 }
                 catch (Exception e)
                 {
-                    Monitor.Log("Failed to serialize: " + location.Name, LogLevel.Trace);
-                    Monitor.Log(e.Message);
+                    Monitor.Log("Failed to serialize: " + location.Name, LogLevel.Warn);
+                    Monitor.Log(e.Message, LogLevel.Info);
                     monitor.Log(e.StackTrace);
                     return null;
                 }
