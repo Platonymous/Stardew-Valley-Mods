@@ -840,8 +840,10 @@ namespace TMXLoader
 
         private static void loadPersistentDataToLocation(GameLocation location)
         {
-            foreach (var d in saveData.Data.Where(p => p.Key == location.Name))
-                try
+            try
+            {
+                if(location is GameLocation)
+                foreach (var d in saveData.Data.Where(p => p.Key == location.Name))
                 {
                     if (!location.Map.Properties.ContainsKey("PersistentData"))
                         location.Map.Properties.Add("PersistentData", d.Type + ":" + d.Key + ":" + d.Value);
@@ -882,13 +884,13 @@ namespace TMXLoader
                                 TileAction.invokeCustomTileActions("Success", location, new Vector2(x, y), lockData[0]);
                         }
                     }
-
-                    
                 }
-                catch
-                {
 
-                }
+            }
+            catch
+            {
+
+            }
         }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -1304,6 +1306,10 @@ namespace TMXLoader
                             if (tile.Properties.TryGetValue("name", out PropertyValue name))
                                 if (name != null)
                                     index = Game1.objectInformation.getIndexByName(name.ToString());
+
+                            if (tile.Properties.TryGetValue("Name", out PropertyValue name2))
+                                if (name2 != null)
+                                    index = Game1.objectInformation.getIndexByName(name2.ToString());
 
                             Vector2 pos = new Vector2(x, y);
                             Crop crop = null;
