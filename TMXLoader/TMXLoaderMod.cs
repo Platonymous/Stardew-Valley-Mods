@@ -945,6 +945,14 @@ namespace TMXLoader
             harmonyFix();
 
             helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
+
+            var SaveAnywhere = helper.ModRegistry.GetApi<Omegasis.SaveAnywhere.Framework.ISaveAnywhereAPI>("Omegasis.SaveAnywhere");
+            if (SaveAnywhere != null)
+            {
+                SaveAnywhere.BeforeSave += (_s, _e) => beforeSave();
+                SaveAnywhere.AfterSave += (_s, _e) => afterSave();
+                SaveAnywhere.AfterLoad += (_s, _e) => SavePatch();
+            }
         }
 
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
