@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Harmony;
+using Microsoft.Xna.Framework;
 using Netcode;
 using PyTK.Extensions;
 using StardewModdingAPI;
@@ -65,7 +66,7 @@ namespace PyTK.CustomElementHandler
                 Game1.bigCraftableSpriteSheet.Tag = "cod_objects";
             };
 
-           Harmony.HarmonyInstance instance = Harmony.HarmonyInstance.Create("PytK.Savehandler.SyncFix");
+            HarmonyInstance instance = HarmonyInstance.Create("PytK.Savehandler.SyncFix");
         }
 
         public static bool isRebuildable(object o)

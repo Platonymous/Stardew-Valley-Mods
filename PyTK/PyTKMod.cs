@@ -23,6 +23,8 @@ using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using TMXTile;
+using xTile.Layers;
+using xTile.Tiles;
 
 namespace PyTK
 {
@@ -51,6 +53,8 @@ namespace PyTK
         internal static object waitForPatching = new object();
         internal static object waitForItems = new object();
 
+        internal static Harmony1.HarmonyInstance hInstance;
+
         internal static UpdateTickedEventArgs updateTicked;
 
         internal static PyTKMod _instance { get; set; }
@@ -69,7 +73,7 @@ namespace PyTK
         public override void Entry(IModHelper helper)
         {
             _instance = this;
-
+            hInstance = Harmony1.HarmonyInstance.Create("Platonymous.PyTK.Rev");
             helper.Events.Display.RenderingWorld += (s,e) =>
             {
                 if (Game1.currentLocation is GameLocation location && location.Map is Map map && map.GetBackgroundColor() is TMXColor tmxColor)
@@ -102,6 +106,13 @@ namespace PyTK
                 Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat);
             };
 
+            helper.ConsoleCommands.Add("show_mapdata", "", (s, p) =>
+             {
+                 ShowMapData(Game1.currentLocation.Map);
+             }
+
+            );
+
             helper.Events.GameLoop.DayStarted += (s, e) =>
             {
                 if (ReInjectCustomObjects)
@@ -116,7 +127,15 @@ namespace PyTK
             {
                 updateTicked = e;
             };
-
+/*
+            helper.Events.Player.Warped += (s, e) =>
+            {
+                if(e.NewLocation is GameLocation l && l.Map is Map map)
+                {
+                    ShowMapData(map);
+                }
+            };
+            */
             this.Helper.Events.Player.Warped += Player_Warped;
             this.Helper.Events.GameLoop.DayStarted += OnDayStarted;
             this.Helper.Events.Multiplayer.PeerContextReceived += (s, e) =>
@@ -216,6 +235,35 @@ namespace PyTK
             helper.Events.GameLoop.UpdateTicked += (s, e) => AnimatedTexture2D.ticked = e.Ticks;
         }
 
+        private void ShowMapData(Map map)
+        {
+            Monitor.Log("Map Data for " + Game1.currentLocation.Name, LogLevel.Info);
+            Monitor.Log("--------------------" + Game1.currentLocation.Name, LogLevel.Info);
+
+            Monitor.Log("Layers: " + map.Layers.Count, LogLevel.Info);
+            foreach (Layer l in map.Layers)
+            {
+                Monitor.Log("------- " + l.Id + " -------", LogLevel.Info);
+                List<string> tileData = new List<string>();
+
+                for (int x = 0; x < l.DisplayWidth / Game1.tileSize; x++)
+                    for (int y = 0; y < l.DisplayHeight / Game1.tileSize; y++)
+                    {
+                        if (l.Tiles[x, y] is Tile tile)
+                            Monitor.Log("[" + x + "," + y + "] => " + tile.TileSheet.Id + ":" + tile.TileIndex, LogLevel.Info);
+                    }
+
+            }
+
+            Monitor.Log("--------------------" + Game1.currentLocation.Name, LogLevel.Info);
+
+            Monitor.Log("Tilesheets: " + map.TileSheets.Count, LogLevel.Info);
+            foreach (TileSheet ts in map.TileSheets)
+            {
+                Monitor.Log("[" + ts.Id + "] => " + ts.ImageSource + " (" + (Game1.mapDisplayDevice as PyDisplayDevice).GetTexture(ts)?.Width + "x"+ (Game1.mapDisplayDevice as PyDisplayDevice).GetTexture(ts)?.Height+ ")", LogLevel.Info);
+            }
+        }
+
         private void Display_RenderingWorld(object sender, RenderingWorldEventArgs e)
         {
             throw new NotImplementedException();
@@ -292,7 +340,7 @@ namespace PyTK
             Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 
             if (Constants.TargetPlatform != GamePlatform.Android)
-                SetUpAssemblyPatch(instance, new XmlSerializer[] { SaveGame.farmerSerializer, SaveGame.locationSerializer, SaveGame.serializer });
+                SetUpAssemblyPatch(hInstance, new XmlSerializer[] { SaveGame.farmerSerializer, SaveGame.locationSerializer, SaveGame.serializer });
 
             Helper.Events.GameLoop.GameLaunched += (s, e) =>
             {
@@ -543,7 +591,7 @@ namespace PyTK
             }
         }
 
-        public void SetUpAssemblyPatch(HarmonyInstance instance, IEnumerable<XmlSerializer> serializers)
+        public void SetUpAssemblyPatch(Harmony1.HarmonyInstance instance, IEnumerable<XmlSerializer> serializers)
         {
             foreach (var serializer in serializers)
             {
@@ -556,7 +604,7 @@ namespace PyTK
                     PatchGeneratedSerializers(new Assembly[] { a });
                 }
 
-                instance.Patch(cache.GetType().GetMethod("Add", BindingFlags.NonPublic | BindingFlags.Instance), postfix: new HarmonyMethod(typeof(PyTKMod).GetMethod("AssemblyCachePatch", BindingFlags.Static | BindingFlags.Public)));
+                instance.Patch(cache.GetType().GetMethod("Add", BindingFlags.NonPublic | BindingFlags.Instance), postfix: new Harmony1.HarmonyMethod(typeof(PyTKMod).GetMethod("AssemblyCachePatch", BindingFlags.Static | BindingFlags.Public)));
             }
         }
 
@@ -611,11 +659,29 @@ namespace PyTK
             else
             {
                 foreach (var met in ty.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
-                    if (met.Name.Contains("_") && (met.Name.StartsWith("Write") || met.Name.StartsWith("Read")))
-                        if (met.Name.StartsWith("Write") && (new List<ParameterInfo>(met.GetParameters()).Exists(p => p.Name == "o" && p.ParameterType.IsClass && p.ParameterType.FullName.Contains("Stardew"))))
-                            instance.Patch(met, prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLReplacer", BindingFlags.Static | BindingFlags.Public)));
-                        else if (met.Name.StartsWith("Read") && met.ReturnType != null && met.ReturnType.IsClass && met.ReturnType.FullName.Contains("Stardew"))
-                            instance.Patch(met, postfix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLRebuilder", BindingFlags.Static | BindingFlags.Public)));
+                {
+                    string type = "--object";
+                    try
+                    {
+                        if (met.Name.Contains("_") && (met.Name.StartsWith("Write") || met.Name.StartsWith("Read")))
+                            if (met.Name.StartsWith("Write") && (new List<ParameterInfo>(met.GetParameters()).Exists(p => p.Name == "o" && p.ParameterType.IsClass && p.ParameterType.FullName.Contains("Stardew"))))
+                            {
+                                Type t = met.GetParameters().ToList().Where(p => p.Name == "o").Select(p => p.ParameterType).FirstOrDefault();
+                                type = t.ToString();
+                                hInstance.Patch(met, prefix: new Harmony1.HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLReplacer", BindingFlags.Static | BindingFlags.Public)));
+                            }
+                            else if (met.Name.StartsWith("Read") && met.ReturnType != null && met.ReturnType.IsClass && met.ReturnType.FullName.Contains("Stardew"))
+                            {
+                                Type t = met.ReturnType;
+                                type = t.ToString();
+                                hInstance.Patch(met, postfix: new Harmony1.HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLRebuilder", BindingFlags.Static | BindingFlags.Public)));
+                            }
+                    }
+                    catch(Exception e) {
+                        _monitor.Log(type, LogLevel.Error);
+                        _monitor.Log(e.Message + ":" + e.StackTrace, LogLevel.Info);
+                    }
+                }
                         
             }
         }
@@ -1009,6 +1075,28 @@ namespace PyTK
 
                 PyNet.syncLocationMapToAll(p[0]);
             }).register();
+        }
+
+        public static class GenericActionFactory
+        {
+            public static MethodInfo CreateMethodByParameter(Type parameterType, Action<object> action, bool result = false)
+            {
+                var createMethod = typeof(GenericActionFactory).GetMethod("CreateMethod")
+                    .MakeGenericMethod(parameterType);
+
+                var del = createMethod.Invoke(null, new object[] { action, result });
+
+                return (MethodInfo) del;
+            }
+            
+            public static MethodInfo CreateMethod<TEvent>(Action<object> action, bool result)
+            {
+
+                if(!result)
+                return (new Action<TEvent>((o) => action.Invoke(o))).GetMethodInfo();
+                else
+                    return new Action<TEvent>((__result) => action.Invoke(__result)).Method;
+            }
         }
     }
 }

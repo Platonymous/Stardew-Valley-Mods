@@ -76,7 +76,7 @@ namespace PyTK.Overrides
                 return AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "checkEventPrecondition");
             }
 
-            internal static bool Prefix(GameLocation __instance, ref string precondition,ref bool __result)
+            internal static bool Prefix(GameLocation __instance, ref string precondition,ref int __result)
             {
                 string t = "M " + (Game1.player.Money - 1);
                 string f = "M " + (Game1.player.Money + 1);
@@ -103,7 +103,7 @@ namespace PyTK.Overrides
                                 else
                                 {
                                     conditions[i] = f;
-                                    __result = false;
+                                    __result = -1;
                                     return false;
                                 }
 

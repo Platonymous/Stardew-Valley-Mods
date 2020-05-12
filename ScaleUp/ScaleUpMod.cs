@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Linq;
 
 namespace ScaleUp
 {
@@ -26,11 +27,14 @@ namespace ScaleUp
             modInstance = this;
             helper.Content.AssetEditors.Add(new Scaler(helper));
             HarmonyInstance harmony = HarmonyInstance.Create("Platonymous.ScaleUp");
-            harmony.Patch(AccessTools.DeclaredMethod(typeof(Texture2D), "FromStream", new Type[] { typeof(GraphicsDevice), typeof(Stream) }), postfix: new HarmonyMethod(this.GetType().GetMethod("LoadFix", BindingFlags.Public | BindingFlags.Static)));
+            harmony.Patch(
+                AccessTools.DeclaredMethod(typeof(Texture2D), "FromStream", new Type[] { typeof(GraphicsDevice), typeof(Stream) }),
+                prefix: new HarmonyMethod(AccessTools.DeclaredMethod(this.GetType(), "FromStream")));
             loadContentPacks();
         }
 
-        public static void LoadFix(Stream stream, ref Texture2D __result)
+
+        public static void FromStream(Stream stream, ref Texture2D __result)
         {
             if (stream is FileStream fs && Path.GetFileNameWithoutExtension(fs.Name) is string key)
             {

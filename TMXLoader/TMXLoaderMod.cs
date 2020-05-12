@@ -989,11 +989,7 @@ namespace TMXLoader
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("loadDataToLocations"), postfix: new HarmonyMethod(this.GetType().GetMethod("SavePatch", BindingFlags.Public | BindingFlags.Static)));
             instance.Patch(typeof(GameLocation).GetMethod("setMapTile"), prefix: new HarmonyMethod(this.GetType().GetMethod("trySetMapTile", BindingFlags.Public | BindingFlags.Static)));
-            instance.Patch(
-                original: AccessTools.Method(typeof(Crop), "harvest"),
-                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "harvest"))
-                );
-
+            
             instance.Patch(
                 original: AccessTools.Method(typeof(Crop), "harvest"),
                 prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "harvest")),
@@ -1075,7 +1071,7 @@ namespace TMXLoader
             return true;
         }
 
-        public static void harvestPost(Crop __instance, int xTile, int yTile, JunimoHarvester junimoHarvester, ref bool __result)
+        public static void harvestPost(Crop __instance, int xTile, int yTile)
         {
             if (!__instance.forageCrop.Value &&
                 (__instance.whichForageCrop.Value == -90 || __instance.whichForageCrop.Value == -91 || __instance.whichForageCrop.Value == -100 || __instance.whichForageCrop.Value == -101))
