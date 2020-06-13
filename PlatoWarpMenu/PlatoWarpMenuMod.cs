@@ -4,9 +4,11 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 
 namespace PlatoWarpMenu
 {
@@ -27,6 +29,7 @@ namespace PlatoWarpMenu
 
         internal static PlatoWarpMenuMod instance;
 
+        internal static Queue<GameLocation> locations = new Queue<GameLocation>();
         public override void Entry(IModHelper helper)
         {
             instance = this;
@@ -43,6 +46,28 @@ namespace PlatoWarpMenu
             harmony.Patch(typeof(Image).GetMethod("Save", new Type[] { typeof(string), typeof(ImageFormat) }), prefix: new Harmony.HarmonyMethod(this.GetType().GetMethod("InterceptScreenshot",System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)));
         }
 
+        private void StartExportSundial()
+        {
+            instance.config.UseTempFolder = true;
+
+            foreach(var location in Game1.locations)
+                location.characters.ToList().ForEach(c => c.IsInvisible = true);
+
+            locations = new Queue<GameLocation>(Game1.locations.Where(l => !l.isStructure.Value && !l.IsFarm && !l.IsGreenhouse));
+            ExportSundial();
+        }
+
+        public static void ExportSundial()
+        {
+            if (locations.Count > 0)
+            {
+                instance.config.UseTempFolder = true;
+                GameLocation loc = locations.Dequeue();
+                instance.Monitor.Log(loc.Name);
+                PlatoWarpMenuMod.GetLocationShotSundial(loc, ExportSundial);
+            }
+        }
+
         public static void GetLocationShot(GameLocation location, Action callback)
         {
             CurrentLocation = location;
@@ -50,12 +75,47 @@ namespace PlatoWarpMenu
             PyTK.PyUtils.setDelayedAction(1, () => _helper.Events.Display.RenderedActiveMenu += Display_Rendered);
         }
 
+        public static void GetLocationShotSundial(GameLocation location, Action callback)
+        {
+            if (location == null)
+                return;
+
+            CurrentLocation = location;
+            Callback = callback;
+            PyTK.PyUtils.setDelayedAction(1, () => _helper.Events.Display.RenderedWorld += Display_RenderedWorld);
+        }
+
+        private static void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)
+        {
+            _helper.Events.Display.RenderedWorld -= Display_RenderedWorld;
+            intercept = true;
+            var g = Game1.currentLocation;
+            var priorColor = Game1.ambientLight;
+            PyTK.PyUtils.setDelayedAction(2, () => Game1.ambientLight = priorColor);
+            Game1.ambientLight = Microsoft.Xna.Framework.Color.White;
+            Game1.currentLocation = CurrentLocation;
+            try
+            {
+                Game1.spriteBatch.End();
+                Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name);
+                Game1.spriteBatch.Begin();
+            }
+            catch
+            {
+
+            }
+            Game1.currentLocation = g;
+            intercept = false;
+            Callback?.Invoke();
+        }
 
         public static void Display_Rendered(object sender, RenderedActiveMenuEventArgs e)
         {
             intercept = true;
             var g = Game1.currentLocation;
-
+            var priorColor = Game1.ambientLight;
+            PyTK.PyUtils.setDelayedAction(2, () => Game1.ambientLight = priorColor);
+            Game1.ambientLight = Microsoft.Xna.Framework.Color.White;
             Game1.currentLocation = CurrentLocation;
             try
             {
@@ -98,6 +158,9 @@ namespace PlatoWarpMenu
         private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             e.Button.TryGetKeyboard(out Keys keyPressed);
+
+            if (e.Button == SButton.NumPad8)
+                StartExportSundial();
 
             if (e.Button != config.MenuButton)
                 return;

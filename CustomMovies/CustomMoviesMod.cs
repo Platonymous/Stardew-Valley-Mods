@@ -34,7 +34,7 @@ namespace CustomMovies
                 {
                     position = pos,
                     zPosition = z,
-                    isLargeItem = (prize is StardewValley.Object o && o.bigCraftable) || !(prize is StardewValley.Object)
+                    isLargeItem = (prize is StardewValley.Object o && o.bigCraftable.Value) || !(prize is StardewValley.Object)
                 };
 
             return null;

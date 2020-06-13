@@ -28,7 +28,6 @@ using xTile.Tiles;
 
 namespace PyTK
 {
-
     public class PyTKMod : Mod
     {
         internal static IModEvents _events => _helper.Events;
@@ -53,7 +52,7 @@ namespace PyTK
         internal static object waitForPatching = new object();
         internal static object waitForItems = new object();
 
-        internal static Harmony1.HarmonyInstance hInstance;
+        internal static HarmonyInstance hInstance;
 
         internal static UpdateTickedEventArgs updateTicked;
 
@@ -73,7 +72,8 @@ namespace PyTK
         public override void Entry(IModHelper helper)
         {
             _instance = this;
-            hInstance = Harmony1.HarmonyInstance.Create("Platonymous.PyTK.Rev");
+
+            hInstance = HarmonyInstance.Create("Platonymous.PyTK.Rev");
             helper.Events.Display.RenderingWorld += (s,e) =>
             {
                 if (Game1.currentLocation is GameLocation location && location.Map is Map map && map.GetBackgroundColor() is TMXColor tmxColor)
@@ -591,7 +591,7 @@ namespace PyTK
             }
         }
 
-        public void SetUpAssemblyPatch(Harmony1.HarmonyInstance instance, IEnumerable<XmlSerializer> serializers)
+        public void SetUpAssemblyPatch(HarmonyInstance instance, IEnumerable<XmlSerializer> serializers)
         {
             foreach (var serializer in serializers)
             {
@@ -604,7 +604,7 @@ namespace PyTK
                     PatchGeneratedSerializers(new Assembly[] { a });
                 }
 
-                instance.Patch(cache.GetType().GetMethod("Add", BindingFlags.NonPublic | BindingFlags.Instance), postfix: new Harmony1.HarmonyMethod(typeof(PyTKMod).GetMethod("AssemblyCachePatch", BindingFlags.Static | BindingFlags.Public)));
+                instance.Patch(cache.GetType().GetMethod("Add", BindingFlags.NonPublic | BindingFlags.Instance), postfix: new HarmonyMethod(typeof(PyTKMod).GetMethod("AssemblyCachePatch", BindingFlags.Static | BindingFlags.Public)));
             }
         }
 
@@ -668,13 +668,13 @@ namespace PyTK
                             {
                                 Type t = met.GetParameters().ToList().Where(p => p.Name == "o").Select(p => p.ParameterType).FirstOrDefault();
                                 type = t.ToString();
-                                hInstance.Patch(met, prefix: new Harmony1.HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLReplacer", BindingFlags.Static | BindingFlags.Public)));
+                                hInstance.Patch(met, prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLReplacer", BindingFlags.Static | BindingFlags.Public)));
                             }
                             else if (met.Name.StartsWith("Read") && met.ReturnType != null && met.ReturnType.IsClass && met.ReturnType.FullName.Contains("Stardew"))
                             {
                                 Type t = met.ReturnType;
                                 type = t.ToString();
-                                hInstance.Patch(met, postfix: new Harmony1.HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLRebuilder", BindingFlags.Static | BindingFlags.Public)));
+                                hInstance.Patch(met, postfix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveXMLRebuilder", BindingFlags.Static | BindingFlags.Public)));
                             }
                     }
                     catch(Exception e) {

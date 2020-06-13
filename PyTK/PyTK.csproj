@@ -47,9 +47,6 @@
   </ItemGroup>
   
   <ItemGroup>
-  <Reference Include="2Harmony">
-    <HintPath>lib\2Harmony.dll</HintPath>
-  </Reference>
   <Reference Include="TMXTile">
     <HintPath>$(GamePath)\smapi-internal\TMXTile.dll</HintPath>
     <Private>False</Private>

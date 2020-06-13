@@ -40,6 +40,8 @@ namespace PlatoWarpMenu
         public static string menuFont1 => PlatoWarpMenuMod.instance?.config?.MenuFont1;
         public static string menuFont2 => PlatoWarpMenuMod.instance?.config?.MenuFont2;
         public static int optionHeight => ((menuHeight - (2 * margins) - options)) / options;
+
+        public static Color? PriorColor = null;
         List<MenuItem> menuItems = new List<MenuItem>();
 
         public WarpMenu()

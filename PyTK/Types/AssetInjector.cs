@@ -10,7 +10,7 @@ namespace PyTK.Types
         private Func<bool> conditions;
         private bool lastCheck;
         private bool disabled = false;
-
+        
         public void Invalidate()
         {
             PyTKMod._helper.Content.InvalidateCache(predicate);

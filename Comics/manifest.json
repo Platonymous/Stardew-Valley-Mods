@@ -1,0 +1,15 @@
+﻿{
+  "Name": "Comics",
+  "Author": "Platonymous",
+  "Version": "1.0.2",
+  "Description": "Buy comics from Pierre",
+  "UniqueID": "Platonymous.Comics",
+  "EntryDll": "Comics.dll",
+  "MinimumApiVersion": "2.11",
+  "UpdateKeys": [ "Nexus:6281" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ]
+}

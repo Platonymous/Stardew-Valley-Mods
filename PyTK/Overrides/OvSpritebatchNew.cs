@@ -94,7 +94,7 @@ namespace PyTK.Overrides
                 if (data != null && data.texture != null)
                 {
                     skip = true;
-                    __instance.Draw(data.texture, destinationRectangle, data.sourceRectangle, data.color, rotation, origin, effects, layerDepth);
+                    __instance.Draw(data.texture, destinationRectangle, data.sourceRectangle, data.color == Color.White ? color : data.color, rotation, origin, effects, layerDepth);
                     return false;
                 }
             }

@@ -24,4 +24,6 @@
 
   <Import Project="$(SolutionDir)\common.targets" />
 
+  <ProjectExtensions><VisualStudio><UserProperties manifest_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
 </Project>

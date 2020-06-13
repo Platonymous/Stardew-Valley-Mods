@@ -1,0 +1,10 @@
+﻿{
+  "Name": "HarmonyMoviesTest",
+  "Author": "ModAuthor",
+  "Version": "1.0.0",
+  "Description": "Mod Template",
+  "UniqueID": "ModAuthor.HarmonyMoviesTest",
+  "EntryDll": "HarmonyMoviesTest.dll",
+  "MinimumApiVersion": "2.11",
+  "UpdateKeys": [ "Nexus:" ]
+}
