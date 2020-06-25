@@ -79,7 +79,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SleepWorker", "SleepWorker\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomFurniture2", "CustomFurniture2\CustomFurniture2.csproj", "{3B38ACB9-422C-47A6-97DD-D66C862A17AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comics", "Comics\Comics.csproj", "{E9698FF9-D395-4681-8A98-096592BD09EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Comics", "Comics\Comics.csproj", "{E9698FF9-D395-4681-8A98-096592BD09EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModUpdater", "ModUpdater\ModUpdater.csproj", "{0840CAF2-BD39-4813-BD29-E7554B02B905}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -287,6 +289,12 @@ Global
 		{E9698FF9-D395-4681-8A98-096592BD09EA}.Release|Any CPU.ActiveCfg = Release|x86
 		{E9698FF9-D395-4681-8A98-096592BD09EA}.Release|x86.ActiveCfg = Release|x86
 		{E9698FF9-D395-4681-8A98-096592BD09EA}.Release|x86.Build.0 = Release|x86
+		{0840CAF2-BD39-4813-BD29-E7554B02B905}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0840CAF2-BD39-4813-BD29-E7554B02B905}.Debug|x86.ActiveCfg = Debug|x86
+		{0840CAF2-BD39-4813-BD29-E7554B02B905}.Debug|x86.Build.0 = Debug|x86
+		{0840CAF2-BD39-4813-BD29-E7554B02B905}.Release|Any CPU.ActiveCfg = Release|x86
+		{0840CAF2-BD39-4813-BD29-E7554B02B905}.Release|x86.ActiveCfg = Release|x86
+		{0840CAF2-BD39-4813-BD29-E7554B02B905}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

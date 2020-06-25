@@ -88,7 +88,7 @@ namespace SeedBag
 
         public override bool actionWhenPurchased()
         {
-            return true;
+            return false;
         }
 
         public override Item getOne()

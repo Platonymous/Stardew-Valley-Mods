@@ -1,10 +1,22 @@
 ﻿{
   "Name": "CustomMusic",
   "Author": "Platonymous",
-  "Version": "1.7.2",
+  "Version": "1.7.3",
   "Description": "Changes the games music",
   "UniqueID": "Platonymous.CustomMusic",
   "EntryDll": "CustomMusic.dll",
   "MinimumApiVersion": "3.0.0",
-  "UpdateKeys": [ "Nexus:3043" ]
+  "UpdateKeys": [ "Nexus:3043" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.ModUpdater",
+      "IsRequired": false
+    }
+  ],
+  "ModUpdater": {
+    "Repository": "Stardew-Valley-Mods",
+    "User": "Platonymous",
+    "Directory": "_releases",
+    "ModFolder": "CustomMusic"
+  }
 }

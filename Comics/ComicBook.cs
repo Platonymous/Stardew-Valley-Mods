@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using PyTK.CustomElementHandler;
 using StardewValley;
+using StardewValley.Menus;
 using StardewValley.Objects;
 using System;
 using System.Collections.Generic;
@@ -165,7 +166,7 @@ namespace Comics
 
         public void checkLoad()
         {
-            if (Loaded)
+            if (Loaded || (!AssetManager.LoadImagesInShop && Game1.activeClickableMenu is ShopMenu && !Game1.player.hasItemInInventoryNamed(Name)))
                 return;
 
             Loaded = true;

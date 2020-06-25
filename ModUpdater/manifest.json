@@ -1,0 +1,10 @@
+﻿{
+  "Name": "ModUpdater",
+  "Author": "Platonymous",
+  "Version": "1.0.1",
+  "Description": "Mod Update Framework",
+  "UniqueID": "Platonymous.ModUpdater",
+  "EntryDll": "ModUpdater.dll",
+  "MinimumApiVersion": "2.11",
+  "UpdateKeys": [ "Nexus:6338" ]
+}

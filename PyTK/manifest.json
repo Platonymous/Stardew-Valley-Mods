@@ -1,7 +1,7 @@
 {
   "Name": "PyTK",
   "Author": "Platonymous",
-  "Version": "1.15.1",
+  "Version": "1.16.0",
   "Description": "Platonymous Toolkit",
   "UniqueID": "Platonymous.Toolkit",
   "EntryDll": "PyTK.dll",
@@ -27,6 +27,16 @@
     {
       "UniqueID": "Entoarox.FurnitureAnywhere",
       "IsRequired": false
+    },
+    {
+      "UniqueID": "Platonymous.ModUpdater",
+      "IsRequired": false
     }
-  ]
+  ],
+  "ModUpdater": {
+    "Repository": "Stardew-Valley-Mods",
+    "User": "Platonymous",
+    "Directory": "_releases",
+    "ModFolder": "PyTK"
+  }
 }

@@ -69,6 +69,7 @@ namespace PyTK
                 return _instance.Helper;
             }
         }
+
         public override void Entry(IModHelper helper)
         {
             _instance = this;
@@ -102,8 +103,8 @@ namespace PyTK
                 if (xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
                     tmxf.DrawImageLayer = PyMaps.drawImageLayer;
 
-                bool adjustForCompat = helper.ModRegistry.IsLoaded("DigitalCarbide.SpriteMaster");
-                Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat);
+                bool adjustForCompat2 = helper.ModRegistry.IsLoaded("DigitalCarbide.SpriteMaster");
+                Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
             };
 
             helper.ConsoleCommands.Add("show_mapdata", "", (s, p) =>

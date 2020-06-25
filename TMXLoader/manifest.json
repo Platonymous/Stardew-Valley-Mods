@@ -1,7 +1,7 @@
 {
   "Name": "TMXL Map Toolkit",
   "Author": "Platonymous",
-  "Version": "1.13.2",
+  "Version": "1.15.0",
   "Description": "Load TMX Maps into the Game",
   "UniqueID": "Platonymous.TMXLoader",
   "EntryDll": "TMXLoader.dll",
@@ -11,6 +11,16 @@
     {
       "UniqueID": "Platonymous.Toolkit",
       "MinimumVersion": "1.13.20"
+    },
+    {
+      "UniqueID": "Platonymous.ModUpdater",
+      "IsRequired": false
     }
-  ]
+  ],
+  "ModUpdater": {
+    "Repository": "Stardew-Valley-Mods",
+    "User": "Platonymous",
+    "Directory": "_releases",
+    "ModFolder": "TMXLoader"
+  }
 }

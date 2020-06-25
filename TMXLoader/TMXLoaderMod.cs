@@ -33,6 +33,7 @@ using TMXTile;
 using StardewValley.Network;
 using StardewValley.Characters;
 using StardewValley.Tools;
+using StardewValley.Objects;
 
 namespace TMXLoader
 {
@@ -721,10 +722,39 @@ namespace TMXLoader
                 if (saved.largeTerrainFeatures.Count > 0)
                     foreach (var obj in saved.largeTerrainFeatures)
                         inGame.largeTerrainFeatures.Add(obj);
+
+                if (inGame is DecoratableLocation dl)
+                {
+                    dl.furniture.Clear();
+                    for (int i = 0; i < dl.wallPaper.Count(); i++)
+                        dl.wallPaper[i] = 0;
+
+                    for (int i = 0; i < dl.floor.Count(); i++)
+                        dl.floor[i] = 0;
+
+                    if (saved is DecoratableLocation sdl)
+                    {
+                        foreach (Furniture f in sdl.furniture)
+                        {
+                            dl.furniture.Add(f);
+                            dl.moveFurniture((int)f.TileLocation.X, (int)f.TileLocation.Y, (int)f.TileLocation.X, (int)f.TileLocation.Y);
+                        }
+
+                        for (int i = 0; i < sdl.wallPaper.Count(); i++)
+                            dl.wallPaper[i] = dl.wallPaper[i];
+
+                        for (int i = 0; i < dl.floor.Count(); i++)
+                            dl.floor[i] = 0;
+
+                        dl.setWallpapers();
+                        dl.setFloors();
+                    }
+                }
             }
 
             //PyTK.CustomElementHandler.SaveHandler.RebuildAll(inGame, Game1.locations);
             inGame.DayUpdate(Game1.dayOfMonth);
+            inGame.resetForPlayerEntry();
             return true;
         }
 

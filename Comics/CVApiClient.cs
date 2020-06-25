@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -14,7 +13,7 @@ namespace Comics
         private readonly int BaseYear;
         private readonly static Dictionary<string, IEnumerable<Issue>> Loaded = new Dictionary<string, IEnumerable<Issue>>();
 
-        public CVApiClient(int baseYear = -1)
+        public CVApiClient(int baseYear)
         {
             BaseYear = baseYear;
             BaseUrl = new Uri("https://comicvine.gamespot.com/api/issues/");
@@ -37,6 +36,7 @@ namespace Comics
                     query.Add("filter", "id:" + id);
                     query.Add("sort", "store_date:desc");
                     query.Add("limit", "1");
+                    query.Add("field_list", "id,image,issue_number,name,volume");
                     client.QueryString = query;
                     string response = client.DownloadString(BaseUrl);
                     var result = JsonConvert.DeserializeObject<IssuesRequest>(response)?.Results ?? new List<Issue>();
@@ -50,17 +50,17 @@ namespace Comics
             }
         }
 
-            public IEnumerable<Issue> GetIssues(int baseYear = -1)
+            public IEnumerable<Issue> GetIssues(int baseYear, uint daysPlayed)
         {
-            if (baseYear == -1)
+            if (baseYear == 0)
                 baseYear = BaseYear;
 
-            uint d = Game1.stats.DaysPlayed;
+            uint d = daysPlayed;
 
             DateTime baseDate = DateTime.Today;
 
-            if (BaseYear != -1)
-                baseDate = new DateTime(BaseYear, 1, 1);
+            if (baseYear != -1)
+                baseDate = new DateTime(baseYear, 1, 1);
             else
                 d = 0;
 
@@ -94,6 +94,7 @@ namespace Comics
                     query.Add("filter", "store_date:" + range);
                     query.Add("sort", "store_date:desc");
                     query.Add("limit", "50");
+                    query.Add("field_list", "id,image,issue_number,name,volume");
                     client.QueryString = query;
                     string response = client.DownloadString(BaseUrl);
                     result = JsonConvert.DeserializeObject<IssuesRequest>(response)?.Results ?? new List<Issue>();

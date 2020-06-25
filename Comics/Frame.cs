@@ -16,7 +16,7 @@ namespace Comics
     public class Frame : Furniture, ICustomObject
     {
         public Frame(ComicBook comic, Vector2 tileLocation)
-            : base(1953, tileLocation)
+            : base(1602, tileLocation)
         {
             this.heldObject.Value = comic;
             this.Stack = comic.Stack;
@@ -24,7 +24,7 @@ namespace Comics
         }
 
         public Frame()
-            : base(1953, Vector2.Zero)
+            : base(1602, Vector2.Zero)
         {
 
         }
@@ -83,30 +83,34 @@ namespace Comics
             if (!(Game1.currentLocation is DecoratableLocation))
                 heldObject.Value.drawWhenHeld(spriteBatch, objectPosition, f);
         }
-        
+
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
+            float scale = 11f;
+            Vector2 offset = new Vector2(0, -64f);
+
             var cb = (this.heldObject.Value as ComicBook);
             cb.checkLoad();
 
             var texture = cb.UsePlaceholder ? AssetManager.Instance.Placeholder : (this.heldObject.Value as ComicBook).Texture;
             var source = new Rectangle(0, 0, texture.Width, texture.Height);
             if (Furniture.isDrawingLocationFurniture)
-            spriteBatch.Draw(texture, Game1.GlobalToLocal(Game1.viewport, (Vector2)this.drawPosition.Value + (this.shakeTimer > 0 ? new Vector2((float)Game1.random.Next(-1, 2), (float)Game1.random.Next(-1, 2)) : Vector2.Zero)), source, Color.White * alpha, 0.0f, Vector2.Zero, 11f,SpriteEffects.None, (float)(this.boundingBox.Value.Bottom - 48) / 10000f);
+                spriteBatch.Draw(texture, Game1.GlobalToLocal(Game1.viewport, (Vector2)this.drawPosition.Value + (this.shakeTimer > 0 ? new Vector2((float)Game1.random.Next(-1, 2), (float)Game1.random.Next(-1, 2)) : Vector2.Zero)), source, Color.White * alpha, 0.0f, Vector2.Zero, scale, SpriteEffects.None, (float)(this.boundingBox.Value.Bottom - 48) / 10000f);
             else
-                spriteBatch.Draw(texture, new Vector2(0,-16f*8f) + Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * 64 + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0)), (float)(y * 64 - (source.Height * 4 - this.boundingBox.Height) + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0)))), source, Color.White * alpha, 0.0f, Vector2.Zero, 11f, SpriteEffects.None, (float)(this.boundingBox.Value.Bottom - 48) / 10000f);
+                spriteBatch.Draw(texture, offset + Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * 64 + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0)), (float)(y * 64 - (source.Height * 4 - this.boundingBox.Height) + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0)))), source, Color.White * alpha, 0.0f, Vector2.Zero, scale, SpriteEffects.None, (float)(this.boundingBox.Value.Bottom - 48) / 10000f);
         }
 
         public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
         {
             var r = (replacement as Furniture);
             var f = new Frame(r.heldObject.Value as ComicBook,r.TileLocation);
+
             return f;
         }
 
         public object getReplacement()
         {
-            Furniture f = new Furniture(1953, this.TileLocation);
+            Furniture f = new Furniture(1602, this.TileLocation);
             f.heldObject.Value = heldObject.Value;
             return f;
         }

@@ -4,10 +4,7 @@ using StardewModdingAPI;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using PyTK.Extensions;
 
 namespace Comics
@@ -17,6 +14,7 @@ namespace Comics
         internal IModHelper Helper;
         public Texture2D Placeholder;
         public static AssetManager Instance;
+        public static bool LoadImagesInShop { get; set; } = false;
 
         public Dictionary<string, Issue> Issues { get; } = new Dictionary<string, Issue>();
 
@@ -29,10 +27,10 @@ namespace Comics
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
 
-        public IEnumerable<Issue> LoadIssuesForToday(int baseYear = -1)
+        public IEnumerable<Issue> LoadIssuesForToday(int baseYear, uint daysPlayed)
         {
             var api = new CVApiClient(baseYear);
-            var result = api.GetIssues(baseYear);
+            var result = api.GetIssues(baseYear, daysPlayed);
             foreach (Issue issue in result)
                 if (!Issues.ContainsKey(issue.Id.ToString()))
                     Issues.Add(issue.Id.ToString(), issue);
@@ -47,7 +45,7 @@ namespace Comics
 
         public Issue GetIssue(string id)
         {
-            var api = new CVApiClient();
+            var api = new CVApiClient(-1);
 
             if (Issues.ContainsKey(id))
                 return Issues[id];
