@@ -73,6 +73,14 @@ namespace TMXLoader
 
         public override void Entry(IModHelper helper)
         {
+            config = Helper.ReadConfig<Config>();
+            config = Helper.ReadConfig<Config>();
+
+            TMXLoaderMod.helper = Helper;
+            monitor = Monitor;
+
+            monitor?.Log("Open Buildables Menu with: " + config?.openBuildMenu, LogLevel.Info);
+
             _instance = this;
             var empty = new TileShop();
             empty.id = "EmptyShop";
@@ -87,7 +95,7 @@ namespace TMXLoader
                     if (b.UniqueId == s.UniqueId)
                         return;
 
-                Monitor.Log("Received Placement for " + s.Id);
+                Monitor?.Log("Received Placement for " + s.Id);
                 loadSavedBuildable(s);
             }, 60, SerializationType.JSON);
 
@@ -98,12 +106,12 @@ namespace TMXLoader
                 if (Game1.IsMasterGame)
                     return;
 
-                Monitor.Log("Received Removal for " + s.Id);
+                Monitor?.Log("Received Removal for " + s.Id);
                 foreach (SaveBuildable b in buildablesBuild)
                     if (b.UniqueId == s.UniqueId)
                     {
                         removeSavedBuildable(b, false, false);
-                        Monitor.Log("Removed " + s.Id);
+                        Monitor?.Log("Removed " + s.Id);
 
                         return;
                     }
@@ -111,9 +119,6 @@ namespace TMXLoader
 
             BuildableRemover.start();
 
-            config = Helper.ReadConfig<Config>();
-            TMXLoaderMod.helper = Helper;
-            monitor = Monitor;
 
             helper.ConsoleCommands.Add("buildables", "Show Buildables Menu", (s, p) =>
             {
@@ -245,7 +250,7 @@ namespace TMXLoader
 
             foreach (var location in addedLocations)
             {
-                Monitor.Log("Restore Location: " + location.name);
+                Monitor?.Log("Restore Location: " + location.name);
 
                 if (Game1.getLocationFromName(location.name) == null)
                     addLocation(location).updateSeasonalTileSheets();
@@ -259,7 +264,7 @@ namespace TMXLoader
             {
                 foreach (SaveLocation loc in saveData.Locations)
                 {
-                    Monitor.Log("Restore Location objects: " + loc.Name);
+                    Monitor?.Log("Restore Location objects: " + loc.Name);
 
                     setLocationObjects(loc);
                     try
@@ -345,18 +350,18 @@ namespace TMXLoader
             }
             catch(Exception e)
             {
-                Monitor.Log(e.Message + ":" + e.StackTrace);
+                Monitor?.Log(e.Message + ":" + e.StackTrace);
             }
 
             if (distribute && Game1.IsMultiplayer)
             {
-                Monitor.Log("Send Removal request");
+                Monitor?.Log("Send Removal request");
                 PyNet.sendRequestToAllFarmers<bool>(buildableRemoverName, toRemove, null, SerializationType.JSON, -1);
             }
         }
         private void loadSavedBuildable(SaveBuildable b)
         {
-            Monitor.Log("Restore Buildable: " + b.Id);
+            Monitor?.Log("Restore Buildable: " + b.Id);
 
             if (Game1.getLocationFromName(b.Location) is GameLocation location)
             {
@@ -663,7 +668,7 @@ namespace TMXLoader
                         }
                         catch (Exception ex)
                         {
-                            Monitor.Log(ex.Message + ":" + ex.StackTrace);
+                            Monitor?.Log(ex.Message + ":" + ex.StackTrace);
                             continue;
                         }
                     }
@@ -693,9 +698,9 @@ namespace TMXLoader
                 }
                 catch (Exception e)
                 {
-                    Monitor.Log("Failed to deserialize: " + loc.Name, LogLevel.Warn);
-                    Monitor.Log(e.Message, LogLevel.Info);
-                    monitor.Log(e.StackTrace);
+                    Monitor?.Log("Failed to deserialize: " + loc.Name, LogLevel.Warn);
+                    Monitor?.Log(e.Message, LogLevel.Info);
+                    Monitor?.Log(e.StackTrace);
                     return false;
                 }
 
@@ -784,9 +789,9 @@ namespace TMXLoader
                 }
                 catch (Exception e)
                 {
-                    Monitor.Log("Failed to serialize: " + location.Name, LogLevel.Warn);
-                    Monitor.Log(e.Message, LogLevel.Info);
-                    monitor.Log(e.StackTrace);
+                    Monitor?.Log("Failed to serialize: " + location.Name, LogLevel.Warn);
+                    Monitor?.Log(e.Message, LogLevel.Info);
+                    Monitor?.Log(e.StackTrace);
                     return null;
                 }
             }
@@ -846,7 +851,7 @@ namespace TMXLoader
                             }
                             catch (Exception ex)
                             {
-                                Monitor.Log(ex.Message + ":" + ex.StackTrace);
+                                Monitor?.Log(ex.Message + ":" + ex.StackTrace);
                             }
                             e.NewLocation.updateSeasonalTileSheets();
 
@@ -940,7 +945,7 @@ namespace TMXLoader
             new ConsoleCommand("loadmap", "Teleport to a map", (s, st) =>
             {
                 if (st.Length < 3)
-                    monitor.Log("Mising Parameter. Use: loadmap {Map} {x} {y}");
+                    Monitor?.Log("Mising Parameter. Use: loadmap {Map} {x} {y}");
                 else
                     Game1.player.warpFarmer(new Warp(int.Parse(st[1]), int.Parse(st[2]), st[0], int.Parse(st[1]), int.Parse(st[2]), false));
             }).register();
@@ -948,13 +953,13 @@ namespace TMXLoader
             new ConsoleCommand("removeNPC", "Removes an NPC", (s, st) =>
             {
                 if (Game1.getCharacterFromName(st.Last()) == null)
-                    Monitor.Log("Couldn't find NPC with that name!", LogLevel.Alert);
+                    Monitor?.Log("Couldn't find NPC with that name!", LogLevel.Alert);
                 else
                 {
                     Game1.removeThisCharacterFromAllLocations(Game1.getCharacterFromName(st.Last()));
                     if (Game1.player.friendshipData.ContainsKey(st.Last()))
                         Game1.player.friendshipData.Remove(st.Last());
-                    Monitor.Log(st.Last() + " was removed!", LogLevel.Info);
+                    Monitor?.Log(st.Last() + " was removed!", LogLevel.Info);
                 }
 
             }).register();
@@ -1130,27 +1135,27 @@ namespace TMXLoader
 
                 skipTrySetMapTile = true;
                 __instance.setMapTile(tileX, tileY, index, layer, action, whichTileSheet);
-                monitor.Log("Setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " ("+ whichTileSheet + ") Location:" + __instance.Name, LogLevel.Trace);
+                monitor?.Log("Setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " ("+ whichTileSheet + ") Location:" + __instance.Name, LogLevel.Trace);
                 return false;
             }
             catch
             {
-                monitor.Log("Error setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " (" + whichTileSheet + ") Location:" + __instance.Name, LogLevel.Warn);
-                monitor.Log("----Tilesheets----", LogLevel.Trace);
+                monitor?.Log("Error setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " (" + whichTileSheet + ") Location:" + __instance.Name, LogLevel.Warn);
+                monitor?.Log("----Tilesheets----", LogLevel.Trace);
                 int i = 0;
                 foreach (TileSheet ts in __instance.Map.TileSheets)
-                    monitor.Log(ts.Id + " ("+ i++ +")", LogLevel.Trace);
+                    monitor?.Log(ts.Id + " ("+ i++ +")", LogLevel.Trace);
 
                 try {
                     skipTrySetMapTile = true;
-                    monitor.Log("Trying to save it...", LogLevel.Info);
+                    monitor?.Log("Trying to save it...", LogLevel.Info);
                     __instance.setMapTile(tileX, tileY, index, layer, action, whichTileSheet + 1);
-                    monitor.Log("...Done", LogLevel.Info);
+                    monitor?.Log("...Done", LogLevel.Info);
 
                 }
                 catch
                 {
-                    monitor.Log("...Failed", LogLevel.Error);
+                    monitor?.Log("...Failed", LogLevel.Error);
                 }
 
                 return false;
@@ -1168,7 +1173,7 @@ namespace TMXLoader
             {
                 foreach (var edit in addedLocations)
                 {
-                    _instance.Monitor.Log("Add Location: " + edit.name);
+                    _instance.Monitor?.Log("Add Location: " + edit.name);
                     if (!(Game1.getLocationFromName(edit.name) is GameLocation))
                         addLocation(edit);
                 }
@@ -1177,8 +1182,8 @@ namespace TMXLoader
             }
             catch(Exception e)
             {
-                _instance.Monitor.Log(e.Message, LogLevel.Trace);
-                _instance.Monitor.Log(e.StackTrace, LogLevel.Trace);
+                _instance.Monitor?.Log(e.Message, LogLevel.Trace);
+                _instance.Monitor?.Log(e.StackTrace, LogLevel.Trace);
             }
         }
 
@@ -1214,7 +1219,7 @@ namespace TMXLoader
 
             PyUtils.addTileAction("ExitBuildable", (key, values, location, position, layer) =>
              {
-                 Monitor.Log("WarpOut");
+                 Monitor?.Log("WarpOut");
                  if (!buildablesExits.ContainsKey(location.Name))
                      return false;
 
@@ -1237,7 +1242,7 @@ namespace TMXLoader
         internal static GameLocation addLocation(MapEdit edit)
         {
             GameLocation location;
-            monitor.Log("Adding:" + edit.name, LogLevel.Trace);
+            monitor?.Log("Adding:" + edit.name, LogLevel.Trace);
             if (edit.type == "Deco")
                 location = new DecoratableLocation(Path.Combine("Maps", edit.name), edit.name);
             else if (edit.type == "Summit")
@@ -1251,12 +1256,12 @@ namespace TMXLoader
             else if (edit.type.StartsWith("SDV:"))
             {
                 location = (GameLocation)PyTK.PyUtils.getTypeSDV(edit.type.Substring(4)).GetConstructor(new Type[] { typeof(string), typeof(string) }).Invoke(new object[] { Path.Combine("Maps", edit.name), edit.name });
-                monitor.Log("Type:" + (edit.type.Substring(4)), LogLevel.Trace);
+                monitor?.Log("Type:" + (edit.type.Substring(4)), LogLevel.Trace);
             }
             else if (edit.type.StartsWith("Custom:"))
             {
                 location = (GameLocation)Type.GetType(edit.type.Substring(7)).GetConstructor(new Type[] { typeof(string), typeof(string) }).Invoke(new object[] { Path.Combine("Maps", edit.name), edit.name });
-                monitor.Log("Type:" + edit.type.Substring(7), LogLevel.Trace);
+                monitor?.Log("Type:" + edit.type.Substring(7), LogLevel.Trace);
             }
             else
                 location = new GameLocation(Path.Combine("Maps", edit.name), edit.name);
@@ -1270,7 +1275,7 @@ namespace TMXLoader
                 }
                 catch (Exception ex)
                 {
-                    monitor.Log(ex.Message + ":" + ex.StackTrace);
+                    monitor?.Log(ex.Message + ":" + ex.StackTrace);
 
                 }
                 location.IsOutdoors = false;
@@ -1293,7 +1298,7 @@ namespace TMXLoader
             if (!Game1.locations.Contains(location))
                 Game1.locations.Add(location);
 
-            monitor.Log("Successfully added:" + location.Name);
+            monitor?.Log("Successfully added:" + location.Name);
 
             return location;
 
@@ -1655,7 +1660,7 @@ namespace TMXLoader
                 }
                 catch (Exception ex)
                 {
-                    Monitor.Log(ex.Message + ":" + ex.StackTrace);
+                    Monitor?.Log(ex.Message + ":" + ex.StackTrace);
                     continue;
                 }
 
@@ -1949,7 +1954,7 @@ namespace TMXLoader
                                 }
                                 catch (Exception ex)
                                 {
-                                    Monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
+                                    Monitor?.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
 
                                 }
                             }
@@ -1964,7 +1969,7 @@ namespace TMXLoader
                         }
                         catch(Exception ex)
                         {
-                            Monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
+                            Monitor?.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
                         }
                     }
 
@@ -1999,7 +2004,7 @@ namespace TMXLoader
                 }
                 catch (Exception e)
                 {
-                    Monitor.Log(e.Message + ":" + e.StackTrace, LogLevel.Error);
+                    Monitor?.Log(e.Message + ":" + e.StackTrace, LogLevel.Error);
                 }
             }
 
@@ -2142,7 +2147,7 @@ namespace TMXLoader
                         }
                         catch(Exception e)
                         {
-                            Monitor.Log(e.Message + ":" + e.StackTrace, LogLevel.Error);
+                            Monitor?.Log(e.Message + ":" + e.StackTrace, LogLevel.Error);
                         }
                     });
                     list.Add(buildableEntry);

@@ -9,7 +9,7 @@ namespace TMXLoader
 {
     public class Config
     {
-        public Microsoft.Xna.Framework.Input.Keys openBuildMenu = Microsoft.Xna.Framework.Input.Keys.F2;
+        public Microsoft.Xna.Framework.Input.Keys openBuildMenu { get; set; } = Microsoft.Xna.Framework.Input.Keys.F2;
         public bool clearBuildingSpace { get; set; } = true;
         public bool converter { get; set; } = false;
     }

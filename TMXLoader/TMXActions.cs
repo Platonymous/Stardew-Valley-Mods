@@ -223,8 +223,8 @@ namespace TMXLoader
                 }
                 catch (Exception ex)
                 {
-                    TMXLoaderMod.monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
-                    TMXLoaderMod.monitor.Log("Couldn't load item SDVType: " + name);
+                    TMXLoaderMod.monitor?.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
+                    TMXLoaderMod.monitor?.Log("Couldn't load item SDVType: " + name);
                 }
             }
             else if (type == "ByType")
@@ -238,8 +238,8 @@ namespace TMXLoader
                 }
                 catch (Exception ex)
                 {
-                    TMXLoaderMod.monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
-                    TMXLoaderMod.monitor.Log("Couldn't load item ByType: " + name);
+                    TMXLoaderMod.monitor?.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
+                    TMXLoaderMod.monitor?.Log("Couldn't load item ByType: " + name);
                 }
             }
 
@@ -256,15 +256,15 @@ namespace TMXLoader
             List<TileShopItem> items = new List<TileShopItem>();
             Dictionary<ISalable, int[]> priceAndStock = new Dictionary<ISalable, int[]>();
             {
-                TMXLoaderMod.monitor.Log("Key:->" + text[1] + "<-");
+                TMXLoaderMod.monitor?.Log("Key:->" + text[1] + "<-");
                 foreach(TileShop tss in TMXLoaderMod.tileShops.Keys)
-                    TMXLoaderMod.monitor.Log(tss.id + " == " + text[1] + "> " +(tss.id == text[1]));
+                    TMXLoaderMod.monitor?.Log(tss.id + " == " + text[1] + "> " +(tss.id == text[1]));
 
 
                 if (TMXLoaderMod.tileShops.Find(kvp => kvp.Key.id == text[1]) is KeyValuePair<TileShop, List<TileShopItem>> tsx)
-                    TMXLoaderMod.monitor.Log(tsx.Key + "-" + tsx.Value);
+                    TMXLoaderMod.monitor?.Log(tsx.Key + "-" + tsx.Value);
                 else
-                    TMXLoaderMod.monitor.Log("not found");
+                    TMXLoaderMod.monitor?.Log("not found");
             }
             if (TMXLoaderMod.tileShops.Find(kvp => kvp.Key.id == text[1] || (text[1].StartsWith("EmptyShop_") && kvp.Key.id == "EmptyShop")) is KeyValuePair<TileShop, List<TileShopItem>> ts && TMXLoaderMod.tileShops.TryGetValue(ts.Key, out items))
             {
@@ -289,7 +289,7 @@ namespace TMXLoader
                     }
                     catch (Exception ex)
                     {
-                        TMXLoaderMod.monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
+                        TMXLoaderMod.monitor?.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
 
                     }
 
@@ -335,7 +335,7 @@ namespace TMXLoader
                     }
                     catch (Exception ex)
                     {
-                        TMXLoaderMod.monitor.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
+                        TMXLoaderMod.monitor?.Log(ex.Message + ":" + ex.StackTrace, LogLevel.Error);
 
                     }
                 }
