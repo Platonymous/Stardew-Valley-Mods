@@ -62,9 +62,7 @@ namespace ModUpdater
                 if (dir.StartsWith("."))
                     continue;
 
-                var parent = Directory.GetParent(dir);
-
-                if (parent.Name.StartsWith("."))
+                if (Directory.GetParent(dir).Name.StartsWith("."))
                     continue;
 
                 ModUpdateManifest mod = Newtonsoft.Json.JsonConvert.DeserializeObject<ModUpdateManifest>(File.ReadAllText(manifestFile));
@@ -79,11 +77,11 @@ namespace ModUpdater
                         mod.ModUpdater.ModFolder = mod.EntryDll.Substring(0, mod.EntryDll.Length - 4);
 
                     if (mod.ModUpdater.Repository != "")
-                        result += CheckMod(modsPath, parent, mod);
+                        result += CheckMod(modsPath, dir, mod);
                     else if (mod.Author == "Platonymous" && !string.IsNullOrEmpty(mod.EntryDll))
                     {
                         mod.ModUpdater = new PyModUpdateInformation(mod.EntryDll.Substring(0, mod.EntryDll.Length - 4));
-                        result += CheckMod(modsPath, parent, mod);
+                        result += CheckMod(modsPath, dir, mod);
                     }
                 }
                 catch (RateLimitExceededException e)
@@ -109,7 +107,7 @@ namespace ModUpdater
             return result;
         }
 
-        public static int CheckMod(string modsPath, DirectoryInfo parent, ModUpdateManifest mod)
+        public static int CheckMod(string modsPath, string modFolder, ModUpdateManifest mod)
         {
             if (!shouldUpdate && !mod.ModUpdater.Install)
             {
@@ -157,7 +155,7 @@ namespace ModUpdater
                     repoContents.Add(rkey, rContent);
                 }
 
-                var selector = mod.ModUpdater.FileSelector.Replace("{ModFolder}", mod.ModUpdater.ModFolder);
+                var selector = mod.ModUpdater.FileSelector.Replace("{ModFolder}", mod.ModUpdater.ModFolder.Replace("[",@"\[").Replace("]", @"\]"));
                 Regex findFile = new Regex(selector, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
                 var filesFound = rContent.Where(f =>
@@ -167,7 +165,11 @@ namespace ModUpdater
                 });
 
                 if (filesFound.Count() == 0)
+                {
+                    Console.WriteLine("File not found:" + selector);
+
                     return 0;
+                }
 
                 foreach (RepositoryContent file in filesFound)
                 {
@@ -211,12 +213,39 @@ namespace ModUpdater
 
                             foreach (ZipArchiveEntry e in zip1.Entries)
                             {
-                                var tPath = Path.Combine(modsPath, e.FullName);
-                                var tDirectory = Path.Combine(modsPath, Path.GetDirectoryName(e.FullName));
+                                string filePath = e.FullName.Replace('/', '\\');
+                                List<string> filePathParts = filePath.Split('\\').ToList();
+                                filePathParts.RemoveAt(0);
+                                Console.WriteLine(modFolder);
+                                filePath = Path.Combine(filePathParts.ToArray());
+                                var tPath = Path.Combine(modFolder, filePath);
+                                var tDirectory = Path.Combine(modFolder, Path.GetDirectoryName(filePath));
                                 if (!Directory.Exists(tDirectory))
                                     Directory.CreateDirectory(tDirectory);
 
                                 Console.WriteLine("[ModUpdater] " + " [" + mod.UniqueID + "] " + "Updating file: " + tPath);
+
+                                if (File.Exists(tPath) && updateManifest.ModUpdater.DoNotReplace.Contains(Path.GetFileName(tPath)))
+                                    continue;
+
+                                foreach (string dFile in updateManifest.ModUpdater.DeleteFiles)
+                                {
+                                    string dfilePath = Path.Combine(modFolder, Path.Combine(dFile.Replace('/', '\\').Split('\\')));
+                                    Console.WriteLine("[ModUpdater] " + " [" + mod.UniqueID + "] " + "Deleting file: " + dFile);
+
+                                    if (File.Exists(dfilePath))
+                                        File.Delete(dfilePath);
+                                }
+
+                                foreach (string dFolder in updateManifest.ModUpdater.DeleteFolders)
+                                {
+                                    string dFolderPath = Path.Combine(modFolder, Path.Combine(dFolder.Replace('/', '\\').Split('\\')));
+                                    Console.WriteLine("[ModUpdater] " + " [" + mod.UniqueID + "] " + "Deleting folder: " + dFolder);
+
+                                    if (Directory.Exists(dFolderPath))
+                                        Directory.Delete(dFolderPath, true);
+                                }
+
                                 e.ExtractToFile(tPath, true);
                             }
                         }
@@ -252,7 +281,8 @@ namespace ModUpdater
         {
             if (update > 0 && config.AutoRestart && Constants.TargetPlatform == GamePlatform.Windows)
             {
-                Process.Start(Path.Combine(Constants.ExecutionPath, "StardewModdingAPI.exe"), string.IsNullOrEmpty(config.ExecutionArgs) ? null : config.ExecutionArgs);
+                var smapi = Process.GetCurrentProcess();
+                Process.Start(smapi.MainModule.FileName, string.IsNullOrEmpty(config.ExecutionArgs) ? null : config.ExecutionArgs);
                 Environment.Exit(-1);
                 return false;
             }

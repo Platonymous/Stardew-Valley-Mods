@@ -23,6 +23,12 @@ namespace ModUpdater
         public string FileSelector { get; set; } = "{ModFolder} ([0-9a-zA-Z.-]+)";
         public string ModFolder { get; set; } = "";
         public bool Install { get; set; } = false;
+
+        public List<string> DoNotReplace { get; set; } = new List<string>() { "config.json", "console.lua" };
+
+        public List<string> DeleteFolders { get; set; } = new List<string>();
+
+        public List<string> DeleteFiles { get; set; } = new List<string>();
     }
 
     public class PyModUpdateInformation : ModUpdateInformation
@@ -33,7 +39,6 @@ namespace ModUpdater
             User = "Platonymous";
             Directory = "_releases";
             ModFolder = modFolder;
-
         }
     }
 }
