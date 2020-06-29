@@ -183,6 +183,17 @@ namespace TMXLoader
                     foreach(var location in locationStorage)
                         wake.Invoke(faInstance, new[] { location });
 
+                Game1.displayHUD = true;
+            };
+
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
+            {
+                Game1.displayHUD = true;
+            };
+
+            helper.Events.GameLoop.SaveCreated += (s, e) =>
+            {
+                Game1.displayHUD = true;
             };
 
             helper.Events.Display.MenuChanged += TMXActions.updateItemListAfterShop;
