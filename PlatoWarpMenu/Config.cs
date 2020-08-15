@@ -12,12 +12,15 @@ namespace PlatoWarpMenu
 
         public string MenuFont2 { get; set; }
 
+        public bool CompatibilityMode { get; set; }
+
         public Config()
         {
             MenuButton = SButton.J;
-            UseTempFolder = false;
+            UseTempFolder = Constants.TargetPlatform == GamePlatform.Android;
             MenuFont1 = "opensans";
             MenuFont2 = "escrita";
+            CompatibilityMode = Constants.TargetPlatform == GamePlatform.Android;
         }
     }
 }

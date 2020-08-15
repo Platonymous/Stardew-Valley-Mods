@@ -8,17 +8,13 @@
     <Platforms>x86</Platforms>
     <PlatformTarget>x86</PlatformTarget>
     <EnableHarmony>true</EnableHarmony>
+    <IgnoreModFilePatterns Condition="'$(MSBuildProjectName)' != 'PlatoTK'">Newtonsoft.Json.Bson\.(?:dll|pdb)</IgnoreModFilePatterns>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <PackageReference Include="Platonymous.PlatoTK" Version="1.1.2" />
   </ItemGroup>
 
   <ItemGroup>

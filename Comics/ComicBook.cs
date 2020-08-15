@@ -1,49 +1,46 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.CustomElementHandler;
+using Netcode;
+using PlatoTK;
+using PlatoTK.Content;
+using PlatoTK.Objects;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Comics
 {
-    public class ComicBook : StardewValley.Object, ICustomObject
+    public class ComicBook : PlatoSObject<StardewValley.Object>
     {
+        public static ISaveIndex SaveIndex { get; set; }
+
         public Texture2D Texture { get; set; } = null;
         public bool Loaded { get; set; } = false;
 
         public bool UsePlaceholder { get; set; } = true;
 
-        public string Description
+        public string ComicDescription
         {
             get
             {
-                return netName.Value.Split('>')[1];
+                return Data.Get("Description");
             }
             set
             {
-                var data = netName.Value.Split('>');
-                data[1] = value;
-                netName.Value = string.Join(">", data);
+                Data.Set("Description", value);
             }
         }
 
-        public string Id
+        public string ComicId
         {
             get
             {
-                return netName.Value.Split('>')[2];
+                return Data.Get("Id");
             }
             set
             {
-                var data = netName.Value.Split('>');
-                data[2] = value;
-                netName.Value = string.Join(">", data);
+                Data.Set("Id", value);
             }
         }
 
@@ -51,13 +48,11 @@ namespace Comics
         {
             get
             {
-                return netName.Value.Split('>')[3];
+                return Data.Get("Volume") ?? "";
             }
             set
             {
-                var data = netName.Value.Split('>');
-                data[3] = value;
-                netName.Value = string.Join(">", data);
+                Data.Set("Volume", value);
             }
         }
 
@@ -65,13 +60,11 @@ namespace Comics
         {
             get
             {
-                return netName.Value.Split('>')[4];
+                return Data.Get("Number") ?? "";
             }
             set
             {
-                var data = netName.Value.Split('>');
-                data[4] = value;
-                netName.Value = string.Join(">", data);
+                Data.Set("Number", value);
             }
         }
 
@@ -79,13 +72,11 @@ namespace Comics
         {
             get
             {
-                return netName.Value.Split('>')[5];
+                return Data.Get("SmallImage") ?? "";
             }
             set
             {
-                var data = netName.Value.Split('>');
-                data[5] = value;
-                netName.Value = string.Join(">", data);
+                Data.Set("SmallImage", value);
             }
         }
 
@@ -93,13 +84,11 @@ namespace Comics
         {
             get
             {
-                return netName.Value.Split('>')[6];
+                return Data.Get("BigImage") ?? "";
             }
             set
             {
-                var data = netName.Value.Split('>');
-                data[6] = value;
-                netName.Value = string.Join(">", data);
+                Data.Set("BigImage", value);
             }
         }
 
@@ -108,75 +97,95 @@ namespace Comics
 
             get
             {
-                return netName.Value.Split('>')[0];
+                return Data.DataString ?? "";
             }
             set
             {
-                var data = netName.Value.Split('>');
-                data[0] = value;
-                netName.Value = string.Join(">", data);
             }
         }
 
         public override string DisplayName
         {
-            get => Name;
-            set => Name = value;
+            get {
+                return Data.Get("Name") ?? "Comic Book";
+            }
+            set
+            {
+
+            }
+        }
+
+        public override string getCategoryName()
+        {
+            return "Comic Book";
         }
 
         public ComicBook()
-            : base()
         {
-            if(string.IsNullOrEmpty(netName.Value))
-                netName.Value = " > > > > > > ";
+
         }
 
-        public ComicBook(string id)
-            : this()
+
+        public ComicBook(Vector2 tileLocation, int parentSheetIndex, int initialStack)
         {
-            Issue issue = AssetManager.Instance.GetIssue(id);
-            Id = id;
-            Description = issue.Name + " (Comic Book)";
-            Volume = issue.Volume.Name;
-            Number = issue.IssueNumber;
-            SmallImage = issue.Image.SmallUrl.ToString();
-            BigImage = issue.Image.MediumUrl.ToString();
-            Name = $"{Volume} #{Number}";
+
         }
+        public ComicBook(Vector2 tileLocation, int parentSheetIndex, bool isRecipe = false)
+        {
+
+        }
+        public ComicBook(int parentSheetIndex, int initialStack, bool isRecipe = false, int price = -1, int quality = 0)
+        {
+
+        }
+        public ComicBook(Vector2 tileLocation, int parentSheetIndex, string Givenname, bool canBeSetDown, bool canBeGrabbed, bool isHoedirt, bool isSpawnedObject)
+        {
+
+        }
+
+
 
         public override string getDescription()
         {
             SpriteFont smallFont = Game1.smallFont;
-            int descriptionWidth = this.getDescriptionWidth();
-            return Game1.parseText(Description, smallFont, descriptionWidth);
+            int descriptionWidth = getDescriptionWidth();
+            return Game1.parseText(ComicDescription, smallFont, descriptionWidth);
         }
 
-        public virtual Dictionary<string, string> getAdditionalSaveData()
+        public new int getDescriptionWidth()
         {
-            return new Dictionary<string, string>() { { "nameData", netName}, { "stack", Stack.ToString() } };
-        }
-
-        public virtual object getReplacement()
-        {
-            Chest c = new Chest(true);
-            c.playerChoiceColor.Value = Color.Magenta;
-            c.TileLocation = TileLocation;
-            return c;
+            int val1 = 272;
+            if (LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.fr)
+                val1 = 384;
+            return Math.Max(val1, (int)Game1.dialogueFont.MeasureString(this.ComicDescription ?? "").X);
         }
 
         public void checkLoad()
         {
+            CheckParentSheetIndex();
             if (Loaded || (!AssetManager.LoadImagesInShop && Game1.activeClickableMenu is ShopMenu && !Game1.player.hasItemInInventoryNamed(Name)))
                 return;
 
             Loaded = true;
 
-            Texture = !string.IsNullOrEmpty(SmallImage) && SmallImage != " " ? AssetManager.Instance.LoadImage(SmallImage,Id) : AssetManager.Instance.LoadImageForIssue(Id);
+            Texture = !string.IsNullOrEmpty(SmallImage) && SmallImage != " " ? AssetManager.Instance.LoadImage(SmallImage,ComicId) : AssetManager.Instance.LoadImageForIssue(ComicId);
                    UsePlaceholder = false;
         }
-
+        
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
+            if (x == 0 && y == 0)
+                return;
+
+            float scale = 11f;
+            Vector2 offset = new Vector2(0, -64f);
+            var texture = UsePlaceholder ? AssetManager.Instance.Placeholder : Texture;
+            var source = new Rectangle(0, 0, texture.Width, texture.Height);
+
+            if (Furniture.isDrawingLocationFurniture)
+                spriteBatch.Draw(texture, Game1.GlobalToLocal(Game1.viewport, new Vector2(x,y) + (Base.shakeTimer > 0 ? new Vector2((float)Game1.random.Next(-1, 2), (float)Game1.random.Next(-1, 2)) : Vector2.Zero)), source, Color.White * alpha, 0.0f, Vector2.Zero, scale, SpriteEffects.None, (float)(Base.boundingBox.Value.Bottom - 48) / 10000f);
+            else
+                spriteBatch.Draw(texture, offset + Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * 64 + (Base.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0)), (float)(y * 64 - (source.Height * 4 - Base.boundingBox.Height) + (Base.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0)))), source, Color.White * alpha, 0.0f, Vector2.Zero, scale, SpriteEffects.None, (float)(Base.boundingBox.Value.Bottom - 48) / 10000f);
         }
 
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
@@ -187,38 +196,74 @@ namespace Comics
 
             spriteBatch.Draw(Game1.shadowTexture, location + new Vector2(32f, 48f), new Microsoft.Xna.Framework.Rectangle?(Game1.shadowTexture.Bounds), color * 0.5f, 0.0f, new Vector2((float)Game1.shadowTexture.Bounds.Center.X, (float)Game1.shadowTexture.Bounds.Center.Y), 3f, SpriteEffects.None, layerDepth - 0.0001f);
             spriteBatch.Draw(texture, location + offset, null, color, 0.0f, Vector2.Zero, 3f, SpriteEffects.None, layerDepth + 0.0001f);
-            if(Stack > 1)
-            Utility.drawTinyDigits(Stack, spriteBatch, location + new Vector2((float)(64 - Utility.getWidthOfTinyDigitString(Stack, 3f * scaleSize)) + 3f * scaleSize, (float)(64.0 - 18.0 * (double)scaleSize + 1.0)), 3f * scaleSize, 1f, color);
+            if(Base?.Stack > 1)
+            Utility.drawTinyDigits(Base.Stack, spriteBatch, location + new Vector2((float)(64 - Utility.getWidthOfTinyDigitString(Base.Stack, 3f * scaleSize)) + 3f * scaleSize, (float)(64.0 - 18.0 * (double)scaleSize + 1.0)), 3f * scaleSize, 1f, color);
         }
-
+        
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, Farmer f)
         {
             checkLoad();
             var texture = UsePlaceholder ? AssetManager.Instance.Placeholder : Texture;
             var offset = new Vector2(-16f, -58f);
             spriteBatch.Draw(texture, objectPosition + offset, null, Color.White, 0.0f, Vector2.Zero, 8f, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 3) / 10000f));
-
         }
-
+        
         public override Item getOne()
         {
-            var c = new ComicBook();
-            c.netName.Value = netName.Value;
-            return c;
+            return GetNew(ComicId);
         }
 
-        public virtual void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
+        public override bool CanLinkWith(object linkedObject)
         {
-           
+            return linkedObject is StardewValley.Object obj && obj.netName.Get().Contains("IsComicBookObject");
         }
 
-        public virtual ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        public static StardewValley.Object GetNew(string id)
         {
-            var c = new ComicBook();
-            c.netName.Value = additionalSaveData["nameData"];
-            if (int.TryParse(additionalSaveData["stack"], out int nstack))
-                c.Stack = nstack;
-            return c;
+            SaveIndex.ValidateIndex();
+
+            var newComic = new StardewValley.Object(SaveIndex.Index,1);
+            
+            newComic.netName.Set("Plato:IsComicBookObject=true|Id=" + id);
+
+            return newComic;
+        }
+        private void CheckParentSheetIndex()
+        {
+            if (SaveIndex.Index != Base?.parentSheetIndex.Value)
+            {
+                SaveIndex.ValidateIndex(Base?.parentSheetIndex.Value ?? -1);
+                Base?.parentSheetIndex.Set(SaveIndex.Index);
+            }
+        }
+        public override void OnConstruction(IPlatoHelper helper, object linkedObject)
+        {
+            base.OnConstruction(helper, linkedObject);
+            SaveIndex.ValidateIndex();
+            Data?.Set("IsComicBookObject", true);
+
+            CheckParentSheetIndex();
+
+            if (!string.IsNullOrEmpty(ComicId))
+            {
+                Issue issue = AssetManager.Instance.GetIssue(ComicId);
+                Data.Set("Volume",issue.Volume.Name);
+                Data.Set("Number", issue.IssueNumber);
+                Data.Set("SmallImage", issue.Image.SmallUrl.ToString());
+                Data.Set("BigImage", issue.Image.MediumUrl.ToString());
+                Data.Set("Name", $"{Volume} #{Number}");
+                Data.Set("Description", issue.Name + " (Comic Book)");
+                Data.Set("IsComicBookObject", true);
+                Helper.SetDelayedAction(1,() => checkLoad());
+            }
+        }
+
+        public override NetString GetDataLink(object linkedObject)
+        {
+            if (linkedObject is Item item)
+                return item.netName;
+
+            return null;
         }
     }
 }

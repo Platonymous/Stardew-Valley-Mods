@@ -1,39 +1,72 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
-using PyTK.CustomElementHandler;
+using PlatoTK;
+using PlatoTK.Content;
+using PlatoTK.Objects;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Objects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Comics
 {
-    public class Frame : Furniture, ICustomObject
+    public class Frame : PlatoFurniture<Furniture>
     {
-        public Frame(ComicBook comic, Vector2 tileLocation)
-            : base(1602, tileLocation)
-        {
-            this.heldObject.Value = comic;
-            this.Stack = comic.Stack;
-            this.Type = "painting";
-        }
+        public static ISaveIndex SaveIndex { get; set; }
 
         public Frame()
-            : base(1602, Vector2.Zero)
         {
 
         }
 
-        public override string Name => heldObject.Value?.Name ?? "Frame";
+        public Frame(int which, Vector2 tile)
+        {
 
-        public override string DisplayName { 
-            get => Name; 
-            set { return; } 
+        }
+
+        public Frame(int which, Vector2 tile, int initialRotations)
+        {
+
+        }
+        public Frame(Vector2 tileLocation, int parentSheetIndex, int initialStack)
+        {
+
+        }
+        public Frame(Vector2 tileLocation, int parentSheetIndex, bool isRecipe = false)
+        {
+
+        }
+        public Frame(int parentSheetIndex, int initialStack, bool isRecipe = false, int price = -1, int quality = 0)
+        {
+
+        }
+        public Frame(Vector2 tileLocation, int parentSheetIndex, string Givenname, bool canBeSetDown, bool canBeGrabbed, bool isHoedirt, bool isSpawnedObject)
+        {
+
+        }
+        
+        public override string Name
+        {
+
+            get
+            {
+                return Data.DataString ?? "";
+            }
+            set
+            {
+            }
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return Base?.heldObject.Value?.DisplayName ?? "Frame";
+            }
+            set
+            {
+
+            }
         }
 
         public override string getCategoryName()
@@ -41,88 +74,117 @@ namespace Comics
             return "Comic Book";
         }
 
-        public override Color getCategoryColor()
-        {
-            return Color.DarkCyan;
-        }
-
         public override string getDescription()
         {
-            return this.heldObject.Value?.getDescription() ?? "Empty";
+            return Base?.heldObject.Value?.getDescription() ?? "Empty";
         }
 
         public override Item getOne()
         {
-            return new Frame(this.heldObject.Value as ComicBook, Vector2.Zero);
+            var one = GetNew(Base?.heldObject.Value);
+            (one as Furniture).updateDrawPosition();
+            return one;
         }
+
 
         public override bool canStackWith(ISalable other)
         {
-            return other is Frame f && f.heldObject.Value is ComicBook cb && cb.Id == (heldObject.Value as ComicBook).Id;
+            return false;
         }
 
         public override bool canBeRemoved(Farmer who)
         {
             return true;
         }
-
         public override bool clicked(Farmer who)
         {
             Game1.haltAfterCheck = false;
             return false;
         }
 
+        public new void resetOnPlayerEntry(GameLocation environment, bool dropDown)
+        {
+            CheckParentSheetIndex();
+            Link?.CallUnlinked<Furniture>((f) => f.resetOnPlayerEntry(environment, dropDown));
+        }
+
+        private void CheckParentSheetIndex()
+        {
+            if (SaveIndex.Index != Base?.parentSheetIndex.Value)
+            {
+                SaveIndex.ValidateIndex(Base?.parentSheetIndex.Value ?? -1);
+                Base?.parentSheetIndex.Set(SaveIndex.Index);
+                Base?.defaultSourceRect.Set(new Rectangle(SaveIndex.Index * 16 % Furniture.furnitureTexture.Width, SaveIndex.Index * 16 / Furniture.furnitureTexture.Width * 16, 16, 16));
+                Base?.sourceRect.Set(Base.defaultSourceRect.Value);
+            }
+        }
+
         public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
         {
-            this.heldObject.Value.Stack = Stack;
-            this.heldObject.Value.drawInMenu(spriteBatch, location, scaleSize, transparency, layerDepth, drawStackNumber, color, drawShadow);
+            CheckParentSheetIndex();
+
+            if (Base?.heldObject?.Value?.Stack is int stack)
+                Base.heldObject.Value.Stack = Base.Stack;
+
+            Base?.heldObject?.Value?.drawInMenu(spriteBatch, location, scaleSize, transparency, layerDepth, drawStackNumber, color, drawShadow);
         }
 
         public override void drawWhenHeld(SpriteBatch spriteBatch, Vector2 objectPosition, Farmer f)
         {
             if (!(Game1.currentLocation is DecoratableLocation))
-                heldObject.Value.drawWhenHeld(spriteBatch, objectPosition, f);
+                Base?.heldObject?.Value?.drawWhenHeld(spriteBatch, objectPosition, f);
         }
 
-        public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
+        public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1f)
         {
-            float scale = 11f;
-            Vector2 offset = new Vector2(0, -64f);
+            CheckParentSheetIndex();
 
-            var cb = (this.heldObject.Value as ComicBook);
-            cb.checkLoad();
+            Vector2 position = Link?.PrivateFields["drawPosition"] is NetVector2 vector ? vector.Get() : Vector2.Zero;
 
-            var texture = cb.UsePlaceholder ? AssetManager.Instance.Placeholder : (this.heldObject.Value as ComicBook).Texture;
-            var source = new Rectangle(0, 0, texture.Width, texture.Height);
-            if (Furniture.isDrawingLocationFurniture)
-                spriteBatch.Draw(texture, Game1.GlobalToLocal(Game1.viewport, (Vector2)this.drawPosition.Value + (this.shakeTimer > 0 ? new Vector2((float)Game1.random.Next(-1, 2), (float)Game1.random.Next(-1, 2)) : Vector2.Zero)), source, Color.White * alpha, 0.0f, Vector2.Zero, scale, SpriteEffects.None, (float)(this.boundingBox.Value.Bottom - 48) / 10000f);
-            else
-                spriteBatch.Draw(texture, offset + Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * 64 + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0)), (float)(y * 64 - (source.Height * 4 - this.boundingBox.Height) + (this.shakeTimer > 0 ? Game1.random.Next(-1, 2) : 0)))), source, Color.White * alpha, 0.0f, Vector2.Zero, scale, SpriteEffects.None, (float)(this.boundingBox.Value.Bottom - 48) / 10000f);
+            if (position == Vector2.Zero)
+                Base?.updateDrawPosition();
+
+            Base?.heldObject?.Value?.draw(spriteBatch, (int)position.X, (int)position.Y, alpha);
+        }
+  
+        public override bool CanLinkWith(object linkedObject)
+        {
+            return linkedObject is Furniture f && (f.ParentSheetIndex == SaveIndex.Index || f.netName.Get().Contains("IsComicFrameObject"));
         }
 
-        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        public override void OnConstruction(IPlatoHelper helper, object linkedObject)
         {
-            var r = (replacement as Furniture);
-            var f = new Frame(r.heldObject.Value as ComicBook,r.TileLocation);
+            base.OnConstruction(helper, linkedObject);
+            SaveIndex.ValidateIndex(Base?.parentSheetIndex.Value ?? -1);
+            Data?.Set("IsComicFrameObject", true);
+            CheckParentSheetIndex();
 
-            return f;
+            if (!(Base?.heldObject.Value is StardewValley.Object))
+                if (Data != null && Data.TryGet("ComicId", out string comicId))
+                    Base?.heldObject.Set(ComicBook.GetNew(comicId));
+                else
+                    Base?.heldObject.Set(ComicBook.GetNew("216384"));
+
+            Base?.updateDrawPosition();
         }
 
-        public object getReplacement()
+
+        public static Item GetNew(StardewValley.Object obj)
         {
-            Furniture f = new Furniture(1602, this.TileLocation);
-            f.heldObject.Value = heldObject.Value;
-            return f;
+            SaveIndex.ValidateIndex();
+            var newFrame = new Furniture(SaveIndex.Index, Vector2.Zero);
+            newFrame.netName.Value = "Plato:IsComicFrameObject=true|ComicId=216384";
+            newFrame.heldObject.Value = (StardewValley.Object)obj?.getOne();
+
+            return newFrame;
         }
 
-        public Dictionary<string, string> getAdditionalSaveData()
+        public override NetString GetDataLink(object linkedObject)
         {
-            return new Dictionary<string, string>();
-        }
+            if (linkedObject is Furniture f)
+                return f.netName;
 
-        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
-        {
-            
+            return null;
         }
     }
 }

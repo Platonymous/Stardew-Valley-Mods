@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Box Width="100%" Height="100%">
+  <Box Id="LeftMenu" Width="140" Height="100%" BackgroundColor="#ff248dc1">
+    <Box Id="template.leftMenu" X="10" Y="10" Width="-20" Height="25" BackgroundColor="#77000000,hover:#cc000000,selected:#ff000000" OnClick="PickSet">
+      <Text Tags="caption" Content="Next Menu Entry" Align="center center" Font="menufont1" TextScale="0.3" TextColor="#ffffffff" ></Text>
+    </Box>
+  </Box>
+
+  <Box Id="LocationsMenu" X="140" Width="630" Height="100%">
+    <Box Id="template.locationsMenu" X="10" Y="10" Width="1x5 -6" Height="25" BackgroundColor="#ffffffff,hover:#aa248dc1,selected:#ff248dc1" OnClick="PickLocation">
+      <Text Tags="caption" Content="Next Menu Entry" TextLimit="14" Align="center center" Font="menufont1" TextScale="0.3" TextColor="#cc000000,selected:#ffffffff" ></Text>
+    </Box>
+  </Box>
+
+  <Box Id="RightMenu" X="call>RightX" Width="call>RightWidth" Height="100%" BackgroundColor="#aa248dc1">
+    <Text Id="LocationName" Content="data>LocationName" Y="10" TextLimit="25" Align="center top" Font="menufont2" TextScale="0.8" TextColor="#ff000000" ></Text>
+    <Box Id="LocationImage" X="10" Y="70" Width="-20" Height ="80% -70" BackgroundMaxScale="4" BackgroundFill="Contain" BackgroundImage="call>LocationImage">
+      <Box Id="template.tiles" BackgroundColor="#00000000,hover:#4400ff00,selected:#8800ff00,highlight:#88ff0000" OnClick="SelectSpot"></Box>
+    </Box>
+    <Box Width="100%" Y="80%" Height="20%" BackgroundColor="#22000000">
+      <Box Width="400" Height="60" Align="center center" BackgroundColor="#ff000000,hover:#ff248dc1" OnClick="WarpTo">
+    <Text Id="WarpInfo" X ="0" Y="0" Content="call>WarpSpot" Font="menufont2" Align="center center" TextScale="0.8" TextColor="#ffffffff"></Text>
+      </Box>
+    </Box>
+  </Box> 
+</Box>

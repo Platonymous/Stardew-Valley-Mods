@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using PyTK.Types;
 using StardewModdingAPI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using PyTK.Extensions;
+using PlatoTK;
 
 namespace Comics
 {
@@ -81,20 +80,53 @@ namespace Comics
         public Texture2D LoadImage(string url, string id, bool big = false)
         {
             string relative = Path.Combine("assets", "issues", id + (big ? "_big" : "") + ".png");
-            string absolute = Path.Combine(Helper.DirectoryPath, "assets", "issues", id + (big ? "_big" : "") + ".png");
-            Texture2D texture = Placeholder;
-            if (File.Exists(absolute))
-                texture = Helper.Content.Load<Texture2D>(relative) ?? Placeholder;
-            else if (Issues.ContainsKey(id))
+            string absolute = Path.Combine(Helper.DirectoryPath, relative);
+            Texture2D texture = null;
+            try
+            {
+                texture = Helper.Content.Load<Texture2D>(relative);
+            }
+            catch
+            {
+                texture = null;
+            }
+
+            if ( texture == null && Issues.ContainsKey(id))
                 texture = DownloadImageFileForIssue(big ? Issues[id].Image.MediumUrl : Issues[id].Image.SmallUrl, id, big);
-            else
+            else if(texture == null)
                 texture = DownloadImageFileForIssue(new Uri(url), id, big);
+
+            if (texture == null)
+                texture = Placeholder;
+
             float scale = texture.Height / 16f;
-            var smallTexture = texture.ScaleUpTexture(1f / scale, false);
+            float tScale = 1f / scale;
+            Texture2D smallTexture = null;
+
+            try
+            {
+                smallTexture = Helper.GetPlatoHelper().Content.Textures.ResizeTexture(texture, (int)(tScale * texture.Width), (int)(tScale * texture.Height));
+            }
+            catch
+            {
+                smallTexture = Helper.GetPlatoHelper().Content.Textures.ExtractArea(texture, new Microsoft.Xna.Framework.Rectangle(0, 0, (int)(tScale * texture.Width), (int)(tScale * texture.Height)));
+            }
+
+            if(smallTexture == null)
+                smallTexture = Helper.GetPlatoHelper().Content.Textures.GetRectangle((int)(tScale * texture.Width), (int)(tScale * texture.Height), Microsoft.Xna.Framework.Color.Red);
 
             if (texture.Height > 16)
-                return ScaledTexture2D.FromTexture(smallTexture, texture, scale);
-            else
+            {
+                smallTexture.Tag = Helper.ModRegistry.ModID + ".Comic_" + id;
+                return Helper.GetPlatoHelper().Harmony.GetDrawHandle<Texture2D>("Comic_" + id, texture, (handler) =>
+                {
+                    handler.Texture = handler.Data;
+                    handler.SourceRectangle = null;
+                    handler.Draw();
+                    return true;
+                },smallTexture);
+            }
+
                 return texture;
         }
 
@@ -111,12 +143,22 @@ namespace Comics
                 texture = DownloadImageFileForIssue(big ? issue.Image.MediumUrl : issue.Image.SmallUrl, id, big);
             
             float scale = texture.Height / 16f;
-            var smallTexture = texture.ScaleUpTexture(1f / scale, false);
+            float tScale = 1f / scale;
+            var smallTexture = Helper.GetPlatoHelper().Content.Textures.ResizeTexture(texture, (int)(tScale * texture.Width), (int)(tScale * texture.Height));
 
             if (texture.Height > 16)
-                return ScaledTexture2D.FromTexture(smallTexture, texture, scale);
-            else
-                return texture;
+            {
+                smallTexture.Tag = Helper.ModRegistry.ModID + ".Comic_" + id;
+                return Helper.GetPlatoHelper().Harmony.GetDrawHandle<Texture2D>("Comic_" + id, texture, (handler) =>
+                {
+                    handler.Texture = handler.Data;
+                    handler.SourceRectangle = null;
+                    handler.Draw();
+                    return true;
+                }, smallTexture);
+            }
+
+            return texture;
         }
     }
 }
