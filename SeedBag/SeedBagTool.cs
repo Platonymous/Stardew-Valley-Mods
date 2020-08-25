@@ -1,239 +1,163 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using StardewValley;
-using StardewValley.Tools;
-using StardewValley.TerrainFeatures;
-
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+using Netcode;
+using PlatoTK;
+using StardewValley;
 using StardewValley.Objects;
-using SObject = StardewValley.Object;
-using PyTK.CustomElementHandler;
+using StardewValley.TerrainFeatures;
+using StardewValley.Tools;
+using System;
+using System.Linq;
 
 namespace SeedBag
 {
-    class SeedBagTool : Hoe, ISaveElement, ICustomObject
+    public class SeedBagTool : PlatoTK.Objects.PlatoTool<StardewValley.Tools.GenericTool>
     {
+        public static int TileIndex { get; set; }
+        public bool InUse = false;
+        public static Texture2D Texture;
+        public static Texture2D AttTexture;
+        public static Texture2D Att2Texture;
 
-        internal static Texture2D texture;
-        private static Texture2D attTexture;
-        private static Texture2D att2Texture;
-        private bool inUse;
+        const int attSlots = 2;
 
-        public Dictionary<string, string> getAdditionalSaveData()
+        internal static void LoadTextures(IPlatoHelper helper)
         {
-            Dictionary<string, string> savedata = new Dictionary<string, string>();
-            savedata.Add("name", Name);
-            return savedata;
-        }
-
-        public dynamic getReplacement()
-        {
-            Chest replacement = new Chest(true);
-            if (attachments.Count() > 0)
+            if (Texture == null)
             {
-                if (attachments[0] != null)
-                    replacement.addItem(attachments[0]);
-
-                if (attachments[1] != null)
-                    replacement.addItem(attachments[1]);
+                Texture = helper.ModHelper.Content.Load<Texture2D>(@"Assets/seedbag.png");
+                AttTexture = helper.ModHelper.Content.Load<Texture2D>(@"Assets/seedattachment.png");
+                Att2Texture = helper.ModHelper.Content.Load<Texture2D>(@"Assets/fertilizerattachment.png");
             }
-
-            return replacement;
         }
 
-        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
-        {
-            build();
-            Chest chest = (Chest)replacement;
-            if (!chest.isEmpty())
+        public override string DisplayName {
+            get => Helper.ModHelper.Translation.Get("Name");
+            set {
+
+            }
+        }
+
+        public override string Name { get
             {
-                if (new List<Item>(chest.items)[0].Category == -19)
-                    attachments[1] = (SObject)chest.items[0];
-                else
-                    attachments[0] = (SObject)chest.items[0];
-
-                if (chest.items.Count > 1)
-                    attachments[1] = (SObject)chest.items[1];
+                return DisplayName;
             }
+            set
+            {
 
-        }
-
-
-        public SeedBagTool(CustomObjectData data)
-            : this()
-        {
+            }
         }
 
         public SeedBagTool()
             : base()
         {
-            build();
+
         }
 
-        public override bool canBeTrashed()
+        public override bool CanLinkWith(object linkedObject)
         {
-            return true;
+            return linkedObject is StardewValley.Tools.GenericTool obj && obj.netName.Get().Contains("IsSeedBagTool");
         }
 
-        internal static void loadTextures()
+        public override NetString GetDataLink(object linkedObject)
         {
-            texture = SeedBagMod._helper.Content.Load<Texture2D>(@"Assets/seedbag.png");
-            attTexture = SeedBagMod._helper.Content.Load<Texture2D>(@"Assets/seedattachment.png");
-            att2Texture = SeedBagMod._helper.Content.Load<Texture2D>(@"Assets/fertilizerattachment.png");
-        }
-
-
-        public override bool actionWhenPurchased()
-        {
-            return false;
+            if (linkedObject is Tool t)
+                return t.netName;
+            return null;
         }
 
         public override Item getOne()
         {
-            return new SeedBagTool();
+            return GetNew(Helper, Base);
+        }
+        public override bool canBeTrashed()
+        {
+            return true;
+        }
+        public override bool actionWhenPurchased()
+        {
+            Game1.playSound("parry");
+            Game1.exitActiveMenu();
+            var newBag = GetNew(Helper);
+            Helper.SetTickDelayedUpdateAction(5, () =>
+            {
+                Game1.player.holdUpItemThenMessage(newBag, true);
+                Game1.player.addItemByMenuIfNecessary(newBag);
+            });
+            return true;
         }
 
         public override void setNewTileIndexForUpgradeLevel()
         {
         }
 
-        public override string DisplayName { get => SeedBagMod.i18n.Get("Name"); set => base.DisplayName = SeedBagMod.i18n.Get("Name"); }
-
-        private void build()
+        public override bool canThisBeAttached(StardewValley.Object o)
         {
-            if (texture == null)
-                loadTextures();
-
-            Name = SeedBagMod.i18n.Get("Name");
-            description = SeedBagMod.i18n.Get("Empty");
-
-            numAttachmentSlots.Value = 2;
-            attachments.SetCount(numAttachmentSlots);
-            InitialParentTileIndex = 77;
-            CurrentParentTileIndex = 77;
-            IndexOfMenuItemView = 0;
-            UpgradeLevel = 4;
-
-            InstantUse = false;
-            inUse = false;
-        }
-        public override void endUsing(GameLocation location, Farmer who)
-        {
-            base.endUsing(location, who);
+            bool cba = (o == null || ((o.Category == -74 || o.Category == -19) && !(o is Furniture)));
+            return cba;
         }
 
-        public override int attachmentSlots()
+        public override StardewValley.Object attach(StardewValley.Object o)
         {
-            return numAttachmentSlots.Value;
-        }
+            StardewValley.Object priorAttachement = null;
 
-        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
-        {
-            spriteBatch.Draw(texture, location + new Vector2(32f, 32f), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(texture, 16, 16, this.IndexOfMenuItemView)), color * transparency, 0.0f, new Vector2(8f, 8f), 4f * scaleSize, SpriteEffects.None, layerDepth);
+            if (o != null && o.Category == -74 && Base.attachments[0] != null)
+                priorAttachement = new StardewValley.Object(Vector2.Zero, Base.attachments[0].ParentSheetIndex, Base.attachments[0].Stack);
 
-            if (inUse)
-            {
-                StardewValley.Farmer f = Game1.player;
-                Vector2 vector = f.getLocalPosition(Game1.viewport) + f.jitter + f.armOffset;
-                int num = (int)vector.Y - ((Game1.tileSize * 5) / 2);
-                spriteBatch.Draw(texture, new Vector2(vector.X, (float)num), new Rectangle?(Game1.getSquareSourceRectForNonStandardTileSheet(Game1.toolSpriteSheet, 16, 16, this.IndexOfMenuItemView)), color * transparency, 0.0f, new Vector2(8f, 8f), 4f * scaleSize, SpriteEffects.None, Math.Max(0f, (float)(f.getStandingY() + Game1.tileSize / 2) / 10000f));
-            }
-
-        }
-
-        public override void drawAttachments(SpriteBatch b, int x, int y)
-        {
-            int offset = 65;
-            Rectangle attachementSourceRectangle = new Rectangle(0, 0, 64, 64);
-            b.Draw(attTexture, new Vector2(x, y), new Rectangle?(attachementSourceRectangle), Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
-
-            Rectangle attachement2SourceRectangle = new Rectangle(0, 0, 64, 64);
-            b.Draw(att2Texture, new Vector2(x, y + offset), new Rectangle?(attachement2SourceRectangle), Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
-
-            if (attachments.Count() > 0)
-            {
-                if (attachments[0] is SObject)
-                    attachments[0].drawInMenu(b, new Vector2(x, y), 1f);
-
-                if (attachments[1] is SObject)
-                    attachments[1].drawInMenu(b, new Vector2(x, y + offset), 1f);
-            }
-
-        }
-
-        public override bool onRelease(GameLocation location, int x, int y, StardewValley.Farmer who)
-        {
-            inUse = false;
-            return base.onRelease(location, x, y, who);
-        }
-
-        public override bool beginUsing(GameLocation location, int x, int y, StardewValley.Farmer who)
-        {
-            inUse = true;
-            return base.beginUsing(location, x, y, who);
-        }
-
-        public override bool canThisBeAttached(SObject o)
-        {
-            if (o == null || o.Category == -74 || o.Category == -19) { return true; } else { return false; }
-        }
-
-
-        public override SObject attach(SObject o)
-        {
-            SObject priorAttachement = null;
-
-            if (o != null && o.Category == -74 && attachments[0] != null)
-                priorAttachement = new SObject(Vector2.Zero, attachments[0].ParentSheetIndex, attachments[0].Stack);
-
-            if (o != null && o.Category == -19 && attachments[1] != null)
-                priorAttachement = new SObject(Vector2.Zero, attachments[1].ParentSheetIndex, attachments[1].Stack);
+            if (o != null && o.Category == -19 && Base.attachments[1] != null)
+                priorAttachement = new StardewValley.Object(Vector2.Zero, Base.attachments[1].ParentSheetIndex, Base.attachments[1].Stack);
 
             if (o == null)
             {
-                if (attachments[0] != null)
+                if (Base.attachments[0] != null)
                 {
-                    priorAttachement = new SObject(Vector2.Zero, attachments[0].ParentSheetIndex, attachments[0].Stack);
-                    attachments[0] = null;
+                    priorAttachement = new StardewValley.Object(Vector2.Zero, Base.attachments[0].ParentSheetIndex, Base.attachments[0].Stack);
+                    Base.attachments[0] = null;
                 }
-                else if (attachments[1] != null)
+                else if (Base.attachments[1] != null)
                 {
-                    priorAttachement = new SObject(Vector2.Zero, attachments[1].ParentSheetIndex, attachments[1].Stack);
-                    attachments[1] = null;
+                    priorAttachement = new StardewValley.Object(Vector2.Zero, Base.attachments[1].ParentSheetIndex, Base.attachments[1].Stack);
+                    Base.attachments[1] = null;
                 }
 
                 Game1.playSound("dwop");
+                Base.description = GetDescriptor(Helper, Base);
                 return priorAttachement;
             }
 
             if (canThisBeAttached(o))
             {
                 if (o.Category == -74)
-                    attachments[0] = o;
+                    Base.attachments[0] = o;
 
                 if (o.Category == -19)
-                    attachments[1] = o;
+                    Base.attachments[1] = o;
 
                 Game1.playSound("button1");
+                Base.description = GetDescriptor(Helper, Base);
                 return priorAttachement;
             }
-
-            return null;
+            else
+            {
+                return o;
+            }
         }
 
-        public override void leftClick(Farmer who)
+        internal float GetSquaredDistance(Vector2 point1, Vector2 point2)
         {
-            base.leftClick(who);
+            float a = (point1.X - point2.X);
+            float b = (point1.Y - point2.Y);
+            return (a * a) + (b * b);
         }
 
         public override void DoFunction(GameLocation location, int x, int y, int power, StardewValley.Farmer who)
         {
-            if (attachments.Count == 0 || (attachments[0] == null && attachments[1] == null))
+            if (Base == null)
+                return;
+
+            if (Base.attachments.Count == 0 || (Base.attachments[0] == null && Base.attachments[1] == null))
             {
-                Game1.showRedMessage(SeedBagMod.i18n.Get("Out_Of_Seeds"));
+                Game1.showRedMessage(Helper.ModHelper.Translation.Get("Out_Of_Seeds"));
                 return;
             }
 
@@ -242,75 +166,116 @@ namespace SeedBag
             who.stopJittering();
             Game1.playSound("leafrustle");
             Vector2 vector = new Vector2((float)(x / Game1.tileSize), (float)(y / Game1.tileSize));
-            List<Vector2> list = base.tilesAffected(vector, power, who);
+            var list = tilesAffected(vector, power, who).OrderBy(v => GetSquaredDistance(who.getTileLocation(),v));
 
             foreach (Vector2 current in list)
             {
                 if (location.terrainFeatures.ContainsKey(current) && location.terrainFeatures[current] is HoeDirt hd && hd.crop == null && !location.objects.ContainsKey(current))
                 {
-                    if (attachments[1] != null && hd.fertilizer.Value <= 0)
+                    if (Base.attachments[1] != null && hd.fertilizer.Value <= 0)
                     {
-                        if (hd.plant(attachments[1].ParentSheetIndex, (int)current.X, (int)current.Y, who, true, location))
+                        if (hd.plant(Base.attachments[1].ParentSheetIndex, (int)current.X, (int)current.Y, who, true, location))
                         {
-                            attachments[1].Stack--;
-                            if (attachments[1].Stack == 0)
+                            Base.attachments[1].Stack--;
+                            if (Base.attachments[1].Stack == 0)
                             {
-                                attachments[1] = null;
-                                Game1.showRedMessage(SeedBagMod.i18n.Get("Out_Of_Fertilizer"));
+                                Base.attachments[1] = null;
+                                Game1.showRedMessage(Helper.ModHelper.Translation.Get("Out_Of_Fertilizer"));
                                 break;
                             }
                         }
                     }
 
-                    if (attachments[0] != null)
+                    if (Base.attachments[0] != null)
                     {
-                        if (hd.plant(attachments[0].ParentSheetIndex, (int)current.X, (int)current.Y, who, false, location))
+                        if (hd.plant(Base.attachments[0].ParentSheetIndex, (int)current.X, (int)current.Y, who, false, location))
                         {
-                            attachments[0].Stack--;
-                            if (attachments[0].Stack == 0)
+                            Base.attachments[0].Stack--;
+                            if (Base.attachments[0].Stack == 0)
                             {
-                                attachments[0] = null;
-                                Game1.showRedMessage(SeedBagMod.i18n.Get("Out_Of_Seeds"));
+                                Base.attachments[0] = null;
+                                Game1.showRedMessage(Helper.ModHelper.Translation.Get("Out_Of_Seeds"));
                                 break;
                             }
                         }
                     }
                 }
             }
+        }
+       
+
+        public static GenericTool GetNew(IPlatoHelper helper, Tool tool = null)
+        {
+            var newTool = new GenericTool();
+            newTool.attachments.SetCount(2);
+            newTool.numAttachmentSlots.Value = attSlots;
+            if (tool != null && tool.attachments.Length > 1)
+            {
+                newTool.attachments[0] = tool.attachments[0];
+                newTool.attachments[1] = tool.attachments[1];
+            }
+            newTool.initialParentTileIndex.Value = TileIndex;
+            newTool.currentParentTileIndex.Value = TileIndex;
+            newTool.instantUse.Value = false;
+            newTool.indexOfMenuItemView.Value = TileIndex;
+            newTool.upgradeLevel.Value = 4;
+            newTool.description = GetDescriptor(helper,newTool);
+            newTool.netName.Set("Plato:IsSeedBagTool=true");
+            return newTool;
+        }
+
+        internal static string GetDescriptor(IPlatoHelper helper, Tool tool)
+        {
+            if (tool.attachments.Count > 0)
+            {
+                if (tool.attachments[0] != null)
+                {
+                    return tool.attachments[0].name;
+                }
+
+                if (tool.attachments[1] != null)
+                {
+                    return tool.attachments[1].name;
+                }
+            }
+
+            return helper.ModHelper.Translation.Get("Empty");
         }
 
         public override string getDescription()
         {
-            if (attachments.Count > 0)
-            {
-                if (attachments[0] != null)
-                {
-                    return attachments[0].name;
-                }
-
-                if (attachments[1] != null)
-                {
-                    return attachments[1].name;
-                }
-
-                string text = description;
-                SpriteFont smallFont = Game1.smallFont;
-                int width = Game1.tileSize * 4 + Game1.tileSize / 4;
-                return Game1.parseText(text, smallFont, width);
-            }
-            else
-            {
-                string text = description;
-                SpriteFont smallFont = Game1.smallFont;
-                int width = Game1.tileSize * 4 + Game1.tileSize / 4;
-                return Game1.parseText(text, smallFont, width);
-            }
-
+            return GetDescriptor(Helper, Base);
         }
 
-        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
+        protected override string loadDescription()
         {
-            return new SeedBagTool();
+            return getDescription();
         }
+
+        protected override string loadDisplayName()
+        {
+            return DisplayName;
+        }
+
+        public override void drawAttachments(SpriteBatch b, int x, int y)
+        {
+            int offset = 65;
+            b.Draw(AttTexture, new Vector2(x, y), null, Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
+            b.Draw(Att2Texture, new Vector2(x, y + offset), null, Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.86f);
+
+            if (Base == null)
+                return;
+
+            if (Base.attachments.Count() > 0)
+            {
+                if (Base.attachments[0] is StardewValley.Object)
+                    Base.attachments[0].drawInMenu(b, new Vector2(x, y), 1f);
+
+                if (Base.attachments[1] is StardewValley.Object)
+                    Base.attachments[1].drawInMenu(b, new Vector2(x, y + offset), 1f);
+            }
+
+        }
+        
     }
 }
