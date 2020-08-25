@@ -210,11 +210,11 @@ namespace PelicanTTS
                 config.Rate = (int) s;
             }, 50, 200);
 
-                instance.Patch(Type.GetType("GenericModConfigMenu.UI.Dropdown, GenericModConfigMenu").GetMethod("Update"), new HarmonyMethod(typeof(PelicanTTSMod).GetMethod("UpdateGMCM")));
+            /*    instance.Patch(Type.GetType("GenericModConfigMenu.UI.Dropdown, GenericModConfigMenu").GetMethod("Update"), new HarmonyMethod(typeof(PelicanTTSMod).GetMethod("UpdateGMCM")));
                 instance.Patch(Type.GetType("GenericModConfigMenu.UI.Dropdown, GenericModConfigMenu").GetMethod("Draw"), new HarmonyMethod(typeof(PelicanTTSMod).GetMethod("DrawGMCM")));
                 instance.Patch(Type.GetType("GenericModConfigMenu.UI.Table, GenericModConfigMenu").GetMethod("Update"), new HarmonyMethod(typeof(PelicanTTSMod).GetMethod("UpdateTableGMCM")));
                 instance.Patch(Type.GetType("GenericModConfigMenu.UI.Scrollbar, GenericModConfigMenu").GetMethod("Scroll"), new HarmonyMethod(typeof(PelicanTTSMod).GetMethod("ScrollGMCM")));
-            
+            */
 
             Helper.Events.Input.MouseWheelScrolled += (s, e) =>
                 {
@@ -230,7 +230,6 @@ namespace PelicanTTS
 
                 api.RegisterLabel(ModManifest, "Voices", "Set the voices for each NPC");
                 int index = 2;
-
 
                 foreach (var npc in config.Voices.Keys.OrderBy(k => k))
                 {
@@ -267,8 +266,48 @@ namespace PelicanTTS
 
                 for (int i = 0; i < 12; i++)
                     api.RegisterLabel(ModManifest, " ", " ");
-            
 
+            api.SubscribeToChange(ModManifest, new Action<string, string>((key, value) =>
+            {
+                if (key.EndsWith("Voice"))
+                {
+                    string character = key.Split(' ')[0];
+
+                    if (value == "Default")
+                        value = SpeechHandlerPolly.getVoice(character);
+                    var mvs = activeVoiceSetup.Values.FirstOrDefault(avs => avs.Name == character);
+
+                    var intro = character;
+                    if (intro == "Default")
+                        intro = i18n.Get("FestivalGreeting");
+                    else
+                    {
+                        var dialogues = _helper.Content.Load<Dictionary<string, string>>(@"Characters/Dialogue/" + character, ContentSource.GameContent);
+                        if (dialogues != null && dialogues.ContainsKey("Introduction"))
+                            intro = dialogues["Introduction"].Split('^')[0].Split('#')[0].Replace("@", "");
+                    }
+                    SpeechHandlerPolly.configSay(character, value, intro, activeRate, mvs is MenuVoiceSetup ? mvs.Pitch : -1, activeVolume);
+                }
+
+            }));
+
+            api.SubscribeToChange(ModManifest, new Action<string, int>((key, value) =>
+            {
+                if (key.Contains("Rate"))
+                    activeRate = value;
+            }));
+
+            api.SubscribeToChange(ModManifest, new Action<string, float>((key, value) =>
+            {
+                if (key.EndsWith("Pitch"))
+                {
+                    string character = key.Split(' ')[0];
+                    var mvs = activeVoiceSetup.Values.First(avs => avs.Name == character);
+                    mvs.Pitch = (float)Math.Ceiling((double)(value * 100)) / 100f;
+                }
+                else if (key.Contains("Volume"))
+                    activeVolume = (float)Math.Ceiling((double)(value * 100)) / 100f;
+            }));
         }
 
         public static void receiveChatMessage(ChatBox __instance, long sourceFarmer, int chatKind, LocalizedContentManager.LanguageCode language, string message)

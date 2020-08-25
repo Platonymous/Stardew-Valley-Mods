@@ -12,10 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Core" Version="3.3.106.1" />
-    <PackageReference Include="AWSSDK.Polly" Version="3.3.103.68" />
+    <PackageReference Include="AWSSDK.Core" Version="3.5.0-beta" />
+    <PackageReference Include="AWSSDK.Polly" Version="3.5.0-beta" />
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-    <PackageReference Include="Platonymous.Ogg2XNA" Version="1.0.0" />
+    <PackageReference Include="Platonymous.Ogg2XNA" Version="1.1.0" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
