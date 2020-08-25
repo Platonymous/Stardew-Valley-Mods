@@ -94,6 +94,66 @@ namespace PyTK.Extensions
             return result;
         }
 
+        public static Texture2D trim(this Texture2D t)
+        {
+            Color[] data = new Color[t.Width * t.Height];
+            t.GetData(data);
+
+            int trimX = -1;
+            int trimY = -1;
+            int trimX2 = -1;
+            int trimY2 = -1;
+
+            for (int x = 0; x < t.Width; x++)
+                for (int y = 0; y < t.Height; y++)
+                    if (data[y * t.Width + x].A != 0)
+                    {
+                        if (trimX == -1 || x < trimX)
+                            trimX = x;
+
+                        if (trimY == -1 || y < trimY)
+                            trimY = y;
+                    }
+
+            for (int x = t.Width - 1; x > -1; x--)
+                for (int y = t.Height -1 ; y > -1; y--)
+                    if (data[y * t.Width + x].A != 0)
+                    {
+                        if (trimX2 == -1 || x > trimX2)
+                            trimX2 = x;
+
+                        if (trimY2 == -1 || y > trimY2)
+                            trimY2 = y;
+                    }
+
+            int trimW = trimX2 - trimX;
+            int trimH = trimY2 - trimY;
+
+            Texture2D result = t.getArea(new Rectangle(trimX,trimY,trimW,trimH));
+            return result;
+        }
+
+        public static Texture2D setArea(this Texture2D t, Point target, Texture2D texture)
+        {
+            Color[] data = new Color[t.Width * t.Height];
+            t.GetData(data);
+            int w = texture.Width;
+            int h = texture.Height;
+            Color[] data2 = new Color[w * h];
+            texture.GetData(data2);
+
+            int x2 = target.X;
+            int y2 = target.Y;
+
+            for (int x = x2; x < w + x2; x++)
+                for (int y = y2; y < h + y2; y++)
+                    data[y * t.Width + x] = data2[(y - y2) * w + (x - x2)];
+
+            Texture2D result = new Texture2D(t.GraphicsDevice, t.Width, t.Height);
+            result.SetData(data);
+            return result;
+        }
+
         public static Texture2D getTile(this Texture2D t, int index, int tileWidth = 16, int tileHeight = 16)
         {
             if (t == null)

@@ -14,19 +14,25 @@ namespace PyTK.Types
 {
     public class PyDisplayDevice : IDisplayDevice
     {
-        private ContentManager m_contentManager;
-        private GraphicsDevice m_graphicsDevice;
-        private Vector2 m_tilePosition;
-        private Microsoft.Xna.Framework.Rectangle m_sourceRectangle;
-        private SpriteBatch m_spriteBatchAlpha;
-        private Color m_modulationColour;
-        private DrawInstructions m_instructions;
-        private Dictionary<TileSheet, Texture2D> m_tileSheetTextures2;
-        private bool adjustOrigin = false;
+        protected ContentManager m_contentManager;
+        protected GraphicsDevice m_graphicsDevice;
+        protected Vector2 m_tilePosition;
+        protected Microsoft.Xna.Framework.Rectangle m_sourceRectangle;
+        protected SpriteBatch m_spriteBatchAlpha;
+        protected Color m_modulationColour;
+        protected DrawInstructions m_instructions;
+        protected Dictionary<TileSheet, Texture2D> m_tileSheetTextures2;
+        protected bool adjustOrigin = false;
 
-        public PyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice, bool compatability = false)
+        public PyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice)
+            : this(contentManager, graphicsDevice, false)
         {
-            adjustOrigin = compatability;
+
+        }
+
+        public PyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice, bool compatibility)
+        {
+            adjustOrigin = compatibility;
             this.m_contentManager = contentManager;
             this.m_graphicsDevice = graphicsDevice;
             this.m_spriteBatchAlpha = new SpriteBatch(graphicsDevice);
@@ -36,17 +42,17 @@ namespace PyTK.Types
             this.m_modulationColour = Color.White;
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
             m_tileSheetTextures2.Clear();
         }
 
-        public void BeginScene(SpriteBatch b)
+        public virtual void BeginScene(SpriteBatch b)
         {
             m_spriteBatchAlpha = b;
         }
 
-        public Texture2D GetTexture(TileSheet tilesheet)
+        public virtual Texture2D GetTexture(TileSheet tilesheet)
         {
             if (m_tileSheetTextures2.TryGetValue(tilesheet, out Texture2D texture))
                 return texture;
@@ -60,12 +66,12 @@ namespace PyTK.Types
             }
         }
 
-        public void DisposeTileSheet(TileSheet tileSheet)
+        public virtual void DisposeTileSheet(TileSheet tileSheet)
         {
             m_tileSheetTextures2.Remove(tileSheet);
         }
 
-        public void DrawTile(Tile tile, Location location, float layerDepth)
+        public virtual void DrawTile(Tile tile, Location location, float layerDepth)
         {
             if (tile == null)
                 return;
@@ -110,7 +116,7 @@ namespace PyTK.Types
             layerDepth);
         }
 
-        private Vector2 GetOffsetForFlippedTile(int rotation)
+        protected virtual Vector2 GetOffsetForFlippedTile(int rotation)
         {
             Vector2 offset = Vector2.Zero;
 
@@ -126,12 +132,12 @@ namespace PyTK.Types
             return offset;
         }
 
-        public void EndScene()
+        public virtual void EndScene()
         {
-            
+
         }
 
-        public void LoadTileSheet(TileSheet tileSheet)
+        public virtual void LoadTileSheet(TileSheet tileSheet)
         {
             try
             {
@@ -175,7 +181,7 @@ namespace PyTK.Types
             }
         }
 
-        public void SetClippingRegion(xTile.Dimensions.Rectangle clippingRegion)
+        public virtual void SetClippingRegion(xTile.Dimensions.Rectangle clippingRegion)
         {
             int backBufferWidth = this.m_graphicsDevice.PresentationParameters.BackBufferWidth;
             int backBufferHeight = this.m_graphicsDevice.PresentationParameters.BackBufferHeight;
@@ -187,7 +193,7 @@ namespace PyTK.Types
             int height = num2 - y;
             this.m_graphicsDevice.Viewport = new Viewport(x, y, width, height);
         }
-        private int Clamp(int nValue, int nMin, int nMax)
+        protected virtual int Clamp(int nValue, int nMin, int nMax)
         {
             return Math.Min(Math.Max(nValue, nMin), nMax);
         }

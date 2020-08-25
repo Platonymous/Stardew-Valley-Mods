@@ -44,19 +44,25 @@ namespace PyTK.Overrides
                     return AccessTools.Method(PyUtils.getTypeSDV("Game1"), "getSourceRectForStandardTileSheet");
                 }
 
-                internal static bool Prefix(Texture2D tileSheet, int tilePosition, int width, int height, ref Rectangle __result, ref bool __state)
+            internal static bool Prefix(Texture2D tileSheet, int tilePosition, int width, int height, ref Rectangle __result, ref bool __state)
+            {
+                if (tileSheet == null)
                 {
-                    string id = tileSheet.Width + "." + tileSheet.Height + "." + width + "." + height;
                     __state = true;
-
-                    if (rectangleCache.ContainsKey(id) && rectangleCache[id].ContainsKey(tilePosition))
-                    {
-                        __result = rectangleCache[id][tilePosition];
-                        __state = false;
-                    }
-
                     return __state;
                 }
+
+                string id = tileSheet.Width + "." + tileSheet.Height + "." + width + "." + height;
+                __state = true;
+
+                if (rectangleCache.ContainsKey(id) && rectangleCache[id].ContainsKey(tilePosition))
+                {
+                    __result = rectangleCache[id][tilePosition];
+                    __state = false;
+                }
+
+                return __state;
+            }
 
                 internal static void Postfix(Texture2D tileSheet, int tilePosition, int width, int height, ref Rectangle __result, ref bool __state)
                 {

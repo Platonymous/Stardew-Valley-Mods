@@ -295,6 +295,37 @@ namespace PyTK.CustomElementHandler
             return dataString.Split(seperator);
         }
 
+        public static Dictionary<string, string> parseDataString(object o)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+
+            if (!SaveHandler.isRebuildable(o))
+                return data;
+
+            string dataString = SaveHandler.getDataString(o);
+
+            if (!dataString.StartsWith(newPrefix))
+                return data;
+
+            string[] dataParts = splitElemets(dataString);
+
+            if (dataParts.Length < 3)
+                return data;
+
+            data.Add("@Type", dataParts[2]);
+
+            if (dataParts.Length > 3)
+                for (int i = 3; i < dataParts.Length; i++)
+                {
+                    if (!dataParts[i].Contains(valueSeperator))
+                        continue;
+                    string[] entry = dataParts[i].Split(valueSeperator);
+                    data.Add(entry[0], entry[1]);
+                }
+
+            return data;
+        }
+
         public static object rebuildElement(string dataString, object replacement)
         {
             if (!dataString.StartsWith(newPrefix))

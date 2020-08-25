@@ -59,7 +59,7 @@ namespace PyTK.Overrides
             if (texture is AnimatedTexture2D animTex)
                 animTex.Tick();
 
-            if (texture is MappedTexture2D mapped && mapped.GetPair(sourceRectangle) is KeyValuePair<Rectangle?,Texture2D> pair && pair.Key.HasValue)
+            if (texture is MappedTexture2D mapped && mapped.GetPair(sourceRectangle) is KeyValuePair<Rectangle?, Texture2D> pair && pair.Key.HasValue)
             {
                 __instance.Draw(pair.Value, destinationRectangle, pair.Key, color, rotation, origin, effects, layerDepth);
                 return false;
@@ -70,7 +70,7 @@ namespace PyTK.Overrides
                 if (s.AsOverlay)
                 {
                     skip = true;
-                    __instance.Draw(texture, destinationRectangle, sourceRectangle, color, rotation, origin, effects, Math.Max(layerDepth - 0.00001f,0f));
+                    __instance.Draw(texture, destinationRectangle, sourceRectangle, color, rotation, origin, effects, Math.Max(layerDepth - 0.00001f, 0f));
                 }
                 var newDestination = new Rectangle(destinationRectangle.X, destinationRectangle.Y, (int)(destinationRectangle.Width), (int)(destinationRectangle.Height));
                 var newSR = new Rectangle?(new Rectangle((int)(r.X * s.Scale), (int)(r.Y * s.Scale), (int)(r.Width * s.Scale), (int)(r.Height * s.Scale)));
@@ -104,7 +104,7 @@ namespace PyTK.Overrides
 
         public static bool Draw(SpriteBatch __instance, Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, SpriteEffects effects, float layerDepth)
         {
-            return DrawFix(__instance, texture, destinationRectangle, sourceRectangle, color,origin, rotation, effects, layerDepth);
+            return DrawFix(__instance, texture, destinationRectangle, sourceRectangle, color, origin, rotation, effects, layerDepth);
         }
         public static bool Draw(SpriteBatch __instance, Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
         {

@@ -85,7 +85,7 @@ namespace PyTK
             PreSerializer.Add(ModManifest, Replacer);
 
             harmonyFix();
-            
+
             initializeResponders();
             startResponder();
             registerConsoleCommands();
@@ -128,15 +128,7 @@ namespace PyTK
             {
                 updateTicked = e;
             };
-/*
-            helper.Events.Player.Warped += (s, e) =>
-            {
-                if(e.NewLocation is GameLocation l && l.Map is Map map)
-                {
-                    ShowMapData(map);
-                }
-            };
-            */
+              
             this.Helper.Events.Player.Warped += Player_Warped;
             this.Helper.Events.GameLoop.DayStarted += OnDayStarted;
             this.Helper.Events.Multiplayer.PeerContextReceived += (s, e) =>
@@ -291,6 +283,25 @@ namespace PyTK
 
             e.NewLocation?.Map.enableMoreMapLayers();
 
+            if (e.NewLocation is GameLocation loc && loc.waterTiles == null && loc.Map.Properties.TryGetValue("@LoadWater", out xTile.ObjectModel.PropertyValue value) && (value == true || value.ToString() == "T"))
+            {
+                loc.waterTiles = new bool[loc.map.Layers[0].LayerWidth, loc.map.Layers[0].LayerHeight];
+                bool flag = false;
+                for (int xTile = 0; xTile < loc.map.Layers[0].LayerWidth; ++xTile)
+                {
+                    for (int yTile = 0; yTile < loc.map.Layers[0].LayerHeight; ++yTile)
+                    {
+                        if (loc.doesTileHaveProperty(xTile, yTile, "Water", "Back") != null)
+                        {
+                            flag = true;
+                            loc.waterTiles[xTile, yTile] = true;
+                        }
+                    }
+                }
+                if (!flag)
+                    loc.waterTiles = (bool[,])null;
+            }
+
             if (e.NewLocation is GameLocation g && g.map is Map m)
             {
                 int forceX = Game1.player.getTileX();
@@ -329,8 +340,6 @@ namespace PyTK
         private void harmonyFix()
         {
             OvSpritebatchNew.initializePatch(instance);
-            // PyUtils.initOverride("SObject", PyUtils.getTypeSDV("Object"),typeof(DrawFix1), new List<string>() { "draw", "drawInMenu", "drawWhenHeld", "drawAsProp" });
-            // PyUtils.initOverride("TemporaryAnimatedSprite", PyUtils.getTypeSDV("TemporaryAnimatedSprite"),typeof(DrawFix2), new List<string>() { "draw" });
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("Load", BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
             PatchGeneratedSerializers(new Assembly[] { Assembly.GetExecutingAssembly() });
@@ -361,7 +370,7 @@ namespace PyTK
                original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "NormalizeTilesheetPaths"),
                postfix: new HarmonyMethod(this.GetType().GetMethod("NormalizeTilesheetPaths", BindingFlags.Public | BindingFlags.Static))
            );
-          
+
             setupLoadIntercepter(instance);
         }
 
@@ -375,13 +384,18 @@ namespace PyTK
 
         public static void NormalizeTilesheetPaths(Map map)
         {
+
             excludeTileSheetsFromModFolder.Clear();
 
             if (!map.TileSheets.Any())
                 return;
 
+
             foreach (xTile.Tiles.TileSheet tilesheet in map.TileSheets)
             {
+                /*foreach (var porp in tilesheet.Properties)
+                    _monitor?.Log("Prop:" + porp.Key + ":" + porp.Value, LogLevel.Info);*/
+
                 if ((tilesheet.Properties.TryGetValue("@Vanilla", out xTile.ObjectModel.PropertyValue vanillaProperty) && vanillaProperty != null) ||
                     (tilesheet.Properties.TryGetValue("@IgnoreLocalFile", out xTile.ObjectModel.PropertyValue ignoreProperty) && ignoreProperty != null))
                 {
@@ -394,7 +408,6 @@ namespace PyTK
                         || filename.StartsWith("winter_", StringComparison.CurrentCultureIgnoreCase);
                     if (isOutdoors && isSeasonal)
                         filename = $"{Game1.currentSeason}_{filename.Substring(filename.IndexOf("_", StringComparison.CurrentCultureIgnoreCase) + 1)}";
-
                     excludeTileSheetsFromModFolder.AddOrReplace(filename);
                 }
             }
@@ -451,7 +464,7 @@ namespace PyTK
 
         public static void FileStreamConstructorPre(ref string path)
         {
-            if (path.Contains(@"Maps/Maps"))
+            if (path.Contains(@"Maps/Maps") && !path.Contains("assets"))
                 path = path.Replace(@"Maps/Maps", "Maps");
 
             openPath = path;
