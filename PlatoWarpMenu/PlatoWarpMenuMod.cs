@@ -12,6 +12,7 @@ using PlatoTK;
 using PlatoTK.UI.Components;
 using PlatoTK.UI;
 using Microsoft.Xna.Framework;
+using StardewValley.Locations;
 
 namespace PlatoWarpMenu
 {
@@ -35,6 +36,8 @@ namespace PlatoWarpMenu
         internal static Queue<GameLocation> locations = new Queue<GameLocation>();
 
         internal static string tempFolder;
+
+        internal static IMapAPI pytk = null;
         public override void Entry(IModHelper helper)
         {
             instance = this;
@@ -59,16 +62,19 @@ namespace PlatoWarpMenu
                         OpenUpMenu();
                     }, appIcon);
                 }
+
+                if (Helper.ModRegistry.GetApi<IMapAPI>("Platonymous.Toolkit") is IMapAPI pApi)
+                    pytk = pApi;
             };
 
-            var harmony = Harmony.HarmonyInstance.Create("Platonymous.PlatoWarpMenu");
+            var harmony = HarmonyInstance.Create("Platonymous.PlatoWarpMenu");
             bool patched = false;
 
             if (!config.CompatibilityMode || Constants.TargetPlatform == GamePlatform.Android)
             {
                 try
                 {
-                    harmony.Patch(Type.GetType("System.Drawing.Image, System.Drawing").GetMethod("Save", new Type[] { typeof(string), Type.GetType("System.Drawing.Imaging.ImageFormat, System.Drawing") }), prefix: new Harmony.HarmonyMethod(this.GetType().GetMethod("InterceptScreenshot", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)));
+                    harmony.Patch(Type.GetType("System.Drawing.Image, System.Drawing").GetMethod("Save", new Type[] { typeof(string), Type.GetType("System.Drawing.Imaging.ImageFormat, System.Drawing") }), prefix: new HarmonyMethod(this.GetType().GetMethod("InterceptScreenshot", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)));
                     patched = true;
                 }
                 catch
@@ -76,6 +82,24 @@ namespace PlatoWarpMenu
 
                 }
             }
+
+            var displayDevice = Game1.mapDisplayDevice;
+
+            helper.Events.GameLoop.UpdateTicked += (s, e) =>
+            {
+                displayDevice = Game1.mapDisplayDevice;
+            };
+
+            helper.Events.GameLoop.UpdateTicking += (s, e) =>
+            {
+                if (Game1.activeClickableMenu is IUIMenu uim)
+                {
+                    uim.ShouldDraw = () =>
+                    {
+                       return Game1.mapDisplayDevice == displayDevice;
+                    };
+                }
+            };
         }
 
         public void OpenUpMenu()
@@ -129,6 +153,11 @@ namespace PlatoWarpMenu
                 }
             };
 
+            Action<IComponent> closeMenu = (c) =>
+             {
+                 Game1.activeClickableMenu = null;
+             };
+
             
             bool loaded = false;
 
@@ -145,8 +174,10 @@ namespace PlatoWarpMenu
 
             Action<IComponent> warpTo = (c) =>
             {
-                if (tLocation is GameLocation && selectedTile.X != -1)
+                if (tLocation is GameLocation)
                 {
+                    if (selectedTile.X == -1)
+                        selectedTile = new Point(tLocation.Map.GetLayer("Back").TileWidth / 2, tLocation.Map.GetLayer("Back").TileHeight / 2);
                     Game1.warpFarmer(tLocation.isStructure.Value ? tLocation.uniqueName.Value : tLocation.Name, selectedTile.X, selectedTile.Y, Game1.player.FacingDirection, tLocation.isStructure.Value);
                     Game1.activeClickableMenu = null;
                 }
@@ -254,6 +285,7 @@ namespace PlatoWarpMenu
             wrapper.Set("LocationImage", getLocationImage);
             wrapper.Set("WarpSpot", getWarpText);
             wrapper.Set("WarpTo", warpTo);
+            wrapper.Set("CloseMenu", closeMenu);
 
 
             Game1.activeClickableMenu = Helper.GetPlatoHelper().UI.OpenMenu(wrapper);
@@ -366,20 +398,26 @@ namespace PlatoWarpMenu
 
             List<string> locations = new List<string>();
 
-            Func<GameLocation, bool> inGroup = (l) => l.map.Properties.ContainsKey("Group") && menuEntries.Contains(l.map.Properties["Group"].ToString());
+            Func<GameLocation, bool> inGroup = (l) => l.map.Properties.ContainsKey("Group");
 
             if (set == i18n.Get("menu.outdoors"))
-                locations = Game1.locations.Where(l => !inGroup(l) && l.IsOutdoors && !(l.IsFarm || l.IsGreenhouse)).Select(g => g.Name).ToList();
+                locations = Game1.locations.Where(l => !inGroup(l) && l.IsOutdoors && !(l.IsFarm || l.IsGreenhouse)).Select(g => g.NameOrUniqueName).ToList();
             else if (set == i18n.Get("menu.indoors"))
-                locations = Game1.locations.Where(l => !inGroup(l) && !l.IsOutdoors && !(l.IsFarm || l.IsGreenhouse)).Select(g => g.Name).ToList();
+                locations = Game1.locations.Where(l => !inGroup(l) && !l.IsOutdoors && !(l.IsFarm || l.IsGreenhouse)).Select(g => g.NameOrUniqueName).ToList();
             else if (set == i18n.Get("menu.buildings"))
-                locations = Game1.locations.Where(l => !inGroup(l) && l.isStructure.Value).Select(g => g.uniqueName.Value).ToList();
+            {
+                locations = Game1.locations.Where(l => l is BuildableGameLocation)
+                    .SelectMany(bgl => (bgl as BuildableGameLocation).buildings)
+                    .Where(b => b.indoors.Value is GameLocation)
+                    .Select(b => b.indoors.Value.NameOrUniqueName)
+                    .ToList();
+            }
             else if (set == i18n.Get("menu.farm"))
-                locations = Game1.locations.Where(l => !inGroup(l) && l.IsFarm || l.IsGreenhouse).Select(g => g.Name).ToList();
+                locations = Game1.locations.Where(l => l.IsFarm || l.IsGreenhouse).Select(g => g.NameOrUniqueName).ToList();
             else if (set == i18n.Get("menu.artifacts"))
-                locations = Game1.locations.Where(l => l.Objects.Values.FirstOrDefault(o => o.ParentSheetIndex == 590) is StardewValley.Object).Select(g => g.Name).ToList();
+                locations = Game1.locations.Where(l => l.Objects.Values.FirstOrDefault(o => o.ParentSheetIndex == 590) is StardewValley.Object).Select(g => g.NameOrUniqueName).ToList();
             else if (set == i18n.Get("menu.farm"))
-                locations = Game1.locations.Where(l => !inGroup(l) && l.IsFarm || l.IsGreenhouse).Select(g => g.Name).ToList();
+                locations = Game1.locations.Where(l => l.IsFarm || l.IsGreenhouse).Select(g => g.NameOrUniqueName).ToList();
             else if (set == i18n.Get("menu.characters"))
             {
                 locations = new List<string>();
@@ -388,7 +426,7 @@ namespace PlatoWarpMenu
                         locations.Add(character.Name);
             }
             else
-                locations = Game1.locations.Where(l => inGroup(l) && l.map.Properties["Group"].ToString() == template.Id).Select(g => g.Name).ToList();
+                locations = Game1.locations.Where(l => inGroup(l) && l.map.Properties["Group"].ToString().Equals(set)).Select(g => g.NameOrUniqueName).ToList();
 
             List<IComponent> menuItems = new List<IComponent>();
 
@@ -446,44 +484,6 @@ namespace PlatoWarpMenu
             });
         }
 
-
-        private static void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)
-        {
-            _helper.Events.Display.RenderedWorld -= Display_RenderedWorld;
-            intercept = true;
-            var g = Game1.currentLocation;
-            var priorColor = Game1.ambientLight;
-            bool priorLight = Game1.drawLighting;
-            Game1.ambientLight = Microsoft.Xna.Framework.Color.White;
-            Game1.drawLighting = false;
-            
-            _helper.GetPlatoHelper().SetDelayedAction(2, () => {
-                Game1.ambientLight = priorColor;
-                Game1.drawLighting = priorLight;
-            }
-            );
-            Game1.currentLocation = CurrentLocation;
-            try
-            {
-                Game1.spriteBatch.End();
-                if (!instance.config.CompatibilityMode && Constants.TargetPlatform != GamePlatform.Android)
-                    Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name);
-                else
-                {
-                    var fix = new ScreenshotAndroidFix();
-                    fix.takeMapScreenshot(Game1.game1, 0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name);
-                }
-                Game1.spriteBatch.Begin();
-            }
-            catch
-            {
-
-            }
-            Game1.currentLocation = g;
-            intercept = false;
-            Callback?.Invoke();
-        }
-
         public static void Display_Rendered(object sender, RenderedActiveMenuEventArgs e)
         {
             intercept = true;
@@ -499,7 +499,10 @@ namespace PlatoWarpMenu
             }
             );
 
-            Game1.currentLocation = CurrentLocation;
+            Game1.currentLocation = CurrentLocation; 
+            Game1.currentLocation.resetForPlayerEntry();
+            pytk?.EnableMoreMapLayers(Game1.currentLocation.Map);
+
             try
             {
                 try { 

@@ -22,5 +22,6 @@
     <Text Id="WarpInfo" X ="0" Y="0" Content="call>WarpSpot" Font="menufont2" Align="center center" TextScale="0.8" TextColor="#ffffffff"></Text>
       </Box>
     </Box>
-  </Box> 
+  </Box>
+    <Text OnClick="CloseMenu" X="-60" Y="10" ID="CloseBtnText" Font="menufont2" Content="X" TextScale="0.8" TextColor="#66000000,hover:#ffffffff"></Text>
 </Box>

@@ -347,7 +347,24 @@ namespace PlatoWarpMenu
                                 string messageToScreen = Game1.currentLocation.currentEvent.messageToScreen;
                             }
 
-                            Game1.mapDisplayDevice.BeginScene(Game1.spriteBatch);
+                            if (Game1.currentLocation.Name.Equals("Farm"))
+                            {
+                                if (Game1.player.CoopUpgradeLevel > 0)
+                                    Game1.spriteBatch.Draw(Game1.currentCoopTexture, Game1.GlobalToLocal(Game1.viewport, new Vector2(1280f, 320f)), new Microsoft.Xna.Framework.Rectangle?(Game1.currentCoopTexture.Bounds), Microsoft.Xna.Framework.Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, Math.Max(0.0f, 0.0576f));
+                                switch (Game1.player.BarnUpgradeLevel)
+                                {
+                                    case 1:
+                                        Game1.spriteBatch.Draw(Game1.currentBarnTexture, Game1.GlobalToLocal(Game1.viewport, new Vector2(768f, 320f)), new Microsoft.Xna.Framework.Rectangle?(Game1.currentBarnTexture.Bounds), Microsoft.Xna.Framework.Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, Math.Max(0.0f, 0.0576f));
+                                        break;
+                                    case 2:
+                                        Game1.spriteBatch.Draw(Game1.currentBarnTexture, Game1.GlobalToLocal(Game1.viewport, new Vector2(640f, 256f)), new Microsoft.Xna.Framework.Rectangle?(Game1.currentBarnTexture.Bounds), Microsoft.Xna.Framework.Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, Math.Max(0.0f, 0.0576f));
+                                        break;
+                                }
+                                if (Game1.player.hasGreenhouse)
+                                    Game1.spriteBatch.Draw(Game1.greenhouseTexture, Game1.GlobalToLocal(Game1.viewport, new Vector2(64f, 320f)), new Microsoft.Xna.Framework.Rectangle?(Game1.greenhouseTexture.Bounds), Microsoft.Xna.Framework.Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, Math.Max(0.0f, 0.0576f));
+                            }
+
+                                Game1.mapDisplayDevice.BeginScene(Game1.spriteBatch);
                             Game1.currentLocation.Map.GetLayer("Front").Draw(Game1.mapDisplayDevice, Game1.viewport, xTile.Dimensions.Location.Origin, false, 4);
                             Game1.mapDisplayDevice.EndScene();
                             Game1.currentLocation.drawAboveFrontLayer(Game1.spriteBatch);
