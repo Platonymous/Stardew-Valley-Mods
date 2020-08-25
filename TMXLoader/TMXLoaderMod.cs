@@ -59,6 +59,8 @@ namespace TMXLoader
         internal static TMXLoaderMod _instance;
         internal static Mod faInstance;
 
+
+
         internal static bool contentPacksLoaded = false;
 
 
@@ -694,7 +696,6 @@ namespace TMXLoader
             settings.ConformanceLevel = ConformanceLevel.Auto;
 
             var inGame = Game1.getLocationFromName(loc.Name);
-
             if (inGame == null)
                 return false;
 
@@ -705,7 +706,7 @@ namespace TMXLoader
             {
                 try
                 {
-                    saved = (GameLocation)SaveGame.locationSerializer.Deserialize(reader);
+                    saved = (GameLocation)SerializationFix.SafeDeSerialize(reader, inGame);
                 }
                 catch (Exception e)
                 {
@@ -714,7 +715,6 @@ namespace TMXLoader
                     Monitor?.Log(e.StackTrace);
                     return false;
                 }
-
             }
 
             if (saved != null)
@@ -766,13 +766,34 @@ namespace TMXLoader
                         dl.setFloors();
                     }
                 }
+
+                if (inGame is IAnimalLocation al && saved is IAnimalLocation sal)
+                {
+                    al.Animals.Clear();
+                    foreach (var a in sal.Animals.FieldDict.Keys.Where(k => sal.Animals[k] is FarmAnimal))
+                    {
+                        al.Animals.Add(a, sal.Animals[a]);
+                    }
+                }
+
+                if (inGame is BuildableGameLocation bgl && saved is BuildableGameLocation sbgl)
+                {
+                    bgl.buildings.Clear();
+                    foreach (Building b in sbgl.buildings)
+                    {
+                        bgl.buildings.Add(b);
+                        b.load();
+                    }
+                }
             }
 
             //PyTK.CustomElementHandler.SaveHandler.RebuildAll(inGame, Game1.locations);
+            TMXLAPI.RaiseOnLocationRestoringEvent(inGame);
             inGame.DayUpdate(Game1.dayOfMonth);
             inGame.resetForPlayerEntry();
             return true;
         }
+
 
         private SaveLocation getLocationSaveData(GameLocation location)
         {
@@ -1091,8 +1112,9 @@ namespace TMXLoader
             return true;
         }
 
-        public static bool harvest(Crop __instance, int xTile, int yTile, JunimoHarvester junimoHarvester, ref bool __result)
+        public static bool harvest(Crop __instance, int xTile, int yTile, JunimoHarvester junimoHarvester, ref bool __result, ref bool __state)
         {
+            __state = false;
             if (!__instance.forageCrop.Value && (__instance.whichForageCrop.Value == -91 || __instance.whichForageCrop.Value == -90))
             {
                 __result = false;
@@ -1108,6 +1130,7 @@ namespace TMXLoader
                         {
                             tile.Properties["HarvestAction"] = layer.Properties["HarvestAction"];
                             TileAction.invokeCustomTileActions("HarvestAction", Game1.currentLocation, pos, layer.Id);
+                            __state = true;
                             break;
                         }
 
@@ -1117,18 +1140,23 @@ namespace TMXLoader
             return true;
         }
 
-        public static void harvestPost(Crop __instance, int xTile, int yTile)
+        public static void harvestPost(Crop __instance, int xTile, int yTile, ref bool __result, ref bool __state)
         {
+            if (__state || !__result)
+                return;
+
+
             if (!__instance.forageCrop.Value &&
                 (__instance.whichForageCrop.Value == -90 || __instance.whichForageCrop.Value == -91 || __instance.whichForageCrop.Value == -100 || __instance.whichForageCrop.Value == -101))
             {
-
                 Vector2 pos = new Vector2(xTile, yTile);
 
                 if (Game1.currentLocation.terrainFeatures.TryGetValue(pos, out TerrainFeature f)
                     && f is HoeDirt h
                     && (h.crop == null || (h.crop == __instance && __instance.regrowAfterHarvest.Value == -1)))
-                    Game1.currentLocation.terrainFeatures.Remove(pos);
+                {
+                    PyUtils.setDelayedAction(2,() => Game1.currentLocation.terrainFeatures.Remove(pos));
+                }
             }
         }
 
@@ -1381,7 +1409,12 @@ namespace TMXLoader
                                 if (crop != null)
                             {
                                 if (!crop.seasonsToGrowIn.Contains(Game1.currentSeason) && !ignoreSeason)
+                                {
+                                    if (location.terrainFeatures.ContainsKey(pos) && location.terrainFeatures[pos] is HoeDirt h)
+                                        location.terrainFeatures.Remove(pos);
+
                                     continue;
+                                }
 
                                 if (!canBeHarvested)
                                     crop.whichForageCrop.Value = hideSoil ? -91 : -90;
