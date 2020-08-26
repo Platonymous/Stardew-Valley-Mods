@@ -95,6 +95,34 @@ namespace Comics
                         itemPriceAndStock.Add(Frame.GetNew(ComicBook.GetNew(issue.Id.ToString())), new int[] { 100, 1 });
                     OpenComicsShop(itemPriceAndStock);
                 }, "OpenComicShop");
+
+                if (Helper.ModRegistry.GetApi<PlatoTK.APIs.ISerializerAPI>("Platonymous.Toolkit") is PlatoTK.APIs.ISerializerAPI pytk)
+                {
+                    pytk.AddPostDeserialization(ModManifest, (o) =>
+                    {
+                        if (o is Chest || o is Furniture)
+                        {
+                            var data = pytk.ParseDataString(o);
+
+                            if (data.ContainsKey("@Type"))
+                            {
+                                if (o is Chest && data["@Type"].Contains("ComicBook") && data.ContainsKey("nameData"))
+                                {
+                                    string id = data["nameData"].Split('>')[2];
+                                    Monitor.Log("Replaced Comicbook", LogLevel.Warn);
+                                    return ComicBook.GetNew(id);
+                                }
+                                else if (o is Furniture f && data["@Type"].Contains("Comics.Frame"))
+                                {
+                                    Monitor.Log("Replaced Frame", LogLevel.Warn);
+                                    return Frame.GetNew(f.heldObject.Value);
+                                }
+                            }
+                        }
+
+                        return o;
+                    });
+                }
             };
         }
 

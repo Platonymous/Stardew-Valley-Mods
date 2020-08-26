@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
 using PlatoTK;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
@@ -68,12 +69,16 @@ namespace SeedBag
 
         public override Item getOne()
         {
-            return GetNew(Helper, Base);
+            if(Base.attachments.Length > 1)
+                return GetNew(Helper, Base.attachments[0], Base.attachments[1]);
+
+            return GetNew(Helper);
         }
         public override bool canBeTrashed()
         {
             return true;
         }
+
         public override bool actionWhenPurchased()
         {
             Game1.playSound("parry");
@@ -81,8 +86,11 @@ namespace SeedBag
             var newBag = GetNew(Helper);
             Helper.SetTickDelayedUpdateAction(5, () =>
             {
-                Game1.player.holdUpItemThenMessage(newBag, true);
-                Game1.player.addItemByMenuIfNecessary(newBag);
+                if (!(Game1.player.hasItemInInventoryNamed(newBag.Name) || Game1.player.hasItemInInventoryNamed(DisplayName)))
+                {
+                    Game1.player.holdUpItemThenMessage(newBag, true);
+                    Game1.player.addItemByMenuIfNecessary(newBag);
+                }
             });
             return true;
         }
@@ -204,16 +212,17 @@ namespace SeedBag
         }
        
 
-        public static GenericTool GetNew(IPlatoHelper helper, Tool tool = null)
+        public static Tool GetNew(IPlatoHelper helper, StardewValley.Object seed = null, StardewValley.Object fertilizer = null)
         {
             var newTool = new GenericTool();
             newTool.attachments.SetCount(2);
             newTool.numAttachmentSlots.Value = attSlots;
-            if (tool != null && tool.attachments.Length > 1)
-            {
-                newTool.attachments[0] = tool.attachments[0];
-                newTool.attachments[1] = tool.attachments[1];
-            }
+            if (seed != null)
+                newTool.attachments[0] = seed;
+
+            if(fertilizer != null)
+                newTool.attachments[1] = fertilizer;
+
             newTool.initialParentTileIndex.Value = TileIndex;
             newTool.currentParentTileIndex.Value = TileIndex;
             newTool.instantUse.Value = false;

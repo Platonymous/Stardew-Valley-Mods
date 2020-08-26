@@ -4,6 +4,8 @@ using StardewModdingAPI.Events;
 using PlatoTK;
 using StardewValley;
 using StardewValley.Menus;
+using System.Linq;
+using StardewValley.Objects;
 
 namespace SeedBag
 {
@@ -42,8 +44,12 @@ namespace SeedBag
                 if (ev.NewMenu is ShopMenu shop && shop.portraitPerson.Name == config.Shop)
                 {
                     var sale = SeedBagTool.GetNew(platoHelper);
-                    shop.itemPriceAndStock.Add(sale, new int[2] { config.Price, 1 });
-                    shop.forSale.Add(sale);
+
+                    if (!shop.itemPriceAndStock.Keys.Any(k => k is Tool t && t.netName.Value.Contains("SeedBag") || k.DisplayName == sale.DisplayName || k.DisplayName == i18n.Get("Name")))
+                    {
+                        shop.itemPriceAndStock.Add(sale, new int[2] { config.Price, 1 });
+                        shop.forSale.Add(sale);
+                    }
                 }
             };
 
@@ -51,10 +57,17 @@ namespace SeedBag
             {
                 pytk.AddPostDeserialization(ModManifest, (o) =>
                 {
-                    var data = pytk.ParseDataString(o);
+                    if (o is Chest c)
+                    {
+                        var data = pytk.ParseDataString(o);
 
-                    if (data.ContainsKey("@Type") && data["@Type"].Contains("SeedBagTool"))
-                        return SeedBagTool.GetNew(platoHelper);
+                        if (data.ContainsKey("@Type") && data["@Type"].Contains("SeedBagTool"))
+                        {
+                            StardewValley.Object seed = (StardewValley.Object)c.items.FirstOrDefault(i => i.Category == -74);
+                            StardewValley.Object fertilizer = (StardewValley.Object)c.items.FirstOrDefault(i => i.Category == -19);
+                            return SeedBagTool.GetNew(platoHelper, seed, fertilizer);
+                        }
+                    }
 
                     return o;
                 });

@@ -254,7 +254,7 @@ namespace Comics
                 Data.Set("Name", $"{Volume} #{Number}");
                 Data.Set("Description", issue.Name + " (Comic Book)");
                 Data.Set("IsComicBookObject", true);
-                Helper.SetDelayedAction(1,() => checkLoad());
+                Helper.SetTickDelayedUpdateAction(1,() => checkLoad());
             }
         }
 
