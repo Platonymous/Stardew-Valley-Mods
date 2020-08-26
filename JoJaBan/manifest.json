@@ -1,7 +1,7 @@
 ﻿{
   "Name": "JoJaBan - Arcade Sokoban",
   "Author": "Platonymous",
-  "Version": "0.4.6",
+  "Version": "0.5.0",
   "Description": "Help JoJa clean up",
   "UniqueID": "Platonymous.JoJaBan",
   "EntryDll": "JoJaBan.dll",

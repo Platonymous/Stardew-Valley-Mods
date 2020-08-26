@@ -1,7 +1,7 @@
 {
   "Name": "Chess",
   "Author": "Platonymous",
-  "Version": "0.9.1",
+  "Version": "0.10.0",
   "Description": "Play Chess.",
   "UniqueID": "Platonymous.Chess",
   "EntryDll": "ChessBoard.dll",

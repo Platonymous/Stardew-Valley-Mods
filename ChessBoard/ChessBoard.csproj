@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="assets\mobile_app_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="i18n\de.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

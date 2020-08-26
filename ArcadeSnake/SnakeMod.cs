@@ -6,6 +6,7 @@ using PyTK.Extensions;
 using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
+using System.IO;
 
 namespace Snake
 {
@@ -27,6 +28,16 @@ namespace Snake
             helper.Events.GameLoop.GameLaunched += (o, e) =>
             {
                 sdata = new CustomObjectData("Snake", "Snake/0/-300/Crafting -9/Play 'Snake by Platonymous' at home!/true/true/0/Snake", helper.Content.Load<Texture2D>(@"Assets/arcade.png"), Color.White, bigCraftable: true, type: typeof(SnakeMachine));
+            
+                if (Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone") is IMobilePhoneApi api)
+                {
+                    Texture2D appIcon = Helper.Content.Load<Texture2D>(Path.Combine("assets", "mobile_app_icon.png"));
+                    bool success = api.AddApp(Helper.ModRegistry.ModID + "MobileSnake", "Snake", () =>
+                    {
+                        Game1.currentMinigame = new SnakeMinigame(helper);
+                    }, appIcon);
+                }
+
             };
             helper.Events.GameLoop.SaveLoaded += (o, e) =>
             {
@@ -43,6 +54,7 @@ namespace Snake
                 }
                 addToCatalogue();
             };
+
 
             helper.Events.GameLoop.Saving += (o, e) =>
             {

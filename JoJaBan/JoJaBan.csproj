@@ -19,6 +19,12 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="assets\mobile_app_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Import Project="$(SolutionDir)\common.targets" />
 
 </Project>

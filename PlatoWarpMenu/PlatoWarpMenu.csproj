@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-    <PackageReference Include="Platonymous.PlatoTK" Version="1.2.1" />
+    <PackageReference Include="Platonymous.PlatoTK" Version="1.2.6" />
   </ItemGroup>
 
   <ItemGroup>

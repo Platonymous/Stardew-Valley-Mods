@@ -7,6 +7,7 @@ using PyTK.Types;
 using StardewModdingAPI;
 using StardewValley;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ChessBoard
 {
@@ -94,6 +95,20 @@ namespace ChessBoard
                 if (Game1.IsMasterGame)
                     helper.Data.WriteSaveData("Platonymous.Chess", ChessGame.SavedGameData);
             };
+
+            helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+        }
+
+        private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
+        {
+            if (Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone") is IMobilePhoneApi api)
+            {
+                Texture2D appIcon = Helper.Content.Load<Texture2D>(Path.Combine("assets", "mobile_app_icon.png"));
+                bool success = api.AddApp(Helper.ModRegistry.ModID + "MobileChess", "Chess", () =>
+                {
+                    Game1.currentMinigame = new ChessGame("Mobile", true, Helper);
+                }, appIcon);
+            }
         }
 
         public static void SyncSession(Session session)

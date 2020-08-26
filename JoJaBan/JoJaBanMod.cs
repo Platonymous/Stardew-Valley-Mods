@@ -45,6 +45,16 @@ namespace JoJaBan
                 Texture2D townInterior = Helper.Content.Load<Texture2D>(@"Maps/townInterior", ContentSource.GameContent);
                 boxTexture = townInterior.getArea(new Rectangle(304, 1024, 16, 32));
                 boxData = new CustomObjectData("JoJa Box", "JoJa Box/0/-300/Crafting -9/JoJa Box/true/true/0/JoJa Box", boxTexture, Color.White, bigCraftable: true, type: typeof(JoJaBox));
+                
+                if (Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone") is IMobilePhoneApi api)
+                {
+                    Texture2D appIcon = Helper.Content.Load<Texture2D>(Path.Combine("assets", "mobile_app_icon.png"));
+                    bool success = api.AddApp(Helper.ModRegistry.ModID + "MobileJoJaBan", "JoJaBan", () =>
+                    {
+                        startGame("", null, Vector2.Zero, "");
+                    }, appIcon);
+                }
+
             };
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.GameLoop.SaveLoaded += (o, e) => addToCatalogue();
