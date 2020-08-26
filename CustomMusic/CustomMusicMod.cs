@@ -35,7 +35,7 @@ namespace CustomMusic
         internal const int simuMax = 8;
         internal const int slp = 500;
         internal List<ActiveMusic> CurrentEmitters = new List<ActiveMusic>();
-
+        public static SynthesizedSound Synth = new SynthesizedSound(form: WaveForm.Square, length: 15);
         public override void Entry(IModHelper helper)
         {
             config = helper.ReadConfig<Config>();
@@ -72,6 +72,14 @@ namespace CustomMusic
                   Monitor.Log("Playing: " + p[0], LogLevel.Info);
                   Game1.changeMusicTrack(p[0]);
               });
+
+            //helper.Events.Input.ButtonPressed += Input_ButtonPressed;
+        }
+
+        private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
+        {
+            if (e.Button == SButton.Y)
+                Synth.Play();
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e)
