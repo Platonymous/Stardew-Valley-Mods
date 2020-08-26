@@ -19,7 +19,7 @@
   <ItemGroup>
     <Reference Include="System.IO.Compression" />
   </ItemGroup>
-
+  
   <Import Project="$(SolutionDir)\common.targets" />
 
 </Project>
