@@ -16,7 +16,7 @@ namespace Comics
 
         public Frame()
         {
-
+            
         }
 
         public Frame(int which, Vector2 tile)

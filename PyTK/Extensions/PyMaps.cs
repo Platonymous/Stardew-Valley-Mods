@@ -107,6 +107,8 @@ namespace PyTK.Extensions
             return false;
         }
 
+        public static Dictionary<Layer, List<LayerEventHandler>> LayerHandlerList = new Dictionary<Layer, List<LayerEventHandler>>();
+
         public static Map enableMoreMapLayers(this Map map)
         {
             foreach (Layer layer in map.Layers)
@@ -114,17 +116,30 @@ namespace PyTK.Extensions
                 if (layer.Properties.ContainsKey("OffestXReset"))
                     layer.SetOffset(new Location(layer.Properties["OffestXReset"], layer.Properties["OffestYReset"]));
 
-                if (layer.Properties.Keys.Contains("DrawChecked"))
+                if (LayerHandlerList.ContainsKey(layer))
                     continue;
 
-                if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
-                    maplayer.AfterDraw += (s, e) => drawLayer(layer, layer.GetOffset(), layer.Properties.ContainsKey("WrapAround"));
-                else if (layer.Properties.ContainsKey("DrawAbove") && map.GetLayer(layer.Properties["DrawAbove"]) is Layer maplayerAbove)
-                    maplayerAbove.AfterDraw += (s, e) => drawLayer(layer, layer.GetOffset(), layer.Properties.ContainsKey("WrapAround"));
-                else if (layer.Properties.ContainsKey("DrawBefore") && map.GetLayer(layer.Properties["DrawBefore"]) is Layer maplayerBefore)
-                    maplayerBefore.BeforeDraw += (s, e) => drawLayer(layer, layer.GetOffset(), layer.Properties.ContainsKey("WrapAround"));
+                LayerHandlerList.Add(layer, new List<LayerEventHandler>());
 
-                layer.Properties["DrawChecked"] = true;
+                if (layer.Properties.ContainsKey("Draw") && map.GetLayer(layer.Properties["Draw"]) is Layer maplayer)
+                {
+                    LayerEventHandler l = (s, e) => drawLayer(layer, layer.GetOffset(), layer.Properties.ContainsKey("WrapAround"));
+                    maplayer.AfterDraw += l;
+                    LayerHandlerList[layer].Add(l);
+                }
+                else if (layer.Properties.ContainsKey("DrawAbove") && map.GetLayer(layer.Properties["DrawAbove"]) is Layer maplayerAbove)
+                {
+                    LayerEventHandler l = (s, e) => drawLayer(layer, layer.GetOffset(), layer.Properties.ContainsKey("WrapAround"));
+                    maplayerAbove.AfterDraw += l;
+                    LayerHandlerList[layer].Add(l);
+
+                }
+                else if (layer.Properties.ContainsKey("DrawBefore") && map.GetLayer(layer.Properties["DrawBefore"]) is Layer maplayerBefore)
+                {
+                    LayerEventHandler l = (s, e) => drawLayer(layer, layer.GetOffset(), layer.Properties.ContainsKey("WrapAround"));
+                    maplayerBefore.BeforeDraw += l;
+                    LayerHandlerList[layer].Add(l); ;
+                }
             }
             return map;
         }

@@ -96,15 +96,27 @@ namespace PyTK
             SaveHandler.setUpEventHandlers();
             CustomObjectData.CODSyncer.start();
             ContentSync.ContentSyncHandler.initialize();
-
+            bool adjustForCompat2 = false;
             helper.Events.GameLoop.GameLaunched += (s, e) =>
             {
 
                 if (xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
                     tmxf.DrawImageLayer = PyMaps.drawImageLayer;
 
-                bool adjustForCompat2 = helper.ModRegistry.IsLoaded("DigitalCarbide.SpriteMaster");
+                adjustForCompat2 = helper.ModRegistry.IsLoaded("DigitalCarbide.SpriteMaster");
                 Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
+            };
+
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
+            {
+                if(!(Game1.mapDisplayDevice is PyDisplayDevice))
+                    Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
+            };
+
+            helper.Events.GameLoop.SaveCreated += (s, e) =>
+            {
+                if (!(Game1.mapDisplayDevice is PyDisplayDevice))
+                    Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
             };
 
             helper.ConsoleCommands.Add("show_mapdata", "", (s, p) =>
@@ -127,6 +139,20 @@ namespace PyTK
             helper.Events.GameLoop.UpdateTicked += (s, e) =>
             {
                 updateTicked = e;
+            };
+
+            helper.Events.GameLoop.ReturnedToTitle += (s, e) =>
+            {
+                foreach(Layer l in PyMaps.LayerHandlerList.Keys)
+                {
+                    foreach (var h in PyMaps.LayerHandlerList[l])
+                    {
+                        l.AfterDraw -= h;
+                        l.BeforeDraw -= h;
+                    }
+                }
+
+                PyMaps.LayerHandlerList.Clear();
             };
               
             this.Helper.Events.Player.Warped += Player_Warped;
@@ -393,9 +419,6 @@ namespace PyTK
 
             foreach (xTile.Tiles.TileSheet tilesheet in map.TileSheets)
             {
-                /*foreach (var porp in tilesheet.Properties)
-                    _monitor?.Log("Prop:" + porp.Key + ":" + porp.Value, LogLevel.Info);*/
-
                 if ((tilesheet.Properties.TryGetValue("@Vanilla", out xTile.ObjectModel.PropertyValue vanillaProperty) && vanillaProperty != null) ||
                     (tilesheet.Properties.TryGetValue("@IgnoreLocalFile", out xTile.ObjectModel.PropertyValue ignoreProperty) && ignoreProperty != null))
                 {
@@ -408,6 +431,7 @@ namespace PyTK
                         || filename.StartsWith("winter_", StringComparison.CurrentCultureIgnoreCase);
                     if (isOutdoors && isSeasonal)
                         filename = $"{Game1.currentSeason}_{filename.Substring(filename.IndexOf("_", StringComparison.CurrentCultureIgnoreCase) + 1)}";
+                   
                     excludeTileSheetsFromModFolder.AddOrReplace(filename);
                 }
             }
