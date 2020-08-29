@@ -87,14 +87,19 @@ namespace TMXLoader
 
             if (type == EditType.Merge)
             {
-                Rectangle? sourceArea = null;
-
-                if (edit.sourceArea.Length == 4)
-                    sourceArea = new Rectangle(edit.sourceArea[0], edit.sourceArea[1], edit.sourceArea[2], edit.sourceArea[3]);
-
-                map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, edit.removeEmpty);
+                if (edit.sourceArea.Length > 4)
+                    for (int i = 0, j = 0; i < edit.sourceArea.Length && j < edit.position.Length; i += 4, j += 2)
+                        map = map.mergeInto(original, new Vector2(edit.position[j], edit.position[j + 1]), new Rectangle(edit.sourceArea[i], edit.sourceArea[i + 1], edit.sourceArea[i + 2], edit.sourceArea[i + 3]), edit.removeEmpty);
+                else
+                {
+                    Rectangle? sourceArea = null;
+                    if (edit.sourceArea.Length == 4)
+                        sourceArea = new Rectangle(edit.sourceArea[0], edit.sourceArea[1], edit.sourceArea[2], edit.sourceArea[3]);
+                    map = map.mergeInto(original, new Vector2(edit.position[0], edit.position[1]), sourceArea, edit.removeEmpty);
+                }
                 editWarps(map, edit.addWarps, edit.removeWarps, original);
-            }else if(type == EditType.Warps)
+            }
+            else if(type == EditType.Warps)
                 editWarps(original, edit.addWarps, edit.removeWarps, original);
             else if(type == EditType.Replace)
             {

@@ -303,7 +303,7 @@ namespace PyTK
         {
             if (e.NewLocation.Map.Properties.ContainsKey("@WaterColor") && TMXColor.FromString(e.NewLocation.Map.Properties["@WaterColor"]) is TMXColor color)
                 e.NewLocation.waterColor.Value = new Color(color.R, color.G, color.B, color.A);
-
+            
             if (!e.IsLocalPlayer)
                 return;
 
@@ -955,7 +955,7 @@ namespace PyTK
                 if (a.Length > 2)
                     if (a[1] == "this")
                     {
-                        string id = location.Name + "." + layer + "." + tile.Y + tile.Y;
+                        string id = location.Name + "." + layer + "." + tile.X + "." + tile.Y + "." + a[2];
                         if (!PyLua.hasScript(id))
                         {
                             if (layer == "Map")

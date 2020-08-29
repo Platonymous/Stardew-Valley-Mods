@@ -132,7 +132,6 @@ namespace PyTK.Extensions
                     LayerEventHandler l = (s, e) => drawLayer(layer, layer.GetOffset(), layer.Properties.ContainsKey("WrapAround"));
                     maplayerAbove.AfterDraw += l;
                     LayerHandlerList[layer].Add(l);
-
                 }
                 else if (layer.Properties.ContainsKey("DrawBefore") && map.GetLayer(layer.Properties["DrawBefore"]) is Layer maplayerBefore)
                 {
