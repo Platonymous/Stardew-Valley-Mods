@@ -100,7 +100,8 @@ namespace PlatoWarpMenu
             float zoomLevel = Game1.options.zoomLevel;
             Game1.options.zoomLevel = 1f;
             RenderTarget2D lightmap = (RenderTarget2D)game.GetFieldValue("_lightmap");
-            game.SetFieldValue(null, "_lightmap");
+            game.SetFieldValue("_lightmap", null);
+
             try
             {
                 typeof(Game1).CallAction("allocateLightmap", maxSize, maxSize);
@@ -180,10 +181,10 @@ namespace PlatoWarpMenu
             if (game.GetFieldValue("_lightmap") != null)
             {
                 game.GetFieldValue<RenderTarget2D>("_lightmap").Dispose();
-                game.SetFieldValue((RenderTarget2D)null, "_lightmap");
+                game.SetFieldValue("_lightmap", (RenderTarget2D)null);
             }
 
-            game.SetFieldValue(lightmap, "_lightmap");
+            game.SetFieldValue( "_lightmap",lightmap);
             Game1.options.zoomLevel = zoomLevel;
             game.takingMapScreenshot = false;
             Game1.displayHUD = displayHud;

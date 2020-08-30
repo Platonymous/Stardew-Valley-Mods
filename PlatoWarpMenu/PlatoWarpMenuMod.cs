@@ -51,7 +51,6 @@ namespace PlatoWarpMenu
 
             helper.Events.GameLoop.GameLaunched += (s, e) =>
             {
-
                 SetUpConfigMenu();
 
                 if (Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone") is IMobilePhoneApi api)
@@ -301,7 +300,7 @@ namespace PlatoWarpMenu
             sets.Add(i18n.Get("menu.farm"));
 
             foreach (GameLocation location in Game1.locations)
-                if (location.map.Properties.ContainsKey("Group") && location.map.Properties["Group"].ToString() is string group)
+                if (location.map.Properties.ContainsKey("Group") && location.map.Properties["Group"].ToString() is string group && !sets.Contains(group))
                     sets.Add(group);
 
             sets.Add(i18n.Get("menu.characters"));
@@ -480,11 +479,11 @@ namespace PlatoWarpMenu
 
             _helper.GetPlatoHelper().SetTickDelayedUpdateAction(1, () =>
             {
-                _helper.Events.Display.RenderedActiveMenu += Display_Rendered;
+                _helper.Events.Display.Rendered += Display_Rendered;
             });
         }
 
-        public static void Display_Rendered(object sender, RenderedActiveMenuEventArgs e)
+        public static void Display_Rendered(object sender, EventArgs e)
         {
             intercept = true;
            var g = Game1.currentLocation;
@@ -508,7 +507,8 @@ namespace PlatoWarpMenu
                 try { 
                     Game1.spriteBatch.End();
                 }
-                catch { }
+                catch {
+                }
 
                 if (instance.config.CompatibilityMode || Constants.TargetPlatform == GamePlatform.Android)
                 {
@@ -530,7 +530,7 @@ namespace PlatoWarpMenu
             }
 
             Game1.currentLocation = g;
-            _helper.Events.Display.RenderedActiveMenu -= Display_Rendered;
+            _helper.Events.Display.Rendered -= Display_Rendered;
             intercept = false;
             Callback?.Invoke();
         }
