@@ -88,8 +88,12 @@ namespace TMXLoader
             if (type == EditType.Merge)
             {
                 if (edit.sourceArea.Length > 4)
+                {
+                    Map merged = original;
                     for (int i = 0, j = 0; i < edit.sourceArea.Length && j < edit.position.Length; i += 4, j += 2)
-                        map = map.mergeInto(original, new Vector2(edit.position[j], edit.position[j + 1]), new Rectangle(edit.sourceArea[i], edit.sourceArea[i + 1], edit.sourceArea[i + 2], edit.sourceArea[i + 3]), edit.removeEmpty);
+                        merged = map.mergeInto(merged, new Vector2(edit.position[j], edit.position[j + 1]), new Rectangle(edit.sourceArea[i], edit.sourceArea[i + 1], edit.sourceArea[i + 2], edit.sourceArea[i + 3]), edit.removeEmpty);
+                    map = merged;
+                }
                 else
                 {
                     Rectangle? sourceArea = null;
