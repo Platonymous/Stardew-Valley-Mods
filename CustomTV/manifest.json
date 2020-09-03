@@ -6,7 +6,7 @@
   "UniqueID": "Platonymous.CustomTV",
   "EntryDll": "CustomTV.dll",
   "MinimumApiVersion": "2.11",
-  "UpdateKeys": [ "Nexus:" ],
+  "UpdateKeys": [ "Nexus:6775" ],
   "Dependencies": [
     {
       "UniqueID": "Platonymous.PlatoTK"
