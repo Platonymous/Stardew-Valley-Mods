@@ -1,0 +1,10 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- put release zips in _releases folder -->
+    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
+
+    <!-- don't add dlls in mod's releases -->
+    <IgnoreModFilePatterns >.(?:dll|pdb)</IgnoreModFilePatterns>
+
+  </PropertyGroup>
+</Project>

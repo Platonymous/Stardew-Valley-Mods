@@ -13,6 +13,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using xTile;
 
 namespace PyTK.Lua
 {
@@ -112,7 +113,17 @@ namespace PyTK.Lua
         public static void registerType(Type type, bool showErrors = true, bool registerAssembly = false, Func<Type, bool> predicate = null)
         {
             if (!registerAssembly)
-                UserData.RegisterType(type);
+            {
+                try
+                {
+                    UserData.RegisterType(type);
+                }
+                catch (Exception e)
+                {
+                    if (showErrors)
+                        Monitor.Log("ERROR: " + e.Message, LogLevel.Alert);
+                }
+            }
             else
             {
                 var types = type.Assembly.DefinedTypes;
@@ -158,6 +169,9 @@ namespace PyTK.Lua
             /* SDV */
             registerType(typeof(Game1), false, true);
             registerType(typeof(NetInt), false, true);
+
+            /*XTile*/
+            registerType(typeof(Map), false, true);
         }
 
         public static void saveScriptToFile(string uniqueId, string path)

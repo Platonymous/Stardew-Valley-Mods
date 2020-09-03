@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".root", ".root", "{D226F84E
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		common.targets = common.targets
+		contentpacks.targets = contentpacks.targets
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -82,6 +83,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Comics", "Comics\Comics.csproj", "{42F5685F-2A0F-4A1E-A401-3FEC98A52000}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatoWarpMenu", "PlatoWarpMenu\PlatoWarpMenu.csproj", "{9E9C188D-38D7-47A8-9488-116AA5FC7A1B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomTV", "CustomTV\CustomTV.csproj", "{DD22A0EF-6492-4DBA-86C0-43E4FE52C450}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomTV", "CustomTV", "{3C7D3540-FD13-4D5C-8208-7E90F71C1469}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomTVTemplate", "CustomTVTemplate\CustomTVTemplate.csproj", "{C8F91418-FA02-41AE-8629-BC4A1160F461}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -295,6 +302,18 @@ Global
 		{9E9C188D-38D7-47A8-9488-116AA5FC7A1B}.Release|Any CPU.ActiveCfg = Release|x86
 		{9E9C188D-38D7-47A8-9488-116AA5FC7A1B}.Release|x86.ActiveCfg = Release|x86
 		{9E9C188D-38D7-47A8-9488-116AA5FC7A1B}.Release|x86.Build.0 = Release|x86
+		{DD22A0EF-6492-4DBA-86C0-43E4FE52C450}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{DD22A0EF-6492-4DBA-86C0-43E4FE52C450}.Debug|x86.ActiveCfg = Debug|x86
+		{DD22A0EF-6492-4DBA-86C0-43E4FE52C450}.Debug|x86.Build.0 = Debug|x86
+		{DD22A0EF-6492-4DBA-86C0-43E4FE52C450}.Release|Any CPU.ActiveCfg = Release|x86
+		{DD22A0EF-6492-4DBA-86C0-43E4FE52C450}.Release|x86.ActiveCfg = Release|x86
+		{DD22A0EF-6492-4DBA-86C0-43E4FE52C450}.Release|x86.Build.0 = Release|x86
+		{C8F91418-FA02-41AE-8629-BC4A1160F461}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{C8F91418-FA02-41AE-8629-BC4A1160F461}.Debug|x86.ActiveCfg = Debug|x86
+		{C8F91418-FA02-41AE-8629-BC4A1160F461}.Debug|x86.Build.0 = Debug|x86
+		{C8F91418-FA02-41AE-8629-BC4A1160F461}.Release|Any CPU.ActiveCfg = Release|x86
+		{C8F91418-FA02-41AE-8629-BC4A1160F461}.Release|x86.ActiveCfg = Release|x86
+		{C8F91418-FA02-41AE-8629-BC4A1160F461}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -302,6 +321,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E99345AC-02CD-45DB-9822-2FE71AC46840} = {DE4D4E3F-A4AE-46D2-85FA-A3A69F4747B1}
 		{23C4D0B7-E356-4363-88E1-F225955FAD29} = {E99345AC-02CD-45DB-9822-2FE71AC46840}
+		{3C7D3540-FD13-4D5C-8208-7E90F71C1469} = {DE4D4E3F-A4AE-46D2-85FA-A3A69F4747B1}
+		{C8F91418-FA02-41AE-8629-BC4A1160F461} = {3C7D3540-FD13-4D5C-8208-7E90F71C1469}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7EFA2B12-CD69-4268-8CFA-F8A82A31DBCC}

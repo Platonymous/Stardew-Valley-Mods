@@ -7,9 +7,7 @@
     <TargetFramework>net452</TargetFramework>
     <Platforms>x86</Platforms>
     <PlatformTarget>x86</PlatformTarget>
-
     <ModFolderName>[TMX]JungleTempleAndCityBus</ModFolderName>
-    <IgnoreModFilePatterns>\.dll$, \.pdb$</IgnoreModFilePatterns>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,8 +20,6 @@
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
   </ItemGroup>
 
-  <Import Project="$(SolutionDir)\common.targets" />
-
-  <ProjectExtensions><VisualStudio><UserProperties manifest_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+  <Import Project="$(SolutionDir)\contentpacks.targets" />
 
 </Project>
