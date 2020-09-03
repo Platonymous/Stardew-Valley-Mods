@@ -30,15 +30,19 @@ namespace CustomTV
             PlatoHelper.Events.QuestionRaised += (q, p) =>
             {
                 if (p.IsTV)
-                    foreach (string channel in CustomTVChannelToken.Channels.Keys.ToList()) {
-                        
+                {
+                    bool added = false;
+
+                    foreach (string channel in CustomTVChannelToken.Channels.Keys.ToList())
+                    {
                         Dictionary<string, string> channelData = Helper.Content.Load<Dictionary<string, string>>($"{CustomTVChannelToken.ChannelDataPrefix}{channel}", ContentSource.GameContent);
-                        
+
                         if (channelData.ContainsKey("@Active") && channelData["@Active"].ToLower() == "false")
                             continue;
 
                         if (CustomTVChannelToken.Channels[channel] == null)
                         {
+                            added = true;
                             CustomTVChannelToken.Channels[channel] = new TVChannel()
                             {
                                 Id = channel,
@@ -86,8 +90,15 @@ namespace CustomTV
 
                         if (CustomTVChannelToken.Channels[channel] is TVChannel tvc && tvc.Seasons.Any(s => s.ToLower() == Game1.currentSeason.ToLower())
                             && tvc.Days.Any(d => d.ToLower() == Game1.shortDayNameFromDayOfSeason(Game1.dayOfMonth).ToLower()))
-                        p.AddResponse(new Response(channel, CustomTVChannelToken.Channels[channel].Name));
+                            p.AddResponse(new Response(channel, CustomTVChannelToken.Channels[channel].Name));
                     }
+
+                    if (added)
+                    {
+                        p.PaginateResponses();
+
+                    }
+                }
             };
 
             PlatoHelper.Events.TVChannelSelected += (s, p) =>
