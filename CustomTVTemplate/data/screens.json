@@ -1,0 +1,34 @@
+{ //Optional Parameter: 'Bounds:X Y W H Frames:F Duration:D Offset:X Y' Defaults: 'Bounds:0 0 42 28 Frames:2 Duration:150 Offset:0 0'
+  "Changes": [
+    {
+      "Action": "Load",
+      "Target": "{{Platonymous.CustomTV/Screen:{{ChannelID}} IntroScreen}}",
+      "FromFile": "assets/intro_screen.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "{{Platonymous.CustomTV/Screen:{{ChannelID}} IntroOverlay}}",
+      "FromFile": "assets/intro_overlay.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "{{Platonymous.CustomTV/Screen:{{ChannelID}} Screen1 Duration:600}}",
+      "FromFile": "assets/screen1.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "{{Platonymous.CustomTV/Screen:{{ChannelID}} Overlay1}}",
+      "FromFile": "assets/overlay1.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "{{Platonymous.CustomTV/Screen:{{ChannelID}} Screen2}}",
+      "FromFile": "assets/screen2.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "{{Platonymous.CustomTV/Screen:{{ChannelID}} Overlay2 Duration:600 Offset:5 5}}",
+      "FromFile": "assets/overlay2.png"
+    }
+  ]
+}

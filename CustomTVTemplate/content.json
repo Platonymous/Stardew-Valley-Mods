@@ -1,0 +1,23 @@
+{
+  "Format": "1.17.0",
+  "DynamicTokens": [
+    {
+      "Name": "ChannelID",
+      "Value": "Plato.Template.Channel1"
+    }
+  ],
+  "Changes": [
+    {
+      "Action": "Include",
+      "FromFile": "data/meta.json"
+    },
+    {
+      "Action": "Include",
+      "FromFile": "data/episodes.json"
+    },
+    {
+      "Action": "Include",
+      "FromFile": "data/screens.json"
+    }
+  ]
+}

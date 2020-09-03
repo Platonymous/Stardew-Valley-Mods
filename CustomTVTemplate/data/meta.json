@@ -1,0 +1,16 @@
+{
+  "Changes": [
+    {
+      "Action": "EditData",
+      "Target": "{{Platonymous.CustomTV/Channel:{{ChannelID}}}}",
+      "Entries": {
+        "@Name": "Channel 1",
+        "@Intro": "Custom TV Channel Template/IntroScreen IntroOverlay",
+        "@Days": "mon tue wed thu fri sat sun", // (default)
+        "@Seasons": "spring summer fall winter", // (default)
+        "@Order": "linear", // 'random' or 'linear' (default)
+        "@Active": "true" // 'false' or 'true' (default)
+      }
+    }
+  ]
+}

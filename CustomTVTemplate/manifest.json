@@ -1,0 +1,17 @@
+﻿{
+  "Name": "CustomTVTemplate",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Custom TV Template",
+  "UniqueID": "Platonymous.CustomTVTemplate",
+  "MinimumApiVersion": "3.0.0",
+  "UpdateKeys": [ "Nexus:" ],
+  "ContentPackFor": {
+    "UniqueID": "Pathoschild.ContentPatcher"
+  },
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.CustomTV"
+    }
+  ]
+}

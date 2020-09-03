@@ -1,0 +1,17 @@
+{
+  "Changes": [
+    {
+      "Action": "EditData",
+      "Target": "{{Platonymous.CustomTV/Channel:{{ChannelID}}}}",
+      "Entries": {
+        "1": "First episode/Screen1 Overlay1",
+        "2": "Second episode/Screen2 Overlay2",
+        "3": "Third episode/Screen1 Overlay2",
+        "4": "Fourth episode/Screen2 Overlay1",
+        "5": "Fifth episode/Screen1 Overlay1",
+        "6": "Sixth episode/Screen2 Overlay2",
+        "7": "Seventh episode/Screen2 Overlay2"
+      }
+    }
+  ]
+}

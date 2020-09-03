@@ -1,0 +1,18 @@
+﻿{
+  "Name": "CustomTV",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Adds custom TV channels via content pack",
+  "UniqueID": "Platonymous.CustomTV",
+  "EntryDll": "CustomTV.dll",
+  "MinimumApiVersion": "2.11",
+  "UpdateKeys": [ "Nexus:" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.PlatoTK"
+    },
+    {
+      "UniqueID": "Pathoschild.ContentPatcher"
+    }
+  ]
+}
