@@ -9,7 +9,7 @@ namespace PyTK.Overrides
 {
     internal class OvTV
     {
-        [HarmonyPatch]
+       [HarmonyPatch]
         internal class TVFix
         {
             internal static MethodInfo TargetMethod()

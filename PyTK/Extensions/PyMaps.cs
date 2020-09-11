@@ -260,7 +260,7 @@ namespace PyTK.Extensions
             }
 
             if (layer.GetTileSheetForImageLayer() is TileSheet ts
-                && device is PyDisplayDevice sDevice
+                && PyDisplayDevice.Instance is PyDisplayDevice sDevice
                 && sDevice.GetTexture(ts) is Texture2D texture
                 && layer.GetOpacity() is float opacity)
             {
@@ -292,7 +292,7 @@ namespace PyTK.Extensions
         public static void drawImageLayer(Layer layer, xTile.Dimensions.Rectangle viewport)
         {
             if (layer.GetTileSheetForImageLayer() is TileSheet ts
-                && Game1.mapDisplayDevice is PyDisplayDevice device
+                && PyDisplayDevice.Instance is PyDisplayDevice device
                 && device.GetTexture(ts) is Texture2D texture
                 && layer.GetOffset() is Location posGlobal
                 && layer.GetOpacity() is float opacity)

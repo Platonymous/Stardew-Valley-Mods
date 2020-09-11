@@ -38,12 +38,6 @@ namespace PyTK.Tiled
                 if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(map.TileSheets[index].ImageSource)))
                     map.TileSheets[index].ImageSource = Path.Combine("Maps", Path.GetFileName(map.TileSheets[index].ImageSource));
 
-            if (!(Game1.mapDisplayDevice is PyDisplayDevice))
-            {
-                bool adjustForCompat = helper.ModRegistry.IsLoaded("DigitalCarbide.SpriteMaster");
-                Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat);
-            }
-
                 map?.LoadTileSheets(Game1.mapDisplayDevice);
        
             return map;
@@ -56,7 +50,7 @@ namespace PyTK.Tiled
             if (pathFile.Exists)
                 return;
             
-            if (includeTilesheets && Game1.mapDisplayDevice is PyDisplayDevice pdd)
+            if (includeTilesheets && PyDisplayDevice.Instance is PyDisplayDevice pdd)
                 foreach (TileSheet ts in map.TileSheets)
                 {
                     string folder = Path.Combine(Path.GetDirectoryName(path), Path.GetDirectoryName(ts.ImageSource));

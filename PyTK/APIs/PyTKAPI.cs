@@ -130,12 +130,12 @@ namespace PyTK.APIs
 
         public IDisplayDevice GetPyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            return new PyDisplayDevice(contentManager, graphicsDevice);
+            return PyDisplayDevice.Instance ?? new PyDisplayDevice(contentManager, graphicsDevice);
         }
 
         public IDisplayDevice GetPyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice, bool compatability)
         {
-            return new PyDisplayDevice(contentManager, graphicsDevice, compatability);
+            return PyDisplayDevice.Instance ?? new PyDisplayDevice(contentManager, graphicsDevice,compatability);
         }
 
         public Dictionary<string, string> ParseDataString(object o)

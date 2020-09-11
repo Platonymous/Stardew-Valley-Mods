@@ -23,11 +23,12 @@ namespace PyTK.Types
         protected DrawInstructions m_instructions;
         protected Dictionary<TileSheet, Texture2D> m_tileSheetTextures2;
         protected bool adjustOrigin = false;
+        internal static PyDisplayDevice Instance;
 
         public PyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice)
             : this(contentManager, graphicsDevice, false)
         {
-
+            
         }
 
         public PyDisplayDevice(ContentManager contentManager, GraphicsDevice graphicsDevice, bool compatibility)
@@ -40,6 +41,7 @@ namespace PyTK.Types
             this.m_tilePosition = new Vector2();
             this.m_sourceRectangle = new Microsoft.Xna.Framework.Rectangle();
             this.m_modulationColour = Color.White;
+            Instance = this;
         }
 
         public virtual void Clear()

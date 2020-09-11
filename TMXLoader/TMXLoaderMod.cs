@@ -72,12 +72,13 @@ namespace TMXLoader
 
         internal PyReceiver<SaveBuildable> BuildableReceiver;
         internal PyReceiver<SaveBuildable> BuildableRemover;
-
+        internal bool resetRain = false;
+        internal bool resetRainValue = true;
         public override void Entry(IModHelper helper)
         {
             config = Helper.ReadConfig<Config>();
             config = Helper.ReadConfig<Config>();
-
+            
             TMXLoaderMod.helper = Helper;
             monitor = Monitor;
 
@@ -150,18 +151,26 @@ namespace TMXLoader
                     PyNet.sendDataToFarmer(buildableReceiverName, b, e.Peer.PlayerID, SerializationType.JSON);
             };
 
+
             helper.Events.Display.RenderingHud += (s, e) =>
             {
                 PropertyValue rain = "";
                 if (!(Game1.currentLocation is GameLocation location) || !(location.Map is Map map) || !map.Properties.TryGetValue("Raining", out rain))
                     return;
 
+               
+
                 if (Game1.isRaining && Game1.currentLocation.IsOutdoors && (!Game1.currentLocation.Name.Equals("Desert") && !(Game1.currentLocation is Summit)) && (!Game1.eventUp || Game1.currentLocation.isTileOnMap(new Vector2((float)(Game1.viewport.X / 64), (float)(Game1.viewport.Y / 64)))))
                     return;
 
-                if (Game1.isRaining || rain == "Always")
+
+                if (rain != "Never" && (Game1.isRaining || rain == "Always"))
+                {
+                    updateRainDrops();
                     for (int index = 0; index < Game1.rainDrops.Length; ++index)
                         Game1.spriteBatch.Draw(Game1.rainTexture, Game1.rainDrops[index].position, new Microsoft.Xna.Framework.Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.rainTexture, Game1.rainDrops[index].frame, -1, -1)), Color.White);
+                }
+
             };
 
             helper.Events.Player.Warped += Player_Warped;
@@ -177,6 +186,8 @@ namespace TMXLoader
                 if(Game1.IsMasterGame)
                     foreach(GameLocation loc in Game1.locations)
                         setupCrops(loc);
+
+                waterEverythingForRainProperty();
 
                 if (!helper.ModRegistry.IsLoaded("Entoarox.FurnitureAnywhere"))
                     return;
@@ -199,6 +210,49 @@ namespace TMXLoader
             };
 
             helper.Events.Display.MenuChanged += TMXActions.updateItemListAfterShop;
+        }
+
+        private void waterEverythingForRainProperty()
+        {
+            foreach (var l in Game1.locations.Where(l => l.IsFarm))
+                if(l.Map.Properties.TryGetValue("Raining", out PropertyValue rain))
+                    if(rain.ToString() == "Never" && Game1.isRaining)
+                        l.terrainFeatures.FieldDict.Values.Where(t => t.Value is HoeDirt h && h.state.Value == 1 ).Select(t => t.Value as HoeDirt).ToList().ForEach(h => h.state.Value = 0);
+                    else if(rain.ToString() == "Always" && !Game1.isRaining)
+                            l.terrainFeatures.FieldDict.Values.Where(t => t.Value is HoeDirt).Select(t => t.Value as HoeDirt).ToList().ForEach(h => h.state.Value = 1);
+        }
+
+        private void updateRainDrops()
+        {
+            for (int index = 0; index < Game1.rainDrops.Length; ++index)
+            {
+                Game1.updateRaindropPosition();
+
+                if (Game1.rainDrops[index].frame == 0)
+                {
+                    Game1.rainDrops[index].accumulator += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
+                    if (Game1.rainDrops[index].accumulator >= 70)
+                    {
+                        Game1.rainDrops[index].position += new Vector2((float)(index * 8 / Game1.rainDrops.Length - 16), (float)(32 - index * 8 / Game1.rainDrops.Length));
+                        Game1.rainDrops[index].accumulator = 0;
+                        if (Game1.random.NextDouble() < 0.1)
+                            ++Game1.rainDrops[index].frame;
+                        if ((double)Game1.rainDrops[index].position.Y > (double)(Game1.viewport.Height + 64))
+                            Game1.rainDrops[index].position.Y = -64f;
+                    }
+                }
+                else
+                {
+                    Game1.rainDrops[index].accumulator += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
+                    if (Game1.rainDrops[index].accumulator > 70)
+                    {
+                        Game1.rainDrops[index].frame = (Game1.rainDrops[index].frame + 1) % 4;
+                        Game1.rainDrops[index].accumulator = 0;
+                        if (Game1.rainDrops[index].frame == 0)
+                            Game1.rainDrops[index].position = new Vector2((float)Game1.random.Next(Game1.viewport.Width), (float)Game1.random.Next(Game1.viewport.Height));
+                    }
+                }
+            }
         }
 
         private void beforeSave()
@@ -790,7 +844,8 @@ namespace TMXLoader
             //PyTK.CustomElementHandler.SaveHandler.RebuildAll(inGame, Game1.locations);
             TMXLAPI.RaiseOnLocationRestoringEvent(inGame);
             inGame.DayUpdate(Game1.dayOfMonth);
-            inGame.resetForPlayerEntry();
+            if(inGame is FarmHouse)
+                inGame.resetForPlayerEntry();
             return true;
         }
 
@@ -841,6 +896,29 @@ namespace TMXLoader
         {
             if (!e.IsLocalPlayer || !(e.NewLocation is GameLocation))
                 return;
+
+            if (resetRain)
+            {
+                Game1.isRaining = resetRainValue;
+                e.NewLocation.resetForPlayerEntry();
+                resetRain = false;
+            }
+
+            if (Game1.isRaining && e.NewLocation.Map.Properties.TryGetValue("Raining", out PropertyValue rain) && rain.ToString() == "Never")
+            {
+                resetRainValue = Game1.isRaining;
+                Game1.isRaining = false;
+                e.NewLocation.resetForPlayerEntry();
+                resetRain = true;
+            }
+
+            if (!Game1.isRaining && e.NewLocation.Map.Properties.TryGetValue("Raining", out PropertyValue raina) && raina.ToString() == "Always")
+            {
+                resetRainValue = Game1.isRaining;
+                Game1.isRaining = true;
+                e.NewLocation.resetForPlayerEntry();
+                resetRain = true;
+            }
 
             foreach (TMXAssetEditor editor in conditionals)
                 if (e.NewLocation is GameLocation gl && gl.mapPath.Value is string mp)

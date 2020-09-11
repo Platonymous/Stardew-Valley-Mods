@@ -25,6 +25,7 @@ using System.IO;
 using TMXTile;
 using xTile.Layers;
 using xTile.Tiles;
+using StardewValley.Objects;
 
 namespace PyTK
 {
@@ -85,7 +86,6 @@ namespace PyTK
             PreSerializer.Add(ModManifest, Replacer);
 
             harmonyFix();
-
             initializeResponders();
             startResponder();
             registerConsoleCommands();
@@ -97,26 +97,28 @@ namespace PyTK
             CustomObjectData.CODSyncer.start();
             ContentSync.ContentSyncHandler.initialize();
             bool adjustForCompat2 = false;
+            bool hasMapTK = false;
             helper.Events.GameLoop.GameLaunched += (s, e) =>
             {
 
                 if (xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
                     tmxf.DrawImageLayer = PyMaps.drawImageLayer;
 
+                hasMapTK = helper.ModRegistry.IsLoaded("Platonymous.MapTK");
                 adjustForCompat2 = helper.ModRegistry.IsLoaded("DigitalCarbide.SpriteMaster");
-                Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
+                Game1.mapDisplayDevice = hasMapTK ? Game1.mapDisplayDevice : new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
             };
 
             helper.Events.GameLoop.SaveLoaded += (s, e) =>
             {
                 if(!(Game1.mapDisplayDevice is PyDisplayDevice))
-                    Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
+                    Game1.mapDisplayDevice = hasMapTK ? Game1.mapDisplayDevice : PyDisplayDevice.Instance ?? new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
             };
 
             helper.Events.GameLoop.SaveCreated += (s, e) =>
             {
                 if (!(Game1.mapDisplayDevice is PyDisplayDevice))
-                    Game1.mapDisplayDevice = new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
+                    Game1.mapDisplayDevice = hasMapTK ? Game1.mapDisplayDevice : PyDisplayDevice.Instance ?? new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
             };
 
             helper.ConsoleCommands.Add("show_mapdata", "", (s, p) =>

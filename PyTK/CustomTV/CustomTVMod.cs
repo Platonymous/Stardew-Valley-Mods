@@ -165,17 +165,20 @@ namespace PyTK.CustomTV
             Game1.player.Halt();
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void addChannel(string id, string name, Action<TV, TemporaryAnimatedSprite, SFarmer, string> action)
         {
             channels.AddOrReplace(id, new TVChannel(id, name, action));
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void addChannel(TVChannel tvChannel)
         {
             changed = true;
             channels.AddOrReplace(tvChannel.id, tvChannel);
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void changeAction(string id, Action<TV, TemporaryAnimatedSprite, SFarmer, string> action)
         {
             changed = true;
@@ -184,12 +187,14 @@ namespace PyTK.CustomTV
                 channels[id].action = action;
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void removeChannel(string key)
         {
             changed = true;
             removeKey(key);
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void removeKey(string key)
         {
             changed = true;
@@ -197,6 +202,7 @@ namespace PyTK.CustomTV
             channels.Remove(key);
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void showProgram(TemporaryAnimatedSprite sprite, string text, Action afterDialogues = null, TemporaryAnimatedSprite overlay = null)
         {
             if (tv == null)
@@ -214,6 +220,7 @@ namespace PyTK.CustomTV
             Game1.afterDialogues = new Game1.afterFadeFunction(afterDialogues);
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void showProgram(TVChannel tvChannel)
         {
             if (tv == null)
@@ -228,11 +235,13 @@ namespace PyTK.CustomTV
             Game1.afterDialogues = new Game1.afterFadeFunction(tvChannel.afterDialogues);
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void showProgram(string id)
         {
             showProgram(channels[id]);
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void endProgram()
         {
             if (tv != null)
@@ -240,6 +249,7 @@ namespace PyTK.CustomTV
             tv = null;
         }
 
+        [ObsoleteAttribute("Will be removed. Use PlatoTK instead.", false)]
         public static void selectChannel(SFarmer who, string answer)
         {
             string a = answer.Split(' ')[0];

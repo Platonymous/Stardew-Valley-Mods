@@ -61,10 +61,11 @@ namespace PyTK.Types
         {
             bool result = true;
             string[] tileActions = actionString.Split(';');
-            PyTKMod._monitor.Log("InvokeAction:" + actionString, StardewModdingAPI.LogLevel.Trace);
 
             foreach (string action in tileActions)
             {
+                PyTKMod._monitor.Log("InvokeAction:" + action, StardewModdingAPI.LogLevel.Trace);
+
                 string nextAction = action.Replace(" § ", "§");
                 if (nextAction.Contains("§"))
                 {
