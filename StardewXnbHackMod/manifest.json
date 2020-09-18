@@ -1,0 +1,11 @@
+﻿{
+  "Name": "StardewXnbHackMod",
+  "Author": "Pathoschild (SXH) & Platonymous (Mod)",
+  "Version": "1.0.0",
+  "Description": "Unpack all XNB files via console command: xnbhack",
+  "UniqueID": "Platonymous.StardewXnbHackMod",
+  "EntryDll": "StardewXnbHackMod.dll",
+  "MinimumApiVersion": "3.7.3",
+  "UpdateKeys": [ "Nexus:" ]
+}
+

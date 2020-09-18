@@ -88,7 +88,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomTV", "CustomTV\Custom
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomTV", "CustomTV", "{3C7D3540-FD13-4D5C-8208-7E90F71C1469}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomTVTemplate", "CustomTVTemplate\CustomTVTemplate.csproj", "{C8F91418-FA02-41AE-8629-BC4A1160F461}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomTVTemplate", "CustomTVTemplate\CustomTVTemplate.csproj", "{C8F91418-FA02-41AE-8629-BC4A1160F461}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StardewXnbHackMod", "StardewXnbHackMod\StardewXnbHackMod.csproj", "{D2CA066C-FCC0-4126-BE2D-6DF27E400934}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -314,6 +316,12 @@ Global
 		{C8F91418-FA02-41AE-8629-BC4A1160F461}.Release|Any CPU.ActiveCfg = Release|x86
 		{C8F91418-FA02-41AE-8629-BC4A1160F461}.Release|x86.ActiveCfg = Release|x86
 		{C8F91418-FA02-41AE-8629-BC4A1160F461}.Release|x86.Build.0 = Release|x86
+		{D2CA066C-FCC0-4126-BE2D-6DF27E400934}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{D2CA066C-FCC0-4126-BE2D-6DF27E400934}.Debug|x86.ActiveCfg = Debug|x86
+		{D2CA066C-FCC0-4126-BE2D-6DF27E400934}.Debug|x86.Build.0 = Debug|x86
+		{D2CA066C-FCC0-4126-BE2D-6DF27E400934}.Release|Any CPU.ActiveCfg = Release|x86
+		{D2CA066C-FCC0-4126-BE2D-6DF27E400934}.Release|x86.ActiveCfg = Release|x86
+		{D2CA066C-FCC0-4126-BE2D-6DF27E400934}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

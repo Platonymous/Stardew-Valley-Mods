@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>StardewXnbHackMod</AssemblyName>
+    <RootNamespace>StardewXnbHackMod</RootNamespace>
+    <Version>1.0.0</Version>
+    <TargetFramework>net452</TargetFramework>
+    <Platforms>x86</Platforms>
+    <PlatformTarget>x86</PlatformTarget>
+    <EnableHarmony>false</EnableHarmony>
+    <IgnoreModFilePatterns>StardewXnbHack.exe.config,StardewXnbHack.exe,Lidgren.Network\.(?:dll|pdb),GalaxyCSharp\.(?:dll|pdb),Lidgren.Network\.(?:dll|pdb),Steamworks.NET\.(?:dll|pdb)</IgnoreModFilePatterns>
+    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="Newtonsoft">
+      <HintPath>$(GamePath)\smapi-internal\Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BmFont">
+      <HintPath>$(GamePath)\BmFont.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SMAPI.Toolkit">
+      <HintPath>$(GamePath)\smapi-internal\SMAPI.Toolkit.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="StardewXnbHack">
+      <HintPath>lib\StardewXnbHack.exe</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="TMXTile">
+      <HintPath>$(GamePath)\smapi-internal\TMXTile.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="Rename" AfterTargets="AfterBuild">
+    <Move SourceFiles="$(OUTDIR)\StardewXnbHack.exe" DestinationFiles="$(OUTDIR)\StardewXnbHack.dll" />
+    <Message Text="Renamed executable file." Importance="high" />
+  </Target>
+  
+  <Target Name="AfterBuild">
+    <DeployModTask ModFolderName="$(ModFolderName)" ModZipPath="$(ModZipPath)" EnableModDeploy="$(EnableModDeploy)" EnableModZip="$(EnableModZip)" ProjectDir="$(ProjectDir)" TargetDir="$(TargetDir)" GameModsDir="$(GameModsPath)" IgnoreModFilePatterns="$(IgnoreModFilePatterns)" />
+  </Target>
+  
+</Project>
