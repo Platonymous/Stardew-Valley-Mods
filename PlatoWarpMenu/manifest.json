@@ -1,7 +1,7 @@
 ﻿{
   "Name": "Plato Warp Menu",
   "Author": "Platonymous",
-  "Version": "1.7.19",
+  "Version": "1.7.20",
   "Description": "Platonymous Warp Menu",
   "UniqueID": "Platonymous.PlatoWarpMenu",
   "EntryDll": "PlatoWarpMenu.dll",
@@ -10,7 +10,7 @@
   "Dependencies": [
     {
       "UniqueID": "Platonymous.PlatoTK",
-      "MinimumVersion": "1.3.0"
+      "MinimumVersion": "1.4.0"
     },
     {
       "UniqueID": "Platonymous.Toolkit",

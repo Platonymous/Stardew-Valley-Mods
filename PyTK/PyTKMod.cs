@@ -29,6 +29,11 @@ using StardewValley.Objects;
 
 namespace PyTK
 {
+    public class PyTKConfig
+    {
+        public string[] Options { get; set; } = new string[0];
+    }
+
     public class PyTKMod : Mod
     {
         internal static IModEvents _events => _helper.Events;
@@ -58,6 +63,7 @@ namespace PyTK
         internal static UpdateTickedEventArgs updateTicked;
 
         internal static PyTKMod _instance { get; set; }
+
         internal static IMonitor _monitor {
             get {
                 return _instance.Monitor;
@@ -71,9 +77,13 @@ namespace PyTK
             }
         }
 
+        internal static PyTKConfig Config { get; set; } = new PyTKConfig();
+
         public override void Entry(IModHelper helper)
         {
             _instance = this;
+
+            Config = helper.ReadConfig<PyTKConfig>();
 
             hInstance = HarmonyInstance.Create("Platonymous.PyTK.Rev");
             helper.Events.Display.RenderingWorld += (s,e) =>
@@ -285,17 +295,12 @@ namespace PyTK
             }
         }
 
-        private void Display_RenderingWorld(object sender, RenderingWorldEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         public static void syncCounter(string id, int value)
         {
             if (Game1.IsMultiplayer)
                 PyNet.sendRequestToAllFarmers<bool>("PyTK.ModSavdDataCounterChangeReceiver", new ValueChangeRequest<string,int>(id,value,saveData.Counters[id]), null, SerializationType.JSON,-1);
         }
-
+        
         public override object GetApi()
         {
             return new PyTKAPI();
@@ -368,20 +373,40 @@ namespace PyTK
         private void harmonyFix()
         {
             OvSpritebatchNew.initializePatch(instance);
+            Monitor.Log("Patching: Assembly", LogLevel.Trace);
+
             instance.PatchAll(Assembly.GetExecutingAssembly());
+            
+            Monitor.Log("Patching: Load", LogLevel.Trace);
             instance.Patch(typeof(SaveGame).GetMethod("Load", BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
+
+            Monitor.Log("Patching: Serializers", LogLevel.Trace);
             PatchGeneratedSerializers(new Assembly[] { Assembly.GetExecutingAssembly() });
 
+            Monitor.Log("Patching: GameLocation Constructors", LogLevel.Trace);
             foreach (ConstructorInfo mc in typeof(GameLocation).GetConstructors())
                 instance.Patch(mc, postfix: new HarmonyMethod(typeof(OvLocations).GetMethod("GameLocationConstructor", BindingFlags.Static | BindingFlags.Public)));
 
             Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 
             if (Constants.TargetPlatform != GamePlatform.Android)
-                SetUpAssemblyPatch(hInstance, new XmlSerializer[] { SaveGame.farmerSerializer, SaveGame.locationSerializer, SaveGame.serializer });
+            {
+                Monitor.Log("Patching: Serializers Assembly", LogLevel.Trace);
+                try
+                {
+                    SetUpAssemblyPatch(hInstance, new XmlSerializer[] { SaveGame.farmerSerializer, SaveGame.locationSerializer, SaveGame.serializer });
+                }
+                catch
+                {
+                    Monitor.Log("Failed to Patch: Serializers Assembly. If the game crashes on save, this might be the cause.", LogLevel.Info);
+                }
+            }
 
             Helper.Events.GameLoop.GameLaunched += (s, e) =>
             {
+                if (Config.Options.Contains("DisableSerializerPatch"))
+                    return;
+
                 Task.Run(() =>
                {
                    lock (waitForIt)
@@ -389,15 +414,32 @@ namespace PyTK
                });
             };
 
-            instance.Patch(
-               original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "GetModFile"),
-               prefix: new HarmonyMethod(this.GetType().GetMethod("GetModFile", BindingFlags.Public | BindingFlags.Static))
-           );
+            Monitor.Log("Patching: GetModFile", LogLevel.Trace);
 
-            instance.Patch(
-               original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "NormalizeTilesheetPaths"),
-               postfix: new HarmonyMethod(this.GetType().GetMethod("NormalizeTilesheetPaths", BindingFlags.Public | BindingFlags.Static))
-           );
+            try
+            {
+                instance.Patch(
+                   original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "GetModFile"),
+                   prefix: new HarmonyMethod(this.GetType().GetMethod("GetModFile", BindingFlags.Public | BindingFlags.Static))
+               );
+            }
+            catch
+            {
+                Monitor.Log("Failed to Patch: GetModFile, this Error may not be critical", LogLevel.Info);
+            }
+
+            Monitor.Log("Patching: NormalizeTilesheetPaths", LogLevel.Trace);
+            try
+            {
+                instance.Patch(
+                   original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "NormalizeTilesheetPaths"),
+                   postfix: new HarmonyMethod(this.GetType().GetMethod("NormalizeTilesheetPaths", BindingFlags.Public | BindingFlags.Static))
+               );
+            }
+            catch
+            {
+                Monitor.Log("Failed to Patch: NormalizeTilesheetPaths, this Error may not be critical", LogLevel.Info);
+            }
 
             setupLoadIntercepter(instance);
         }
@@ -442,40 +484,83 @@ namespace PyTK
 
         private void setupLoadIntercepter(HarmonyInstance harmony)
         {
+             Monitor.Log("Patching: FromStream", LogLevel.Trace);
+
+            if (!Config.Options.Contains("DisableFSPatch"))
+                foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(gm => gm.Name.Contains("FromStream") && gm.GetParameters().ToList().Exists(p => p.Name == "stream")))
+                {
+                    try
+                    {
+                        harmony.Patch(
+                            original: m,
+                            postfix: new HarmonyMethod(this.GetType().GetMethod("FromStreamIntercepter", BindingFlags.Public | BindingFlags.Static)));
+                    }
+                    catch
+                    {
+                        Monitor.Log("Failed to Patch: FromStream, this Error may not be critical", LogLevel.Info);
+                    }
+                }
+
+            Monitor.Log("Patching: PatchImage", LogLevel.Trace);
+
             try
             {
-                foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(gm => gm.Name.Contains("FromStream") && gm.GetParameters().ToList().Exists(p => p.Name == "stream")))
-                    harmony.Patch(
-                        original: m,
-                        postfix: new HarmonyMethod(this.GetType().GetMethod("FromStreamIntercepter", BindingFlags.Public | BindingFlags.Static)));
-            }
-            catch
-            {
-
-            }
-
-            harmony.Patch(
+                harmony.Patch(
                 original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.Content.AssetDataForImage, StardewModdingAPI"), "PatchImage"),
                 prefix: new HarmonyMethod(this.GetType().GetMethod("PatchImage", BindingFlags.Public | BindingFlags.Static))
             );
-
-            harmony.Patch(
-               original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.Content.AssetDataForImage, StardewModdingAPI"), "ExtendImage"),
-               prefix: new HarmonyMethod(this.GetType().GetMethod("ExtendImage", BindingFlags.Public | BindingFlags.Static))
-           );
-
-            foreach (ConstructorInfo constructor in typeof(FileStream).GetConstructors().Where(c => c.GetParameters().ToList().Exists(p => p.ParameterType == typeof(string) && p.Name == "path")))
+            }
+            catch
             {
-                harmony.Patch(
-               original: constructor,
-               prefix: new HarmonyMethod(this.GetType().GetMethod("FileStreamConstructorPre", BindingFlags.Public | BindingFlags.Static))
-                );
+                Monitor.Log("Failed to Patch: PatchImage, this Error may not be critical", LogLevel.Info);
             }
 
-            harmony.Patch(
-                original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "PremultiplyTransparency"),
-                prefix: new HarmonyMethod(this.GetType().GetMethod("PremultiplyTransparencyPre", BindingFlags.Public | BindingFlags.Static))
-            );
+            Monitor.Log("Patching: ExtendImage", LogLevel.Trace);
+
+            try
+            {
+                harmony.Patch(
+                   original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.Content.AssetDataForImage, StardewModdingAPI"), "ExtendImage"),
+                   prefix: new HarmonyMethod(this.GetType().GetMethod("ExtendImage", BindingFlags.Public | BindingFlags.Static))
+               );
+            }
+            catch
+            {
+                Monitor.Log("Failed to Patch: ExtendImage, this Error may not be critical", LogLevel.Info);
+            }
+
+            Monitor.Log("Patching: FileStream Constructors", LogLevel.Trace);
+
+            
+                foreach (ConstructorInfo constructor in typeof(FileStream).GetConstructors().Where(c => c.GetParameters().ToList().Exists(p => p.ParameterType == typeof(string) && p.Name == "path")))
+                {
+                    try
+                    {
+                        harmony.Patch(
+                       original: constructor,
+                       prefix: new HarmonyMethod(this.GetType().GetMethod("FileStreamConstructorPre", BindingFlags.Public | BindingFlags.Static))
+                        );
+                    }
+                    catch
+                    {
+                        Monitor.Log("Failed to Patch: FileStream Constructors, this Error may not be critical", LogLevel.Info);
+
+                    }
+                }
+
+            Monitor.Log("Patching: PremultiplyTransparency", LogLevel.Trace);
+
+            try
+            {
+                harmony.Patch(
+                    original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.ContentManagers.ModContentManager, StardewModdingAPI"), "PremultiplyTransparency"),
+                    prefix: new HarmonyMethod(this.GetType().GetMethod("PremultiplyTransparencyPre", BindingFlags.Public | BindingFlags.Static))
+                );
+            }
+            catch
+            {
+                Monitor.Log("Failed to Patch: PremultiplyTransparency, this Error may not be critical", LogLevel.Info);
+            }
 
             ContentInterceptors.Add(new TextureInterceptor<ScaleUpData>(ModManifest, ScaleUpInterceptor));
         }
@@ -633,6 +718,9 @@ namespace PyTK
 
         public void SetUpAssemblyPatch(HarmonyInstance instance, IEnumerable<XmlSerializer> serializers)
         {
+            if (Config.Options.Contains("DisableSerializerPatch"))
+                return;
+
             foreach (var serializer in serializers)
             {
                 var cache = serializer.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);

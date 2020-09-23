@@ -12,7 +12,7 @@ namespace PlatoWarpMenu
 
         public string MenuFont2 { get; set; }
 
-        public bool CompatibilityMode { get; set; }
+        public bool CompatibilityMode { get => true; set { } }
 
         public Config()
         {

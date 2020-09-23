@@ -5,6 +5,7 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TMXTile;
 using xTile.Dimensions;
 using xTile.Display;
@@ -46,7 +47,7 @@ namespace PyTK.Types
 
         public virtual void Clear()
         {
-            m_tileSheetTextures2.Clear();
+            m_tileSheetTextures2.ToList().ForEach(t => DisposeTileSheet(t.Key));
         }
 
         public virtual void BeginScene(SpriteBatch b)
@@ -60,7 +61,7 @@ namespace PyTK.Types
                 return texture;
             else
             {
-                LoadTileSheet(tilesheet);
+                LoadTileSheet2(tilesheet);
                 if (m_tileSheetTextures2.TryGetValue(tilesheet, out Texture2D texture2))
                     return texture2;
                 else
@@ -70,6 +71,9 @@ namespace PyTK.Types
 
         public virtual void DisposeTileSheet(TileSheet tileSheet)
         {
+            if (m_tileSheetTextures2.ContainsKey(tileSheet))
+                m_tileSheetTextures2[tileSheet].Dispose();
+
             m_tileSheetTextures2.Remove(tileSheet);
         }
 
@@ -80,6 +84,8 @@ namespace PyTK.Types
 
             xTile.Dimensions.Rectangle tileImageBounds = tile.TileSheet.GetTileImageBounds(tile.TileIndex);
             Texture2D tileSheetTexture = GetTexture(tile.TileSheet);
+
+
             if (tileSheetTexture == null || tileSheetTexture.IsDisposed)
                 return;
 
@@ -139,13 +145,23 @@ namespace PyTK.Types
 
         }
 
-        public virtual void LoadTileSheet(TileSheet tileSheet)
+        public virtual void LoadTileSheet2(TileSheet tileSheet, bool invalidated = false)
         {
+           if(invalidated)
+                PyTKMod._instance.Helper.Content.InvalidateCache(tileSheet.ImageSource);
+
             try
             {
 
                 if (m_contentManager.Load<Texture2D>(tileSheet.ImageSource) is Texture2D texture)
                 {
+                    if (texture.IsDisposed)
+                    {
+                        if(!invalidated)
+                            LoadTileSheet2(tileSheet, true);
+                        return;
+                    }
+                    
                     if (m_tileSheetTextures2.ContainsKey(tileSheet))
                         m_tileSheetTextures2[tileSheet] = texture;
                     else
@@ -181,6 +197,11 @@ namespace PyTK.Types
                             m_tileSheetTextures2.Add(tileSheet, texture);
                 }
             }
+        }
+
+        public virtual void LoadTileSheet(TileSheet tileSheet)
+        {
+
         }
 
         public virtual void SetClippingRegion(xTile.Dimensions.Rectangle clippingRegion)
