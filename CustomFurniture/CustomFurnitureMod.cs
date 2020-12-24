@@ -127,6 +127,9 @@ namespace CustomFurniture
             Helper.Events.Display.MenuChanged += OnMenuChanged;
         }
 
+        public Dictionary<IManifest, List<string>> furnitureByContentPack =
+          new Dictionary<IManifest, List<string>>();
+
         private void loadPacks()
         {
             int countPacks = 0;
@@ -151,6 +154,10 @@ namespace CustomFurniture
                     pack.version = cpack.Manifest.Version.ToString();
                     string author = pack.author == "none" ? "" : " by " + pack.author;
                     Monitor.Log(pack.name + " " + pack.version + author, LogLevel.Info);
+                    if (!furnitureByContentPack.ContainsKey(cpack.Manifest))
+                    {
+                      furnitureByContentPack.Add(cpack.Manifest, new List<string>());
+                    }
                     foreach (CustomFurnitureData data in pack.furniture)
                     {
                         countObjects++;
@@ -164,6 +171,7 @@ namespace CustomFurniture
                         CustomFurniture f = new CustomFurniture(data, objectID, Vector2.Zero);
                         furniturePile.AddOrReplace(pileID, f);
                         furniture.AddOrReplace(objectID, f);
+                        furnitureByContentPack[cpack.Manifest].Add(f.name);
                     }
                 }
 
