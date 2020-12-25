@@ -127,6 +127,12 @@ namespace CustomFurniture
             Helper.Events.Display.MenuChanged += OnMenuChanged;
         }
 
+        private Api api;
+        public override object GetApi()
+        {
+            return api ?? (api = new Api());
+        }
+
         public Dictionary<IManifest, List<string>> furnitureByContentPack =
           new Dictionary<IManifest, List<string>>();
 
