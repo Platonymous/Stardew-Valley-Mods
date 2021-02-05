@@ -72,7 +72,7 @@ namespace SundropNPCTest
         {
              if (__instance is IPatchedSubType subType
                 && subType.ShouldPatch
-                && subType.SubTypeOf.GetMethod(__originalMethod.Name, __originalMethod.GetParameters().Select(p => p.ParameterType).ToArray()) is MethodInfo m)
+                && subType.GetType().GetMethod($"{Prefix}{__originalMethod.Name}", __originalMethod.GetParameters().Select(p => p.ParameterType).ToArray()) is MethodInfo m)
             {
                 m.Invoke(__instance, args);
                 return false;
@@ -85,7 +85,7 @@ namespace SundropNPCTest
         {
             if (__instance is IPatchedSubType subType
                 && subType.ShouldPatch
-                && subType.SubTypeOf.GetMethod($"{Prefix}{__originalMethod.Name}", __originalMethod.GetParameters().Select(p => p.ParameterType).ToArray()) is MethodInfo m)
+                && subType.GetType().GetMethod($"{Prefix}{__originalMethod.Name}", __originalMethod.GetParameters().Select(p => p.ParameterType).ToArray()) is MethodInfo m)
             {
                 __result = (TResult) m.Invoke(__instance, args);
                 return false;
