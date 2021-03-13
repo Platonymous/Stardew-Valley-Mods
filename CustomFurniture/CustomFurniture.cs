@@ -61,6 +61,7 @@ namespace CustomFurniture
             tileLocation.Value = tile;
 
             CustomFurnitureMod.helper.Reflection.GetField<string>(this, "_description").SetValue(data.description);
+            CustomFurnitureMod.helper.Reflection.GetField<int>(this, "_placementRestriction").SetValue(2);
 
             parentSheetIndex.Set(data.index);
             setTexture();
