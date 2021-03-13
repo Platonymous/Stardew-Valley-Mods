@@ -761,6 +761,23 @@ namespace PyTK
             Helper.Events.GameLoop.DayStarted -= GameLoop_DayStarted;
         }
 
+        private static List<object> didPatch = new List<object>();
+        public static void SerializersReinitialized( XmlSerializer serializer )
+        {
+            //_monitor.Log( "Serializer reinitialized; redoing patches: " + serializer );
+            if ( serializer == null )
+            {
+                PatchGeneratedSerializers( new Assembly[] { Assembly.GetExecutingAssembly() } );
+                _instance.SetUpAssemblyPatch( hInstance, new XmlSerializer[] { SaveGame.farmerSerializer, SaveGame.locationSerializer, SaveGame.serializer } );
+                PatchGeneratedSerializers( AppDomain.CurrentDomain.GetAssemblies().Where( a => a.FullName.Contains( "Microsoft.GeneratedCode" ) ) );
+            }
+            else
+            {
+                _instance.SetUpAssemblyPatch( hInstance, new XmlSerializer[] { serializer } );
+                PatchGeneratedSerializers( AppDomain.CurrentDomain.GetAssemblies().Where( a => a.FullName.Contains( "Microsoft.GeneratedCode" ) ) );
+            }
+        }
+
         public static void PatchGeneratedSerializers(IEnumerable<Assembly> assemblies)
         {
             foreach (var ass in assemblies)
@@ -770,6 +787,11 @@ namespace PyTK
 
         public static void PatchGeneratedSerializerType(Type ty)
         {
+            if ( didPatch.Contains( ty ) )
+                return;
+            didPatch.Add( ty );
+            //_monitor.Log( "type:" + ty.FullName );
+
             if (ty.FullName.Contains("XmlSerializer1"))
             {
                 if (Constants.TargetPlatform != GamePlatform.Android && ty.GetField("cache", BindingFlags.NonPublic | BindingFlags.Static) is FieldInfo field && field.GetValue(null) is object cache)
