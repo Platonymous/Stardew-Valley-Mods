@@ -47,7 +47,7 @@ namespace PyTK.Types
 
         public virtual void Clear()
         {
-            m_tileSheetTextures2.ToList().ForEach(t => DisposeTileSheet(t.Key));
+            m_tileSheetTextures2.Clear();
         }
 
         public virtual void BeginScene(SpriteBatch b)
@@ -71,9 +71,6 @@ namespace PyTK.Types
 
         public virtual void DisposeTileSheet(TileSheet tileSheet)
         {
-            if (m_tileSheetTextures2.ContainsKey(tileSheet))
-                m_tileSheetTextures2[tileSheet].Dispose();
-
             m_tileSheetTextures2.Remove(tileSheet);
         }
 
@@ -201,7 +198,7 @@ namespace PyTK.Types
 
         public virtual void LoadTileSheet(TileSheet tileSheet)
         {
-
+            LoadTileSheet2(tileSheet);
         }
 
         public virtual void SetClippingRegion(xTile.Dimensions.Rectangle clippingRegion)

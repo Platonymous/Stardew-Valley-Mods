@@ -23,9 +23,16 @@ namespace PyTK.PlatoUI
 
         public virtual string Id { get; set; }
 
+        private float lastUIZoom = 1f;
+
         public PlatoUIMenu(string id, UIElement element, bool clone = false, Texture2D background = null, Color? backgroundColor = null, bool movingBackground = false)
             :base(0,0,Game1.viewport.Width,Game1.viewport.Height,false)
         {
+
+            lastUIZoom = Game1.options.desiredUIScale;
+            Game1.options.desiredUIScale = Game1.options.desiredBaseZoomLevel;
+            PyTK.PyTKMod._helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked; ;
+            
 
             if (backgroundColor.HasValue)
                 BackgroundColor = backgroundColor.Value;
@@ -38,11 +45,21 @@ namespace PyTK.PlatoUI
 
             BaseMenu.UpdateBounds();
         }
-       
+
+        private void GameLoop_UpdateTicked(object sender, StardewModdingAPI.Events.UpdateTickedEventArgs e)
+        {
+            if (!(Game1.activeClickableMenu is PlatoUIMenu))
+            {
+                Game1.options.desiredUIScale = lastUIZoom;
+                PyTK.PyTKMod._helper.Events.GameLoop.UpdateTicked -= GameLoop_UpdateTicked;
+            }
+        }
+
         public virtual void ClearMenu(UIElement element = null)
         {
             BaseMenu.Clear(element);
         }
+
         public override void draw(SpriteBatch b)
         {
             BeforeDrawAction?.Invoke(b);

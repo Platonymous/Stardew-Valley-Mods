@@ -13,6 +13,7 @@ using PyTK.ContentSync;
 using xTile.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using xTile;
+using System.IO.Compression;
 
 namespace PyTK
 {
@@ -257,37 +258,60 @@ namespace PyTK
 
         public static byte[] DecompressBytes(byte[] data)
         {
-            return Ionic.Zlib.GZipStream.UncompressBuffer(data);
+            return Decompress(data);
         }
 
         public static byte[] CompressStringToBytes(string str)
         {
-            return Ionic.Zlib.GZipStream.CompressString(str);
+            return Compress(System.Text.Encoding.UTF8.GetBytes(str));
         }
 
         public static string DecompressString(byte[] str)
         {
-            return Ionic.Zlib.GZipStream.UncompressString(str);
+            return System.Text.Encoding.UTF8.GetString(Decompress(str));
         }
 
         public static string CompressBytes(byte[] buffer)
         {
-            return Convert.ToBase64String(Ionic.Zlib.GZipStream.CompressBuffer(buffer));
+            return Convert.ToBase64String(Compress(buffer));
+        }
+
+        public static byte[] Compress(byte[] buffer)
+        {
+            using (MemoryStream decompressed = new MemoryStream(buffer))
+            using (MemoryStream compressed = new MemoryStream())
+            using (GZipStream gzip = new GZipStream(compressed, CompressionMode.Compress))
+            {
+                decompressed.CopyTo(gzip);
+                gzip.Close();
+                return compressed.ToArray();
+            }
+        }
+
+        public static byte[] Decompress(byte[] buffer)
+        {
+            using (MemoryStream decompressed = new MemoryStream())
+            using (MemoryStream compressed = new MemoryStream(buffer))
+            using (GZipStream gzip = new GZipStream(compressed, CompressionMode.Decompress))
+            {
+                gzip.CopyTo(decompressed);
+                return decompressed.ToArray();
+            }
         }
 
         public static byte[] DecompressBytes(string data)
         {
-            return Ionic.Zlib.GZipStream.UncompressBuffer(Convert.FromBase64String(data));
+            return Decompress(Convert.FromBase64String(data));
         }
 
         public static string CompressString(string str)
         {
-            return Convert.ToBase64String(Ionic.Zlib.GZipStream.CompressString(str));
+            return CompressBytes(System.Text.Encoding.UTF8.GetBytes(str));
         }
 
         public static string DecompressString(string str)
         {
-            return Ionic.Zlib.GZipStream.UncompressString(Convert.FromBase64String(str));
+            return System.Text.Encoding.UTF8.GetString(Decompress(Convert.FromBase64String(str)));
         }
 
         public void WarpFarmer(Farmer farmer, string location, int x, int y, bool isStructure = false, int facingAfterWarp = -1)
