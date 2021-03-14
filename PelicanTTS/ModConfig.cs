@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using StardewModdingAPI;
+using System.Collections.Generic;
 
 namespace PelicanTTS
 {
@@ -20,6 +21,8 @@ namespace PelicanTTS
        // public bool ReadChatMessages { get; set; } = true;
 
         public int Rate { get; set; } = 100;
+
+        public SButton ReadScreenKey { get; set; } = SButton.N;
 
         public Dictionary<string, VoiceSetup> Voices { get; set; } = new Dictionary<string, VoiceSetup>();
     }

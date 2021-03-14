@@ -22,9 +22,11 @@ namespace PelicanTTS
         internal static IManifest _manifest;
         internal static ITranslationHelper i18n => _helper.Translation;
         internal static Dictionary<LocalizedContentManager.LanguageCode, List<string>> voices = new Dictionary<LocalizedContentManager.LanguageCode, List<string>>();
+        internal static List<string> neural = new List<string>();
         internal static string currentName = "Abigail";
         internal static Dictionary<object, int> currentIndex = new Dictionary<object, int>();
         internal static int maxValues = 5;
+        internal static Screengraber screenGraber;
        
 
         public override void Entry(IModHelper helper)
@@ -32,7 +34,7 @@ namespace PelicanTTS
             _helper = helper;
             _manifest = ModManifest;
             config = Helper.ReadConfig<ModConfig>();
-
+            screenGraber = new Screengraber();
             Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
 
             helper.ConsoleCommands.Add("tts_update", "Updates new NPCs", (s,p) => setUpNPCConfig());
@@ -47,6 +49,14 @@ namespace PelicanTTS
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
 
+            helper.Events.Input.ButtonPressed += Input_ButtonPressed;
+
+            neural.AddRange(new string[]{
+                "Salli","Joanna","Ivy","Kendra","Kimberly","Kevin","Matthew","Justin","Joey",
+                "Lupe","Olivia","Camila",
+                "Amy","Emma", "Brian",
+            });
+
             voices.Add(LocalizedContentManager.LanguageCode.de, (new List<string>()
             {
                 "Marlene","Vicki","Hans"
@@ -54,7 +64,7 @@ namespace PelicanTTS
 
             voices.Add(LocalizedContentManager.LanguageCode.en, (new List<string>()
             {
-                "Brian","Amy","Joey","Emma","Nicole","Justin","Russell","Matthew","Kendra","Salli","Kimberly","Geraint","Ivy","Raveena","Aditi"
+                "Brian","Amy","Joey","Emma","Nicole","Olivia","Justin","Russell","Joanna","Matthew","Kevin", "Kendra","Salli","Kimberly","Geraint","Ivy","Raveena","Aditi"
             }).OrderBy(v => v).ToList());
 
             voices.Add(LocalizedContentManager.LanguageCode.es, (new List<string>()
@@ -111,7 +121,24 @@ namespace PelicanTTS
             {
                 "Zhiyu"
             }).OrderBy(v => v).ToList());
-            
+
+            /*voices.Add(LocalizedContentManager.LanguageCode.hu, (new List<string>()
+            {
+                "None"
+            }).OrderBy(v => v).ToList());
+
+
+            voices.Add(LocalizedContentManager.LanguageCode.th, (new List<string>()
+            {
+                "None"
+            }).OrderBy(v => v).ToList());*/
+
+        }
+
+        private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
+        {
+            if (e.Button == config.ReadScreenKey && Game1.getMousePosition() is Point p)
+                screenGraber.read(p);
         }
 
         private void GameLoop_OneSecondUpdateTicked(object sender, OneSecondUpdateTickedEventArgs e)
@@ -171,6 +198,7 @@ namespace PelicanTTS
                 config.ReadHudMessages = true;
                 config.ReadLetters = true;
                 config.ReadNonCharacterMessages = true;
+                config.ReadScreenKey = SButton.N;
                 //config.ReadChatMessages = true;
 
                 var npcs = Helper.Content.Load<Dictionary<string, string>>("Data//NPCDispositions", ContentSource.GameContent);
@@ -190,7 +218,9 @@ namespace PelicanTTS
             api.RegisterSimpleOption(ModManifest, "Read Non-Character Messages", "", () => config.ReadNonCharacterMessages, (s) => config.ReadNonCharacterMessages = s);
             api.RegisterSimpleOption(ModManifest, "Read Letters", "", () => config.ReadLetters, (s) => config.ReadLetters = s);
             api.RegisterSimpleOption(ModManifest, "Read Hud Messages", "", () => config.ReadHudMessages, (s) => config.ReadHudMessages = s);
-          //  api.RegisterSimpleOption(ModManifest, "Read Chat Messages", "", () => config.ReadChatMessages, (s) => config.ReadChatMessages = s);
+            api.RegisterSimpleOption(ModManifest, "Read Screen Key", "", () => config.ReadScreenKey, (s) => config.ReadScreenKey = s);
+
+            //  api.RegisterSimpleOption(ModManifest, "Read Chat Messages", "", () => config.ReadChatMessages, (s) => config.ReadChatMessages = s);
 
             api.RegisterClampedOption(ModManifest, "Volume", "Set Volume", () =>
             {
@@ -284,7 +314,11 @@ namespace PelicanTTS
                     {
                         var dialogues = _helper.Content.Load<Dictionary<string, string>>(@"Characters/Dialogue/" + character, ContentSource.GameContent);
                         if (dialogues != null && dialogues.ContainsKey("Introduction"))
+                        {
                             intro = dialogues["Introduction"].Split('^')[0].Split('#')[0].Replace("@", "");
+                            if(intro.Length < 7)
+                                intro = dialogues["Mon"].Split('^')[0].Split('#')[0].Replace("@", "");
+                        }
                     }
                     SpeechHandlerPolly.configSay(character, value, intro, activeRate, mvs is MenuVoiceSetup ? mvs.Pitch : -1, activeVolume);
                 }

@@ -32,6 +32,7 @@ namespace PelicanTTS
 
         private static AmazonPollyClient pc;
         private static VoiceId currentVoice;
+        private static string currentVoiceString;
         private static string tmppath;
         public static bool speak;
         private static string speakerName;
@@ -56,26 +57,31 @@ namespace PelicanTTS
 
                bool mumbling = PelicanTTSMod.config.MumbleDialogues;
 
-               text = text.Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
+               text = text.Replace("0g","0 gold").Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
+               bool useNeuralEngine = !mumbling && shouldUseNeuralEngine(voice);
+
+               var amzeffectIn = mumbling ? "<amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" : "<amazon:auto-breaths><amazon:effect phonation='soft'>";
+               var amzeffectOut = mumbling ? "</amazon:effect></amazon:effect>" : "</amazon:effect></amazon:auto-breaths>";
 
                if (mumbling)
-                   text = @"<speak><amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" + Dialogue.convertToDwarvish(text) + @"</amazon:effect></amazon:effect></speak>";
+                   text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + Dialogue.convertToDwarvish(text) + (useNeuralEngine ? "" : amzeffectOut) + @"</speak>";
                else
-                   text = @"<speak><amazon:auto-breaths><amazon:effect phonation='soft'><prosody rate='"+ (rate == -1 ? PelicanTTSMod.config.Rate : rate) + "%'>" + text + @"</prosody></amazon:effect></amazon:auto-breaths></speak>";
+                   text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (rate == -1 ? PelicanTTSMod.config.Rate : rate) + "%'>" + text + @"</prosody>"+ (useNeuralEngine ? "" : amzeffectOut) + "</speak>";
 
-
-               int hash = text.GetHashCode();
+               int hash = (text + (useNeuralEngine ? "-neural" : "")).GetHashCode();
                if (!Directory.Exists(Path.Combine(tmppath, name)))
                    Directory.CreateDirectory(Path.Combine(tmppath, name));
 
                string file = Path.Combine(Path.Combine(tmppath, name), "speech_" + currentVoice.Value + (mumbling ? "_mumble_" : "_") + hash + ".wav");
                SoundEffect nextSpeech = null;
+
                if (!File.Exists(file))
                {
                    SynthesizeSpeechRequest sreq = new SynthesizeSpeechRequest();
                    sreq.Text = text;
                    sreq.TextType = TextType.Ssml;
                    sreq.OutputFormat = OutputFormat.Ogg_vorbis;
+                   sreq.Engine = useNeuralEngine ? Engine.Neural : Engine.Standard;
                    sreq.VoiceId = currentVoice;
                    SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
                    using (var memStream = new MemoryStream())
@@ -165,14 +171,19 @@ namespace PelicanTTS
 
         public static void setVoiceById(string id)
         {
+            currentVoiceString = id;
             if (VoiceId.FindValue(id) is VoiceId vId1)
                 currentVoice = vId1;
             else if (VoiceId.FindValue(PelicanTTSMod.i18n.Get("default")) is VoiceId vId2)
+            {
                 currentVoice = vId2;
+                currentVoiceString = PelicanTTSMod.i18n.Get("default");
+            }
             else
             {
                 speakerName = "default";
                 currentVoice = VoiceId.Salli;
+                currentVoiceString = "Salli";
             }
         }
 
@@ -254,6 +265,11 @@ namespace PelicanTTS
             }
         }
 
+        internal static bool shouldUseNeuralEngine(string voice)
+        {
+            return PelicanTTSMod.neural.Contains(voice);
+        }
+
         internal static void t2sOut()
         {
             while (runSpeech)
@@ -267,14 +283,19 @@ namespace PelicanTTS
                     if (currentText.StartsWith("+"))
                         continue;
 
-                    currentText = currentText.Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
+                    currentText = currentText.Replace("0g","0 gold").Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
+                    
+                    bool useNeuralEngine = !mumbling && shouldUseNeuralEngine(currentVoiceString);
+
+                    var amzeffectIn = mumbling ? "<amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" : "<amazon:auto-breaths><amazon:effect phonation='soft'>";
+                    var amzeffectOut = mumbling ? "</amazon:effect></amazon:effect>" : "</amazon:effect></amazon:auto-breaths>";
 
                     if (mumbling)
-                        currentText = @"<speak><amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" + Dialogue.convertToDwarvish(currentText) + @"</amazon:effect></amazon:effect></speak>";
+                        currentText = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + Dialogue.convertToDwarvish(currentText) + (useNeuralEngine ? "" : amzeffectOut) + @"</speak>";
                     else
-                        currentText = @"<speak><amazon:auto-breaths><amazon:effect phonation='soft'><prosody rate='" + PelicanTTSMod.config.Rate + "%'>" + currentText + @"</prosody></amazon:effect></amazon:auto-breaths></speak>";
+                        currentText = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (PelicanTTSMod.config.Rate) + "%'>" + currentText + @"</prosody>" + (useNeuralEngine ? "" : amzeffectOut) + "</speak>";
 
-                    int hash = currentText.GetHashCode();
+                    int hash = (currentText + (useNeuralEngine ? "-neural" : "")).GetHashCode();
                     if (!Directory.Exists(Path.Combine(tmppath, speakerName)))
                         Directory.CreateDirectory(Path.Combine(tmppath, speakerName));
 
@@ -288,6 +309,7 @@ namespace PelicanTTS
                         sreq.TextType = TextType.Ssml;
                         sreq.OutputFormat = OutputFormat.Ogg_vorbis;
                         sreq.VoiceId = currentVoice;
+                        sreq.Engine = useNeuralEngine ? Engine.Neural : Engine.Standard;
                         SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
                         using (var memStream = new MemoryStream())
                         {
