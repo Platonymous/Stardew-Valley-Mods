@@ -172,6 +172,20 @@ namespace CustomFurniture
                         string objectID = pileID;
                         CustomFurnitureMod.log("Load:" + objectID);
                         string tkey = $"{data.folderName}/{ data.texture}";
+                        if (data.textureOverlay != null)
+                        {
+                            string tkey2 = $"{data.folderName}/{ data.textureOverlay}";
+                            if (!CustomFurniture.Textures.ContainsKey(tkey2))
+                                CustomFurniture.Textures.Add(tkey2, data.fromContent ? data.textureOverlay : cpack.GetActualAssetKey(data.textureOverlay));
+                        }
+
+                        if (data.textureUnderlay != null)
+                        {
+                            string tkey3 = $"{data.folderName}/{ data.textureUnderlay}";
+                            if (!CustomFurniture.Textures.ContainsKey(tkey3))
+                                CustomFurniture.Textures.Add(tkey3, data.fromContent ? data.textureUnderlay : cpack.GetActualAssetKey(data.textureUnderlay));
+                        }
+
                         if (!CustomFurniture.Textures.ContainsKey(tkey))
                             CustomFurniture.Textures.Add(tkey, data.fromContent ? data.texture : cpack.GetActualAssetKey(data.texture));
                         CustomFurniture f = new CustomFurniture(data, objectID, Vector2.Zero);

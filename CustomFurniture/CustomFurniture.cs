@@ -12,9 +12,12 @@ using Netcode;
 
 namespace CustomFurniture
 {
-    public class CustomFurniture : Furniture, ISaveElement
+    public class CustomFurniture : Furniture, ISaveElement, ISittable
     {
         public Texture2D texture;
+        public Texture2D textureOverlay;
+        public Texture2D textureUnderlay;
+
         public static Dictionary<string, string> Textures = new Dictionary<string, string>();
         private int animationFrames;
         private int frame;
@@ -26,10 +29,11 @@ namespace CustomFurniture
         private int rotatedWidth;
         private int rotatedBoxWidth;
         private int rotatedBoxHeight;
+        private bool isStool = false;
         public FurnitureRotation fRotation;
         public CustomFurnitureData data;
         public string id;
-
+       
         public CustomFurniture()
         {
 
@@ -39,6 +43,7 @@ namespace CustomFurniture
         {
             build(data, objectID, tile);
         }
+
 
         public void build(CustomFurnitureData data, string objectID, Vector2 tile)
         {
@@ -67,15 +72,19 @@ namespace CustomFurniture
             setTexture();
             name = data.name;
             List<string> decorTypes = new List<string>();
-            decorTypes.Add("chair");
+           /* decorTypes.Add("chair");
             decorTypes.Add("bench");
             decorTypes.Add("couch");
-            decorTypes.Add("armchair");
+            decorTypes.Add("armchair");*/
             decorTypes.Add("dresser");
             decorTypes.Add("bookcase");
             decorTypes.Add("other");
             string typename = data.type.Contains("table") ? "table" : decorTypes.Contains(data.type) ? "decor" : data.type;
-            furniture_type.Value = data.type.Contains("table") ? 11 : decorTypes.Contains(data.type) ? 8 : CustomFurnitureMod.helper.Reflection.GetMethod(new Furniture(), "getTypeNumberFromName").Invoke<int>(data.type);
+
+            if (this.Name.Contains("Stool") || data.type == "stool")
+                isStool = true;
+
+            //furniture_type.Value = data.type.Contains("table") ? 11 : decorTypes.Contains(data.type) ? 8 : CustomFurnitureMod.helper.Reflection.GetMethod(new Furniture(), "getTypeNumberFromName").Invoke<int>(data.type);
             furniture_type.Value = getTypeFromName(typename);
             defaultSourceRect.Value = new Rectangle(data.index * 16 % texture.Width, data.index * 16 / texture.Width * 16, 1, 1);
             drawHeldObjectLow.Value = false;
@@ -97,12 +106,20 @@ namespace CustomFurniture
 
             fRotation = FurnitureRotation.horizontal;
             texture = null;
+            textureOverlay = null;
+            textureUnderlay = null;
         }
 
         public override void DayUpdate(GameLocation location)
         {
             if (data.fromContent)
+            {
                 texture = CustomFurnitureMod.helper.Content.Load<Texture2D>(data.texture, StardewModdingAPI.ContentSource.GameContent);
+                if(data.textureOverlay != null)
+                    textureOverlay = CustomFurnitureMod.helper.Content.Load<Texture2D>(data.textureOverlay, StardewModdingAPI.ContentSource.GameContent);
+                if (data.textureUnderlay != null)
+                    textureUnderlay = CustomFurnitureMod.helper.Content.Load<Texture2D>(data.textureUnderlay, StardewModdingAPI.ContentSource.GameContent);
+            }
 
             base.DayUpdate(location);
         }
@@ -112,8 +129,16 @@ namespace CustomFurniture
             restore();
             string folder = new DirectoryInfo(data.folderName).Name;
             string tkey = $"{folder}/{data.texture}";
+
+           
             if (Textures.ContainsKey(tkey))
-                texture = CustomFurnitureMod.helper.Content.Load<Texture2D>(Textures[($"{folder}/{data.texture}")],StardewModdingAPI.ContentSource.GameContent);
+                texture = CustomFurnitureMod.helper.Content.Load<Texture2D>(Textures[tkey],StardewModdingAPI.ContentSource.GameContent);
+            if (data.textureOverlay is string overlay && $"{folder}/{overlay}" is string tkey2 && Textures.ContainsKey(tkey2))
+                textureOverlay = CustomFurnitureMod.helper.Content.Load<Texture2D>(Textures[tkey2], StardewModdingAPI.ContentSource.GameContent);
+            if (data.textureUnderlay is string underlay && $"{folder}/{underlay}" is string tkey3 && Textures.ContainsKey(tkey3))
+                textureUnderlay = CustomFurnitureMod.helper.Content.Load<Texture2D>(Textures[tkey3], StardewModdingAPI.ContentSource.GameContent);
+
+
         }
 
         protected override string loadDisplayName()
@@ -133,6 +158,7 @@ namespace CustomFurniture
         {
             switch (type)
             {
+                case "stool": return chair;
                 case "chair": return chair;
                 case "bench": return bench;
                 case "couch": return couch;
@@ -235,11 +261,33 @@ namespace CustomFurniture
             int offset = frameWidth * 16 * frame;
 
             animatedSourceRect = frame == 0 ? sourceRect : new Rectangle(offset + sourceRect.X, sourceRect.Y, sourceRect.Width, sourceRect.Height);
-          
+
+            float under = (float)(base.boundingBox.Value.Top + 16) / 10000f;
+            float over = (float)(base.boundingBox.Value.Bottom - 8) / 10000f;
+            float position = 
+                furniture_type == 12 ? 0.0f : 
+                HasSittingFarmers() &&  furniture_type > 3 ? over : 
+                    isStool ? under : 
+                    currentRotation.Value == 2 ? over : under;
+
             if (x == -1)
-                spriteBatch.Draw(texture, Game1.GlobalToLocal(Game1.viewport, drawPosition), new Rectangle?(animatedSourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, furniture_type == 12 ? 0.0f : (float)(boundingBox.Bottom - 8) / 10000f);
+            {
+                if (textureUnderlay != null)
+                    spriteBatch.Draw(textureUnderlay, Game1.GlobalToLocal(Game1.viewport, drawPosition), new Rectangle?(animatedSourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, under);
+                spriteBatch.Draw(texture, Game1.GlobalToLocal(Game1.viewport, drawPosition), new Rectangle?(animatedSourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, position);
+                if(textureOverlay != null)
+                    spriteBatch.Draw(textureOverlay, Game1.GlobalToLocal(Game1.viewport, drawPosition), new Rectangle?(animatedSourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, over);
+
+            }
             else
-                spriteBatch.Draw(texture, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize), (float)(y * Game1.tileSize - (sourceRect.Height * Game1.pixelZoom - boundingBox.Height)))), new Rectangle?(sourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, this.furniture_type.Value == 12 ? 0.0f : (float)(boundingBox.Bottom - 8) / 10000f);
+            {
+                if(textureUnderlay != null)
+                    spriteBatch.Draw(textureUnderlay, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize), (float)(y * Game1.tileSize - (sourceRect.Height * Game1.pixelZoom - boundingBox.Height)))), new Rectangle?(sourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, under);
+                spriteBatch.Draw(texture, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize), (float)(y * Game1.tileSize - (sourceRect.Height * Game1.pixelZoom - boundingBox.Height)))), new Rectangle?(sourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, position);
+                if(textureOverlay != null)
+                    spriteBatch.Draw(textureOverlay, Game1.GlobalToLocal(Game1.viewport, new Vector2((float)(x * Game1.tileSize), (float)(y * Game1.tileSize - (sourceRect.Height * Game1.pixelZoom - boundingBox.Height)))), new Rectangle?(sourceRect), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, over);
+            }
+
             if (heldObject.Value == null)
                 return;
             if (heldObject.Value is CustomFurniture ho)
