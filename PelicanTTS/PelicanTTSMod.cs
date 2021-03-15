@@ -23,6 +23,9 @@ namespace PelicanTTS
         internal static ITranslationHelper i18n => _helper.Translation;
         internal static Dictionary<LocalizedContentManager.LanguageCode, List<string>> voices = new Dictionary<LocalizedContentManager.LanguageCode, List<string>>();
         internal static List<string> neural = new List<string>();
+        internal static List<string> conversational = new List<string>();
+        internal static List<string> news = new List<string>();
+
         internal static string currentName = "Abigail";
         internal static Dictionary<object, int> currentIndex = new Dictionary<object, int>();
         internal static int maxValues = 5;
@@ -55,6 +58,10 @@ namespace PelicanTTS
                 "Salli","Joanna","Ivy","Kendra","Kimberly","Kevin","Matthew","Justin","Joey",
                 "Lupe","Olivia","Camila",
                 "Amy","Emma", "Brian",
+            });
+
+            news.AddRange(new string[]{
+                "Matthew", "Joanna", "Lupe", "Amy"
             });
 
             voices.Add(LocalizedContentManager.LanguageCode.de, (new List<string>()
@@ -177,7 +184,11 @@ namespace PelicanTTS
             if (!Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu"))
                 return;
 
-            var cVoices = voices[LocalizedContentManager.LanguageCode.en];
+            var cVoices = voices[LocalizedContentManager.CurrentLanguageCode];
+
+            foreach (var lang in voices.Where(v => v.Key != LocalizedContentManager.CurrentLanguageCode))
+                foreach (var voice in lang.Value.Where(v => !cVoices.Contains(v)))
+                    cVoices.Add(voice + "*");
 
             if (voices.ContainsKey(Helper.Translation.LocaleEnum))
                 cVoices = voices[Helper.Translation.LocaleEnum];
@@ -277,10 +288,14 @@ namespace PelicanTTS
                             return npc + ":default";
 
                         activeVoiceSetup[npc].Voice = config.Voices[npc].Voice;
-                        return config.Voices[npc].Voice;
+                        string voice = config.Voices[npc].Voice;
+
+                        if (!voices[LocalizedContentManager.CurrentLanguageCode].Contains(voice))
+                            return voice + "*";
+                        return voice;
                     }, (s) =>
                     {
-                        config.Voices[npc].Voice = s.Replace(npc + ":", "");
+                        config.Voices[npc].Voice = s.Replace(npc + ":", "").Replace("*","");
                         activeVoiceSetup[npc].Voice = config.Voices[npc].Voice;
                         currentName = npc;
                     }, npcVoices.ToArray());
@@ -306,7 +321,7 @@ namespace PelicanTTS
                     if (value == "Default")
                         value = SpeechHandlerPolly.getVoice(character);
                     var mvs = activeVoiceSetup.Values.FirstOrDefault(avs => avs.Name == character);
-
+                    value = value.Replace("*", "");
                     var intro = character;
                     if (intro == "Default")
                         intro = i18n.Get("FestivalGreeting");
