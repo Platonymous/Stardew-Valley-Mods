@@ -601,8 +601,8 @@ namespace PyTK
 
                     if (data.Animation is Animation anim)
                     {
-                        tileHeight = anim.FrameHeight == -1 ? texture.Height : anim.FrameHeight;
-                        tileWidth = anim.FrameWidth == -1 ? texture.Width : anim.FrameWidth;
+                        tileHeight = anim.FrameHeight == -1 ? texture.Height : Math.Min(texture.Height, anim.FrameHeight);
+                        tileWidth = anim.FrameWidth == -1 ? texture.Width : Math.Min(texture.Width, anim.FrameWidth);
                         fps = anim.FPS;
                         loop = anim.Loop;
 
@@ -646,6 +646,9 @@ namespace PyTK
             var sr = !sourceArea.HasValue ? s : sourceArea.Value;
             var tr = !targetArea.HasValue ? sr : targetArea.Value;
 
+            if (__instance.Data is ScaledTexture2D && !(source is ScaledTexture2D))
+                return true;
+
             if (source is ScaledTexture2D scaled)
             {
                 if (a == tr && patchMode == PatchMode.Replace)
@@ -663,7 +666,7 @@ namespace PyTK
                     __instance.Data.getArea(tr).GetData(data);
                     scaled.SetData<Color>(data);
                 }
-
+                
                 if (__instance.Data is MappedTexture2D map)
                     map.Set(tr, source);
                 else
@@ -675,6 +678,8 @@ namespace PyTK
                 return false;
             }else if(__instance.Data is ScaledTexture2D sc)
             {
+
+
                 __instance.ReplaceWith(new MappedTexture2D(__instance.Data, new Dictionary<Rectangle?, Texture2D>() { { tr, (sr.Width != source.Width || sr.Height != source.Height) ? source.getArea(sr) : source } }));
                 return false;
             }
