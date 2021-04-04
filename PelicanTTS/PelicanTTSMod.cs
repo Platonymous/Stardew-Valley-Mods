@@ -23,6 +23,7 @@ namespace PelicanTTS
         internal static ITranslationHelper i18n => _helper.Translation;
         internal static Dictionary<LocalizedContentManager.LanguageCode, List<string>> voices = new Dictionary<LocalizedContentManager.LanguageCode, List<string>>();
         internal static List<string> neural = new List<string>();
+        internal static List<string> others = new List<string>();
         internal static List<string> conversational = new List<string>();
         internal static List<string> news = new List<string>();
 
@@ -30,17 +31,33 @@ namespace PelicanTTS
         internal static Dictionary<object, int> currentIndex = new Dictionary<object, int>();
         internal static int maxValues = 5;
         internal static Screengraber screenGraber;
-       
+
+        internal static Dictionary<string, string> neuralReplacements;
+
+        internal static Dictionary<string, Amazon.RegionEndpoint> endPoints;
+
+        internal static Amazon.RegionEndpoint activeEndpoint = Amazon.RegionEndpoint.USEast1;
+
 
         public override void Entry(IModHelper helper)
         {
+            endPoints = new Dictionary<string, Amazon.RegionEndpoint>()
+            {
+               { "USA",Amazon.RegionEndpoint.USEast1},
+                {"UK",Amazon.RegionEndpoint.EUWest2},
+                {"Germany",Amazon.RegionEndpoint.EUCentral1},
+                {"Canada",Amazon.RegionEndpoint.CACentral1},
+                {"Japan",Amazon.RegionEndpoint.APNortheast1}
+            };
+
             _helper = helper;
             _manifest = ModManifest;
             config = Helper.ReadConfig<ModConfig>();
+            activeEndpoint = endPoints[config.Server];
             screenGraber = new Screengraber();
             Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
 
-            helper.ConsoleCommands.Add("tts_update", "Updates new NPCs", (s,p) => setUpNPCConfig());
+            helper.ConsoleCommands.Add("tts_update", "Updates new NPCs", (s, p) => setUpNPCConfig());
 
             Helper.WriteConfig<ModConfig>(config);
             string tmppath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "Content"), "TTS");
@@ -55,10 +72,13 @@ namespace PelicanTTS
             helper.Events.Input.ButtonPressed += Input_ButtonPressed;
 
             neural.AddRange(new string[]{
-                "Salli","Joanna","Ivy","Kendra","Kimberly","Kevin","Matthew","Justin","Joey",
-                "Lupe","Olivia","Camila",
-                "Amy","Emma", "Brian",
+                "Kevin","Olivia",
             });
+
+            neuralReplacements = new Dictionary<string, string>()
+            {
+                { "Kevin","Justin" },{"Olivia","Nicole"}
+            };
 
             news.AddRange(new string[]{
                 "Matthew", "Joanna", "Lupe", "Amy"
@@ -129,16 +149,13 @@ namespace PelicanTTS
                 "Zhiyu"
             }).OrderBy(v => v).ToList());
 
-            /*voices.Add(LocalizedContentManager.LanguageCode.hu, (new List<string>()
-            {
-                "None"
-            }).OrderBy(v => v).ToList());
+            voices.Add(LocalizedContentManager.LanguageCode.hu, new List<string>());
 
 
-            voices.Add(LocalizedContentManager.LanguageCode.th, (new List<string>()
-            {
-                "None"
-            }).OrderBy(v => v).ToList());*/
+            voices.Add(LocalizedContentManager.LanguageCode.th, new List<string>());
+
+
+            others.AddRange(typeof(VoiceId).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Select(f => f.Name).Where(v => !voices.Any(vc => vc.Value.Contains(v))));
 
         }
 
@@ -185,13 +202,16 @@ namespace PelicanTTS
                 return;
 
             var cVoices = voices[LocalizedContentManager.CurrentLanguageCode];
+            var eVoices = new List<string>();
 
             foreach (var lang in voices.Where(v => v.Key != LocalizedContentManager.CurrentLanguageCode))
                 foreach (var voice in lang.Value.Where(v => !cVoices.Contains(v)))
-                    cVoices.Add(voice + "*");
+                    eVoices.Add(voice + "*");
 
-            if (voices.ContainsKey(Helper.Translation.LocaleEnum))
-                cVoices = voices[Helper.Translation.LocaleEnum];
+            foreach (var voice in others.Where(v => !cVoices.Contains(v) && !eVoices.Contains(v + "*")))
+                eVoices.Add(voice + "*");
+
+            cVoices.AddRange(eVoices.OrderBy(v => v).Where(v => !cVoices.Contains(v)));
 
             maxValues = Math.Min(cVoices.Count + 1, 7);
 
@@ -210,6 +230,7 @@ namespace PelicanTTS
                 config.ReadLetters = true;
                 config.ReadNonCharacterMessages = true;
                 config.ReadScreenKey = SButton.N;
+                config.LanguageCode = SpeechHandlerPolly.getLanguageCode(true);
                 //config.ReadChatMessages = true;
 
                 var npcs = Helper.Content.Load<Dictionary<string, string>>("Data//NPCDispositions", ContentSource.GameContent);
@@ -230,8 +251,16 @@ namespace PelicanTTS
             api.RegisterSimpleOption(ModManifest, "Read Letters", "", () => config.ReadLetters, (s) => config.ReadLetters = s);
             api.RegisterSimpleOption(ModManifest, "Read Hud Messages", "", () => config.ReadHudMessages, (s) => config.ReadHudMessages = s);
             api.RegisterSimpleOption(ModManifest, "Read Screen Key", "", () => config.ReadScreenKey, (s) => config.ReadScreenKey = s);
-
+            api.RegisterSimpleOption(ModManifest, "Language Code", "", () => config.LanguageCode, (s) => config.LanguageCode = s);
             //  api.RegisterSimpleOption(ModManifest, "Read Chat Messages", "", () => config.ReadChatMessages, (s) => config.ReadChatMessages = s);
+            api.RegisterSimpleOption(ModManifest, "Neural Voices", "", () => config.UseNeuralVoices, (s) => config.UseNeuralVoices = s);
+
+            api.RegisterChoiceOption(ModManifest, "Server", "", () => config.Server, (s) =>
+            {
+                config.Server = s;
+                activeEndpoint = endPoints[s];
+                SpeechHandlerPolly.pc = null;
+            }, endPoints.Keys.ToArray());
 
             api.RegisterClampedOption(ModManifest, "Volume", "Set Volume", () =>
             {

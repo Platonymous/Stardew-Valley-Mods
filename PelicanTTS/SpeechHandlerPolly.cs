@@ -30,7 +30,7 @@ namespace PelicanTTS
         private static IModHelper Helper;
 
 
-        private static AmazonPollyClient pc;
+        internal static AmazonPollyClient pc;
         private static VoiceId currentVoice;
         private static string currentVoiceString;
         private static string tmppath;
@@ -45,8 +45,12 @@ namespace PelicanTTS
 
         }
 
-        internal static string getLanguageCode()
+        internal static string getLanguageCode(bool ignoreConfig = false)
         {
+
+            if (!ignoreConfig && PelicanTTSMod.config.LanguageCode.Length >= 2)
+                return PelicanTTSMod.config.LanguageCode;
+
             switch (LocalizedContentManager.CurrentLanguageCode)
             {
                 case LocalizedContentManager.LanguageCode.de: return "de-DE";
@@ -84,7 +88,12 @@ namespace PelicanTTS
                text = text.Replace("0g","0 gold").Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
                text = language1 + text + language2;
 
-               bool useNeuralEngine = !mumbling && shouldUseNeuralEngine(voice);
+               bool neural = shouldUseNeuralEngine(voice, out string v);
+
+               if (!neural && voice != v)
+                   currentVoice = VoiceId.FindValue(v);
+
+               bool useNeuralEngine = !mumbling && neural;
 
                var amzeffectIn = mumbling ? "<amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" : "<amazon:auto-breaths><amazon:effect phonation='soft'>";
                var amzeffectOut = mumbling ? "</amazon:effect></amazon:effect>" : "</amazon:effect></amazon:auto-breaths>";
@@ -291,8 +300,16 @@ namespace PelicanTTS
             }
         }
 
-        internal static bool shouldUseNeuralEngine(string voice)
+        internal static bool shouldUseNeuralEngine(string voice, out string replacement)
         {
+            replacement = voice;
+
+            if (!PelicanTTSMod.config.UseNeuralVoices)
+            {
+                replacement = PelicanTTSMod.neuralReplacements.TryGetValue(voice, out string v) ? v : voice;
+                return false;
+            }
+
             return PelicanTTSMod.neural.Contains(voice);
         }
 
@@ -320,8 +337,13 @@ namespace PelicanTTS
                     string language2 = "</lang>";
 
                     currentText = language1 + currentText + language2;
+                    
+                    bool neural = shouldUseNeuralEngine(currentVoiceString, out string v);
 
-                    bool useNeuralEngine = !mumbling && shouldUseNeuralEngine(currentVoiceString);
+                    if (!neural && currentVoiceString != v)
+                        currentVoice = VoiceId.FindValue(v);
+
+                    bool useNeuralEngine = !mumbling && neural;
 
                     bool news = false;
 

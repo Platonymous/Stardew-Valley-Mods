@@ -22,8 +22,14 @@ namespace PelicanTTS
 
         public int Rate { get; set; } = 100;
 
+        public string LanguageCode { get; set; } = "";
+
         public SButton ReadScreenKey { get; set; } = SButton.N;
 
         public Dictionary<string, VoiceSetup> Voices { get; set; } = new Dictionary<string, VoiceSetup>();
+
+        public bool UseNeuralVoices { get; set; } = true;
+
+        public string Server { get; set; } = "USA";
     }
 }
