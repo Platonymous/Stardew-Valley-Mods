@@ -53,9 +53,10 @@ namespace CustomTV
 
                             if (channelData.ContainsKey("@Intro"))
                             {
-                                GetShowData(channelData["@Intro"], out string text, out string screen, out string overlay);
+                                GetShowData(channelData["@Intro"], out string text, out string screen, out string overlay, out string music);
 
                                 CustomTVChannelToken.Channels[channel].Intro = text;
+                                CustomTVChannelToken.Channels[channel].IntroMusic = music;
 
                                 if (!string.IsNullOrEmpty(screen) && CustomTVChannelToken.GetScreenId(channel, screen) is string screenId
                                 && CustomTVChannelToken.Screens.ContainsKey(screenId)
@@ -77,6 +78,7 @@ namespace CustomTV
                                 os.FrameDuration, os.Frames, int.MaxValue, Vector2.Zero, false, false, 0f, 0.0f, Color.White, 1f,
                                 0.0f, 0.0f, 0.0f, false);
                             }
+
 
                             if (channelData.ContainsKey("@Seasons"))
                                 CustomTVChannelToken.Channels[channel].Seasons = channelData["@Seasons"].Split(' ');
@@ -108,7 +110,7 @@ namespace CustomTV
                 && Helper.Content.Load<Dictionary<string, string>>($"{CustomTVChannelToken.ChannelDataPrefix}{p.ChannelName}", ContentSource.GameContent) is Dictionary<string,string> channelData
                 )
                 {
-                    if (TryPickShow(channelData, p.ChannelName,out string text, out string screen, out string overlay, channel.Random))
+                    if (TryPickShow(channelData, p.ChannelName,out string text, out string screen, out string overlay, out string music, channel.Random))
                     {
                         if (channel.IntroScreen != null)
                         {
@@ -126,6 +128,21 @@ namespace CustomTV
                                                             p.ScreenPosition.Y + (channel.IntroOverlayOffset[1] * p.Scale));
                             channel.IntroOverlay.layerDepth = p.OverlayLayerDepth;
                             channel.IntroOverlay.scale = p.Scale;
+                        }
+
+                        string cMusic = Game1.getMusicTrackName();
+                        bool changeMusic = false;
+                        if (!string.IsNullOrEmpty(channel.IntroMusic) && channel.IntroMusic != "none")
+                        {
+                            changeMusic = true;
+                            try
+                            {
+                                Game1.changeMusicTrack(channel.IntroMusic);
+                            }
+                            catch
+                            {
+
+                            }
                         }
 
                         p.ShowScene(channel.IntroScreen, channel.IntroOverlay, channel.Intro, () =>
@@ -157,7 +174,31 @@ namespace CustomTV
                               , false, false, p.OverlayLayerDepth, 0.0f, Color.White, p.Scale,
                               0.0f, 0.0f, 0.0f, false);
 
-                              p.ShowScene(screenSprite, overlaySprite, text, () => p.TurnOffTV());
+                              if (!string.IsNullOrEmpty(music) && music != "none")
+                              {
+                                  changeMusic = true;
+                                  try
+                                  {
+                                      Game1.changeMusicTrack(music);
+                                  }
+                                  catch
+                                  {
+
+                                  }
+                              }
+
+                              p.ShowScene(screenSprite, overlaySprite, text, () => {
+                                  try
+                                  {
+                                      if (changeMusic)
+                                          Game1.changeMusicTrack(cMusic);
+                                  }
+                                  catch
+                                  {
+
+                                  }
+                                  p.TurnOffTV();
+                              });
                           });
                     }
 
@@ -171,11 +212,11 @@ namespace CustomTV
             return $"CustomTV_{channelid}_{showid}{(rewatch ? "_Rewatch" : "")}";
         }
 
-        private bool TryPickShow(Dictionary<string, string> channelData, string channelId, out string text, out string screen, out string overlay, bool random = false, bool rewatch = false, bool check = false)
+        private bool TryPickShow(Dictionary<string, string> channelData, string channelId, out string text, out string screen, out string overlay, out string music, bool random = false, bool rewatch = false, bool check = false)
         {
             if(Today.ContainsKey(channelId) && channelData.ContainsKey(Today[channelId]))
             {
-                GetShowData(channelData[Today[channelId]], out text, out screen, out overlay);
+                GetShowData(channelData[Today[channelId]], out text, out screen, out overlay, out music);
                 return true;
             }
 
@@ -191,7 +232,7 @@ namespace CustomTV
             if (!random && channelData.Keys.FirstOrDefault(p)
                 is string show && !string.IsNullOrEmpty(show))
             {
-                GetShowData(channelData[show], out text, out screen, out overlay);
+                GetShowData(channelData[show], out text, out screen, out overlay, out music);
                 Today.Add(channelId, show);
                 string mailId = GetMailFlag(channelId, show, rewatch);
                 if (!Game1.MasterPlayer.mailReceived.Contains(mailId))
@@ -199,7 +240,7 @@ namespace CustomTV
                 return true;
             } else if(random && channelData.Keys.Where(p) is IEnumerable<string> keys && keys.Count() is int keyCount && keyCount > 0) {
                 string rKey = keys.Skip(r.Next(0, keyCount - 1)).First();
-                GetShowData(channelData[rKey], out text, out screen, out overlay);
+                GetShowData(channelData[rKey], out text, out screen, out overlay, out music);
                 Today.Add(channelId, rKey);
                 string mailId = GetMailFlag(channelId, rKey, rewatch);
                 if(!Game1.MasterPlayer.mailReceived.Contains(mailId))
@@ -210,7 +251,7 @@ namespace CustomTV
             if (!rewatch)
             {
                 string mailId = GetMailFlag(channelId, "All", false);
-                bool startRewatch = TryPickShow(channelData, channelId, out text, out screen, out overlay, random, true);
+                bool startRewatch = TryPickShow(channelData, channelId, out text, out screen, out overlay, out music, random, true);
                 if (!Game1.MasterPlayer.mailReceived.Contains(mailId) && startRewatch)
                     Game1.MasterPlayer.mailReceived.Add(mailId);
 
@@ -221,31 +262,33 @@ namespace CustomTV
                 Game1.MasterPlayer.mailReceived
                     .Where(m => m.StartsWith($"CustomTV_{channelId}") && m.EndsWith("_Rewatch"))
                     .ToList().ForEach(m => Game1.MasterPlayer.mailReceived.Remove(m));
-                return TryPickShow(channelData, channelId, out text, out screen, out overlay, random, true, true);
+                return TryPickShow(channelData, channelId, out text, out screen, out overlay, out music, random, true, true);
             }
 
             text = "Missing Text";
+            music = "none";
             screen = null;
             overlay = null;
 
             return false;
         }
 
-        private void GetShowData(string dataString, out string text, out string screen, out string overlay)
+        private void GetShowData(string dataString, out string text, out string screen, out string overlay, out string music)
         {
             string[] parts = dataString.Split('/');
             text = parts[0];
-            if (parts.Length == 1)
-            {
-                screen = null;
-                overlay = null;
-            }
-            else
-            {
-                string[] screens = parts[1].Split(' ');
-                screen = screens[0];
-                overlay = screens.Length > 1 ? screens[1] : null;
-            }
+            screen = null;
+            overlay = null;
+            music = "none";
+            if (parts.Length <= 1)
+                return;
+
+            string[] screens = parts[1].Split(' ');
+            screen = screens[0];
+            overlay = screens.Length > 1 ? screens[1] : null;
+
+            if (parts.Length > 2)
+                music = parts[2].Trim();
         }
     }
 }

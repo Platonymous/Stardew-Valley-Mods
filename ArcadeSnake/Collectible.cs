@@ -1,8 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.Extensions;
 using StardewValley;
 using System;
+using PlatoTK;
+using System.Linq;
 
 namespace Snake
 {
@@ -21,8 +22,17 @@ namespace Snake
 
         public void LoadTextures()
         {
-            DrawTexture = Game1.objectSpriteSheet.getTile(Index);
-            Shadow = Game1.objectSpriteSheet.getTile(Index).setSaturation(0).setLight(0);
+            var plato = SnakeMinigame.Helper.GetPlatoHelper();
+            DrawTexture = plato.Content.Textures.ExtractTile(Game1.objectSpriteSheet, Index);
+            Shadow = new Texture2D(Game1.graphics.GraphicsDevice, DrawTexture.Width, DrawTexture.Height);
+            Color[] data = new Color[Shadow.Width * Shadow.Height];
+            Shadow.GetData<Color>(data);
+
+            for (int i = 0; i < data.Length; i++)
+                data[i] = data[i].A != 0 ? Color.Black : data[i];
+
+            Shadow.SetData(data);
+
         }
 
         public override void Resize()

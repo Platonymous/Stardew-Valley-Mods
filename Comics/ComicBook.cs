@@ -20,15 +20,46 @@ namespace Comics
 
         public bool UsePlaceholder { get; set; } = true;
 
+
+#if ANDROID
+        private Issue GetIssue => AssetManager.Instance.GetIssue(ComicId);
+#else
+        private void SetModData(string key, string value, StardewValley.Object b = null)
+        {
+            if (b == null)
+                b = Base;
+
+            if (b?.modDataForSerialization.ContainsKey(key) ?? false)
+                b.modDataForSerialization[key] = value;
+            else
+                b?.modDataForSerialization.Add(key, value);
+        }
+
+        private string GetModData(string key, StardewValley.Object b = null)
+        {
+            if (b == null)
+                b = Base;
+
+            return b?.modDataForSerialization.ContainsKey(key) ?? false ? b.modDataForSerialization[key] : "";
+        }
+#endif
+
         public string ComicDescription
         {
             get
             {
-                return Data.Get("Description");
+#if ANDROID
+                return Name + " (Comic Book)";
+#else
+                return GetModData("Description");
+#endif
             }
             set
             {
-                Data.Set("Description", value);
+#if ANDROID
+#else
+                SetModData("Description", value);
+#endif
             }
         }
 
@@ -36,11 +67,18 @@ namespace Comics
         {
             get
             {
-                return Data.Get("Id");
+#if ANDROID
+                return netName.Value.Split(';') is string[] s && s.Length > 1 ? s[1] : "244342";
+#else
+                return GetModData("Id");
+#endif
             }
             set
             {
-                Data.Set("Id", value);
+#if ANDROID
+#else           
+                SetModData("Id", value);
+#endif
             }
         }
 
@@ -48,11 +86,18 @@ namespace Comics
         {
             get
             {
-                return Data.Get("Volume") ?? "";
+#if ANDROID
+                return GetIssue.Volume.Name;
+#else
+                return GetModData("Volume");
+#endif
             }
             set
             {
-                Data.Set("Volume", value);
+#if ANDROID
+#else   
+                SetModData("Volume", value);
+#endif
             }
         }
 
@@ -60,11 +105,18 @@ namespace Comics
         {
             get
             {
-                return Data.Get("Number") ?? "";
+#if ANDROID
+                return GetIssue.IssueNumber;
+#else
+                return GetModData("Number");
+#endif
             }
             set
             {
-                Data.Set("Number", value);
+#if ANDROID
+#else
+                SetModData("Number", value);
+#endif
             }
         }
 
@@ -72,11 +124,18 @@ namespace Comics
         {
             get
             {
-                return Data.Get("SmallImage") ?? "";
+#if ANDROID
+                return GetIssue.Image.SmallUrl.ToString();
+#else
+                return GetModData("SmallImage");
+#endif
             }
             set
             {
-                Data.Set("SmallImage", value);
+#if ANDROID
+#else
+                SetModData("SmallImage", value);
+#endif
             }
         }
 
@@ -84,34 +143,37 @@ namespace Comics
         {
             get
             {
-                return Data.Get("BigImage") ?? "";
+#if ANDROID
+                return GetIssue.Image.MediumUrl.ToString();
+#else
+                return GetModData("BigImage");
+#endif
             }
             set
             {
-                Data.Set("BigImage", value);
-            }
-        }
-
-        public override string Name
-        {
-
-            get
-            {
-                return Data.DataString ?? "";
-            }
-            set
-            {
+#if ANDROID
+#else
+                SetModData("bigImage", value);
+#endif
             }
         }
 
         public override string DisplayName
         {
-            get {
-                return Data.Get("Name") ?? "Comic Book";
+            get
+            {
+#if ANDROID
+                return $"{Volume} #{Number}";
+#else
+                return GetModData("Name") is string n && n != "" ? n : "Comic Book";
+#endif
             }
             set
             {
-
+#if ANDROID
+#else
+                SetModData("Name", value);
+#endif
             }
         }
 
@@ -212,19 +274,19 @@ namespace Comics
         {
             return GetNew(ComicId);
         }
-
-        public override bool CanLinkWith(object linkedObject)
-        {
-            return linkedObject is StardewValley.Object obj && obj.netName.Get().Contains("IsComicBookObject");
-        }
-
+       
         public static StardewValley.Object GetNew(string id)
         {
             SaveIndex.ValidateIndex();
 
             var newComic = new StardewValley.Object(SaveIndex.Index,1);
-            
-            newComic.netName.Set("Plato:IsComicBookObject=true|Id=" + id);
+
+            PlatoObject<StardewValley.Object>.SetIdentifier(newComic, typeof(ComicBook));
+#if ANDROID
+            newComic.netName.Value = newComic.netName.Value.Split(';')[0] + ";" + id;
+#else        
+            newComic.modDataForSerialization.Add("Id", id);
+#endif
 
             return newComic;
         }
@@ -232,7 +294,7 @@ namespace Comics
         {
             if (SaveIndex.Index != Base?.parentSheetIndex.Value)
             {
-                SaveIndex.ValidateIndex(Base?.parentSheetIndex.Value ?? -1);
+                SaveIndex.ValidateIndex();
                 Base?.parentSheetIndex.Set(SaveIndex.Index);
             }
         }
@@ -240,30 +302,28 @@ namespace Comics
         {
             base.OnConstruction(helper, linkedObject);
             SaveIndex.ValidateIndex();
-            Data?.Set("IsComicBookObject", true);
 
             CheckParentSheetIndex();
 
-            if (!string.IsNullOrEmpty(ComicId))
+            if (string.IsNullOrEmpty(ComicId))
+                ComicId = "244342";
+
+            if (linkedObject is StardewValley.Object obj)
             {
                 Issue issue = AssetManager.Instance.GetIssue(ComicId);
-                Data.Set("Volume",issue.Volume.Name);
-                Data.Set("Number", issue.IssueNumber);
-                Data.Set("SmallImage", issue.Image.SmallUrl.ToString());
-                Data.Set("BigImage", issue.Image.MediumUrl.ToString());
-                Data.Set("Name", $"{Volume} #{Number}");
-                Data.Set("Description", issue.Name + " (Comic Book)");
-                Data.Set("IsComicBookObject", true);
-                Helper.SetTickDelayedUpdateAction(1,() => checkLoad());
+#if ANDROID
+                obj.netName.Value = obj.netName.Value.Split(';')[0] + ';' + ComicId;
+#else
+                SetModData("Volume", issue.Volume.Name,obj);
+                SetModData("Number", issue.IssueNumber, obj);
+                SetModData("SmallImage", issue.Image.SmallUrl.ToString(), obj);
+                SetModData("BigImage", issue.Image.MediumUrl.ToString(),obj);
+                SetModData("Name", $"{Volume} #{Number}", obj);
+                SetModData("Description", issue.Name + " (Comic Book)",obj);
+                SetModData("Id", ComicId);
+#endif
+                Helper.SetTickDelayedUpdateAction(1, () => checkLoad());
             }
-        }
-
-        public override NetString GetDataLink(object linkedObject)
-        {
-            if (linkedObject is Item item)
-                return item.netName;
-
-            return null;
         }
     }
 }

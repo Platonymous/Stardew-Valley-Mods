@@ -62,23 +62,30 @@ namespace Comics
             {
                 var platoHelper = helper.GetPlatoHelper();
 
-                string comicData = "Plato:IsComicBookObject=true|Id=244342/100/-300/Basic -20/Comic Book/Comic Book";
-                string frameData = "Plato:IsComicFrameObject=true|ComicId=216384/painting/1 1/1 1/1/350/Comic Book Frame";
+                string comicData = "ComicBookObject/100/-300/Crafting/Comic Book/Comic Book";
+                string frameData = "ComicBookFrame/painting/1 1/1 1/1/350/Comic Book Frame";
 
                 ComicBook.SaveIndex = platoHelper.Content.GetSaveIndex(
                     "Plato.ComicBook",
                     () => Game1.objectInformation,
-                    (handle) => handle.Value == comicData,
-                    (handle) => platoHelper.Content.Injections.InjectDataInsert("Data//ObjectInformation", handle.Index, comicData));
+                    (handle) => handle.Value.Contains("ComicBookObject"),
+                    (handle) =>
+                    {
+                        platoHelper.Content.Injections.InjectDataInsert(@"Data/ObjectInformation", handle.Index, comicData);
+                        helper.Content.InvalidateCache(@"Data/ObjectInformation");
+                    });
 
                 Frame.SaveIndex = platoHelper.Content.GetSaveIndex(
                      "Plato.ComicFrame",
-                     "Data//Furniture",
-                    (handle) => handle.Value == frameData,
-                    (handle) => platoHelper.Content.Injections.InjectDataInsert("Data//Furniture", handle.Index, frameData));
+                     @"Data/Furniture",
+                    (handle) => handle.Value.Contains("ComicBookFrame"),
+                    (handle) => {
+                        platoHelper.Content.Injections.InjectDataInsert(@"Data/Furniture", handle.Index, frameData);
+                        helper.Content.InvalidateCache(@"Data/Furniture");
+                        });
 
-                platoHelper.Harmony.PatchTileDraw("Plato.ComicBookDraw", () => Game1.objectSpriteSheet, assetManager.Placeholder, null, () => ComicBook.SaveIndex.Index);
-                platoHelper.Harmony.PatchAreaDraw("Plato.ComicBookFrame", () => Furniture.furnitureTexture, assetManager.Placeholder, null, () => new Rectangle(Frame.SaveIndex.Index * 16 % Furniture.furnitureTexture.Width, Frame.SaveIndex.Index * 16 / Furniture.furnitureTexture.Width * 16, 16, 16));
+                platoHelper.Harmony.PatchTileDraw("Plato.ComicBookDraw", Game1.objectSpriteSheet, (t) => t.Name == @"Maps\springobjects" || t.Equals(Game1.objectSpriteSheet), assetManager.Placeholder, null, () => ComicBook.SaveIndex.Index);
+                platoHelper.Harmony.PatchAreaDraw("Plato.ComicBookFrame", Furniture.furnitureTexture, (t) => (!string.IsNullOrEmpty(Furniture.furnitureTexture.Name) && t.Name == Furniture.furnitureTexture.Name) || t.Equals(Furniture.furnitureTexture), assetManager.Placeholder, null, () => new Rectangle(Frame.SaveIndex.Index * 16 % Furniture.furnitureTexture.Width, Frame.SaveIndex.Index * 16 / Furniture.furnitureTexture.Width * 16, 16, 16));
 
                 platoHelper.Harmony.LinkContruction<StardewValley.Object, ComicBook>();
                 platoHelper.Harmony.LinkContruction<Furniture, Frame>();
@@ -86,15 +93,18 @@ namespace Comics
                 platoHelper.Harmony.LinkTypes(typeof(StardewValley.Object), typeof(ComicBook));
                 platoHelper.Harmony.LinkTypes(typeof(StardewValley.Object), typeof(Frame));
 
-
-                platoHelper.Harmony.RegisterTileAction((tileAction) =>
+                platoHelper.Events.CallingTileAction += (se, tileaction) =>
                 {
-                    var itemPriceAndStock = new Dictionary<ISalable, int[]>();
-                    var p = tileAction.Params;
-                    foreach (Issue issue in assetManager.LoadIssuesForToday(p.Length > 0 && !string.IsNullOrEmpty(p[0]) && int.TryParse(p[0], out int year) ? year : config.baseYear, Game1.stats.DaysPlayed))
-                        itemPriceAndStock.Add(Frame.GetNew(ComicBook.GetNew(issue.Id.ToString())), new int[] { 100, 1 });
-                    OpenComicsShop(itemPriceAndStock);
-                }, "OpenComicShop");
+                    if (tileaction.Trigger == "OpenComicShop")
+                    {
+                        var itemPriceAndStock = new Dictionary<ISalable, int[]>();
+                        var p = tileaction.Parameter;
+                        foreach (Issue issue in assetManager.LoadIssuesForToday(p.Length > 0 && !string.IsNullOrEmpty(p[0]) && int.TryParse(p[0], out int year) ? year : config.baseYear, Game1.stats.DaysPlayed))
+                            itemPriceAndStock.Add(Frame.GetNew(ComicBook.GetNew(issue.Id.ToString())), new int[] { 100, 1 });
+                        OpenComicsShop(itemPriceAndStock);
+                        tileaction.TakeOver(true);
+                    }
+                };
 
                 if (Helper.ModRegistry.GetApi<PlatoTK.APIs.ISerializerAPI>("Platonymous.Toolkit") is PlatoTK.APIs.ISerializerAPI pytk)
                 {

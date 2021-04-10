@@ -3,25 +3,22 @@
   <PropertyGroup>
     <AssemblyName>Comics</AssemblyName>
     <RootNamespace>Comics</RootNamespace>
-    <Version>1.0.0</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
-    <EnableHarmony>true</EnableHarmony>
-    <IgnoreModFilePatterns Condition="'$(MSBuildProjectName)' != 'PlatoTK'">Newtonsoft.Json.Bson\.(?:dll|pdb)</IgnoreModFilePatterns>
+    <Version>2.3.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-    <PackageReference Include="Platonymous.PlatoTK" Version="1.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="assets\issues\placeholder.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Reference Include="Platonymous.PlatoTK">
+      <HintPath>$(GamePath)\Mods\PlatoTK\PlatoTK.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
   </ItemGroup>
+
 
   <Import Project="$(SolutionDir)\common.targets" />
 

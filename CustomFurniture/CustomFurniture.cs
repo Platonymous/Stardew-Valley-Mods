@@ -12,7 +12,11 @@ using Netcode;
 
 namespace CustomFurniture
 {
+#if ANDROID
+    public class CustomFurniture : Furniture, ISaveElement
+#else
     public class CustomFurniture : Furniture, ISaveElement, ISittable
+#endif
     {
         public Texture2D texture;
         public Texture2D textureOverlay;
@@ -265,8 +269,11 @@ namespace CustomFurniture
             float under = (float)(base.boundingBox.Value.Top + 16) / 10000f;
             float over = (float)(base.boundingBox.Value.Bottom - 8) / 10000f;
             float position = 
-                furniture_type == 12 ? 0.0f : 
-                HasSittingFarmers() &&  furniture_type > 3 ? over : 
+                furniture_type == 12 ? 0.0f :
+#if ANDROID     
+#else
+        HasSittingFarmers() &&  furniture_type > 3 ? over : 
+#endif
                     isStool ? under : 
                     currentRotation.Value == 2 ? over : under;
 

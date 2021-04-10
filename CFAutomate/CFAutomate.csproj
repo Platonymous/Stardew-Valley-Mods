@@ -3,15 +3,9 @@
   <PropertyGroup>
     <AssemblyName>CFAutomate</AssemblyName>
     <RootNamespace>CFAutomate</RootNamespace>
-    <Version>2.10.16</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
+    <Version>2.12.11</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CustomFarmingRedux\CustomFarmingRedux.csproj">

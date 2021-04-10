@@ -1,47 +1,34 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
-using PyTK.CustomElementHandler;
+using PlatoTK;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 
 namespace Arcade2048
 {
-    class Machine2048 : PySObject
+    class Machine2048
     {
         public Machine2048()
         {
 
         }
-
-        public Machine2048(CustomObjectData data)
-            : base(data, Vector2.Zero)
+        
+        public static void start(IModHelper helper)
         {
+            Game1.currentMinigame = new Game2048(helper.GetPlatoHelper());
         }
-
-        public Machine2048(CustomObjectData data, Vector2 tileLocation)
-            : base(data, tileLocation)
+        public static StardewValley.Object GetNew(StardewValley.Object alt)
         {
-        }
+            if (Game1.bigCraftablesInformation.Values.Any(v => v.Contains("2048 Arcade Machine")))
+            {
+                var obj = new StardewValley.Object(Vector2.Zero, Game1.bigCraftablesInformation.FirstOrDefault(b => b.Value.Contains("2048 Arcade Machine")).Key, false);
+                return obj;
+            }
 
-        public override bool checkForAction(StardewValley.Farmer who, bool justCheckingForActivity = false)
-        {
-            if (justCheckingForActivity)
-                return true;
-            Game1.currentMinigame = new Game2048();
-            return true;
+            return alt;
         }
-
-        public override Item getOne()
-        {
-            return new Machine2048(data) { TileLocation = Vector2.Zero };
-        }
-
-        public override ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
-        {
-            CustomObjectData data = CustomObjectData.collection[additionalSaveData["id"]];
-            return new Machine2048(CustomObjectData.collection[additionalSaveData["id"]], (replacement as Chest).TileLocation);
-        }
-
 
     }
 }

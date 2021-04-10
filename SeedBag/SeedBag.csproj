@@ -3,15 +3,16 @@
   <PropertyGroup>
     <AssemblyName>SeedBag</AssemblyName>
     <RootNamespace>SeedBag</RootNamespace>
-    <Version>1.2.10</Version>
+    <Version>1.7.3</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-    <PackageReference Include="Platonymous.PlatoTK" Version="1.3.0" />
+    <Reference Include="Platonymous.PlatoTK">
+      <HintPath>$(GamePath)\Mods\PlatoTK\PlatoTK.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

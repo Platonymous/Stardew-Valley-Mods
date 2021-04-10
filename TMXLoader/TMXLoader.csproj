@@ -3,22 +3,9 @@
   <PropertyGroup>
     <AssemblyName>TMXLoader</AssemblyName>
     <RootNamespace>TMXLoader</RootNamespace>
-    <Version>1.9.4</Version>
+    <Version>1.22.1</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
-
-    <EnableHarmony>false</EnableHarmony>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="BuildableEdit.cs~RF11759495.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="1.2.0.1" />
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="sr.lua">
@@ -40,7 +27,5 @@
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
-
-  <ProjectExtensions><VisualStudio><UserProperties manifest_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

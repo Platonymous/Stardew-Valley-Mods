@@ -3,15 +3,9 @@
   <PropertyGroup>
     <AssemblyName>GhostTown</AssemblyName>
     <RootNamespace>GhostTown</RootNamespace>
-    <Version>1.0.4</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
+    <Version>1.0.4</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PyTK\PyTK.csproj" />

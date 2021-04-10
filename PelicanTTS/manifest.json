@@ -1,10 +1,11 @@
 {
   "Name": "PelicanTTS",
   "Author": "Platonymous",
-  "Version": "1.12.5",
+  "Version": "1.12.6",
   "Description": "Text-To-Speech Mod",
   "UniqueID": "Platonymous.PelicanTTS",
   "EntryDll": "PelicanTTS.dll",
+  "tests": "$(SolutionDir)",
   "MinimumApiVersion": "3.0.0",
   "UpdateKeys": [ "Nexus:1079" ]
 }

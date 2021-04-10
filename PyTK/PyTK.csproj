@@ -3,13 +3,9 @@
   <PropertyGroup>
     <AssemblyName>PyTK</AssemblyName>
     <RootNamespace>PyTK</RootNamespace>
-    <Version>1.19.0</Version>
+    <Version>1.22.2</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
-
-    <EnableHarmony>true</EnableHarmony>
-
+    
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
     <Authors>Platonymous</Authors>
@@ -22,22 +18,16 @@
 
     <PackageIcon>pytk-icon.png</PackageIcon>
 
-    <PackageIconUrl />
-
     <RepositoryUrl>https://github.com/Platonymous/Stardew-Valley-Mods/</RepositoryUrl>
 
     <RepositoryType>GitHub</RepositoryType>
-
-    <PackageLicenseExpression></PackageLicenseExpression>
 
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 
     <PackageId>Platonymous.PyTK</PackageId>
 
     <Product>Platonymous.PyTK</Product>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
   </PropertyGroup>
@@ -46,7 +36,6 @@
     <PackageReference Include="MoonSharp" Version="2.0.0.0" />
     <PackageReference Include="ncalc" Version="1.3.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.2.2" />
   </ItemGroup>
   
   <ItemGroup>
@@ -74,11 +63,5 @@
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
-
-  <ItemGroup>
-    <Reference Update="0Harmony">
-      <SpecificVersion>false</SpecificVersion>
-    </Reference>
-  </ItemGroup>
 
 </Project>

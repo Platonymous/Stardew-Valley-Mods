@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.Extensions;
 using StardewValley;
 using System;
 using static Snake.SnakeMinigame;
@@ -50,7 +49,7 @@ namespace Snake
                 GameInstance.Board.GameOver = true;
                 GameInstance.Board.Paused = true;
 
-                setScore(Game1.player.Name, score);
+                setScore(SnakeMinigame.Helper,Game1.player.Name, score);
 
                 Game1.currentSong.Stop(AudioStopOptions.Immediate);
                 Game1.playSound("death");

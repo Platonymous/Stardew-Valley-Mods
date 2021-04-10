@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>_2048ArcadeMachine</AssemblyName>
+    <RootNamespace>_2048ArcadeMachine</RootNamespace>
+    <Version>1.0.0</Version>
+    <TargetFramework>net452</TargetFramework>
+    <ModFolderName>[JA] Arcade2048</ModFolderName>
+  </PropertyGroup>
+
+  <Import Project="$(SolutionDir)\contentpacks.targets" />
+
+</Project>

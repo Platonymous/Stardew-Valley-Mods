@@ -24,5 +24,7 @@ namespace CustomTV
         public string[] Days { get; set; } = new string[7] { "mon", "tue", "wed", "thu", "fri", "sat", "sun" };
 
         public bool Random { get; set; } = false;
+
+        public string IntroMusic { get; set; } = "none";
     }
 }

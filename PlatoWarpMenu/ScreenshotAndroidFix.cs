@@ -10,6 +10,7 @@ using StardewValley.Locations;
 using StardewModdingAPI;
 using PlatoTK;
 using PlatoTK.Reflection;
+using System.Reflection;
 
 namespace PlatoWarpMenu
 {
@@ -98,7 +99,14 @@ namespace PlatoWarpMenu
             bool displayHud = Game1.displayHUD;
             game.takingMapScreenshot = true;
             float zoomLevel = Game1.options.zoomLevel;
-            Game1.options.zoomLevel = 1f;
+#if ANDROID
+            if (Game1.options.GetType().GetField("baseZoomLevel") is FieldInfo finfo)
+                finfo.SetValue(Game1.options, 1f);
+            else if (Game1.options.GetType().GetField("zoomLevel") is FieldInfo finfo4)
+                finfo4.SetValue(Game1.options, 1f);
+#else
+            Game1.options.baseZoomLevel = 1f;
+#endif
             RenderTarget2D lightmap = (RenderTarget2D)game.GetFieldValue("_lightmap");
             game.SetFieldValue("_lightmap", null);
 
@@ -185,7 +193,15 @@ namespace PlatoWarpMenu
             }
 
             game.SetFieldValue( "_lightmap",lightmap);
-            Game1.options.zoomLevel = zoomLevel;
+#if ANDROID
+            if (Game1.options.GetType().GetField("baseZoomLevel") is FieldInfo finfo3)
+                finfo3.SetValue(Game1.options, zoomLevel);
+            else if (Game1.options.GetType().GetField("zoomLevel") is FieldInfo finfo4)
+                finfo4.SetValue(Game1.options, zoomLevel);
+#else
+            Game1.options.baseZoomLevel = zoomLevel;
+#endif
+
             game.takingMapScreenshot = false;
             Game1.displayHUD = displayHud;
             Game1.viewport = viewport;

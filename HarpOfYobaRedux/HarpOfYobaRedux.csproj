@@ -3,15 +3,12 @@
   <PropertyGroup>
     <AssemblyName>HarpOfYobaRedux</AssemblyName>
     <RootNamespace>HarpOfYobaRedux</RootNamespace>
-    <Version>2.6.4</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
+    <Version>2.7.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>

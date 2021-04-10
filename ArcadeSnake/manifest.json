@@ -1,7 +1,7 @@
 {
   "Name": "Snake",
   "Author": "Platonymous",
-  "Version": "1.3.0",
+  "Version": "1.4.0",
   "Description": "Play Snake.",
   "UniqueID": "Platonymous.Snake",
   "EntryDll": "Snake.dll",
@@ -9,7 +9,16 @@
   "UpdateKeys": [ "Nexus:2056" ],
   "Dependencies": [
     {
-      "UniqueID": "Platonymous.Toolkit"
+      "UniqueID": "Platonymous.PlatoTK",
+      "MinimumVersion": "1.9.0"
+    },
+    {
+      "UniqueID": "spacechase0.JsonAssets",
+      "IsRequired": false
+    },
+    {
+      "UniqueID": "spacechase0.ArcadeRoom",
+      "IsRequired": false
     }
   ]
 }

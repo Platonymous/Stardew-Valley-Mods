@@ -3,26 +3,14 @@
   <PropertyGroup>
     <AssemblyName>JoJaBan</AssemblyName>
     <RootNamespace>JoJaBan</RootNamespace>
-    <Version>0.4.4</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
+    <Version>0.5.0</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PyTK\PyTK.csproj">
       <Private>false</Private>
     </ProjectReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="assets\mobile_app_icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using PyTK;
-using PyTK.Extensions;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Minigames;
@@ -31,6 +29,7 @@ namespace Snake
 
         public SnakeMinigame(IModHelper helper)
         {
+            Helper = helper;
             ShouldQuit = false;
             Initialize(helper);
             StartGame();
@@ -61,6 +60,8 @@ namespace Snake
         public static HighscoreList HighscoreTable { get; set; } = new HighscoreList();
         public bool ShowHighscore { get; set; } = false;
 
+        internal static IModHelper Helper { get; set; }
+
         #endregion
 
         #region Initiation
@@ -68,10 +69,10 @@ namespace Snake
         public void Initialize(IModHelper helper)
         {
             Random = new Random();
-            BoardTexture = helper.Content.Load<Texture2D>(@"Assets/board.png");
-            BoardDebug = helper.Content.Load<Texture2D>(@"Assets/board_debug.png");
-            SpriteSheet = helper.Content.Load<Texture2D>(@"Assets/sprites.png");
-            Background = helper.Content.Load<Texture2D>(@"Assets/background.png");
+            BoardTexture = helper.Content.Load<Texture2D>(@"assets/board.png");
+            BoardDebug = helper.Content.Load<Texture2D>(@"assets/board_debug.png");
+            SpriteSheet = helper.Content.Load<Texture2D>(@"assets/sprites.png");
+            Background = helper.Content.Load<Texture2D>(@"assets/background.png");
             TiledSize = new Point(16, 16);
             SpriteSize = new Point(69, 80);
             Scale = 0.8f;
@@ -104,7 +105,7 @@ namespace Snake
             Board.SpawnCollectible();
         }
 
-        public static void setScore(string name, int score)
+        public static void setScore(IModHelper helper, string name, int score, bool send = true)
         {
             Highscore highscore = new Highscore(name, score);
             var oldEntry = HighscoreTable.Entries.Find(entry => entry.Name == name && entry.Value >= score);
@@ -114,10 +115,8 @@ namespace Snake
                 HighscoreTable.Entries.Add(highscore);
                 SnakeMod.monitor.Log("New Highscore!");
                 SnakeMod.monitor.Log(highscore.Name + ": " + highscore.Value);
-                if (Game1.IsMasterGame)
-                    PyNet.sendRequestToAllFarmers<bool>(SnakeMod.highscoreListReceiverName, HighscoreTable, null, serializationType: PyTK.Types.SerializationType.JSON);
-                else
-                    Task.Run(async () => await PyNet.sendRequestToFarmer<bool>(SnakeMod.highscoreReceiverName, highscore, Game1.MasterPlayer,serializationType: PyTK.Types.SerializationType.JSON));
+                if(send)
+                    helper.Multiplayer.SendMessage<Highscore>(highscore, "Highscore", new string[] { "Platonymous.Snake" });
             }
         }
         #endregion
@@ -197,7 +196,8 @@ namespace Snake
                     {
                         text2 = next.Name;
                         text3 = next.Value.ToString();
-                        scores.AddOrReplace(next.Name);
+                        if(scores.Contains(next.Name))
+                            scores.Add(next.Name);
                         highs.RemoveAll(ent => ent.Name == next.Name);
                     }
 
@@ -207,7 +207,8 @@ namespace Snake
                     {
                         text4 = next.Name;
                         text5 = next.Value.ToString();
-                        scores.AddOrReplace(next.Name);
+                        if (scores.Contains(next.Name))
+                            scores.Add(next.Name);
                         highs.RemoveAll(ent => ent.Name == next.Name);
                     }
 
@@ -217,7 +218,8 @@ namespace Snake
                     {
                         text6 = next.Name;
                         text7 = next.Value.ToString();
-                        scores.AddOrReplace(next.Name);
+                        if (scores.Contains(next.Name))
+                            scores.Add(next.Name);
                     }
                 }
 
@@ -274,8 +276,9 @@ namespace Snake
 
             int px = (int) (x1 + w / 2 + Player.GetBoxPosition().X * w);
             int py = (int) (y1 + w / 2 + Player.GetBoxPosition().Y * w);
-
-            Utility.drawLineWithScreenCoordinates(px, py,(int) (Board.GetDrawPosition(Player.GetBoxPosition().toVector2(),Player.Size).X + (Player.Size.X / 2)), (int)(Board.GetDrawPosition(Player.GetBoxPosition().toVector2(), Player.Size).Y - (Player.Size.Y / 4) + Player.Size.Y), b, Color.White);
+            var boxPos = Player.GetBoxPosition();
+            var boxPos2 = new Vector2(boxPos.X, boxPos.Y);
+            Utility.drawLineWithScreenCoordinates(px, py,(int) (Board.GetDrawPosition(boxPos2,Player.Size).X + (Player.Size.X / 2)), (int)(Board.GetDrawPosition(boxPos2, Player.Size).Y - (Player.Size.Y / 4) + Player.Size.Y), b, Color.White);
 
             if (Board.nextCollectible == null)
                 return;
@@ -398,7 +401,7 @@ namespace Snake
 
         public bool tick(GameTime time)
         {
-            if(!debug || Keys.Up.isDown())
+            if(!debug || Helper.Input.IsDown(Keys.Up.ToSButton()))
                 Board.Update(time.TotalGameTime.Milliseconds);
 
             if(ShouldQuit)

@@ -3,17 +3,9 @@
   <PropertyGroup>
     <AssemblyName>ArcadePong</AssemblyName>
     <RootNamespace>ArcadePong</RootNamespace>
-    <Version>1.1.1</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
-
-    <EnableHarmony>true</EnableHarmony>
+    <Version>1.1.1</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PyTK\PyTK.csproj">

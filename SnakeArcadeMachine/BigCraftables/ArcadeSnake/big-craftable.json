@@ -1,0 +1,8 @@
+{
+  "Name": "Snake Arcade Machine",
+  "Description": "Play 'Snake by Platonymous' at home!",
+  "Price": 5000,
+  "PurchasePrice": 5000,
+  "CanPurchase": true,
+  "PurchaseFrom": "Gus"
+}

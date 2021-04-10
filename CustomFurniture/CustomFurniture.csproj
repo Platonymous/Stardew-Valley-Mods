@@ -3,17 +3,9 @@
   <PropertyGroup>
     <AssemblyName>CustomFurniture</AssemblyName>
     <RootNamespace>CustomFurniture</RootNamespace>
-    <Version>0.9.2</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
-
-    <EnableHarmony>true</EnableHarmony>
+    <Version>0.12.0</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.2.2" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Furniture\non-cp-packs-go-here.txt">

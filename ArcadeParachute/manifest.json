@@ -1,0 +1,15 @@
+﻿{
+  "Name": "ArcadeParachute",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Arcade for playing the unreleased Wumbus Parachute",
+  "UniqueID": "Platonymous.ArcadeParachute",
+  "EntryDll": "ArcadeParachute.dll",
+  "MinimumApiVersion": "2.11",
+  "UpdateKeys": [ "Nexus:" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Toolkit"
+    }
+  ]
+}

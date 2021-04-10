@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using PyTK.CustomElementHandler;
 using StardewValley;
@@ -31,7 +32,14 @@ namespace ArcadePong
                 return true;
             PongMinigame.quit = false;
             zoom = Game1.options.zoomLevel;
-            Game1.options.zoomLevel = 1.0f;
+#if ANDROID
+            if (Game1.options.GetType().GetField("baseZoomLevel") is FieldInfo finfo3)
+                finfo3.SetValue(Game1.options, 1f);
+            else if (Game1.options.GetType().GetField("zoomLevel") is FieldInfo finfo4)
+                finfo4.SetValue(Game1.options, 1f);
+#else
+            Game1.options.baseZoomLevel = 1f;
+#endif
             Game1.currentMinigame = new PongMinigame();
             ArcadePongMod.runPong = true;
             return true;

@@ -1,20 +1,25 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Netcode;
 using PlatoTK;
-using StardewModdingAPI;
+using PlatoTK.Content;
+using PlatoTK.Objects;
 using StardewValley;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using StardewValley.Tools;
-using System;
 using System.Linq;
 
 namespace SeedBag
 {
     public class SeedBagTool : PlatoTK.Objects.PlatoTool<StardewValley.Tools.GenericTool>
     {
-        public static int TileIndex { get; set; }
+        public static ISaveIndex SaveIndex { get; set; }
+
+        public static int TileIndex { 
+            get {
+                return SaveIndex.Index;
+            } 
+        }
         public bool InUse = false;
         public static Texture2D Texture;
         public static Texture2D AttTexture;
@@ -55,18 +60,6 @@ namespace SeedBag
 
         }
 
-        public override bool CanLinkWith(object linkedObject)
-        {
-            return linkedObject is StardewValley.Tools.GenericTool obj && obj.netName.Get().Contains("IsSeedBagTool");
-        }
-
-        public override NetString GetDataLink(object linkedObject)
-        {
-            if (linkedObject is Tool t)
-                return t.netName;
-            return null;
-        }
-
         public override Item getOne()
         {
             if(Base.attachments.Length > 1)
@@ -74,6 +67,7 @@ namespace SeedBag
 
             return GetNew(Helper);
         }
+
         public override bool canBeTrashed()
         {
             return true;
@@ -151,6 +145,16 @@ namespace SeedBag
             }
         }
 
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float transparency, float layerDepth, StackDrawType drawStackNumber, Color color, bool drawShadow)
+        {
+            Base.initialParentTileIndex.Value = SaveIndex.Index;
+            Base.IndexOfMenuItemView = SaveIndex.Index;
+            Base.currentParentTileIndex.Value = SaveIndex.Index;
+
+            Link.CallUnlinked<GenericTool>(t => t.drawInMenu(spriteBatch, location, scaleSize, transparency, layerDepth, drawStackNumber, color, drawShadow));
+
+        }
+
         internal float GetSquaredDistance(Vector2 point1, Vector2 point2)
         {
             float a = (point1.X - point2.X);
@@ -210,7 +214,19 @@ namespace SeedBag
                 }
             }
         }
-       
+
+        public override void OnConstruction(IPlatoHelper helper, object linkedObject)
+        {
+            base.OnConstruction(helper, linkedObject);
+
+            if (linkedObject is GenericTool obj)
+            {
+                obj.initialParentTileIndex.Value = TileIndex;
+                obj.currentParentTileIndex.Value = TileIndex;
+                obj.indexOfMenuItemView.Value = TileIndex;
+            }
+        }
+
 
         public static Tool GetNew(IPlatoHelper helper, StardewValley.Object seed = null, StardewValley.Object fertilizer = null)
         {
@@ -229,7 +245,9 @@ namespace SeedBag
             newTool.indexOfMenuItemView.Value = TileIndex;
             newTool.upgradeLevel.Value = 4;
             newTool.description = GetDescriptor(helper,newTool);
-            newTool.netName.Set("Plato:IsSeedBagTool=true");
+            
+            PlatoObject<GenericTool>.SetIdentifier(newTool,typeof(SeedBagTool));
+
             return newTool;
         }
 

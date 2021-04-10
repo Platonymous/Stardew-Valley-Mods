@@ -13,6 +13,7 @@ using PlatoTK.UI.Components;
 using PlatoTK.UI;
 using Microsoft.Xna.Framework;
 using StardewValley.Locations;
+using System.Reflection;
 
 namespace PlatoWarpMenu
 {
@@ -517,7 +518,17 @@ namespace PlatoWarpMenu
                 }
                 else
                 {
-                    Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name);
+#if ANDROID
+                    if (Game1.game1.GetType().GetMethod("takeMapScreenshot") is MethodInfo minfo)
+                        if (minfo.GetParameters().Length == 2)
+                            minfo.Invoke(Game1.game1, new object[] { 0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name });
+                        else {
+                            Action c = () => Console.WriteLine("Screenshot taken");
+                            minfo.Invoke(Game1.game1, new object[] { 0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name, c });
+                        }
+#else
+                    Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name, () => Console.WriteLine("Screenshot taken"));
+#endif
                 }
                 try { 
                     Game1.spriteBatch.Begin();

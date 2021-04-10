@@ -24,6 +24,8 @@ namespace ModUpdater
         public string ModFolder { get; set; } = "";
         public bool Install { get; set; } = false;
 
+        public string Branch { get; set; } = "";
+
         public List<string> DoNotReplace { get; set; } = new List<string>() { "config.json", "console.lua" };
 
         public List<string> DeleteFolders { get; set; } = new List<string>();

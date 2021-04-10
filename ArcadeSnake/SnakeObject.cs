@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.Extensions;
 using System;
 using static Snake.SnakeMinigame;
 
@@ -59,7 +58,12 @@ namespace Snake
         public virtual void Turn(Direction direction)
         {
             Point box = GetBoxPosition();
-            GameInstance.Board.Turns.AddOrReplace(GetNextBoxCoordinates(), direction);
+            var boxC = GetNextBoxCoordinates();
+            if (GameInstance.Board.Turns.ContainsKey(boxC))
+                GameInstance.Board.Turns[boxC] = direction;
+            else
+                GameInstance.Board.Turns.Add(boxC, direction);
+
         }
 
         public virtual void HandleOutOfBounds()

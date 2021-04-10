@@ -1,5 +1,4 @@
-﻿using System;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using PlatoTK;
 using StardewValley;
@@ -15,6 +14,7 @@ namespace SeedBag
         internal static IModHelper _helper => _instance.Helper;
         internal static ITranslationHelper i18n => _helper.Translation;
         internal static Config config;
+        internal static string seedBagToolData;
 
 
         public override void Entry(IModHelper helper)
@@ -23,6 +23,36 @@ namespace SeedBag
             config = helper.ReadConfig<Config>();
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.Player.InventoryChanged += Player_InventoryChanged;
+            helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
+        }
+
+        private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+        {
+            Game1.player.items.Where(i => i is StardewValley.Tools.GenericTool).ToList().ForEach(i =>
+            {
+                if (i is Tool t && t.netName.Value.Contains("Plato:IsSeedBag"))
+                {
+                    Game1.player.removeItemFromInventory(t);
+                    try
+                    {
+                        Game1.player.addItemToInventory(SeedBagTool.GetNew(Helper.GetPlatoHelper(), t.attachments[0], t.attachments[1]));
+                    }
+                    catch
+                    {
+
+                    }
+                    }
+            });
+        }
+
+        private void Player_InventoryChanged(object sender, InventoryChangedEventArgs e)
+        {
+            e.Added.Where(a => e.IsLocalPlayer && !(a is Tool) && (a?.netName?.Value?.Contains("SeedBag") ?? false)).ToList().ForEach(s =>
+            {
+               e.Player.removeItemFromInventory(s);
+               e.Player.addItemToInventory(SeedBagTool.GetNew(Helper.GetPlatoHelper()));
+            });
         }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -31,13 +61,16 @@ namespace SeedBag
 
             platoHelper.Harmony.LinkContruction<StardewValley.Tools.GenericTool, SeedBagTool>();
             platoHelper.Harmony.LinkTypes(typeof(StardewValley.Tools.GenericTool), typeof(SeedBagTool));
-
             SeedBagTool.LoadTextures(platoHelper);
-            string seedBagTool = "Plato:IsSeedBag=true/"+ config.Price +"/-300/Basic -20/"+i18n.Get("Name")+"/"+ i18n.Get("Name");
+            seedBagToolData = "SeedBag/"+ config.Price +"/-300/Crafting/"+i18n.Get("Name")+"/"+ i18n.Get("Empty");
 
-            SeedBagTool.TileIndex = ((Game1.toolSpriteSheet.Width / 16) * (Game1.toolSpriteSheet.Height / 16)) + 99;
-
-            platoHelper.Harmony.PatchTileDraw("Plato.SeedBagToolTile", () => Game1.toolSpriteSheet, SeedBagTool.Texture, null, SeedBagTool.TileIndex);
+            SeedBagTool.SaveIndex = platoHelper.Content.GetSaveIndex("Plato.SeedBagTool", () => Game1.objectInformation, (s) => s.Value.StartsWith("SeedBag"), (s) =>
+            {
+                platoHelper.Content.Injections.InjectDataInsert("Data/ObjectInformation", s.Index, seedBagToolData);
+                Helper.Content.InvalidateCache("Data/ObjectInformation");
+                platoHelper.Harmony.PatchTileDraw("Plato.SeedBagObjectTile", Game1.objectSpriteSheet, (t) => t.Name == @"Maps\springobjects" || t.Equals(Game1.objectSpriteSheet), SeedBagTool.Texture, null, s.Index);
+                platoHelper.Harmony.PatchTileDraw("Plato.SeedBagToolTile", Game1.toolSpriteSheet, (t) => t.Equals(Game1.toolSpriteSheet), SeedBagTool.Texture, null, s.Index);
+            });
 
             Helper.Events.Display.MenuChanged += (s, ev) =>
             {

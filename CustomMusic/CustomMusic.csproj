@@ -3,16 +3,11 @@
   <PropertyGroup>
     <AssemblyName>CustomMusic</AssemblyName>
     <RootNamespace>CustomMusic</RootNamespace>
-    <Version>1.2.4</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
-    
-    <EnableHarmony>true</EnableHarmony>
+    <Version>1.8.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
     <PackageReference Include="Platonymous.Ogg2XNA" Version="1.1.0" />
   </ItemGroup>
 

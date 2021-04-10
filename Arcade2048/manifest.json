@@ -1,7 +1,7 @@
 {
   "Name": "Arcade 2048",
   "Author": "Platonymous",
-  "Version": "1.2.0",
+  "Version": "1.4.1",
   "Description": "Play 2048.",
   "UniqueID": "Platonymous.2048",
   "EntryDll": "Arcade2048.dll",
@@ -9,7 +9,16 @@
   "UpdateKeys": [ "Nexus:2048" ],
   "Dependencies": [
     {
-      "UniqueID": "Platonymous.Toolkit"
+      "UniqueID": "Platonymous.PlatoTK",
+      "MinimumVersion": "1.9.0"
+    },
+    {
+      "UniqueID": "spacechase0.JsonAssets",
+      "IsRequired": false
+    },
+    {
+      "UniqueID": "spacechase0.ArcadeRoom",
+      "IsRequired": false
     }
   ]
 }

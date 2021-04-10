@@ -52,7 +52,17 @@ namespace PelicanTTS
 
             _helper = helper;
             _manifest = ModManifest;
-            config = Helper.ReadConfig<ModConfig>();
+
+
+            try
+            {
+                config = Helper.ReadConfig<ModConfig>();
+            }
+            catch
+            {
+                config = new ModConfig();
+                Helper.WriteConfig(config);
+            }
             activeEndpoint = endPoints[config.Server];
             screenGraber = new Screengraber();
             Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
@@ -60,12 +70,7 @@ namespace PelicanTTS
             helper.ConsoleCommands.Add("tts_update", "Updates new NPCs", (s, p) => setUpNPCConfig());
 
             Helper.WriteConfig<ModConfig>(config);
-            string tmppath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "Content"), "TTS");
-
-            if (Directory.Exists(Path.Combine(Helper.DirectoryPath, "TTS")))
-                if (!Directory.Exists(tmppath))
-                    Directory.CreateDirectory(tmppath);
-
+            
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
 
@@ -156,7 +161,6 @@ namespace PelicanTTS
 
 
             others.AddRange(typeof(VoiceId).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Select(f => f.Name).Where(v => !voices.Any(vc => vc.Value.Contains(v))));
-
         }
 
         private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)

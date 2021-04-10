@@ -44,24 +44,16 @@ namespace Comics
         {
 
         }
-        
-        public override string Name
-        {
-
-            get
-            {
-                return Data.DataString ?? "";
-            }
-            set
-            {
-            }
-        }
 
         public override string DisplayName
         {
             get
             {
+#if ANDROID
+                return Base?.heldObject.Value?.netName.Value.Split(';')[0] ?? "Frame";
+#else
                 return Base?.heldObject.Value?.DisplayName ?? "Frame";
+#endif
             }
             set
             {
@@ -112,7 +104,7 @@ namespace Comics
         {
             if (SaveIndex.Index != Base?.parentSheetIndex.Value)
             {
-                SaveIndex.ValidateIndex(Base?.parentSheetIndex.Value ?? -1);
+                SaveIndex.ValidateIndex();
                 Base?.parentSheetIndex.Set(SaveIndex.Index);
                 Base?.defaultSourceRect.Set(new Rectangle(SaveIndex.Index * 16 % Furniture.furnitureTexture.Width, SaveIndex.Index * 16 / Furniture.furnitureTexture.Width * 16, 16, 16));
                 Base?.sourceRect.Set(Base.defaultSourceRect.Value);
@@ -146,24 +138,24 @@ namespace Comics
 
             Base?.heldObject?.Value?.draw(spriteBatch, (int)position.X, (int)position.Y, alpha);
         }
-  
-        public override bool CanLinkWith(object linkedObject)
-        {
-            return linkedObject is Furniture f && (f.ParentSheetIndex == SaveIndex.Index || f.netName.Get().Contains("IsComicFrameObject"));
-        }
 
         public override void OnConstruction(IPlatoHelper helper, object linkedObject)
         {
             base.OnConstruction(helper, linkedObject);
-            SaveIndex.ValidateIndex(Base?.parentSheetIndex.Value ?? -1);
-            Data?.Set("IsComicFrameObject", true);
+            SaveIndex.ValidateIndex();
             CheckParentSheetIndex();
 
-            if (!(Base?.heldObject.Value is StardewValley.Object))
-                if (Data != null && Data.TryGet("ComicId", out string comicId))
-                    Base?.heldObject.Set(ComicBook.GetNew(comicId));
-                else
-                    Base?.heldObject.Set(ComicBook.GetNew("216384"));
+#if ANDROID
+            if (Base?.heldObject.Value is StardewValley.Object obj && obj.netName.Value.Split(';') is string[] split && split.Length > 1)
+                Base?.heldObject.Set(ComicBook.GetNew(split[1]));
+            else
+                Base?.heldObject.Set(ComicBook.GetNew("216384")); ;
+#else
+            if (Base?.heldObject.Value is StardewValley.Object obj && obj.modDataForSerialization.TryGetValue("Id", out string id))
+                Base?.heldObject.Set(ComicBook.GetNew(id));
+            else
+                Base?.heldObject.Set(ComicBook.GetNew("216384"));
+#endif
 
             Base?.updateDrawPosition();
         }
@@ -173,18 +165,12 @@ namespace Comics
         {
             SaveIndex.ValidateIndex();
             var newFrame = new Furniture(SaveIndex.Index, Vector2.Zero);
-            newFrame.netName.Value = "Plato:IsComicFrameObject=true|ComicId=216384";
+
+            PlatoObject<Furniture>.SetIdentifier(newFrame, typeof(Frame));
+
             newFrame.heldObject.Value = (StardewValley.Object)obj?.getOne();
 
             return newFrame;
-        }
-
-        public override NetString GetDataLink(object linkedObject)
-        {
-            if (linkedObject is Furniture f)
-                return f.netName;
-
-            return null;
         }
     }
 }

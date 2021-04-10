@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.Extensions;
 using StardewValley;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static Snake.SnakeMinigame;
-using Netcode;
 
 namespace Snake
 {
@@ -94,7 +93,7 @@ namespace Snake
 
         public void SpawnCollectible()
         {
-            List<int> indexes = new List<KeyValuePair<int, string>>(((Dictionary<int,string>)Game1.objectInformation).FindAll(o => o.Value.Contains("Basic - 75") || o.Value.Contains("Basic -79"))).toList(i => i.Key);
+            List<int> indexes = new List<KeyValuePair<int, string>>(((Dictionary<int,string>)Game1.objectInformation).Where(o => o.Value.Contains("Basic - 75") || o.Value.Contains("Basic -79"))).Select(i => i.Key).ToList();
 
             int index = indexes[GameInstance.Random.Next(0,indexes.Count-1)];
 

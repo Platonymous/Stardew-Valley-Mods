@@ -1,7 +1,7 @@
 {
   "Name": "Seed Bag",
   "Author": "Platonymous",
-  "Version": "1.6.7",
+  "Version": "1.7.3",
   "Description": "Adds a Seed Bag to the Game",
   "UniqueID": "Platonymous.SeedBag",
   "EntryDll": "SeedBag.dll",
@@ -9,7 +9,8 @@
   "UpdateKeys": [ "Nexus:1133" ],
   "Dependencies": [
     {
-      "UniqueID": "Platonymous.PlatoTK"
+      "UniqueID": "Platonymous.PlatoTK",
+      "MinimumVersion": "1.8.0"
     },
     {
       "UniqueID": "Platonymous.ModUpdater",

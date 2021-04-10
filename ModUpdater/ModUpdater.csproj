@@ -3,17 +3,13 @@
   <PropertyGroup>
     <AssemblyName>ModUpdater</AssemblyName>
     <RootNamespace>ModUpdater</RootNamespace>
-    <Version>1.0.0</Version>
     <TargetFramework>net462</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
-    <EnableHarmony>true</EnableHarmony>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Octokit" Version="0.48.0" />
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
+    <PackageReference Include="Octokit" Version="0.50.0" />
   </ItemGroup>
 
   <ItemGroup>

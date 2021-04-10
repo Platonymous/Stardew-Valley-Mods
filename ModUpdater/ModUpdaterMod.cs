@@ -176,7 +176,6 @@ namespace ModUpdater
                     var fileName = Path.GetFileNameWithoutExtension(file.Path);
                     var match = findFile.Match(fileName);
                     string newVersion = match.Groups[1].Value;
-
                     if (SemanticVersion.TryParse(newVersion, out ISemanticVersion version) 
                         && (mod.ModUpdater.Install || (shouldUpdate && SemanticVersion.TryParse(currentVersion, out ISemanticVersion current) && version.IsNewerThan(current))))
                     {

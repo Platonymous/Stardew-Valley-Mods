@@ -100,5 +100,10 @@ namespace CFAutomate.Framework
             stack.Stack = stackSize;
             return stack;
         }
+
+        public void PreventEmptyStacks()
+        {
+            
+        }
     }
 }

@@ -95,7 +95,14 @@ namespace ArcadePong
                 Game1.quit = false;
                 ArcadePongMod.runPong = false; ;
                 PongMinigame.quit = true;
-                Game1.options.zoomLevel = PongMachine.zoom;
+#if ANDROID
+                if (Game1.options.GetType().GetField("baseZoomLevel") is FieldInfo finfo3)
+                    finfo3.SetValue(Game1.options, PongMachine.zoom);
+                else if (Game1.options.GetType().GetField("zoomLevel") is FieldInfo finfo4)
+                    finfo4.SetValue(Game1.options, PongMachine.zoom);
+#else
+                Game1.options.baseZoomLevel = PongMachine.zoom;
+#endif
             }
         }
     }

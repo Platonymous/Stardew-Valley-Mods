@@ -1,0 +1,17 @@
+{
+  "Name": "Snake",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Play Snake.",
+  "UniqueID": "Platonymous.SnakeJA",
+  "MinimumApiVersion": "3.0.0",
+  "ContentPackFor": {
+    "UniqueID": "spacechase0.JsonAssets"
+  },
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Snake",
+      "IsRequired": false
+    }
+  ]
+}

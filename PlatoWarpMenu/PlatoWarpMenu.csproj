@@ -3,22 +3,20 @@
   <PropertyGroup>
     <AssemblyName>PlatoWarpMenu</AssemblyName>
     <RootNamespace>PlatoWarpMenu</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.9.0</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
-    <EnableHarmony>true</EnableHarmony>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
-    <PackageReference Include="Platonymous.PlatoTK" Version="1.4.8" />
+   <ItemGroup>
+    <Reference Include="Platonymous.PlatoTK">
+      <HintPath>$(GamePath)\Mods\PlatoTK\PlatoTK.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
   </ItemGroup>
 
+
   <ItemGroup>
-    <None Update="assets\mobile_app_icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="fonts\escrita.fnt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -29,15 +27,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="fonts\opensans_0.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="i18n\de.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="i18n\default.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="i18n\zh.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="menu.xml">

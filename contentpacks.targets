@@ -1,10 +1,106 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <UsingTask TaskName="ReplaceMenifestVersion" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+      <InputFilename ParameterType="System.String" Required="true" />
+      <CurrentVersion ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Core" />
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            File.WriteAllText(
+                InputFilename,
+                  Regex.Replace(File.ReadAllText(InputFilename), "\"Version\": \".+\",", "\"Version\": \""+CurrentVersion+"\",")
+                );
+          ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  
+  <UsingTask TaskName="AutoIncrementVersion" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+      <ProjectFile ParameterType="System.String" Required="true" />
+      <CurrentVersion ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Core" />
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            string[] version = CurrentVersion.Split('.');
+            string[] patch = version[2].Split('-');
+            patch[0] = (int.Parse(patch[0]) + 1).ToString();
+            version[2] = string.Join("-",patch);
+            string newVersion = string.Join(".",version);
+            File.WriteAllText(
+                ProjectFile,
+                Regex.Replace(File.ReadAllText(ProjectFile), "<Version>.+</Version>", "<Version>"+newVersion+"</Version>")
+                );
+          ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+  
+    
   <PropertyGroup>
-    <!-- put release zips in _releases folder -->
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
-
-    <!-- don't add dlls in mod's releases -->
+    <Platforms>anycpu</Platforms>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <EnableHarmony>true</EnableHarmony>
+    <ModZipPath>$(SolutionDir)_releases</ModZipPath>
+    <Configurations>Debug;Release;Android</Configurations>
     <IgnoreModFilePatterns >.(?:dll|pdb)</IgnoreModFilePatterns>
-
+    <Authors>Platonymous</Authors>
+    <RepositoryUrl>https://github.com/Platonymous/Stardew-Valley-Mods</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Android' ">
+    <GamePath>C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\SDV 1.4</GamePath>
+    <ModZipPath>$(SolutionDir)_releases_android</ModZipPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="content.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="assets/**/*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="data/**/*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="BigCraftables/**/*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="ReplaceMenifestVersion" BeforeTargets="AfterBuild">
+    <ReplaceMenifestVersion
+      InputFilename="$(ProjectDir)manifest.json"
+      CurrentVersion="$(Version)" />
+    <ItemGroup>
+      <OldVersions Include="$(ModZipPath)\$(ProjectName)*.zip;$(ModZipPath)\$(ModFolderName)*.zip"/>
+    </ItemGroup>
+    <Delete Files="@(OldVersions)" />
+  </Target>
+  <!--
+  <Target Name="AutoIncrementVersion" AfterTargets="AfterBuild">
+    <AutoIncrementVersion
+      ProjectFile="$(ProjectDir)$(ProjectName).csproj"
+      CurrentVersion="$(Version)" />
+  </Target>-->
+
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.3.0" />
+  </ItemGroup>
+
 </Project>

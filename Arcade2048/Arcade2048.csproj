@@ -3,27 +3,19 @@
   <PropertyGroup>
     <AssemblyName>Arcade2048</AssemblyName>
     <RootNamespace>Arcade2048</RootNamespace>
-    <Version>1.0.7</Version>
     <TargetFramework>net452</TargetFramework>
-    <Platforms>x86</Platforms>
-    <PlatformTarget>x86</PlatformTarget>
+    <Version>1.4.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.1.0" />
+    <Reference Include="Platonymous.PlatoTK">
+      <HintPath>$(GamePath)\Mods\PlatoTK\PlatoTK.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-  </ItemGroup>
 
-  <ItemGroup>
-    <None Update="assets\mobile_app_icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
 
