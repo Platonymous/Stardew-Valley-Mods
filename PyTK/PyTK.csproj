@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>PyTK</AssemblyName>
     <RootNamespace>PyTK</RootNamespace>
-    <Version>1.22.2</Version>
+    <Version>1.22.3</Version>
     <TargetFramework>net452</TargetFramework>
     
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

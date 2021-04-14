@@ -83,8 +83,15 @@ namespace PyTK
         {
             _instance = this;
 
-            Config = helper.ReadConfig<PyTKConfig>();
-
+            try
+            {
+                Config = helper.ReadConfig<PyTKConfig>();
+            }
+            catch
+            {
+                Config = new PyTKConfig();
+                helper.WriteConfig(Config);
+            }
             hInstance = HarmonyInstance.Create("Platonymous.PyTK.Rev");
             helper.Events.Display.RenderingWorld += (s,e) =>
             {
