@@ -429,19 +429,31 @@ namespace PyTK
              Monitor.Log("Patching: FromStream", LogLevel.Trace);
 
             if (!Config.Options.Contains("DisableFSPatch"))
-                foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(gm => gm.Name.Contains("FromStream") && gm.GetParameters().ToList().Exists(p => p.Name == "stream")))
+            {
+                int fsc = 0;
+                foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance))
+                {
+                    Monitor.Log($"{m.Name}({string.Join(",",m.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"))})", LogLevel.Info);
+                }
+                    
+
+                    foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(gm => gm.Name.Contains("FromStream") && gm.GetParameters().ToList().Exists(p => p.Name == "stream")))
                 {
                     try
                     {
                         harmony.Patch(
                             original: m,
                             postfix: new HarmonyMethod(this.GetType().GetMethod("FromStreamIntercepter", BindingFlags.Public | BindingFlags.Static)));
+                        fsc++;
                     }
                     catch
                     {
                         Monitor.Log("Failed to Patch: FromStream, this Error may not be critical", LogLevel.Info);
                     }
                 }
+                Monitor.Log($"Patched: FromStream ({fsc})", LogLevel.Info);
+
+            }
 
             Monitor.Log("Patching: PatchImage", LogLevel.Trace);
 
@@ -473,7 +485,7 @@ namespace PyTK
 
             Monitor.Log("Patching: FileStream Constructors", LogLevel.Trace);
 
-            
+            int fscc = 0;
                 foreach (ConstructorInfo constructor in typeof(FileStream).GetConstructors().Where(c => c.GetParameters().ToList().Exists(p => p.ParameterType == typeof(string) && p.Name == "path")))
                 {
                     try
@@ -482,6 +494,7 @@ namespace PyTK
                        original: constructor,
                        prefix: new HarmonyMethod(this.GetType().GetMethod("FileStreamConstructorPre", BindingFlags.Public | BindingFlags.Static))
                         );
+                    fscc++;
                     }
                     catch
                     {
@@ -489,6 +502,7 @@ namespace PyTK
 
                     }
                 }
+            Monitor.Log($"Patched: FileStream Constructors ({fscc})", LogLevel.Info);
 
             Monitor.Log("Patching: PremultiplyTransparency", LogLevel.Trace);
 
@@ -508,6 +522,12 @@ namespace PyTK
         }
 
         private static string openPath = "";
+
+        public static void LoadAsset(string assetName, Type type, object __result)
+        {
+                _monitor.Log("Loading:" + assetName, LogLevel.Warn);
+            
+        }
 
         public static void PremultiplyTransparencyPre(object __instance, ref Texture2D texture)
         {

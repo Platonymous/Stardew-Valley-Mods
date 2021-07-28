@@ -1,7 +1,7 @@
 {
   "Name": "CustomMusic",
   "Author": "Platonymous",
-  "Version": "1.8.0",
+  "Version": "1.8.1",
   "Description": "Changes the games music",
   "UniqueID": "Platonymous.CustomMusic",
   "EntryDll": "CustomMusic.dll",

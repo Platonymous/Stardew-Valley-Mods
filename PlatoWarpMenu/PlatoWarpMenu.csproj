@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>PlatoWarpMenu</AssemblyName>
     <RootNamespace>PlatoWarpMenu</RootNamespace>
-    <Version>1.9.0</Version>
+    <Version>1.9.1</Version>
     <TargetFramework>net452</TargetFramework>
   </PropertyGroup>
 
