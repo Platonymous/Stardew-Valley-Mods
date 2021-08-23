@@ -24,19 +24,20 @@ namespace SeedBag
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.Player.InventoryChanged += Player_InventoryChanged;
-            helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
+            helper.Events.GameLoop.SaveLoaded += (s,e) => FixItems();
+            helper.Events.GameLoop.DayStarted += (s, e) => FixItems();
         }
 
-        private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+        private void FixItems()
         {
             Game1.player.items.Where(i => i is StardewValley.Tools.GenericTool).ToList().ForEach(i =>
             {
-                if (i is Tool t && t.netName.Value.Contains("Plato:IsSeedBag"))
+                if (i is Tool t && ((t?.netName?.Value?.Contains("Plato:IsSeedBag") ?? false) || (t?.netName?.Value?.Contains(i18n.Get("Name")) ?? false)))
                 {
-                    Game1.player.removeItemFromInventory(t);
+                    int index = Game1.player.items.IndexOf(i);
                     try
                     {
-                        Game1.player.addItemToInventory(SeedBagTool.GetNew(Helper.GetPlatoHelper(), t.attachments[0], t.attachments[1]));
+                        Game1.player.items[index] = SeedBagTool.GetNew(Helper.GetPlatoHelper(), t.attachments[0], t.attachments[1]);
                     }
                     catch
                     {
@@ -48,7 +49,7 @@ namespace SeedBag
 
         private void Player_InventoryChanged(object sender, InventoryChangedEventArgs e)
         {
-            e.Added.Where(a => e.IsLocalPlayer && !(a is Tool) && (a?.netName?.Value?.Contains("SeedBag") ?? false)).ToList().ForEach(s =>
+            e.Added.Where(a => e.IsLocalPlayer && !(a is Tool) && (a?.netName?.Value?.Contains("SeedBag") ?? false) || (a?.netName?.Value?.Contains(i18n.Get("Name")) ?? false)).ToList().ForEach(s =>
             {
                e.Player.removeItemFromInventory(s);
                e.Player.addItemToInventory(SeedBagTool.GetNew(Helper.GetPlatoHelper()));
@@ -107,5 +108,6 @@ namespace SeedBag
             }
 
         }
+
     }
 }

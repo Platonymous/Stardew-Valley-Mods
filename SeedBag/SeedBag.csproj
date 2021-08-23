@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>SeedBag</AssemblyName>
     <RootNamespace>SeedBag</RootNamespace>
-    <Version>1.7.3</Version>
+    <Version>1.7.4</Version>
     <TargetFramework>net452</TargetFramework>
   </PropertyGroup>
 
