@@ -5,6 +5,8 @@
     <RootNamespace>CustomMovies</RootNamespace>
     <TargetFramework>net452</TargetFramework>
     <Version>0.9.4</Version>
+
+    <EnableHarmony>true</EnableHarmony>
   </PropertyGroup>
 
   <ItemGroup>
