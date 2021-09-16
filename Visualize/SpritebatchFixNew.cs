@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using HarmonyLib;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Linq;
@@ -10,13 +11,13 @@ namespace Visualize
     class SpritbatchFixNew
     {
 
-        internal static void initializePatch(Harmony.HarmonyInstance instance)
+        internal static void initializePatch(Harmony instance)
         {
             foreach (MethodInfo method in typeof(SpritbatchFixNew).GetMethods(BindingFlags.Static | BindingFlags.Public).Where(m => m.Name == "Draw"))
             {
                 try
                 {
-                    instance.Patch(typeof(SpriteBatch).GetMethod("Draw", method.GetParameters().Select(p => p.ParameterType.Name.Contains("Texture2D") ? typeof(Texture2D) : p.ParameterType.Name.Contains("Color") ? typeof(Color) : p.ParameterType).Where(t => !t.Name.Contains("SpriteBatch")).ToArray()), new Harmony.HarmonyMethod(method), null, null);
+                    instance.Patch(typeof(SpriteBatch).GetMethod("Draw", method.GetParameters().Select(p => p.ParameterType.Name.Contains("Texture2D") ? typeof(Texture2D) : p.ParameterType.Name.Contains("Color") ? typeof(Color) : p.ParameterType).Where(t => !t.Name.Contains("SpriteBatch")).ToArray()), new HarmonyMethod(method), null, null);
                 }
                 catch (Exception e)
                 {
@@ -29,7 +30,7 @@ namespace Visualize
             {
                 try
                 {
-                    instance.Patch(typeof(SpriteBatch).GetMethod("DrawString", method.GetParameters().Select(p => p.ParameterType.Name.Contains("Color") ? typeof(Color) : p.ParameterType).Where(t => !t.Name.Contains("SpriteBatch")).ToArray()), new Harmony.HarmonyMethod(method), null, null);
+                    instance.Patch(typeof(SpriteBatch).GetMethod("DrawString", method.GetParameters().Select(p => p.ParameterType.Name.Contains("Color") ? typeof(Color) : p.ParameterType).Where(t => !t.Name.Contains("SpriteBatch")).ToArray()), new HarmonyMethod(method), null, null);
                 }
                 catch (Exception e)
                 {

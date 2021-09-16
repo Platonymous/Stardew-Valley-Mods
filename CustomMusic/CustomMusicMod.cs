@@ -2,7 +2,7 @@
 using System.IO;
 using Microsoft.Xna.Framework.Audio;
 using Ogg2XNA;
-using Harmony;
+using HarmonyLib;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -43,7 +43,7 @@ namespace CustomMusic
             SHelper = Helper;
             Thread thread = new Thread(loadContentPacks);
             thread.Start();
-            var harmony = HarmonyInstance.Create("Platonymous.CustomMusic");
+            var harmony = new Harmony("Platonymous.CustomMusic");
             harmony.Patch(typeof(Cue).GetMethod("Stop"), new HarmonyMethod(typeof(Overrides), "Stop"));
             harmony.Patch(typeof(Cue).GetMethod("Play"), new HarmonyMethod(typeof(Overrides), "Play"));
             harmony.Patch(typeof(Cue).GetMethod("Dispose"), new HarmonyMethod(typeof(Overrides), "Dispose"));

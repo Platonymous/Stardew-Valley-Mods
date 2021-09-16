@@ -8,7 +8,7 @@ using StardewValley.Menus;
 using System.Linq;
 using StardewValley.Objects;
 using System;
-using Harmony;
+using HarmonyLib;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using PyTK.Extensions;
@@ -54,7 +54,7 @@ namespace CustomFurniture
 
         public void harmonyFix()
         {
-            var instance = HarmonyInstance.Create("Platonymous.CustomFurniture");
+            var instance = new Harmony("Platonymous.CustomFurniture");
             instance.PatchAll(Assembly.GetExecutingAssembly());
         }
 

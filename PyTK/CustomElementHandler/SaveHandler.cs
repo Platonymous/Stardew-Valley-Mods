@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Netcode;
 using PyTK.Extensions;
@@ -66,7 +66,7 @@ namespace PyTK.CustomElementHandler
                 Game1.bigCraftableSpriteSheet.Tag = "cod_objects";
             };
 
-            HarmonyInstance instance = HarmonyInstance.Create("PytK.Savehandler.SyncFix");
+            Harmony instance = new Harmony("PytK.Savehandler.SyncFix");
         }
 
         public static bool isRebuildable(object o)

@@ -10,7 +10,7 @@ using StardewValley;
 using System.Collections.Generic;
 using System.IO;
 using xTile;
-using Harmony;
+using HarmonyLib;
 using System.Reflection;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
@@ -1134,7 +1134,7 @@ namespace TMXLoader
 
         private void harmonyFix()
         {
-            HarmonyInstance instance = HarmonyInstance.Create("Platonymous.TMXLoader");
+            Harmony instance = new Harmony("Platonymous.TMXLoader");
             instance.PatchAll(Assembly.GetExecutingAssembly());
             instance.Patch(typeof(SaveGame).GetMethod("loadDataToLocations"), postfix: new HarmonyMethod(this.GetType().GetMethod("SavePatch", BindingFlags.Public | BindingFlags.Static)));
             instance.Patch(typeof(GameLocation).GetMethod("setMapTile"), prefix: new HarmonyMethod(this.GetType().GetMethod("trySetMapTile", BindingFlags.Public | BindingFlags.Static)));

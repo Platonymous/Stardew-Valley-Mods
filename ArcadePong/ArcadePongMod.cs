@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using PyTK.Extensions;
@@ -24,7 +24,7 @@ namespace ArcadePong
         public override void Entry(IModHelper helper)
         {
             monitor = Monitor;
-            HarmonyInstance.Create("Platonymous.ArcadePong").PatchAll(Assembly.GetExecutingAssembly());
+            new Harmony("Platonymous.ArcadePong").PatchAll(Assembly.GetExecutingAssembly());
             helper.Events.GameLoop.SaveLoaded += (o, e) => setup();
             helper.Events.GameLoop.GameLaunched += (o, e ) => pdata = new CustomObjectData("Pong", "Pong/0/-300/Crafting -9/Play 'Pong by Cat' at home!/true/true/0/Pong", Game1.bigCraftableSpriteSheet.getTile(159, 16, 32).setSaturation(0).setLight(130), Color.Yellow, bigCraftable: true, type: typeof(PongMachine));
         }
