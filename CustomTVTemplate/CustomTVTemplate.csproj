@@ -4,21 +4,13 @@
     <AssemblyName>CustomTVTemplate</AssemblyName>
     <RootNamespace>CustomTVTemplate</RootNamespace>
     <Version>1.0.0</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
 </PropertyGroup>
 
   <Import Project="$(SolutionDir)\contentpacks.targets" />
 
   <ItemGroup>
-    <None Update="data\screens.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="data\meta.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="data\episodes.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Update="data\*.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>

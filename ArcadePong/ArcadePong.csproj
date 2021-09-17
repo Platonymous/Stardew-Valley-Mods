@@ -3,14 +3,12 @@
   <PropertyGroup>
     <AssemblyName>ArcadePong</AssemblyName>
     <RootNamespace>ArcadePong</RootNamespace>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Version>1.1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\PyTK\PyTK.csproj" Private="false" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

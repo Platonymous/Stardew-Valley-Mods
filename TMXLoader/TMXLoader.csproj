@@ -4,26 +4,19 @@
     <AssemblyName>TMXLoader</AssemblyName>
     <RootNamespace>TMXLoader</RootNamespace>
     <Version>1.22.1</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="sr.lua">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="sr.lua" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="TMXTile">
-      <HintPath>$(GamePath)\smapi-internal\TMXTile.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <Reference Include="TMXTile" HintPath="$(GamePath)\smapi-internal\TMXTile.dll" Private="False" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\PyTK\PyTK.csproj" Private="false" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

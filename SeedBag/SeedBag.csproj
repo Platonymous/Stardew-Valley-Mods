@@ -4,15 +4,11 @@
     <AssemblyName>SeedBag</AssemblyName>
     <RootNamespace>SeedBag</RootNamespace>
     <Version>1.7.4</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Platonymous.PlatoTK">
-      <HintPath>$(GamePath)\Mods\PlatoTK\PlatoTK.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>false</SpecificVersion>
-    </Reference>
+    <Reference Include="Platonymous.PlatoTK" HintPath="$(GamePath)\Mods\PlatoTK\PlatoTK.dll" Private="False" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

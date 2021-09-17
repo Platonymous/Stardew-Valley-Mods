@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>HarpOfYobaRedux</AssemblyName>
     <RootNamespace>HarpOfYobaRedux</RootNamespace>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Version>2.7.3</Version>
   </PropertyGroup>
 
@@ -12,9 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\PyTK\PyTK.csproj" Private="false" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

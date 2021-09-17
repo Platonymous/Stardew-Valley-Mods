@@ -4,7 +4,7 @@
     <AssemblyName>_2048ArcadeMachine</AssemblyName>
     <RootNamespace>_2048ArcadeMachine</RootNamespace>
     <Version>1.0.0</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <ModFolderName>[JA] Arcade2048</ModFolderName>
   </PropertyGroup>
 

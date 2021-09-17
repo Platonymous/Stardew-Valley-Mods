@@ -4,7 +4,7 @@
     <AssemblyName>PlanImporter</AssemblyName>
     <RootNamespace>PlanImporter</RootNamespace>
     <Version>0.8.12</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,15 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="imports\farm.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="imports\hill.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="imports\*" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
 
 </Project>
-

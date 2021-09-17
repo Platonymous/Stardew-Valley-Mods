@@ -3,10 +3,11 @@
   <PropertyGroup>
     <AssemblyName>ModUpdater</AssemblyName>
     <RootNamespace>ModUpdater</RootNamespace>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Version>1.1.0</Version>
 
     <EnableHarmony>true</EnableHarmony>
+    <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
   </PropertyGroup>
 
   <ItemGroup>

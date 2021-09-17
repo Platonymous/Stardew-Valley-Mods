@@ -290,8 +290,8 @@ namespace PlatoWarpMenu
                                 Game1.spriteBatch.End();
                                 tthis.GraphicsDevice.SetRenderTarget(target_screen);
                             }
-                            if (Game1.bloomDay && Game1.bloom != null)
-                                Game1.bloom.BeginDraw();
+                            //if (Game1.bloomDay && Game1.bloom != null)
+                            //    Game1.bloom.BeginDraw();
                             tthis.GraphicsDevice.Clear(bgColor);
                             Game1.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, (DepthStencilState)null, (RasterizerState)null);
                             if (Game1.background != null)

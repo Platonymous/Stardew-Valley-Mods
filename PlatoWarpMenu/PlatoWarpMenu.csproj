@@ -4,38 +4,18 @@
     <AssemblyName>PlatoWarpMenu</AssemblyName>
     <RootNamespace>PlatoWarpMenu</RootNamespace>
     <Version>1.9.1</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
    <ItemGroup>
-    <Reference Include="Platonymous.PlatoTK">
-      <HintPath>$(GamePath)\Mods\PlatoTK\PlatoTK.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>false</SpecificVersion>
-    </Reference>
+    <Reference Include="Platonymous.PlatoTK" HintPath="$(GamePath)\Mods\PlatoTK\PlatoTK.dll" Private="False" />
   </ItemGroup>
 
-
   <ItemGroup>
-    <None Update="fonts\escrita.fnt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="fonts\escrita_0.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="fonts\opensans.fnt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="fonts\opensans_0.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="menu.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Update="fonts\*" CopyToOutputDirectory="Always" />
+    <None Update="menu.xml" CopyToOutputDirectory="Always" />
   </ItemGroup>
   
   <Import Project="$(SolutionDir)\common.targets" />
   
-  <ProjectExtensions><VisualStudio><UserProperties manifest_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
-
 </Project>
