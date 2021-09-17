@@ -690,12 +690,12 @@ namespace PyTK
 
             foreach (var serializer in serializers)
             {
-                var cache = serializer.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
-                Hashtable cacheTable = (Hashtable)cache.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cache);
+                var cache = serializer.GetType().GetField("s_cache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                IDictionary cacheTable = (IDictionary)cache.GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cache);
 
                 foreach (var c in cacheTable.Values)
                 {
-                    var a = (Assembly)c.GetType().GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
+                    var a = (Assembly)c.GetType().GetField("_assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
                     PatchGeneratedSerializers(new Assembly[] { a });
                 }
 
@@ -705,7 +705,7 @@ namespace PyTK
 
         public static void AssemblyCachePatch(string ns, object o, object assembly)
         {
-            PatchGeneratedSerializers(new Assembly[] { (Assembly)assembly.GetType().GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(assembly) });
+            PatchGeneratedSerializers(new Assembly[] { (Assembly)assembly.GetType().GetField("_assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(assembly) });
         }
 
         public static void serializeFix(ref System.Object o)
@@ -761,12 +761,12 @@ namespace PyTK
 
             if (ty.FullName.Contains("XmlSerializer1"))
             {
-                if (Constants.TargetPlatform != GamePlatform.Android && ty.GetField("cache", BindingFlags.NonPublic | BindingFlags.Static) is FieldInfo field && field.GetValue(null) is object cache)
-                    if (cache.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Instance) is FieldInfo cField && cField.GetValue(cache) is Hashtable cacheTable)
+                if (Constants.TargetPlatform != GamePlatform.Android && ty.BaseType.GetField("s_cache", BindingFlags.NonPublic | BindingFlags.Static) is FieldInfo field && field.GetValue(null) is object cache)
+                    if (cache.GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance) is FieldInfo cField && cField.GetValue(cache) is IDictionary cacheTable)
                     {
                         foreach (var c in cacheTable.Values)
                         {
-                            var a = (Assembly)c.GetType().GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
+                            var a = (Assembly)c.GetType().GetField("_assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
                             PatchGeneratedSerializers(new Assembly[] { a });
                         }
 
