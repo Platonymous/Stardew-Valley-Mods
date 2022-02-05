@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections;
 using NCalc;
-using Harmony;
+using HarmonyLib;
 using System.Reflection;
 using PyTK.Lua;
 using PyTK.Extensions;
@@ -382,7 +382,7 @@ namespace PyTK
 
         public static void initOverride(string harmonyId, Type type, Type patch, List<string> toPatch)
         {
-            HarmonyInstance harmony = HarmonyInstance.Create("Platonymous.PyTK.PyUtils." + harmonyId);
+            Harmony harmony = new Harmony("Platonymous.PyTK.PyUtils." + harmonyId);
             MethodInfo prefix = patch.GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().Find(m => m.Name.ToLower() == "prefix");
             MethodInfo postfix = patch.GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().Find(m => m.Name.ToLower() == "postfix");
             List<MethodInfo> originals = type.GetMethods().ToList();

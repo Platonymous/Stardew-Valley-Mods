@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Harmony;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -16,7 +16,7 @@ namespace PelicanTTS
 {
     internal class Screengraber
     {
-        HarmonyInstance instance;
+        Harmony instance;
         static bool shouldRead = false;
         static Point target = Point.Zero;
         static string capture = "";
@@ -26,7 +26,7 @@ namespace PelicanTTS
 
         public Screengraber()
         {
-            instance = HarmonyInstance.Create("PelicanTTS.Screengrabber");
+            instance = new Harmony("PelicanTTS.Screengrabber");
             foreach (MethodInfo drawMethod in typeof(SpriteBatch).GetMethods().Where(m => m.GetParameters().Any(p => p.ParameterType == typeof(string) && p.Name == "text")))
                 if (drawMethod.GetParameters().FirstOrDefault(p => p.Name == "scale") is ParameterInfo pa)
                     if (pa.ParameterType == typeof(Vector2))

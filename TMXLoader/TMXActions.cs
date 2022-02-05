@@ -16,6 +16,7 @@ using xTile;
 using xTile.Dimensions;
 using xTile.Layers;
 using xTile.Tiles;
+using Range = PyTK.Types.Range;
 
 namespace TMXLoader
 {

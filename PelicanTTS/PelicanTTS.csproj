@@ -4,7 +4,9 @@
     <AssemblyName>PelicanTTS</AssemblyName>
     <RootNamespace>PelicanTTS</RootNamespace>
     <Version>1.12.6</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
+
+    <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
@@ -14,6 +16,5 @@
     <PackageReference Include="AWSSDK.Polly" Version="3.7.0.9" />
     <PackageReference Include="Platonymous.Ogg2XNA" Version="1.1.0" />
   </ItemGroup>
-  
 
 </Project>

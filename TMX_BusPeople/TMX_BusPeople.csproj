@@ -4,11 +4,10 @@
     <AssemblyName>TMX_BusPeople</AssemblyName>
     <RootNamespace>TMX_BusPeople</RootNamespace>
     <Version>1.3.0</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <ModFolderName>[TMX]JungleTempleAndCityBus</ModFolderName>
   </PropertyGroup>
 
- 
   <Import Project="$(SolutionDir)\contentpacks.targets" />
 
 </Project>

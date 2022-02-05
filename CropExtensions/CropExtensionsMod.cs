@@ -1,5 +1,5 @@
 ﻿using StardewModdingAPI;
-using Harmony;
+using HarmonyLib;
 using StardewValley;
 using StardewValley.TerrainFeatures;
 using System.Linq;
@@ -45,7 +45,7 @@ namespace CropExtensions
         public override void Entry(IModHelper helper)
         {
             config = helper.ReadConfig<Config>();
-            var instance = HarmonyInstance.Create("Platonymous.CropExtension");
+            var instance = new Harmony("Platonymous.CropExtension");
             instance.Patch(typeof(HoeDirt).GetMethod("plant"), null, new HarmonyMethod(this.GetType().GetMethod("plant")));
             instance.Patch(typeof(HoeDirt).GetMethod("canPlantThisSeedHere"), null, new HarmonyMethod(this.GetType().GetMethod("canPlantThisSeedHere")));
             instance.Patch(typeof(Crop).GetMethod("newDay"), new HarmonyMethod(this.GetType().GetMethod("newDay")));

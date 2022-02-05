@@ -4,7 +4,7 @@
     <AssemblyName>Portraiture</AssemblyName>
     <RootNamespace>Portraiture</RootNamespace>
     <Version>1.8.2</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,13 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Portraits\Non-Content-Pack-Folders-Go-Here.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Portraits\Non-Content-Pack-Folders-Go-Here.txt" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PyTK\PyTK.csproj" />
+    <ProjectReference Include="..\PyTK\PyTK.csproj" Private="false" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

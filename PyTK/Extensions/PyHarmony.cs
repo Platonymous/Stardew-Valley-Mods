@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using StardewModdingAPI;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace PyTK.Extensions
         internal static IModHelper Helper { get; } = PyTKMod._helper;
         internal static IMonitor Monitor { get; } = PyTKMod._monitor;
 
-        private static Dictionary<string, HarmonyInstance> harmonyInstances = new Dictionary<string, HarmonyInstance>();
+        private static Dictionary<string, Harmony> harmonyInstances = new Dictionary<string, Harmony>();
 
         public static void PatchBase(this Type type, IModHelper helper)
         {
@@ -32,9 +32,9 @@ namespace PyTK.Extensions
         public static void PatchType(this Type type, Type typeToPatch, string harmonyId)
         {
             if (!harmonyInstances.ContainsKey(harmonyId))
-                harmonyInstances.Add(harmonyId, HarmonyInstance.Create(harmonyId));
+                harmonyInstances.Add(harmonyId, new Harmony(harmonyId));
 
-            HarmonyInstance harmony = harmonyInstances[harmonyId];
+            Harmony harmony = harmonyInstances[harmonyId];
 
             List<MethodInfo> originals = typeToPatch.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m != m.GetBaseDefinition()).ToList();
             foreach (MethodInfo method in originals)

@@ -3,24 +3,17 @@
   <PropertyGroup>
     <AssemblyName>CFAutomate</AssemblyName>
     <RootNamespace>CFAutomate</RootNamespace>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Version>2.12.11</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CustomFarmingRedux\CustomFarmingRedux.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\PyTK\PyTK.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\CustomFarmingRedux\CustomFarmingRedux.csproj" Private="false" />
+    <ProjectReference Include="..\PyTK\PyTK.csproj" Private="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Automate">
-      <HintPath>$(GamePath)\Mods\Automate\Automate.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <Reference Include="Automate" HintPath="$(GamePath)\Mods\Automate\Automate.dll" Private="false" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

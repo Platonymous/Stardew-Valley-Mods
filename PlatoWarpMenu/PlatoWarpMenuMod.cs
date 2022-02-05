@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
@@ -67,7 +67,7 @@ namespace PlatoWarpMenu
                     pytk = pApi;
             };
 
-            var harmony = HarmonyInstance.Create("Platonymous.PlatoWarpMenu");
+            var harmony = new Harmony("Platonymous.PlatoWarpMenu");
             bool patched = false;
 
             if (!config.CompatibilityMode || Constants.TargetPlatform == GamePlatform.Android)

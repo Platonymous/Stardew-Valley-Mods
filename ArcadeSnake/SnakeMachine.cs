@@ -2,7 +2,7 @@
 using StardewValley;
 using System;
 using System.Linq;
-using Harmony;
+using HarmonyLib;
 using StardewModdingAPI;
 
 namespace Snake

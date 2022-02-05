@@ -4,7 +4,7 @@
     <AssemblyName>NoSoilDecayRedux</AssemblyName>
     <RootNamespace>NoSoilDecayRedux</RootNamespace>
     <Version>1.5.7</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

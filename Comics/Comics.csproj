@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Comics</AssemblyName>
     <RootNamespace>Comics</RootNamespace>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Version>2.3.0</Version>
   </PropertyGroup>
 
@@ -12,13 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Platonymous.PlatoTK">
-      <HintPath>$(GamePath)\Mods\PlatoTK\PlatoTK.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>false</SpecificVersion>
-    </Reference>
+    <Reference Include="Platonymous.PlatoTK" HintPath="$(GamePath)\Mods\PlatoTK\PlatoTK.dll" Private="false" />
   </ItemGroup>
-
 
   <Import Project="$(SolutionDir)\common.targets" />
 

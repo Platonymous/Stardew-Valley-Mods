@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
 using PyTK.Extensions;
 using StardewModdingAPI;
@@ -89,7 +89,7 @@ namespace CustomMovies
 
         private void harmonyFix()
         {
-            HarmonyInstance instance = HarmonyInstance.Create("Platonymous.CustomMovies");
+            Harmony instance = new Harmony("Platonymous.CustomMovies");
             instance.Patch(typeof(MovieTheater).GetMethod("GetMovieData", BindingFlags.Public | BindingFlags.Static), null, new HarmonyMethod(typeof(CustomMoviesMod).GetMethod("GetMovieData", BindingFlags.Public | BindingFlags.Static)), null);
             instance.Patch(typeof(MovieTheater).GetMethod("GetMovieForDate", BindingFlags.Public | BindingFlags.Static), null, new HarmonyMethod(typeof(CustomMoviesMod).GetMethod("GetMovieForDate", BindingFlags.Public | BindingFlags.Static)), null);
             instance.Patch(typeof(MovieTheater).GetMethod("GetMovieReactions", BindingFlags.Public | BindingFlags.Static), null, new HarmonyMethod(typeof(CustomMoviesMod).GetMethod("GetMovieReactions", BindingFlags.Public | BindingFlags.Static)), null);

@@ -8,7 +8,7 @@ using PyTK.Types;
 using PyTK.CustomElementHandler;
 using PyTK.ConsoleCommands;
 using PyTK.CustomTV;
-using Harmony;
+using HarmonyLib;
 using System.Reflection;
 using StardewValley.Menus;
 using System.Collections.Generic;
@@ -58,7 +58,7 @@ namespace PyTK
         internal static object waitForPatching = new object();
         internal static object waitForItems = new object();
 
-        internal static HarmonyInstance hInstance;
+        internal static Harmony hInstance;
 
         internal static UpdateTickedEventArgs updateTicked;
 
@@ -92,7 +92,7 @@ namespace PyTK
                 Config = new PyTKConfig();
                 helper.WriteConfig(Config);
             }
-            hInstance = HarmonyInstance.Create("Platonymous.PyTK.Rev");
+            hInstance = new Harmony("Platonymous.PyTK.Rev");
             helper.Events.Display.RenderingWorld += (s,e) =>
             {
                 if (Game1.currentLocation is GameLocation location && location.Map is Map map && map.GetBackgroundColor() is TMXColor tmxColor)
@@ -375,7 +375,7 @@ namespace PyTK
                 TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
         }
         
-        public static HarmonyInstance instance = HarmonyInstance.Create("Platonymous.PyTK");
+        public static Harmony instance = new Harmony("Platonymous.PyTK");
 
         private void harmonyFix()
         {
@@ -424,7 +424,7 @@ namespace PyTK
             setupLoadIntercepter(instance);
         }
        
-        private void setupLoadIntercepter(HarmonyInstance harmony)
+        private void setupLoadIntercepter(Harmony harmony)
         {
              Monitor.Log("Patching: FromStream", LogLevel.Trace);
 
@@ -683,19 +683,19 @@ namespace PyTK
             }
         }
 
-        public void SetUpAssemblyPatch(HarmonyInstance instance, IEnumerable<XmlSerializer> serializers)
+        public void SetUpAssemblyPatch(Harmony instance, IEnumerable<XmlSerializer> serializers)
         {
             if (Config.Options.Contains("DisableSerializerPatch"))
                 return;
 
             foreach (var serializer in serializers)
             {
-                var cache = serializer.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
-                Hashtable cacheTable = (Hashtable)cache.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cache);
+                var cache = serializer.GetType().GetField("s_cache", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                IDictionary cacheTable = (IDictionary)cache.GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(cache);
 
                 foreach (var c in cacheTable.Values)
                 {
-                    var a = (Assembly)c.GetType().GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
+                    var a = (Assembly)c.GetType().GetField("_assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
                     PatchGeneratedSerializers(new Assembly[] { a });
                 }
 
@@ -705,7 +705,7 @@ namespace PyTK
 
         public static void AssemblyCachePatch(string ns, object o, object assembly)
         {
-            PatchGeneratedSerializers(new Assembly[] { (Assembly)assembly.GetType().GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(assembly) });
+            PatchGeneratedSerializers(new Assembly[] { (Assembly)assembly.GetType().GetField("_assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(assembly) });
         }
 
         public static void serializeFix(ref System.Object o)
@@ -761,12 +761,12 @@ namespace PyTK
 
             if (ty.FullName.Contains("XmlSerializer1"))
             {
-                if (Constants.TargetPlatform != GamePlatform.Android && ty.GetField("cache", BindingFlags.NonPublic | BindingFlags.Static) is FieldInfo field && field.GetValue(null) is object cache)
-                    if (cache.GetType().GetField("cache", BindingFlags.NonPublic | BindingFlags.Instance) is FieldInfo cField && cField.GetValue(cache) is Hashtable cacheTable)
+                if (Constants.TargetPlatform != GamePlatform.Android && ty.BaseType.GetField("s_cache", BindingFlags.NonPublic | BindingFlags.Static) is FieldInfo field && field.GetValue(null) is object cache)
+                    if (cache.GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance) is FieldInfo cField && cField.GetValue(cache) is IDictionary cacheTable)
                     {
                         foreach (var c in cacheTable.Values)
                         {
-                            var a = (Assembly)c.GetType().GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
+                            var a = (Assembly)c.GetType().GetField("_assembly", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(c);
                             PatchGeneratedSerializers(new Assembly[] { a });
                         }
 

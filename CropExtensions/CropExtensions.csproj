@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>CropExtensions</AssemblyName>
     <RootNamespace>CropExtensions</RootNamespace>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Version>1.1.1</Version>
   </PropertyGroup>
 

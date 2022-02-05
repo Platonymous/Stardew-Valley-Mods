@@ -4,7 +4,7 @@
     <AssemblyName>ShipFromInventory</AssemblyName>
     <RootNamespace>ShipFromInventory</RootNamespace>
     <Version>1.4.1</Version>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

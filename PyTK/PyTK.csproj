@@ -4,32 +4,24 @@
     <AssemblyName>PyTK</AssemblyName>
     <RootNamespace>PyTK</RootNamespace>
     <Version>1.22.8</Version>
-    <TargetFramework>net452</TargetFramework>
-    
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
-    <Authors>Platonymous</Authors>
-
-    <Description>Modding Toolkit for Stardew Valley</Description>
-
-    <Copyright>Copyright 2019</Copyright>
-
-    <PackageProjectUrl>https://github.com/Platonymous/Stardew-Valley-Mods/blob/master/PyTK/Examples.md</PackageProjectUrl>
-
-    <PackageIcon>pytk-icon.png</PackageIcon>
-
-    <RepositoryUrl>https://github.com/Platonymous/Stardew-Valley-Mods/</RepositoryUrl>
-
-    <RepositoryType>GitHub</RepositoryType>
-
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-
-    <PackageId>Platonymous.PyTK</PackageId>
-
-    <Product>Platonymous.PyTK</Product>
+    <TargetFramework>net5.0</TargetFramework>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Platonymous</Authors>
+    <Description>Modding Toolkit for Stardew Valley</Description>
+    <Copyright>Copyright 2019</Copyright>
+    <PackageProjectUrl>https://github.com/Platonymous/Stardew-Valley-Mods/blob/master/PyTK/Examples.md</PackageProjectUrl>
+    <PackageIcon>pytk-icon.png</PackageIcon>
+    <RepositoryUrl>https://github.com/Platonymous/Stardew-Valley-Mods/</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageId>Platonymous.PyTK</PackageId>
+    <Product>Platonymous.PyTK</Product>
+
+    <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,27 +31,13 @@
   </ItemGroup>
   
   <ItemGroup>
-  <Reference Include="TMXTile">
-    <HintPath>$(GamePath)\smapi-internal\TMXTile.dll</HintPath>
-    <Private>False</Private>
-    <SpecificVersion>false</SpecificVersion>
-  </Reference>
-    <Reference Include="BmFont">
-      <HintPath>$(GamePath)\BmFont.dll</HintPath>
-      <Private>true</Private>
-      <SpecificVersion>false</SpecificVersion>
-    </Reference>
+  <Reference Include="TMXTile" HintPath="$(GamePath)\smapi-internal\TMXTile.dll" Private="False" />
+    <Reference Include="BmFont" HintPath="$(GamePath)\BmFont.dll" Private="False" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="LICENSE.txt">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    <None Include="pytk-icon.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
+    <None Include="LICENSE.txt" Pack="True" PackagePath="" />
+    <None Include="pytk-icon.png" Pack="True" PackagePath="" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

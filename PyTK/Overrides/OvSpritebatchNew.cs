@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
 
 namespace PyTK.Overrides
 {
@@ -18,10 +19,10 @@ namespace PyTK.Overrides
 
         internal static bool skip = false;
 
-        internal static void initializePatch(Harmony.HarmonyInstance instance)
+        internal static void initializePatch(Harmony instance)
         {
             foreach (MethodInfo method in typeof(OvSpritebatchNew).GetMethods(BindingFlags.Static | BindingFlags.Public).Where(m => m.Name == "Draw"))
-                instance.Patch(typeof(SpriteBatch).GetMethod("Draw", method.GetParameters().Select(p => p.ParameterType).Where(t => !t.Name.Contains("SpriteBatch")).ToArray()), new Harmony.HarmonyMethod(method), null, null);
+                instance.Patch(typeof(SpriteBatch).GetMethod("Draw", method.GetParameters().Select(p => p.ParameterType).Where(t => !t.Name.Contains("SpriteBatch")).ToArray()), new HarmonyMethod(method), null, null);
         }
 
         internal static CustomObjectData getDataFromSourceRectangle(Rectangle source)
