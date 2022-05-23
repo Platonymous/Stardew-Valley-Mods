@@ -68,7 +68,7 @@ namespace SeedBag
             SeedBagTool.SaveIndex = platoHelper.Content.GetSaveIndex("Plato.SeedBagTool", () => Game1.objectInformation, (s) => s.Value.StartsWith("SeedBag"), (s) =>
             {
                 platoHelper.Content.Injections.InjectDataInsert("Data/ObjectInformation", s.Index, seedBagToolData);
-                Helper.Content.InvalidateCache("Data/ObjectInformation");
+                Helper.GameContent.InvalidateCache("Data/ObjectInformation");
                 platoHelper.Harmony.PatchTileDraw("Plato.SeedBagObjectTile", Game1.objectSpriteSheet, (t) => t.Name == @"Maps\springobjects" || t.Equals(Game1.objectSpriteSheet), SeedBagTool.Texture, null, s.Index);
                 platoHelper.Harmony.PatchTileDraw("Plato.SeedBagToolTile", Game1.toolSpriteSheet, (t) => t.Equals(Game1.toolSpriteSheet), SeedBagTool.Texture, null, s.Index);
             });

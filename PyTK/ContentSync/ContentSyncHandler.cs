@@ -144,7 +144,7 @@ namespace PyTK.ContentSync
                 SerializableDictionary<int, string> content = null;
                 try
                 {
-                    content = Helper.Content.Load<SerializableDictionary<int, string>>(instruction.assetName, ContentSource.GameContent);
+                    content = Helper.GameContent.Load<SerializableDictionary<int, string>>(instruction.assetName);
                 }
                 catch
                 {
@@ -164,7 +164,7 @@ namespace PyTK.ContentSync
                 SerializableDictionary<string, string> content = null;
                 try
                 {
-                    content = Helper.Content.Load<SerializableDictionary<string, string>>(instruction.assetName, ContentSource.GameContent);
+                    content = Helper.GameContent.Load<SerializableDictionary<string, string>>(instruction.assetName);
                 }
                 catch
                 {
@@ -184,7 +184,7 @@ namespace PyTK.ContentSync
                 Texture2D content = null;
                 try
                 {
-                    content = Helper.Content.Load<Texture2D>(instruction.assetName, ContentSource.GameContent);
+                    content = Helper.GameContent.Load<Texture2D>(instruction.assetName);
                 }
                 catch
                 {
@@ -203,7 +203,7 @@ namespace PyTK.ContentSync
                 Map content = null;
                 try
                 {
-                    content = Helper.Content.Load<Map>(instruction.assetName, ContentSource.GameContent);
+                    content = Helper.GameContent.Load<Map>(instruction.assetName);
                 }
                 catch
                 {
@@ -351,16 +351,16 @@ namespace PyTK.ContentSync
             {
                 object asset = null;
                 if (contentRequest.type == (int) ContentType.DictInt)
-                    asset = game ? Helper.Content.Load<SerializableDictionary<int, string>>(contentRequest.assetName, ContentSource.GameContent) : (SerializableDictionary<int, string>)content[contentRequest.assetName];
+                    asset = game ? Helper.GameContent.Load<SerializableDictionary<int, string>>(contentRequest.assetName) : (SerializableDictionary<int, string>)content[contentRequest.assetName];
 
                 if (contentRequest.type == (int)ContentType.DictString)
-                   asset = game ? Helper.Content.Load<SerializableDictionary<string, string>>(contentRequest.assetName, ContentSource.GameContent) : (SerializableDictionary<string, string>)content[contentRequest.assetName];
+                   asset = game ? Helper.GameContent.Load<SerializableDictionary<string, string>>(contentRequest.assetName) : (SerializableDictionary<string, string>)content[contentRequest.assetName];
 
                 if (contentRequest.type == (int)ContentType.Texture)
-                    asset = game ? Helper.Content.Load<Texture2D>(contentRequest.assetName, ContentSource.GameContent) : (Texture2D)content[contentRequest.assetName];
+                    asset = game ? Helper.GameContent.Load<Texture2D>(contentRequest.assetName) : (Texture2D)content[contentRequest.assetName];
 
                 if (contentRequest.type == (int)ContentType.Map)
-                    asset = game ? Helper.Content.Load<Map>(contentRequest.assetName, ContentSource.GameContent) : (Map)content[contentRequest.assetName];
+                    asset = game ? Helper.GameContent.Load<Map>(contentRequest.assetName) : (Map)content[contentRequest.assetName];
 
                 result = serialize(asset, (ContentType)contentRequest.type);
             }

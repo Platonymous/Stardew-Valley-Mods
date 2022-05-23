@@ -13,7 +13,7 @@ namespace PyTK.Types
         
         public void Invalidate()
         {
-            PyTKMod._helper.Content.InvalidateCache(predicate);
+            PyTKMod._helper.GameContent.InvalidateCache(predicate);
         }
 
         public void Disable()

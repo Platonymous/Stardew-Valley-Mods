@@ -32,7 +32,7 @@ namespace PyTK.Tiled
 
         public static Map Load(string path, IModHelper helper, bool syncTexturesToClients, IContentPack contentPack)
         {
-            Map map = contentPack != null ? contentPack.LoadAsset<Map>(path) : helper.Content.Load<Map>(path);
+            Map map = contentPack != null ? contentPack.ModContent.Load<Map>(path) : helper.ModContent.Load<Map>(path);
 
             for (int index = 0; index < map.TileSheets.Count; ++index)
                 if (string.IsNullOrWhiteSpace(Path.GetDirectoryName(map.TileSheets[index].ImageSource)))
@@ -135,7 +135,7 @@ namespace PyTK.Tiled
                 layer.Properties.Add("DrawChecked", true);
         }
 
-        public static bool Convert (string pathIn, string pathOut, IModHelper helper, ContentSource contentSource = ContentSource.ModFolder, IMonitor monitor = null)
+        public static bool Convert (string pathIn, string pathOut, IModHelper helper, bool gameContent = false, IMonitor monitor = null)
         {
             if(!pathIn.EndsWith(".tbin") && !pathIn.EndsWith(".xnb") && !pathOut.EndsWith(".tmx"))
             {
@@ -151,9 +151,9 @@ namespace PyTK.Tiled
             try
             {
                 if (pathIn.EndsWith(".tbin"))
-                    mem = tbin2tmx(pathIn, helper, contentSource);
+                    mem = tbin2tmx(pathIn, helper, gameContent);
                 else
-                    mem = xnb2tmx(pathIn, helper, contentSource);
+                    mem = xnb2tmx(pathIn, helper, gameContent);
 
             FileStream file = new FileStream(Path.Combine(helper.DirectoryPath, pathOut), FileMode.Create);
             mem.Position = 0;
@@ -170,7 +170,7 @@ namespace PyTK.Tiled
                 try
                 {
                     string imagePath = pathOut.Replace(".tmx", ".png");
-                    Texture2D image = helper.Content.Load<Texture2D>(pathIn);
+                    Texture2D image = helper.ModContent.Load<Texture2D>(pathIn);
                     image.SaveAsPng(new FileStream(Path.Combine(helper.DirectoryPath, imagePath), FileMode.Create), image.Width, image.Height);
                     return true;
                 }
@@ -217,21 +217,27 @@ namespace PyTK.Tiled
             return stream;
         }
 
-        internal static MemoryStream tbin2tmx(string path, IModHelper helper, ContentSource contentSource)
+        internal static MemoryStream tbin2tmx(string path, IModHelper helper, bool gameContent)
         {
-            Map map = helper.Content.Load<Map>(path, contentSource);
+            Map map = gameContent
+                ? helper.GameContent.Load<Map>(path)
+                : helper.ModContent.Load<Map>(path);
             return map2tmx(map);
         }
 
-        internal static MemoryStream xnb2tmx(string path, IModHelper helper, ContentSource contentSource)
+        internal static MemoryStream xnb2tmx(string path, IModHelper helper, bool gameContent)
         {
-            Map map = helper.Content.Load<Map>(path, contentSource);
+            Map map = gameContent
+                ? helper.GameContent.Load<Map>(path)
+                : helper.ModContent.Load<Map>(path);
             return map2tmx(map);
         }
 
-        internal static MemoryStream xnb2tbin(string path, IModHelper helper, ContentSource contentSource)
+        internal static MemoryStream xnb2tbin(string path, IModHelper helper, bool gameContent)
         {
-            Map map = helper.Content.Load<Map>(path, contentSource);
+            Map map = gameContent
+                ? helper.GameContent.Load<Map>(path)
+                : helper.ModContent.Load<Map>(path);
             map.LoadTileSheets(Game1.mapDisplayDevice);
             return map2tbin(map);
         }

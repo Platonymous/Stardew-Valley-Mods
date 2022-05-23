@@ -81,9 +81,9 @@ namespace CustomFarmingRedux
                 else
                 {
                     if (pack.baseFolder != "ContentPack")
-                        texture2d = helper.Content.Load<Texture2D>($"{pack.baseFolder}/{folder}/{texture}");
+                        texture2d = helper.ModContent.Load<Texture2D>($"{pack.baseFolder}/{folder}/{texture}");
                     else
-                        texture2d = pack.contentPack.LoadAsset<Texture2D>(texture);
+                        texture2d = pack.contentPack.ModContent.Load<Texture2D>(texture);
                 }
 
             if (scaleup)

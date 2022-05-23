@@ -103,7 +103,7 @@ namespace ChessBoard
         {
             if (Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone") is IMobilePhoneApi api)
             {
-                Texture2D appIcon = Helper.Content.Load<Texture2D>(Path.Combine("assets", "mobile_app_icon.png"));
+                Texture2D appIcon = Helper.ModContent.Load<Texture2D>("assets/mobile_app_icon.png");
                 bool success = api.AddApp(Helper.ModRegistry.ModID + "MobileChess", "Chess", () =>
                 {
                     Game1.currentMinigame = new ChessGame("Mobile", true, Helper);

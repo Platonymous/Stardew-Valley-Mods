@@ -72,7 +72,7 @@ namespace Comics
                     (handle) =>
                     {
                         platoHelper.Content.Injections.InjectDataInsert(@"Data/ObjectInformation", handle.Index, comicData);
-                        helper.Content.InvalidateCache(@"Data/ObjectInformation");
+                        helper.GameContent.InvalidateCache("Data/ObjectInformation");
                     });
 
                 Frame.SaveIndex = platoHelper.Content.GetSaveIndex(
@@ -81,7 +81,7 @@ namespace Comics
                     (handle) => handle.Value.Contains("ComicBookFrame"),
                     (handle) => {
                         platoHelper.Content.Injections.InjectDataInsert(@"Data/Furniture", handle.Index, frameData);
-                        helper.Content.InvalidateCache(@"Data/Furniture");
+                        helper.GameContent.InvalidateCache("Data/Furniture");
                         });
 
                 platoHelper.Harmony.PatchTileDraw("Plato.ComicBookDraw", Game1.objectSpriteSheet, (t) => t.Name == @"Maps\springobjects" || t.Equals(Game1.objectSpriteSheet), assetManager.Placeholder, null, () => ComicBook.SaveIndex.Index);

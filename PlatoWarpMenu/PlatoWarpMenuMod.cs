@@ -56,7 +56,7 @@ namespace PlatoWarpMenu
 
                 if (Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone") is IMobilePhoneApi api)
                 {
-                    Texture2D appIcon = Helper.Content.Load<Texture2D>(Path.Combine("assets", "mobile_app_icon.png"));
+                    Texture2D appIcon = Helper.ModContent.Load<Texture2D>("assets/mobile_app_icon.png");
                     bool success = api.AddApp(Helper.ModRegistry.ModID + "MobileWarpMenu", "Warp Menu", () =>
                     {
                         OpenUpMenu();
@@ -223,7 +223,7 @@ namespace PlatoWarpMenu
                                 if (PlatoWarpMenuMod.instance.config.UseTempFolder)
                                     try
                                     {
-                                        screen = Helper.Content.Load<Texture2D>(Path.Combine("Temp", (location.isStructure.Value ? location.uniqueName.Value : location.Name) + ".png"));
+                                        screen = Helper.ModContent.Load<Texture2D>($"Temp/{(location.isStructure.Value ? location.uniqueName.Value : location.Name)}.png");
                                     }
                                     catch { }
 

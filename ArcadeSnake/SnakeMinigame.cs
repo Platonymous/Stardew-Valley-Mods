@@ -69,10 +69,10 @@ namespace Snake
         public void Initialize(IModHelper helper)
         {
             Random = new Random();
-            BoardTexture = helper.Content.Load<Texture2D>(@"assets/board.png");
-            BoardDebug = helper.Content.Load<Texture2D>(@"assets/board_debug.png");
-            SpriteSheet = helper.Content.Load<Texture2D>(@"assets/sprites.png");
-            Background = helper.Content.Load<Texture2D>(@"assets/background.png");
+            BoardTexture = helper.ModContent.Load<Texture2D>(@"assets/board.png");
+            BoardDebug = helper.ModContent.Load<Texture2D>(@"assets/board_debug.png");
+            SpriteSheet = helper.ModContent.Load<Texture2D>(@"assets/sprites.png");
+            Background = helper.ModContent.Load<Texture2D>(@"assets/background.png");
             TiledSize = new Point(16, 16);
             SpriteSize = new Point(69, 80);
             Scale = 0.8f;

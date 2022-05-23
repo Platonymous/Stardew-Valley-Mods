@@ -128,23 +128,23 @@ namespace ChessBoard
 
         public static void LoadTextures(IModHelper helper)
         {
-            helper.Content.Load<Texture2D>(@"Characters/Monsters/Skeleton", ContentSource.GameContent).getArea(new Rectangle(0, 64, 64, 32)).inject(@"PlatonymousChess/Rook_White");
-            helper.Content.Load<Texture2D>(@"Characters/Monsters/Shadow Brute", ContentSource.GameContent).getArea(new Rectangle(0, 0, 64, 32)).inject(@"PlatonymousChess/Rook_Black");
+            helper.GameContent.Load<Texture2D>("Characters/Monsters/Skeleton").getArea(new Rectangle(0, 64, 64, 32)).inject(@"PlatonymousChess/Rook_White");
+            helper.GameContent.Load<Texture2D>("Characters/Monsters/Shadow Brute").getArea(new Rectangle(0, 0, 64, 32)).inject(@"PlatonymousChess/Rook_Black");
 
-            helper.Content.Load<Texture2D>(@"Animals/White Cow", ContentSource.GameContent).getArea(new Rectangle(0, 64, 128, 32)).inject(@"PlatonymousChess/Knight_White");
-            helper.Content.Load<Texture2D>(@"Animals/Brown Cow", ContentSource.GameContent).getArea(new Rectangle(0, 0, 128, 32)).inject(@"PlatonymousChess/Knight_Black");
+            helper.GameContent.Load<Texture2D>("Animals/White Cow").getArea(new Rectangle(0, 64, 128, 32)).inject(@"PlatonymousChess/Knight_White");
+            helper.GameContent.Load<Texture2D>("Animals/Brown Cow").getArea(new Rectangle(0, 0, 128, 32)).inject(@"PlatonymousChess/Knight_Black");
 
-            helper.Content.Load<Texture2D>(@"Characters/Junimo", ContentSource.GameContent).getArea(new Rectangle(0, 64, 128, 16)).inject(@"PlatonymousChess/Pawn_White");
-            helper.Content.Load<Texture2D>(@"Characters/Junimo", ContentSource.GameContent).getArea(new Rectangle(0, 0, 128, 16)).inject(@"PlatonymousChess/Pawn_Black");
+            helper.GameContent.Load<Texture2D>("Characters/Junimo").getArea(new Rectangle(0, 64, 128, 16)).inject(@"PlatonymousChess/Pawn_White");
+            helper.GameContent.Load<Texture2D>("Characters/Junimo").getArea(new Rectangle(0, 0, 128, 16)).inject(@"PlatonymousChess/Pawn_Black");
 
-            helper.Content.Load<Texture2D>(@"Animals/White Chicken", ContentSource.GameContent).getArea(new Rectangle(0, 32, 64, 16)).inject(@"PlatonymousChess/Bishop_White");
-            helper.Content.Load<Texture2D>(@"Animals/Void Chicken", ContentSource.GameContent).getArea(new Rectangle(0, 96, 64, 16)).inject(@"PlatonymousChess/Bishop_Black");
+            helper.GameContent.Load<Texture2D>("Animals/White Chicken").getArea(new Rectangle(0, 32, 64, 16)).inject(@"PlatonymousChess/Bishop_White");
+            helper.GameContent.Load<Texture2D>("Animals/Void Chicken").getArea(new Rectangle(0, 96, 64, 16)).inject(@"PlatonymousChess/Bishop_Black");
 
-            helper.Content.Load<Texture2D>(@"Characters/"+ChessBoardMod.config.WhiteQueen, ContentSource.GameContent).getArea(new Rectangle(0, 64, 64, 32)).inject(@"PlatonymousChess/Queen_White");
-            helper.Content.Load<Texture2D>(@"Characters/" + ChessBoardMod.config.BlackQueen, ContentSource.GameContent).getArea(new Rectangle(0, 0, 64, 32)).inject(@"PlatonymousChess/Queen_Black");
+            helper.GameContent.Load<Texture2D>($"Characters/{ChessBoardMod.config.WhiteQueen}").getArea(new Rectangle(0, 64, 64, 32)).inject(@"PlatonymousChess/Queen_White");
+            helper.GameContent.Load<Texture2D>($"Characters/{ChessBoardMod.config.BlackQueen}").getArea(new Rectangle(0, 0, 64, 32)).inject(@"PlatonymousChess/Queen_Black");
 
-            helper.Content.Load<Texture2D>(@"Characters/" + ChessBoardMod.config.WhiteKing, ContentSource.GameContent).getArea(new Rectangle(0, 64, 64, 32)).inject(@"PlatonymousChess/King_White");
-            helper.Content.Load<Texture2D>(@"Characters/" + ChessBoardMod.config.BlackKing, ContentSource.GameContent).getArea(new Rectangle(0, 0, 64, 32)).inject(@"PlatonymousChess/King_Black");
+            helper.GameContent.Load<Texture2D>($"Characters/{ChessBoardMod.config.WhiteKing}").getArea(new Rectangle(0, 64, 64, 32)).inject(@"PlatonymousChess/King_White");
+            helper.GameContent.Load<Texture2D>($"Characters/{ChessBoardMod.config.BlackKing}").getArea(new Rectangle(0, 0, 64, 32)).inject(@"PlatonymousChess/King_Black");
         }
 
         public void loadTurns()

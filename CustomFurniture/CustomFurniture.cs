@@ -118,11 +118,11 @@ namespace CustomFurniture
         {
             if (data.fromContent)
             {
-                texture = CustomFurnitureMod.helper.Content.Load<Texture2D>(data.texture, StardewModdingAPI.ContentSource.GameContent);
+                texture = CustomFurnitureMod.helper.GameContent.Load<Texture2D>(data.texture);
                 if(data.textureOverlay != null)
-                    textureOverlay = CustomFurnitureMod.helper.Content.Load<Texture2D>(data.textureOverlay, StardewModdingAPI.ContentSource.GameContent);
+                    textureOverlay = CustomFurnitureMod.helper.GameContent.Load<Texture2D>(data.textureOverlay);
                 if (data.textureUnderlay != null)
-                    textureUnderlay = CustomFurnitureMod.helper.Content.Load<Texture2D>(data.textureUnderlay, StardewModdingAPI.ContentSource.GameContent);
+                    textureUnderlay = CustomFurnitureMod.helper.GameContent.Load<Texture2D>(data.textureUnderlay);
             }
 
             base.DayUpdate(location);
@@ -136,11 +136,11 @@ namespace CustomFurniture
 
            
             if (Textures.ContainsKey(tkey))
-                texture = CustomFurnitureMod.helper.Content.Load<Texture2D>(Textures[tkey],StardewModdingAPI.ContentSource.GameContent);
+                texture = CustomFurnitureMod.helper.GameContent.Load<Texture2D>(Textures[tkey]);
             if (data.textureOverlay is string overlay && $"{folder}/{overlay}" is string tkey2 && Textures.ContainsKey(tkey2))
-                textureOverlay = CustomFurnitureMod.helper.Content.Load<Texture2D>(Textures[tkey2], StardewModdingAPI.ContentSource.GameContent);
+                textureOverlay = CustomFurnitureMod.helper.GameContent.Load<Texture2D>(Textures[tkey2]);
             if (data.textureUnderlay is string underlay && $"{folder}/{underlay}" is string tkey3 && Textures.ContainsKey(tkey3))
-                textureUnderlay = CustomFurnitureMod.helper.Content.Load<Texture2D>(Textures[tkey3], StardewModdingAPI.ContentSource.GameContent);
+                textureUnderlay = CustomFurnitureMod.helper.GameContent.Load<Texture2D>(Textures[tkey3]);
 
 
         }

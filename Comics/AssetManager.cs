@@ -39,7 +39,7 @@ namespace Comics
 
         private Texture2D LoadPlaceholder()
         {
-            return Helper.Content.Load<Texture2D>("assets/issues/placeholder.png");
+            return Helper.ModContent.Load<Texture2D>("assets/issues/placeholder.png");
         }
 
         public Issue GetIssue(string id)
@@ -67,7 +67,7 @@ namespace Comics
                     string absolute = Path.Combine(Helper.DirectoryPath, "assets", "issues", id + (big ? "_big" : "") + ".png");
 
                     client.DownloadFile(file,absolute);
-                    Texture2D texture = Helper.Content.Load<Texture2D>(relative) ?? Placeholder;
+                    Texture2D texture = Helper.ModContent.Load<Texture2D>(relative) ?? Placeholder;
                     return texture;
                 }
             }
@@ -84,7 +84,7 @@ namespace Comics
             Texture2D texture = null;
             try
             {
-                texture = Helper.Content.Load<Texture2D>(relative);
+                texture = Helper.ModContent.Load<Texture2D>(relative);
             }
             catch
             {
@@ -136,7 +136,7 @@ namespace Comics
             string absolute = Path.Combine(Helper.DirectoryPath, "assets", "issues", id + (big ? "_big" : "") + ".png");
             var texture = Placeholder;
             if (File.Exists(absolute))
-                texture = Helper.Content.Load<Texture2D>(relative) ?? Placeholder;
+                texture = Helper.ModContent.Load<Texture2D>(relative) ?? Placeholder;
             else if (Issues.ContainsKey(id))
                 texture = DownloadImageFileForIssue(big ? Issues[id].Image.MediumUrl : Issues[id].Image.SmallUrl, id, big);
             else if (GetIssue(id) is Issue issue)

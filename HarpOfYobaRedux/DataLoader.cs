@@ -68,7 +68,7 @@ namespace HarpOfYobaRedux
 
         private static Texture2D loadTexture(IModHelper helper, string file)
         {
-            return helper.Content.Load<Texture2D>($"Assets/{file}");
+            return helper.ModContent.Load<Texture2D>($"Assets/{file}");
         }
 
     }

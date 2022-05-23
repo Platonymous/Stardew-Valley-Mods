@@ -179,7 +179,7 @@ namespace PelicanTTS
 
         private void setUpNPCConfig()
         {
-            var npcs = Helper.Content.Load<Dictionary<string, string>>("Data//NPCDispositions", ContentSource.GameContent);
+            var npcs = Helper.GameContent.Load<Dictionary<string, string>>("Data/NPCDispositions");
 
             if (!config.Voices.ContainsKey("Default"))
                 config.Voices.Add("Default", new VoiceSetup() { Voice = SpeechHandlerPolly.getVoice("default", true) });
@@ -237,7 +237,7 @@ namespace PelicanTTS
                 config.LanguageCode = SpeechHandlerPolly.getLanguageCode(true);
                 //config.ReadChatMessages = true;
 
-                var npcs = Helper.Content.Load<Dictionary<string, string>>("Data//NPCDispositions", ContentSource.GameContent);
+                var npcs = Helper.GameContent.Load<Dictionary<string, string>>("Data/NPCDispositions");
 
                 foreach (var voice in config.Voices.Keys)
                 {
@@ -360,7 +360,7 @@ namespace PelicanTTS
                         intro = i18n.Get("FestivalGreeting");
                     else
                     {
-                        var dialogues = _helper.Content.Load<Dictionary<string, string>>(@"Characters/Dialogue/" + character, ContentSource.GameContent);
+                        var dialogues = _helper.GameContent.Load<Dictionary<string, string>>($"Characters/Dialogue/{character}");
                         if (dialogues != null && dialogues.ContainsKey("Introduction"))
                         {
                             intro = dialogues["Introduction"].Split('^')[0].Split('#')[0].Replace("@", "");
@@ -552,7 +552,7 @@ namespace PelicanTTS
                     intro = i18n.Get("FestivalGreeting");
                 else
                 {
-                    var dialogues = _helper.Content.Load<Dictionary<string, string>>(@"Characters/Dialogue/" + intro, ContentSource.GameContent);
+                    var dialogues = _helper.GameContent.Load<Dictionary<string, string>>($"Characters/Dialogue/{intro}");
                     if (dialogues != null && dialogues.ContainsKey("Introduction"))
                         intro = dialogues["Introduction"].Split('^')[0].Split('#')[0].Replace("@", "");
                 }

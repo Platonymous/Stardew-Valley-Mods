@@ -162,7 +162,7 @@ namespace Visualize
         {
             if (profile.palette != "none")
             {
-                Texture2D paletteImage = _helper.Content.Load<Texture2D>($"Profiles/{profile.palette}", ContentSource.ModFolder);
+                Texture2D paletteImage = _helper.ModContent.Load<Texture2D>($"Profiles/{profile.palette}");
 
                 if (paletteCache.ContainsKey(paletteImage))
                     palette = paletteCache[paletteImage];

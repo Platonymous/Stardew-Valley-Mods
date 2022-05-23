@@ -111,8 +111,8 @@ namespace TMXLoader
                 editWarps(map, edit.addWarps, edit.removeWarps, original);
             }else if(type == EditType.Festival)
             {
-                Texture2D springTex = TMXLoaderMod.helper.Content.Load<Texture2D>("Maps/spring_outdoorsTileSheet", ContentSource.GameContent);
-                Dictionary<string, string> source = TMXLoaderMod.helper.Content.Load<Dictionary<string, string>>("Data\\NPCDispositions", ContentSource.GameContent);
+                Texture2D springTex = TMXLoaderMod.helper.GameContent.Load<Texture2D>("Maps/spring_outdoorsTileSheet");
+                Dictionary<string, string> source = TMXLoaderMod.helper.GameContent.Load<Dictionary<string, string>>("Data/NPCDispositions");
                 int index = source.Keys.ToList().IndexOf(npcedit.name);
                 TileSheet spring = original.GetTileSheet("ztemp");
                 if (spring == null)

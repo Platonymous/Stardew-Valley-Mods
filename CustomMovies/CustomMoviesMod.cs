@@ -209,7 +209,7 @@ namespace CustomMovies
                 CMVAssetEditor.CurrentMovie = null;
 
             if (lastMovie != CMVAssetEditor.CurrentMovie)
-                cmHelper.Content.InvalidateCache(@"LooseSprites\Movies");
+                cmHelper.GameContent.InvalidateCache("LooseSprites/Movies");
 
             lastMovie = CMVAssetEditor.CurrentMovie;
 

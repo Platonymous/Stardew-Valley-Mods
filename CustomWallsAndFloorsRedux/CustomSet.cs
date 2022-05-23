@@ -19,11 +19,11 @@ namespace CustomWallsAndFloorsRedux
 
         public CustomSet(IContentPack pack, bool addToCatalogue = true, bool injectTileSheets = true)
         {
-            Walls = pack.HasFile("walls.png") ? pack.LoadAsset<Texture2D>("walls.png") : null;
-            Floors = pack.HasFile("floors.png") ? pack.LoadAsset<Texture2D>("floors.png") : null;
+            Walls = pack.HasFile("walls.png") ? pack.ModContent.Load<Texture2D>("walls.png") : null;
+            Floors = pack.HasFile("floors.png") ? pack.ModContent.Load<Texture2D>("floors.png") : null;
             
             if (pack.HasFile("settings.json"))
-                Settings = pack.LoadAsset<Settings>("settings.json");
+                Settings = pack.ModContent.Load<Settings>("settings.json");
             
             Pack = pack;
             

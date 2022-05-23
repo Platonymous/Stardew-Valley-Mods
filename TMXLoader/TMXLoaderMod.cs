@@ -384,7 +384,7 @@ namespace TMXLoader
                 if (pay && Game1.IsMasterGame && buildables.Find(b => b.id == toRemove.Id) is BuildableEdit be)
                 {
                     GameLocation loc = Game1.getLocationFromName(toRemove.Location);
-                    Map map = helper.Content.Load<Map>(loc.mapPath.Value,ContentSource.GameContent);
+                    Map map = helper.GameContent.Load<Map>(loc.mapPath.Value);
                     Map bMap  = TMXContent.Load(be.file, Helper, be._pack);
                     if (bMap == null)
                         return;
@@ -464,7 +464,7 @@ namespace TMXLoader
             {
                 string buildFile = edit.indoorsFile;
 
-                helper.Content.InvalidateCache(edit._pack.GetActualAssetKey(buildFile));
+                helper.GameContent.InvalidateCache(edit._pack.ModContent.GetInternalAssetName(buildFile));
 
                 Map map = TMXContent.Load(buildFile, Helper, edit._pack);
                 if (map == null)
@@ -481,7 +481,7 @@ namespace TMXLoader
 
                 try
                 {
-                    m = Helper.Content.Load<Map>("Maps/" + e.name, ContentSource.GameContent);
+                    m = Helper.GameContent.Load<Map>($"Maps/{e.name}");
                 }
                 catch
                 {
@@ -940,8 +940,8 @@ namespace TMXLoader
                         {
                             editor.lastCheck = r;
 
-                            Helper.Content.InvalidateCache(e.NewLocation.mapPath.Value);
-                            helper.Content.InvalidateCache(Game1.currentLocation.mapPath.Value);
+                            Helper.GameContent.InvalidateCache(e.NewLocation.mapPath.Value);
+                            helper.GameContent.InvalidateCache(Game1.currentLocation.mapPath.Value);
                             try
                             {
                                 Game1.currentLocation.reloadMap();
@@ -981,7 +981,7 @@ namespace TMXLoader
 
             foreach (string map in festivals)
                 if (e.NewLocation is GameLocation gl && gl.mapPath.Value is string mp && mp.Contains(map))
-                    Helper.Content.InvalidateCache(e.NewLocation.mapPath.Value);
+                    Helper.GameContent.InvalidateCache(e.NewLocation.mapPath.Value);
 
             if(Game1.IsMasterGame)
                 loadPersistentDataToLocation(e.NewLocation);
@@ -1628,7 +1628,7 @@ namespace TMXLoader
             {
                 tileShops.AddOrReplace(shop, shop.inventory);
                 foreach (string path in shop.portraits)
-                    pack.LoadAsset<Texture2D>(path).inject(@"Portraits/" + Path.GetFileNameWithoutExtension(path));
+                    pack.ModContent.Load<Texture2D>(path).inject(@"Portraits/" + Path.GetFileNameWithoutExtension(path));
             }
 
             foreach (NPCPlacement edit in tmxPack.festivalSpots)
@@ -1643,7 +1643,7 @@ namespace TMXLoader
                 helper.Events.GameLoop.SaveLoaded += (s, e) =>
                 {
                     if (Game1.getCharacterFromName(edit.name) == null)
-                        Game1.locations.Where(gl => gl.Name == edit.map).First().addCharacter(new NPC(new AnimatedSprite("Characters\\" + edit.name, 0, 16, 32), new Vector2(edit.position[0], edit.position[1]), edit.map, 0, edit.name, edit.datable, (Dictionary<int, int[]>)null, Helper.Content.Load<Texture2D>("Portraits\\" + edit.name, ContentSource.GameContent)));
+                        Game1.locations.Where(gl => gl.Name == edit.map).First().addCharacter(new NPC(new AnimatedSprite("Characters\\" + edit.name, 0, 16, 32), new Vector2(edit.position[0], edit.position[1]), edit.map, 0, edit.name, edit.datable, (Dictionary<int, int[]>)null, Helper.GameContent.Load<Texture2D>($"Portraits/{edit.name}")));
                 };
             }
 
@@ -1711,7 +1711,7 @@ namespace TMXLoader
 
                 // pack.WriteJsonFile<TMXContentPack>("content.json", tmxPack);
 
-                edit._icon = pack.LoadAsset<Texture2D>(edit.iconFile);
+                edit._icon = pack.ModContent.Load<Texture2D>(edit.iconFile);
                 edit._map = TMXContent.Load(edit.file, Helper, pack);
                 if (edit._map == null)
                     continue;
@@ -1781,7 +1781,7 @@ namespace TMXLoader
 
                 try
                 {
-                    map = Helper.Content.Load<Map>(path, ContentSource.GameContent);
+                    map = Helper.GameContent.Load<Map>(path);
                     map.LoadTileSheets(Game1.mapDisplayDevice);
                 }
                 catch (Exception ex)

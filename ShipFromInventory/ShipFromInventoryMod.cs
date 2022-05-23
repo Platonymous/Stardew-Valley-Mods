@@ -31,7 +31,7 @@ namespace ShipFromInventory
         public override void Entry(IModHelper helper)
         {
             config = helper.ReadConfig<Config>();
-            shippingBinTexture = helper.Content.Load<Texture2D>(@"Buildings/Shipping Bin", ContentSource.GameContent);
+            shippingBinTexture = helper.GameContent.Load<Texture2D>("Buildings/Shipping Bin");
             shippingBinLidRectangle = new Rectangle(134, 226, 30, 25);
             var instance = new Harmony("Platonymous.ShipFromInventory");
             instance.Patch(typeof(InventoryPage).GetConstructor(new[] { typeof(int), typeof(int), typeof(int), typeof(int) }), null, new HarmonyMethod(this.GetType().GetMethod("InventoryPageCon")));

@@ -37,7 +37,7 @@ namespace PyTK.PlatoUI
             FontPages = new List<Texture2D>();
 
             foreach (FontPage page in FontFile.Pages)
-                FontPages.Add(helper.Content.Load<Texture2D>(Path.Combine(Path.GetDirectoryName(assetName), page.File)));
+                FontPages.Add(helper.ModContent.Load<Texture2D>($"{Path.GetDirectoryName(assetName)}/{page.File}"));
         }
     }
 }

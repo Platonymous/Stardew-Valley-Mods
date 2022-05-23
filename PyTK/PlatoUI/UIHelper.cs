@@ -71,7 +71,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_dark == null)
-                    _dark = PyTK.PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors",StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(473,36,24,24));
+                    _dark = PyTK.PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(473,36,24,24));
 
                 return _dark;
             }
@@ -82,7 +82,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_tab == null)
-                    _tab = PyTK.PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(16, 368, 16, 16));
+                    _tab = PyTK.PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(16, 368, 16, 16));
 
                 return _tab;
             }
@@ -93,7 +93,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_yellow == null)
-                    _yellow = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/DialogBoxGreen", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(16, 16, 160, 160));
+                    _yellow = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/DialogBoxGreen").getArea(new Rectangle(16, 16, 160, 160));
 
                 return _yellow;
             }
@@ -104,7 +104,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_yellowBox == null)
-                    _yellowBox = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(293, 360, 24, 24));
+                    _yellowBox = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(293, 360, 24, 24));
 
                 return _yellowBox;
             }
@@ -115,7 +115,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_yellowComb1 == null)
-                    _yellowComb1 = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(293, 360, 18, 24));
+                    _yellowComb1 = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(293, 360, 18, 24));
 
                 return _yellowComb1;
             }
@@ -126,7 +126,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_yellowComb2 == null)
-                    _yellowComb2 = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(311, 360, 18, 24));
+                    _yellowComb2 = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(311, 360, 18, 24));
 
                 return _yellowComb2;
             }
@@ -137,7 +137,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_bounceClose == null)
-                    _bounceClose = new AnimatedTexture2D(PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(289, 342, 121, 12)),11,12,12,true,true,1);
+                    _bounceClose = new AnimatedTexture2D(PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(289, 342, 121, 12)),11,12,12,true,true,1);
 
                 return _bounceClose;
             }
@@ -148,7 +148,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_whitebubble == null)
-                    _whitebubble = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(111, 1870, 54, 49));
+                    _whitebubble = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(111, 1870, 54, 49));
 
                 return _whitebubble;
             }
@@ -159,7 +159,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_hourglas == null)
-                    _hourglas = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(16, 0, 10, 16));
+                    _hourglas = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(16, 0, 10, 16));
 
                 return _hourglas;
             }
@@ -170,7 +170,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_arrowUp == null)
-                    _arrowUp = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(76, 72, 40, 44));
+                    _arrowUp = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(76, 72, 40, 44));
 
                 return _arrowUp;
             }
@@ -181,7 +181,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_arrowDown == null)
-                    _arrowDown = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(12, 76, 40, 44));
+                    _arrowDown = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(12, 76, 40, 44));
 
                 return _arrowDown;
             }
@@ -192,7 +192,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_arrowRight == null)
-                    _arrowRight = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(12, 204, 44, 40));
+                    _arrowRight = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(12, 204, 44, 40));
 
                 return _arrowRight;
             }
@@ -203,7 +203,7 @@ namespace PyTK.PlatoUI
             get
             {
                 if (_arrowLeft == null)
-                    _arrowLeft = PyTKMod._helper.Content.Load<Texture2D>(@"LooseSprites/Cursors", StardewModdingAPI.ContentSource.GameContent).getArea(new Rectangle(8, 268, 44, 40));
+                    _arrowLeft = PyTKMod._helper.GameContent.Load<Texture2D>("LooseSprites/Cursors").getArea(new Rectangle(8, 268, 44, 40));
 
                 return _arrowLeft;
             }
