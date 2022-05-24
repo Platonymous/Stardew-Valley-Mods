@@ -1016,8 +1016,18 @@ namespace PyTK
                 action = String.Join(" ", text);
                 if (key == "cs")
                     action += ";";
-                 Helper.ConsoleCommands.Trigger(key, action.Split(' '));
-                 return true;
+
+                ICommandHelper commandHelper = Helper.ConsoleCommands;
+                object commandManager = commandHelper.GetType().GetField("CommandManager", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(commandHelper);
+                if (commandManager is null)
+                    throw new InvalidOperationException("Can't get SMAPI's underlying command manager.");
+
+                MethodInfo triggerCommand = commandManager.GetType().GetMethod("Trigger", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                if (triggerCommand is null)
+                    throw new InvalidOperationException("Can't get SMAPI's underlying CommandManager.Trigger method.");
+
+                triggerCommand.Invoke(commandManager, new object[] { key, action.Split(' ') });
+                return true;
              }).register();
 
             TileAction Game = new TileAction("Game", (action, location, tile, layer) =>
