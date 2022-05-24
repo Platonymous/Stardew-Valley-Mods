@@ -5,6 +5,6 @@
   "Description": "Allows for more detailed crop seasons",
   "UniqueID": "Platonymous.CropExtension",
   "EntryDll": "CropExtensions.dll",
-  "MinimumApiVersion": "2.9",
+  "MinimumApiVersion": "3.14.0",
   "UpdateKeys": [ "Nexus:3208" ]
 }

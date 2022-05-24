@@ -5,7 +5,7 @@
   "Description": "Buy comics from Pierre",
   "UniqueID": "Platonymous.Comics",
   "EntryDll": "Comics.dll",
-  "MinimumApiVersion": "3.2.0",
+  "MinimumApiVersion": "3.14.0",
   "UpdateKeys": [ "Nexus:6281" ],
   "Dependencies": [
     {

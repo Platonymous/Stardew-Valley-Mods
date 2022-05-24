@@ -5,7 +5,7 @@
   "Description": "Write and place notes",
   "UniqueID": "Platonymous.Notes",
   "EntryDll": "Notes.dll",
-  "MinimumApiVersion": "2.11.2",
+  "MinimumApiVersion": "3.14.0",
   "UpdateKeys": [ "Nexus:3068" ],
   "Dependencies": [
     {

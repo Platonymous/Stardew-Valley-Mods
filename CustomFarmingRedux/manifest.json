@@ -6,7 +6,7 @@
   "UniqueID": "Platonymous.CustomFarming",
   "EntryDll": "CustomFarmingRedux.dll",
   "UpdateKeys": [ "Nexus:991" ],
-  "MinimumApiVersion": "2.11.2",
+  "MinimumApiVersion": "3.14.0",
   "Dependencies": [
     {
       "UniqueID": "Platonymous.Toolkit"
