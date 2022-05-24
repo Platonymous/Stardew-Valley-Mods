@@ -9,7 +9,7 @@ namespace GhostTown
         public override void Entry(IModHelper helper)
         {
             config = helper.ReadConfig<Config>();
-            helper.Content.AssetEditors.Add(new Ghostify(helper));
+            helper.Events.Content.AssetRequested += new Ghostify(helper).OnAssetRequested;
         }
     }
 }

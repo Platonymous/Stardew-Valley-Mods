@@ -1,9 +1,10 @@
 ﻿using System;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 
 namespace PyTK.Types
 {
-    public class AssetEditInjector<TAsset, TSource> : IAssetEditor
+    public class AssetEditInjector<TAsset, TSource>
     {
         private readonly Func<TSource, TAsset> asset;
         private readonly Func<IAssetName, bool> predicate;
@@ -25,17 +26,15 @@ namespace PyTK.Types
             predicate = a => a.IsEquivalentTo(assetName, useBaseName: true);
         }
 
-        public bool CanEdit<TAssetRequest>(IAssetInfo asset)
+        internal void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
-            return predicate(asset.NameWithoutLocale);
-        }
-
-        public void Edit<TAssetRequest>(IAssetData asset)
-        {
-            if (typeof(TSource) == typeof(IAssetDataForImage))
-                this.asset((TSource)asset.AsImage());
-            else
-                asset.ReplaceWith(this.asset.Invoke(asset.GetData<TSource>()));
+            if (predicate(e.NameWithoutLocale))
+            {
+                if (typeof(TSource) == typeof(IAssetDataForImage))
+                    e.Edit(asset => this.asset((TSource)asset.AsImage()));
+                else
+                    e.Edit(asset => asset.ReplaceWith(this.asset.Invoke(asset.GetData<TSource>())));
+            }
         }
     }
 }

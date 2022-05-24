@@ -19,13 +19,13 @@ namespace PyTK.Extensions
 
         public static AssetLoadInjector<T> injectLoad<T>(this AssetLoadInjector<T> t)
         {
-            Helper.Content.AssetLoaders.Add(t);
+            Helper.Events.Content.AssetRequested += t.OnAssetRequested;
             return t;
         }
 
         public static AssetEditInjector<T, TAsset> injectEdit<T, TAsset>(this AssetEditInjector<T, TAsset> t)
         {
-            Helper.Content.AssetEditors.Add(t);
+            Helper.Events.Content.AssetRequested += t.OnAssetRequested;
             return t;
         }
 

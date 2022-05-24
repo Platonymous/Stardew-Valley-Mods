@@ -24,7 +24,8 @@ namespace CustomMovies
         public override void Entry(IModHelper helper)
         {
             cmHelper = helper;
-            helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched; ;
+            helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+            helper.Events.Content.AssetRequested += CMVAssetEditor.OnAssetRequested;
         }
 
         public static CraneGame.Prize getCustomMoviePrize(CustomMovieData movieData, CraneGame game, Vector2 pos, float z)
@@ -43,9 +44,7 @@ namespace CustomMovies
         private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
         {
             loadContentPacks();
-            Helper.Content.AssetEditors.Add(new CMVAssetEditor(Helper));
             harmonyFix();
-
         }
 
         public void loadContentPacks()

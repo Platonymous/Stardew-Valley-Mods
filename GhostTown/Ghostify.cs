@@ -1,18 +1,27 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using System.Collections.Generic;
+using System.Linq;
 using PyTK.Extensions;
 using PyTK.Types;
+using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 
 namespace GhostTown
 {
-    class Ghostify : IAssetEditor
+    class Ghostify
     {
-        public IModHelper helper;
-        private ColorManipulation spriteGhostifyer;
-        private ColorManipulation portraitGhostifyer;
-        private ColorManipulation mapsGhostifyer;
+        public readonly IModHelper helper;
+        private readonly ColorManipulation spriteGhostifyer;
+        private readonly ColorManipulation portraitGhostifyer;
+        private readonly ColorManipulation mapsGhostifyer;
+
+        private readonly HashSet<string> IgnoreNpcSpriteNames = new(
+            new [] { "Gunther", "Marlon", "Krobus", "Bouncer", "Morris", "Sandy", "Henchman", "Dwarf", "Henchman", "Junimo", "MrQi", "robot", "Mariner" },
+            StringComparer.OrdinalIgnoreCase
+        );
 
         public Ghostify(IModHelper helper)
         {
@@ -26,27 +35,61 @@ namespace GhostTown
             mapsGhostifyer = GhostTownMod.config.desaturate ? new ColorManipulation(40, 100) : new ColorManipulation();
         }
 
-        public bool CanEdit<T>(IAssetInfo asset)
+        public void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
-            if (!GhostTownMod.config.animals && asset.AssetName.Contains("Animals"))
-                return false;
-
-            if (!GhostTownMod.config.critters && asset.AssetName.Contains("critters"))
-                return false;
-
-            if (!GhostTownMod.config.people && (asset.AssetName.Contains("Portraits") || asset.AssetName.Contains("Characters")))
-                return false;
-
-            if (asset.AssetNameEquals("Characters/Gunther") || asset.AssetNameEquals("Characters/Marlon") || asset.AssetNameEquals("Characters/Krobus") || asset.AssetNameEquals("Characters/Bouncer") || asset.AssetNameEquals("Characters/Morris") || asset.AssetNameEquals("Characters/Sandy") || asset.AssetNameEquals("Characters/Henchman") || asset.AssetNameEquals("Characters/Dwarf") || asset.AssetNameEquals("Characters/Henchman") || asset.AssetNameEquals("Characters/Junimo") || asset.AssetNameEquals("Characters/MrQi") || asset.AssetNameEquals("Characters/robot") || asset.AssetNameEquals("Characters/Mariner"))
-                return false;
-            
-            return asset.DataType.Equals(typeof(Texture2D)) && !asset.AssetName.Contains("Farmer");
+            if (this.CanEdit(e.DataType, e.NameWithoutLocale, out ColorManipulation effect))
+            {
+                e.Edit(asset =>
+                {
+                    var editor = asset.AsImage();
+                    editor.ReplaceWith(editor.Data.changeColor(effect));
+                });
+            }
         }
 
-        public void Edit<T>(IAssetData asset)
+        public bool CanEdit(Type assetType, IAssetName assetName, out ColorManipulation effect)
         {
-            asset.AsImage().ReplaceWith(asset.AsImage().Data.changeColor(asset.AssetName.Contains("Portraits") ? portraitGhostifyer : (asset.AssetName.Contains("Animals") || asset.AssetName.Contains("critters") || (asset.AssetName.Contains("Characters") && !asset.AssetName.Contains("Monsters"))) ? spriteGhostifyer : mapsGhostifyer));
-        }
+            effect = null;
+            if (!typeof(Texture2D).IsAssignableFrom(assetType))
+                return false;
 
+            // animals
+            if (assetName.IsDirectlyUnderPath("Animals"))
+            {
+                if (GhostTownMod.config.animals)
+                    effect = spriteGhostifyer;
+            }
+
+            // critters
+            else if (assetName.IsEquivalentTo("LooseSprites/critters"))
+            {
+                if (GhostTownMod.config.critters)
+                    effect = spriteGhostifyer;
+            }
+
+            // NPC portraits
+            else if (assetName.IsDirectlyUnderPath("Portraits"))
+            {
+                if (GhostTownMod.config.people)
+                    effect = portraitGhostifyer;
+            }
+
+            // NPC sprites
+            else if (assetName.IsDirectlyUnderPath("Characters"))
+            {
+                if (GhostTownMod.config.people)
+                {
+                    string npcName = PathUtilities.GetSegments(assetName.Name, limit: 2)[1];
+                    if (!this.IgnoreNpcSpriteNames.Contains(npcName))
+                        effect = spriteGhostifyer;
+                }
+            }
+
+            // any other non-farmer textures
+            else if (!assetName.StartsWith("Characters/Farmer/"))
+                effect = mapsGhostifyer;
+
+            return effect != null;
+        }
     }
 }

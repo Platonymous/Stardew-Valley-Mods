@@ -1,9 +1,10 @@
 ﻿using System;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 
 namespace PyTK.Types
 {
-    public class AssetLoadInjector<TAsset> : IAssetLoader
+    public class AssetLoadInjector<TAsset>
     {
         private readonly TAsset asset;
         private readonly Func<IAssetName, bool> predicate;
@@ -19,14 +20,11 @@ namespace PyTK.Types
             predicate = a => a.IsEquivalentTo(assetName, useBaseName: true);
         }
 
-        public bool CanLoad<TAssetRequest>(IAssetInfo asset)
+        internal void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
-            return predicate(asset.NameWithoutLocale);
-        }
+            if (predicate(e.NameWithoutLocale))
+                e.LoadFrom(() => this.asset, AssetLoadPriority.Medium);
 
-        public TAssetRequest Load<TAssetRequest>(IAssetInfo asset)
-        {
-            return (TAssetRequest)(object)this.asset;
         }
     }
 }

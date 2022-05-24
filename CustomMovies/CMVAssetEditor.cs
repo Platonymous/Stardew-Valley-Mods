@@ -1,28 +1,15 @@
-﻿using StardewModdingAPI;
-using System;
+﻿using StardewModdingAPI.Events;
 
 namespace CustomMovies
 {
-    class CMVAssetEditor : IAssetEditor
+    static class CMVAssetEditor
     {
         public static CustomMovieData CurrentMovie { get; set; } = null;
-        private IModHelper helper;
 
-        public CMVAssetEditor(IModHelper helper)
+        public static void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
-            this.helper = helper;
+            if (CurrentMovie is not null && e.Name.IsEquivalentTo("LooseSprites/Movies"))
+                e.Edit(asset => asset.ReplaceWith(CurrentMovie._texture));
         }
-
-        public bool CanEdit<T>(IAssetInfo asset)
-        {
-            return asset.AssetNameEquals(@"LooseSprites\Movies");
-        }
-
-        public void Edit<T>(IAssetData asset)
-        {
-            if (CurrentMovie != null)
-                asset.ReplaceWith(CurrentMovie._texture);
-        }
-
     }
 }

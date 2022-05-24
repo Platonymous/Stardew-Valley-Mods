@@ -19,9 +19,8 @@ namespace TMXLoader
         Festival,
         SpouseRoom
     }
-    public class TMXAssetEditor : IAssetEditor
+    public class TMXAssetEditor
     {
-
         private MapEdit edit;
         private NPCPlacement npcedit;
         private Map newMap;
@@ -33,6 +32,8 @@ namespace TMXLoader
 
         public bool lastCheck = true;
 
+        public string ContentPackId { get; }
+
         public override bool Equals(object obj)
         {
             return obj is TMXAssetEditor tmxe && edit == tmxe.edit && inLocation == tmxe.inLocation && assetName == tmxe.assetName;
@@ -43,8 +44,9 @@ namespace TMXLoader
             return (edit.GetHashCode() + ":" + inLocation + ":" + assetName + ":" + edit.position).GetHashCode();
         }
 
-        public TMXAssetEditor(MapEdit edit, Map map, EditType type)
+        public TMXAssetEditor(string contentPackId, MapEdit edit, Map map, EditType type)
         {
+            this.ContentPackId = contentPackId;
             this.edit = edit;
             this.type = type;
             this.newMap = map;
@@ -57,8 +59,10 @@ namespace TMXLoader
             lastCheck = conditions == "";
         }
 
-        public TMXAssetEditor(NPCPlacement npcedit, EditType type)
+        public TMXAssetEditor(string contentPackId, NPCPlacement npcedit, EditType type)
         {
+            this.ContentPackId = contentPackId;
+
             this.npcedit = npcedit;
             this.type = type;
             this.assetName = npcedit.map;
@@ -66,15 +70,15 @@ namespace TMXLoader
             this.inLocation = null;
             lastCheck = conditions == "";
         }
-        public bool CanEdit<T>(IAssetInfo asset)
+        public bool CanEdit(IAssetName asset)
         {
             if (saveBuildable != null && !TMXLoaderMod.buildablesBuild.Contains(saveBuildable))
                 return false;
 
-            return asset.AssetNameEquals(edit is BuildableEdit ? assetName : "Maps/" + assetName);
+            return asset.IsEquivalentTo(edit is BuildableEdit ? assetName : $"Maps/{assetName}");
         }
 
-        public void Edit<T>(IAssetData asset)
+        public void Edit(IAssetData asset)
         {
             if (saveBuildable != null && !TMXLoaderMod.buildablesBuild.Contains(saveBuildable))
                 return;

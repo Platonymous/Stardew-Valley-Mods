@@ -59,6 +59,7 @@ namespace TMXLoader
         internal static TMXLoaderMod _instance;
         internal static Mod faInstance;
 
+        private readonly List<TMXAssetEditor> AssetEditors = new();
 
 
         internal static bool contentPacksLoaded = false;
@@ -129,6 +130,8 @@ namespace TMXLoader
                 if (Context.IsWorldReady && buildables.Count > 0)
                     showBuildablesMenu();
             });
+
+            helper.Events.Content.AssetRequested += OnAssetRequested;
 
             helper.Events.GameLoop.ReturnedToTitle += (s, e) =>
             {
@@ -210,6 +213,15 @@ namespace TMXLoader
             };
 
             helper.Events.Display.MenuChanged += TMXActions.updateItemListAfterShop;
+        }
+
+        private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
+        {
+            foreach (TMXAssetEditor editor in this.AssetEditors)
+            {
+                if (editor.CanEdit(e.NameWithoutLocale))
+                    e.Edit(asset => editor.Edit(asset), onBehalfOf: editor.ContentPackId);
+            }
         }
 
         private void waterEverythingForRainProperty()
@@ -1582,6 +1594,7 @@ namespace TMXLoader
         internal void loadPack(TMXContentPack tmxPack) 
         {
             var pack = tmxPack.parent;
+            string packModId = pack.Manifest.UniqueID;
 
             foreach (string mod in tmxPack.hasMods)
                 if (!helper.ModRegistry.IsLoaded(mod))
@@ -1593,7 +1606,7 @@ namespace TMXLoader
 
             if (tmxPack.scripts.Count > 0)
                 foreach (string script in tmxPack.scripts)
-                    PyLua.loadScriptFromFile(Path.Combine(pack.DirectoryPath, script), pack.Manifest.UniqueID);
+                    PyLua.loadScriptFromFile(Path.Combine(pack.DirectoryPath, script), packModId);
 
             PyLua.loadScriptFromFile(Path.Combine(Helper.DirectoryPath, "sr.lua"), "Platonymous.TMXLoader.SpouseRoom");
 
@@ -1620,7 +1633,7 @@ namespace TMXLoader
                     continue;
                 edit._pack = pack;
 
-                Helper.Content.AssetEditors.Add(new TMXAssetEditor(edit, map, EditType.SpouseRoom));
+                this.AssetEditors.Add(new TMXAssetEditor(packModId, edit, map, EditType.SpouseRoom));
                 //  mapsToSync.AddOrReplace(edit.name, map);
             }
 
@@ -1634,7 +1647,7 @@ namespace TMXLoader
             foreach (NPCPlacement edit in tmxPack.festivalSpots)
             {
                 festivals.AddOrReplace(edit.map);
-                addAssetEditor(new TMXAssetEditor(edit, EditType.Festival));
+                addAssetEditor(new TMXAssetEditor(packModId, edit, EditType.Festival));
                 // mapsToSync.AddOrReplace(edit.map, original);
             }
 
@@ -1657,7 +1670,7 @@ namespace TMXLoader
 
                 string groupName = "TMXL";
 
-                if (pack.Manifest.UniqueID.Contains("StardewValleyExpanded"))
+                if (packModId.Contains("StardewValleyExpanded"))
                     groupName = "SDV Expanded";
 
                 if (edit.addLocation)
@@ -1683,7 +1696,7 @@ namespace TMXLoader
                 if (map == null)
                     continue;
                 edit._pack = pack;
-                addAssetEditor(new TMXAssetEditor(edit, map, EditType.Replace));
+                addAssetEditor(new TMXAssetEditor(packModId, edit, map, EditType.Replace));
                 // mapsToSync.AddOrReplace(edit.name, map);
             }
 
@@ -1693,13 +1706,13 @@ namespace TMXLoader
                 if (map == null)
                     continue;
                 edit._pack = pack;
-                addAssetEditor(new TMXAssetEditor(edit, map, EditType.Merge));
+                addAssetEditor(new TMXAssetEditor(packModId, edit, map, EditType.Merge));
                 // mapsToSync.AddOrReplace(edit.name, map);
             }
 
             foreach (MapEdit edit in tmxPack.onlyWarps)
             {
-                addAssetEditor(new TMXAssetEditor(edit, null, EditType.Warps));
+                addAssetEditor(new TMXAssetEditor(packModId, edit, null, EditType.Warps));
                 // mapsToSync.AddOrReplace(edit.name, map);
             }
 
@@ -1743,7 +1756,7 @@ namespace TMXLoader
             if (editor.conditions != "" || editor.inLocation != null)
                 conditionals.Add(editor);
 
-            Helper.Content.AssetEditors.Add(editor);
+            this.AssetEditors.Add(editor);
             return editor;
         }
 
@@ -1752,7 +1765,7 @@ namespace TMXLoader
             if (conditionals.Contains(editor))
                 conditionals.Remove(editor);
 
-            Helper.Content.AssetEditors.Remove(editor);
+            this.AssetEditors.Remove(editor);
             return editor;
         }
 
