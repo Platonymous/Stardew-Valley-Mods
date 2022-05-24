@@ -130,20 +130,12 @@ namespace PyTK
 
         public static string getContentFolder()
         {
-            string folder = Path.Combine(Constants.ExecutionPath, Game1.content.RootDirectory);
-            DirectoryInfo directoryInfo = new DirectoryInfo(folder);
+            string folder = Constants.ContentPath;
 
-            if (directoryInfo.Exists)
+            if (Directory.Exists(folder))
                 return folder;
 
-            folder = folder.Replace("MacOS", "Resources").Replace("smapi-internal/","");
-
-            directoryInfo = new DirectoryInfo(folder);
-            if (directoryInfo.Exists)
-                return folder;
-            else
-                Monitor.Log("DebugF:" + folder);
-
+            Monitor.Log("DebugF:" + folder);
             return @"failed";
         }
 
