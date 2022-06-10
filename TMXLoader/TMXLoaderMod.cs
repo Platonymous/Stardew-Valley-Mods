@@ -39,7 +39,6 @@ namespace TMXLoader
 {
     public class TMXLoaderMod : Mod
     {
-        internal static string contentFolder = "Maps";
         internal static IMonitor monitor;
         internal static IModHelper helper;
         internal static Dictionary<string, Map> mapsToSync = new Dictionary<string, Map>();
@@ -61,6 +60,8 @@ namespace TMXLoader
 
         private readonly List<TMXAssetEditor> AssetEditors = new();
 
+        /// <summary>The loaded buildable interior maps.</summary>
+        public Dictionary<IAssetName, Map> BuildableInteriors = new();
 
         internal static bool contentPacksLoaded = false;
 
@@ -217,6 +218,11 @@ namespace TMXLoader
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
+            // load buildable interior
+            if (e.DataType == typeof(Map) && this.BuildableInteriors.TryGetValue(e.NameWithoutLocale, out Map map))
+                e.LoadFrom(() => map, AssetLoadPriority.Medium);
+
+            // apply editors
             foreach (TMXAssetEditor editor in this.AssetEditors)
             {
                 if (editor.CanEdit(e.NameWithoutLocale))
@@ -491,23 +497,13 @@ namespace TMXLoader
                 if (!map.Properties.ContainsKey("Warp"))
                     map.Properties["Warp"] = "0 0 Farm 0 0";
 
-                try
-                {
-                    m = Helper.GameContent.Load<Map>($"Maps/{e.name}");
-                }
-                catch
-                {
-                   
-                }
+                this.BuildableInteriors.TryAdd(Helper.GameContent.ParseAssetName($"Maps/{e.name}"), map);
 
                 if (!map.Properties.ContainsKey("Group"))
                     map.Properties.Add("Group", "Buildables");
 
                 if (!map.Properties.ContainsKey("Name"))
                     map.Properties.Add("Name", edit.name);
-
-                if (m == null)
-                    map.inject("Maps/" + e.name);
 
                 return addLocation(e);
             }
