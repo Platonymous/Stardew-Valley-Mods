@@ -460,7 +460,11 @@ namespace PyTK
             try
             {
                 harmony.Patch(
-                original: AccessTools.Method(Type.GetType("StardewModdingAPI.Framework.Content.AssetDataForImage, StardewModdingAPI"), "PatchImage"),
+                original: AccessTools.Method(
+                    Type.GetType("StardewModdingAPI.Framework.Content.AssetDataForImage, StardewModdingAPI"),
+                    "PatchImage",
+                    new[] { typeof(Texture2D), typeof(Rectangle), typeof(Rectangle), typeof(PatchMode) }
+                ),
                 prefix: new HarmonyMethod(this.GetType().GetMethod("PatchImage", BindingFlags.Public | BindingFlags.Static))
             );
             }
