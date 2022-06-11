@@ -1250,7 +1250,7 @@ namespace TMXLoader
             }
         }
 
-
+        private static string SetMapTileLogKey = null;
         public static bool trySetMapTile(GameLocation __instance, int tileX, int tileY, int index, string layer, string action, int whichTileSheet = 0)
         {
             if (skipTrySetMapTile)
@@ -1263,13 +1263,28 @@ namespace TMXLoader
             {
 
                 skipTrySetMapTile = true;
+
+                // log message for first tile in a location
+                {
+                    string logKey = $"{__instance.NameOrUniqueName}|{Game1.ticks}";
+                    if (SetMapTileLogKey != logKey)
+                    {
+                        SetMapTileLogKey = logKey;
+                        monitor.Log($"Setting map tiles for {__instance.NameOrUniqueName}...", LogLevel.Trace);
+                    }
+                }
+
+                // log verbose message for each tile
+                if (monitor.IsVerbose)
+                    monitor?.Log($"Setting MapTile: X:{tileX} Y:{tileY} Layer:{layer} TileSheet: {__instance.Map.TileSheets[whichTileSheet].Id} ({whichTileSheet}) Location:{__instance.Name}", LogLevel.Trace);
+
+                // set tile
                 __instance.setMapTile(tileX, tileY, index, layer, action, whichTileSheet);
-                monitor?.Log("Setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " ("+ whichTileSheet + ") Location:" + __instance.Name, LogLevel.Trace);
                 return false;
             }
             catch
             {
-                monitor?.Log("Error setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " (" + whichTileSheet + ") Location:" + __instance.Name, LogLevel.Warn);
+                monitor?.Log($"Error setting MapTile: X:{tileX} Y:{tileY} Layer:{layer} TileSheet: {__instance.Map.TileSheets[whichTileSheet].Id} ({whichTileSheet}) Location:{__instance.Name}", LogLevel.Warn);
                 monitor?.Log("----Tilesheets----", LogLevel.Trace);
                 int i = 0;
                 foreach (TileSheet ts in __instance.Map.TileSheets)
