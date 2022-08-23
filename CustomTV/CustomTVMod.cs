@@ -35,7 +35,7 @@ namespace CustomTV
 
                     foreach (string channel in CustomTVChannelToken.Channels.Keys.ToList())
                     {
-                        Dictionary<string, string> channelData = Helper.Content.Load<Dictionary<string, string>>($"{CustomTVChannelToken.ChannelDataPrefix}{channel}", ContentSource.GameContent);
+                        Dictionary<string, string> channelData = Helper.GameContent.Load<Dictionary<string, string>>($"{CustomTVChannelToken.ChannelDataPrefix}{channel}");
 
                         if (channelData.ContainsKey("@Active") && channelData["@Active"].ToLower() == "false")
                             continue;
@@ -107,7 +107,7 @@ namespace CustomTV
             {
                 if (CustomTVChannelToken.Channels.ContainsKey(p.ChannelName) 
                 && CustomTVChannelToken.Channels[p.ChannelName] is TVChannel channel
-                && Helper.Content.Load<Dictionary<string, string>>($"{CustomTVChannelToken.ChannelDataPrefix}{p.ChannelName}", ContentSource.GameContent) is Dictionary<string,string> channelData
+                && Helper.GameContent.Load<Dictionary<string, string>>($"{CustomTVChannelToken.ChannelDataPrefix}{p.ChannelName}") is Dictionary<string,string> channelData
                 )
                 {
                     if (TryPickShow(channelData, p.ChannelName,out string text, out string screen, out string overlay, out string music, channel.Random))

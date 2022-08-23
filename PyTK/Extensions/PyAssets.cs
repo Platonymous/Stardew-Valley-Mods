@@ -17,31 +17,31 @@ namespace PyTK.Extensions
 
         /* Basics */
 
-        public static AssetInjector<T, IAssetInfo> injectLoad<T, IAssetInfo>(this AssetInjector<T, IAssetInfo> t)
+        public static AssetLoadInjector<T> injectLoad<T>(this AssetLoadInjector<T> t)
         {
-            Helper.Content.AssetLoaders.Add(t);
+            Helper.Events.Content.AssetRequested += t.OnAssetRequested;
             return t;
         }
 
-        public static AssetInjector<T, TAsset> injectEdit<T, TAsset>(this AssetInjector<T, TAsset> t)
+        public static AssetEditInjector<T, TAsset> injectEdit<T, TAsset>(this AssetEditInjector<T, TAsset> t)
         {
-            Helper.Content.AssetEditors.Add(t);
+            Helper.Events.Content.AssetRequested += t.OnAssetRequested;
             return t;
         }
 
         /* Textures */
 
-        public static AssetInjector<Texture2D, IAssetInfo> inject(this Texture2D t, string assetName)
+        public static AssetLoadInjector<Texture2D> inject(this Texture2D t, string assetName)
         {
-            return new AssetInjector<Texture2D, IAssetInfo>(assetName, t).injectLoad();
+            return new AssetLoadInjector<Texture2D>(assetName, t).injectLoad();
         }
 
-        public static AssetInjector<Texture2D, Texture2D> injectAs(this Texture2D t, string assetName)
+        public static AssetEditInjector<Texture2D, Texture2D> injectAs(this Texture2D t, string assetName)
         {
-            return new AssetInjector<Texture2D, Texture2D>(assetName, t).injectEdit();
+            return new AssetEditInjector<Texture2D, Texture2D>(assetName, t).injectEdit();
         }
 
-        public static AssetInjector<IAssetDataForImage, IAssetDataForImage> injectInto(this Texture2D t, string assetName, Rectangle? source, Rectangle? target, PatchMode mode = PatchMode.Replace)
+        public static AssetEditInjector<IAssetDataForImage, IAssetDataForImage> injectInto(this Texture2D t, string assetName, Rectangle? source, Rectangle? target, PatchMode mode = PatchMode.Replace)
         {
             Func<IAssetDataForImage, IAssetDataForImage> merger = new Func<IAssetDataForImage, IAssetDataForImage>(delegate (IAssetDataForImage asset)
             {
@@ -49,15 +49,15 @@ namespace PyTK.Extensions
                 return asset;
             });
 
-            return new AssetInjector<IAssetDataForImage, IAssetDataForImage>(assetName, merger).injectEdit();
+            return new AssetEditInjector<IAssetDataForImage, IAssetDataForImage>(assetName, merger).injectEdit();
         }
 
-        public static AssetInjector<IAssetDataForImage, IAssetDataForImage> injectInto(this Texture2D t, string assetName, Point position, PatchMode mode = PatchMode.Replace)
+        public static AssetEditInjector<IAssetDataForImage, IAssetDataForImage> injectInto(this Texture2D t, string assetName, Point position, PatchMode mode = PatchMode.Replace)
         {
            return t.injectInto(assetName, null, new Rectangle(position.X, position.Y, t.Width, t.Height), mode);
         }
 
-        public static AssetInjector<IAssetDataForImage, IAssetDataForImage> injectTileInto(this Texture2D t, string assetName, int targetTileIndex, int sourceTileIndex = 0, int tileWidth = 16, int tileHeight = 16, PatchMode mode = PatchMode.Replace)
+        public static AssetEditInjector<IAssetDataForImage, IAssetDataForImage> injectTileInto(this Texture2D t, string assetName, int targetTileIndex, int sourceTileIndex = 0, int tileWidth = 16, int tileHeight = 16, PatchMode mode = PatchMode.Replace)
         {
             Func<IAssetDataForImage, IAssetDataForImage> merger = new Func<IAssetDataForImage, IAssetDataForImage>(delegate (IAssetDataForImage asset)
             {
@@ -67,10 +67,10 @@ namespace PyTK.Extensions
                 return asset;
             });
 
-            return new AssetInjector<IAssetDataForImage, IAssetDataForImage>(assetName, merger).injectEdit();
+            return new AssetEditInjector<IAssetDataForImage, IAssetDataForImage>(assetName, merger).injectEdit();
         }
 
-        public static AssetInjector<IAssetDataForImage, IAssetDataForImage> injectTileInto(this Texture2D t, string assetName, Range targetTileIndex, Range sourceTileIndex, int tileWidth = 16, int tileHeight = 16, PatchMode mode = PatchMode.Replace)
+        public static AssetEditInjector<IAssetDataForImage, IAssetDataForImage> injectTileInto(this Texture2D t, string assetName, Range targetTileIndex, Range sourceTileIndex, int tileWidth = 16, int tileHeight = 16, PatchMode mode = PatchMode.Replace)
         {
             Func<IAssetDataForImage, IAssetDataForImage> merger = new Func<IAssetDataForImage, IAssetDataForImage>(delegate (IAssetDataForImage asset)
             {
@@ -83,51 +83,51 @@ namespace PyTK.Extensions
                 return asset;
             });
 
-            return new AssetInjector<IAssetDataForImage, IAssetDataForImage>(assetName, merger).injectEdit();
+            return new AssetEditInjector<IAssetDataForImage, IAssetDataForImage>(assetName, merger).injectEdit();
         }
 
         /* Maps */
 
-        public static AssetInjector<Map, IAssetInfo> inject(this Map t, string assetName)
+        public static AssetLoadInjector<Map> inject(this Map t, string assetName)
         {
-            return new AssetInjector<Map, IAssetInfo>(assetName, t).injectLoad();
+            return new AssetLoadInjector<Map>(assetName, t).injectLoad();
         }
 
-        public static AssetInjector<Map, Map> injectAs(this Map t, string assetName)
+        public static AssetEditInjector<Map, Map> injectAs(this Map t, string assetName)
         {
-            return new AssetInjector<Map, Map>(assetName, t).injectEdit();
+            return new AssetEditInjector<Map, Map>(assetName, t).injectEdit();
         }
 
-        public static AssetInjector<Map, Map> injectInto(this Map t, string assetName, Vector2 position, Rectangle? sourceRectangle)
+        public static AssetEditInjector<Map, Map> injectInto(this Map t, string assetName, Vector2 position, Rectangle? sourceRectangle)
         {
             Func<Map, Map> merger = new Func<Map, Map>(delegate (Map asset)
             {
                 return t.mergeInto(asset, position, sourceRectangle);
             });
 
-            return new AssetInjector<Map, Map>(assetName, merger).injectEdit();
+            return new AssetEditInjector<Map, Map>(assetName, merger).injectEdit();
         }
 
         /* Data */
 
-        public static AssetInjector<IDictionary<TKey, TValue>, IAssetInfo> inject<TKey, TValue>(this IDictionary<TKey, TValue> t, string assetName)
+        public static AssetLoadInjector<IDictionary<TKey, TValue>> inject<TKey, TValue>(this IDictionary<TKey, TValue> t, string assetName)
         {
-            return new AssetInjector<IDictionary<TKey, TValue>, IAssetInfo>(assetName, t).injectLoad();
+            return new AssetLoadInjector<IDictionary<TKey, TValue>>(assetName, t).injectLoad();
         }
 
-        public static AssetInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>> injectAs<TDict, TKey, TValue>(this IDictionary<TKey, TValue> t, string assetName)
+        public static AssetEditInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>> injectAs<TDict, TKey, TValue>(this IDictionary<TKey, TValue> t, string assetName)
         {
-            return new AssetInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>>(assetName, t).injectEdit();
+            return new AssetEditInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>>(assetName, t).injectEdit();
         }
 
-        public static AssetInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>> injectInto<TKey, TValue>(this IDictionary<TKey, TValue> t, string assetName)
+        public static AssetEditInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>> injectInto<TKey, TValue>(this IDictionary<TKey, TValue> t, string assetName)
         {
             Func<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>> merger = new Func<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>>(delegate (IDictionary<TKey, TValue> asset)
             {
                 return asset.AddOrReplace(t);
             });
 
-            return new AssetInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>>(assetName, merger).injectEdit();
+            return new AssetEditInjector<IDictionary<TKey, TValue>, IDictionary<TKey, TValue>>(assetName, merger).injectEdit();
         }
     }
 }

@@ -42,7 +42,7 @@ namespace CustomMovies
         public void LoadTexture(IContentPack pack)
         {
             _pack = pack;
-            _texture = _pack.LoadAsset<Texture2D>(Sheet);
+            _texture = _pack.ModContent.Load<Texture2D>(Sheet);
 
             if (Frames > 1)
                 _texture = new AnimatedTexture2D(_texture, _texture.Width, _texture.Height / Frames, AnimationSpeed, Looped, Scale);

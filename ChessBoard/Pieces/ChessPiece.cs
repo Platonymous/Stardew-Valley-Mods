@@ -26,6 +26,8 @@ namespace ChessBoard.Pieces
 
         public bool White { get; set; }
 
+        public string ColorName => this.White ? "White" : "Black";
+
         public int TileHeight { get; set; } = 1;
 
         private bool loadedTexture = false;
@@ -39,14 +41,14 @@ namespace ChessBoard.Pieces
             if (loadTexture)
             {
                 loadedTexture = true;
-                Texture2D texture = helper.Content.Load<Texture2D>(@"PlatonymousChess/" + Name + "_" + (White ? "White" : "Black"), ContentSource.GameContent);
+                Texture2D texture = helper.GameContent.Load<Texture2D>($"PlatonymousChess/{Name}_{ColorName}");
                 Texture = ((new PyTK.Types.AnimatedTexture2D(texture, texture.Height, texture.Height, 6, startPaused: true)));
             }
         }
 
         public void LoadCharacterTexture(IModHelper helper)
         {
-            Texture2D texture = helper.Content.Load<Texture2D>(@"PlatonymousChess/" + Name + "_" + (White ? "White" : "Black"), ContentSource.GameContent);
+            Texture2D texture = helper.GameContent.Load<Texture2D>($"PlatonymousChess/{Name}_{ColorName}");
             Texture = ((new PyTK.Types.AnimatedTexture2D(texture, texture.Height / 2, texture.Height, 6, startPaused: true)));
             Scale = 0.75f;
             OffsetY = 0.1f;

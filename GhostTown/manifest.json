@@ -5,7 +5,7 @@
   "Description": "Ghostify Stardew Valley",
   "UniqueID": "Platonymous.GhostTown",
   "EntryDll": "GhostTown.dll",
-  "MinimumApiVersion": "2.9.0",
+  "MinimumApiVersion": "3.14.0",
   "UpdateKeys": [ "Nexus:2992" ],
   "Dependencies": [
     {

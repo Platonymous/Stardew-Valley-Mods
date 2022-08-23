@@ -184,7 +184,7 @@ namespace CropExtensions
              });
 
 
-            foreach (var crop in Helper.Content.Load<Dictionary<int, string>>("Data/Crops", ContentSource.GameContent)){
+            foreach (var crop in Helper.GameContent.Load<Dictionary<int, string>>("Data/Crops")){
                 string[] cropInfo = Game1.objectInformation[int.Parse(crop.Value.Split('/')[3])].Split('/');
                 string label = cropInfo[0];
                 string description = cropInfo[5];

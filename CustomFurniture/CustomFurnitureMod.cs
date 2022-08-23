@@ -176,18 +176,18 @@ namespace CustomFurniture
                         {
                             string tkey2 = $"{data.folderName}/{ data.textureOverlay}";
                             if (!CustomFurniture.Textures.ContainsKey(tkey2))
-                                CustomFurniture.Textures.Add(tkey2, data.fromContent ? data.textureOverlay : cpack.GetActualAssetKey(data.textureOverlay));
+                                CustomFurniture.Textures.Add(tkey2, data.fromContent ? data.textureOverlay : cpack.ModContent.GetInternalAssetName(data.textureOverlay).Name);
                         }
 
                         if (data.textureUnderlay != null)
                         {
                             string tkey3 = $"{data.folderName}/{ data.textureUnderlay}";
                             if (!CustomFurniture.Textures.ContainsKey(tkey3))
-                                CustomFurniture.Textures.Add(tkey3, data.fromContent ? data.textureUnderlay : cpack.GetActualAssetKey(data.textureUnderlay));
+                                CustomFurniture.Textures.Add(tkey3, data.fromContent ? data.textureUnderlay : cpack.ModContent.GetInternalAssetName(data.textureUnderlay).Name);
                         }
 
                         if (!CustomFurniture.Textures.ContainsKey(tkey))
-                            CustomFurniture.Textures.Add(tkey, data.fromContent ? data.texture : cpack.GetActualAssetKey(data.texture));
+                            CustomFurniture.Textures.Add(tkey, data.fromContent ? data.texture : cpack.ModContent.GetInternalAssetName(data.texture).Name);
                         CustomFurniture f = new CustomFurniture(data, objectID, Vector2.Zero);
                         furniturePile.AddOrReplace(pileID, f);
                         furniture.AddOrReplace(objectID, f);

@@ -68,8 +68,9 @@ namespace Snake
                 name: "Snake",
                 objectName: "Snake Arcade Machine",
                 start: () => SnakeMachine.start(Helper),
-                sprite: Helper.Content.GetActualAssetKey(@"assets/arcade.png"),
-                iconForMobilePhone: Helper.Content.GetActualAssetKey(@"assets/mobile_app_icon.png"));
+                sprite: Helper.ModContent.GetInternalAssetName("assets/arcade.png").Name,
+                iconForMobilePhone: Helper.ModContent.GetInternalAssetName("assets/mobile_app_icon.png").Name
+            );
         }
 
         private void Multiplayer_ModMessageReceived(object sender, StardewModdingAPI.Events.ModMessageReceivedEventArgs e)

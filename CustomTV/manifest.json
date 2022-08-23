@@ -5,7 +5,7 @@
   "Description": "Adds custom TV channels via content pack",
   "UniqueID": "Platonymous.CustomTV",
   "EntryDll": "CustomTV.dll",
-  "MinimumApiVersion": "2.11",
+  "MinimumApiVersion": "3.14.0",
   "UpdateKeys": [ "Nexus:6775" ],
   "Dependencies": [
     {

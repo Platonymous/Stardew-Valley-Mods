@@ -39,7 +39,6 @@ namespace TMXLoader
 {
     public class TMXLoaderMod : Mod
     {
-        internal static string contentFolder = "Maps";
         internal static IMonitor monitor;
         internal static IModHelper helper;
         internal static Dictionary<string, Map> mapsToSync = new Dictionary<string, Map>();
@@ -59,7 +58,10 @@ namespace TMXLoader
         internal static TMXLoaderMod _instance;
         internal static Mod faInstance;
 
+        private readonly List<TMXAssetEditor> AssetEditors = new();
 
+        /// <summary>The loaded buildable interior maps.</summary>
+        public Dictionary<IAssetName, Map> BuildableInteriors = new();
 
         internal static bool contentPacksLoaded = false;
 
@@ -129,6 +131,8 @@ namespace TMXLoader
                 if (Context.IsWorldReady && buildables.Count > 0)
                     showBuildablesMenu();
             });
+
+            helper.Events.Content.AssetRequested += OnAssetRequested;
 
             helper.Events.GameLoop.ReturnedToTitle += (s, e) =>
             {
@@ -210,6 +214,20 @@ namespace TMXLoader
             };
 
             helper.Events.Display.MenuChanged += TMXActions.updateItemListAfterShop;
+        }
+
+        private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
+        {
+            // load buildable interior
+            if (e.DataType == typeof(Map) && this.BuildableInteriors.TryGetValue(e.NameWithoutLocale, out Map map))
+                e.LoadFrom(() => map, AssetLoadPriority.Medium);
+
+            // apply editors
+            foreach (TMXAssetEditor editor in this.AssetEditors)
+            {
+                if (editor.CanEdit(e.NameWithoutLocale))
+                    e.Edit(asset => editor.Edit(asset), onBehalfOf: editor.ContentPackId);
+            }
         }
 
         private void waterEverythingForRainProperty()
@@ -384,7 +402,7 @@ namespace TMXLoader
                 if (pay && Game1.IsMasterGame && buildables.Find(b => b.id == toRemove.Id) is BuildableEdit be)
                 {
                     GameLocation loc = Game1.getLocationFromName(toRemove.Location);
-                    Map map = helper.Content.Load<Map>(loc.mapPath.Value,ContentSource.GameContent);
+                    Map map = helper.GameContent.Load<Map>(loc.mapPath.Value);
                     Map bMap  = TMXContent.Load(be.file, Helper, be._pack);
                     if (bMap == null)
                         return;
@@ -464,7 +482,7 @@ namespace TMXLoader
             {
                 string buildFile = edit.indoorsFile;
 
-                helper.Content.InvalidateCache(edit._pack.GetActualAssetKey(buildFile));
+                helper.GameContent.InvalidateCache(edit._pack.ModContent.GetInternalAssetName(buildFile));
 
                 Map map = TMXContent.Load(buildFile, Helper, edit._pack);
                 if (map == null)
@@ -479,23 +497,13 @@ namespace TMXLoader
                 if (!map.Properties.ContainsKey("Warp"))
                     map.Properties["Warp"] = "0 0 Farm 0 0";
 
-                try
-                {
-                    m = Helper.Content.Load<Map>("Maps/" + e.name, ContentSource.GameContent);
-                }
-                catch
-                {
-                   
-                }
+                this.BuildableInteriors.TryAdd(Helper.GameContent.ParseAssetName($"Maps/{e.name}"), map);
 
                 if (!map.Properties.ContainsKey("Group"))
                     map.Properties.Add("Group", "Buildables");
 
                 if (!map.Properties.ContainsKey("Name"))
                     map.Properties.Add("Name", edit.name);
-
-                if (m == null)
-                    map.inject("Maps/" + e.name);
 
                 return addLocation(e);
             }
@@ -940,8 +948,8 @@ namespace TMXLoader
                         {
                             editor.lastCheck = r;
 
-                            Helper.Content.InvalidateCache(e.NewLocation.mapPath.Value);
-                            helper.Content.InvalidateCache(Game1.currentLocation.mapPath.Value);
+                            Helper.GameContent.InvalidateCache(e.NewLocation.mapPath.Value);
+                            helper.GameContent.InvalidateCache(Game1.currentLocation.mapPath.Value);
                             try
                             {
                                 Game1.currentLocation.reloadMap();
@@ -981,7 +989,7 @@ namespace TMXLoader
 
             foreach (string map in festivals)
                 if (e.NewLocation is GameLocation gl && gl.mapPath.Value is string mp && mp.Contains(map))
-                    Helper.Content.InvalidateCache(e.NewLocation.mapPath.Value);
+                    Helper.GameContent.InvalidateCache(e.NewLocation.mapPath.Value);
 
             if(Game1.IsMasterGame)
                 loadPersistentDataToLocation(e.NewLocation);
@@ -1242,7 +1250,7 @@ namespace TMXLoader
             }
         }
 
-
+        private static string SetMapTileLogKey = null;
         public static bool trySetMapTile(GameLocation __instance, int tileX, int tileY, int index, string layer, string action, int whichTileSheet = 0)
         {
             if (skipTrySetMapTile)
@@ -1255,13 +1263,28 @@ namespace TMXLoader
             {
 
                 skipTrySetMapTile = true;
+
+                // log message for first tile in a location
+                {
+                    string logKey = $"{__instance.NameOrUniqueName}|{Game1.ticks}";
+                    if (SetMapTileLogKey != logKey)
+                    {
+                        SetMapTileLogKey = logKey;
+                        monitor.Log($"Setting map tiles for {__instance.NameOrUniqueName}...", LogLevel.Trace);
+                    }
+                }
+
+                // log verbose message for each tile
+                if (monitor.IsVerbose)
+                    monitor?.Log($"Setting MapTile: X:{tileX} Y:{tileY} Layer:{layer} TileSheet: {__instance.Map.TileSheets[whichTileSheet].Id} ({whichTileSheet}) Location:{__instance.Name}", LogLevel.Trace);
+
+                // set tile
                 __instance.setMapTile(tileX, tileY, index, layer, action, whichTileSheet);
-                monitor?.Log("Setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " ("+ whichTileSheet + ") Location:" + __instance.Name, LogLevel.Trace);
                 return false;
             }
             catch
             {
-                monitor?.Log("Error setting MapTile: X:" + tileX + " Y:" + tileY + " Layer:" + layer + " TileSheet: " + __instance.Map.TileSheets[whichTileSheet].Id + " (" + whichTileSheet + ") Location:" + __instance.Name, LogLevel.Warn);
+                monitor?.Log($"Error setting MapTile: X:{tileX} Y:{tileY} Layer:{layer} TileSheet: {__instance.Map.TileSheets[whichTileSheet].Id} ({whichTileSheet}) Location:{__instance.Name}", LogLevel.Warn);
                 monitor?.Log("----Tilesheets----", LogLevel.Trace);
                 int i = 0;
                 foreach (TileSheet ts in __instance.Map.TileSheets)
@@ -1582,6 +1605,7 @@ namespace TMXLoader
         internal void loadPack(TMXContentPack tmxPack) 
         {
             var pack = tmxPack.parent;
+            string packModId = pack.Manifest.UniqueID;
 
             foreach (string mod in tmxPack.hasMods)
                 if (!helper.ModRegistry.IsLoaded(mod))
@@ -1593,7 +1617,7 @@ namespace TMXLoader
 
             if (tmxPack.scripts.Count > 0)
                 foreach (string script in tmxPack.scripts)
-                    PyLua.loadScriptFromFile(Path.Combine(pack.DirectoryPath, script), pack.Manifest.UniqueID);
+                    PyLua.loadScriptFromFile(Path.Combine(pack.DirectoryPath, script), packModId);
 
             PyLua.loadScriptFromFile(Path.Combine(Helper.DirectoryPath, "sr.lua"), "Platonymous.TMXLoader.SpouseRoom");
 
@@ -1620,7 +1644,7 @@ namespace TMXLoader
                     continue;
                 edit._pack = pack;
 
-                Helper.Content.AssetEditors.Add(new TMXAssetEditor(edit, map, EditType.SpouseRoom));
+                this.AssetEditors.Add(new TMXAssetEditor(packModId, edit, map, EditType.SpouseRoom));
                 //  mapsToSync.AddOrReplace(edit.name, map);
             }
 
@@ -1628,13 +1652,13 @@ namespace TMXLoader
             {
                 tileShops.AddOrReplace(shop, shop.inventory);
                 foreach (string path in shop.portraits)
-                    pack.LoadAsset<Texture2D>(path).inject(@"Portraits/" + Path.GetFileNameWithoutExtension(path));
+                    pack.ModContent.Load<Texture2D>(path).inject(@"Portraits/" + Path.GetFileNameWithoutExtension(path));
             }
 
             foreach (NPCPlacement edit in tmxPack.festivalSpots)
             {
                 festivals.AddOrReplace(edit.map);
-                addAssetEditor(new TMXAssetEditor(edit, EditType.Festival));
+                addAssetEditor(new TMXAssetEditor(packModId, edit, EditType.Festival));
                 // mapsToSync.AddOrReplace(edit.map, original);
             }
 
@@ -1643,7 +1667,7 @@ namespace TMXLoader
                 helper.Events.GameLoop.SaveLoaded += (s, e) =>
                 {
                     if (Game1.getCharacterFromName(edit.name) == null)
-                        Game1.locations.Where(gl => gl.Name == edit.map).First().addCharacter(new NPC(new AnimatedSprite("Characters\\" + edit.name, 0, 16, 32), new Vector2(edit.position[0], edit.position[1]), edit.map, 0, edit.name, edit.datable, (Dictionary<int, int[]>)null, Helper.Content.Load<Texture2D>("Portraits\\" + edit.name, ContentSource.GameContent)));
+                        Game1.locations.Where(gl => gl.Name == edit.map).First().addCharacter(new NPC(new AnimatedSprite("Characters\\" + edit.name, 0, 16, 32), new Vector2(edit.position[0], edit.position[1]), edit.map, 0, edit.name, edit.datable, (Dictionary<int, int[]>)null, Helper.GameContent.Load<Texture2D>($"Portraits/{edit.name}")));
                 };
             }
 
@@ -1657,7 +1681,7 @@ namespace TMXLoader
 
                 string groupName = "TMXL";
 
-                if (pack.Manifest.UniqueID.Contains("StardewValleyExpanded"))
+                if (packModId.Contains("StardewValleyExpanded"))
                     groupName = "SDV Expanded";
 
                 if (edit.addLocation)
@@ -1683,7 +1707,7 @@ namespace TMXLoader
                 if (map == null)
                     continue;
                 edit._pack = pack;
-                addAssetEditor(new TMXAssetEditor(edit, map, EditType.Replace));
+                addAssetEditor(new TMXAssetEditor(packModId, edit, map, EditType.Replace));
                 // mapsToSync.AddOrReplace(edit.name, map);
             }
 
@@ -1693,13 +1717,13 @@ namespace TMXLoader
                 if (map == null)
                     continue;
                 edit._pack = pack;
-                addAssetEditor(new TMXAssetEditor(edit, map, EditType.Merge));
+                addAssetEditor(new TMXAssetEditor(packModId, edit, map, EditType.Merge));
                 // mapsToSync.AddOrReplace(edit.name, map);
             }
 
             foreach (MapEdit edit in tmxPack.onlyWarps)
             {
-                addAssetEditor(new TMXAssetEditor(edit, null, EditType.Warps));
+                addAssetEditor(new TMXAssetEditor(packModId, edit, null, EditType.Warps));
                 // mapsToSync.AddOrReplace(edit.name, map);
             }
 
@@ -1711,7 +1735,7 @@ namespace TMXLoader
 
                 // pack.WriteJsonFile<TMXContentPack>("content.json", tmxPack);
 
-                edit._icon = pack.LoadAsset<Texture2D>(edit.iconFile);
+                edit._icon = pack.ModContent.Load<Texture2D>(edit.iconFile);
                 edit._map = TMXContent.Load(edit.file, Helper, pack);
                 if (edit._map == null)
                     continue;
@@ -1743,7 +1767,7 @@ namespace TMXLoader
             if (editor.conditions != "" || editor.inLocation != null)
                 conditionals.Add(editor);
 
-            Helper.Content.AssetEditors.Add(editor);
+            this.AssetEditors.Add(editor);
             return editor;
         }
 
@@ -1752,7 +1776,7 @@ namespace TMXLoader
             if (conditionals.Contains(editor))
                 conditionals.Remove(editor);
 
-            Helper.Content.AssetEditors.Remove(editor);
+            this.AssetEditors.Remove(editor);
             return editor;
         }
 
@@ -1781,7 +1805,7 @@ namespace TMXLoader
 
                 try
                 {
-                    map = Helper.Content.Load<Map>(path, ContentSource.GameContent);
+                    map = Helper.GameContent.Load<Map>(path);
                     map.LoadTileSheets(Game1.mapDisplayDevice);
                 }
                 catch (Exception ex)

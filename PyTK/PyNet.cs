@@ -203,13 +203,13 @@ namespace PyTK
 
                         try
                         {
-                            texture = Helper.Content.Load<Texture2D>(t.ImageSource, ContentSource.GameContent);
+                            texture = Helper.GameContent.Load<Texture2D>(t.ImageSource);
                         }
                         catch
                         {
                             try
                             {
-                                texture = Helper.Content.Load<Texture2D>(Path.Combine("Maps", t.ImageSource), ContentSource.GameContent);
+                                texture = Helper.GameContent.Load<Texture2D>($"Maps/{t.ImageSource}");
                             }
                             catch
                             {
@@ -230,13 +230,13 @@ namespace PyTK
                                     string sFilenameMaps = Path.Combine("Maps", sFilename);
                                     try
                                     {
-                                        seasonTexture = Helper.Content.Load<Texture2D>(sFilename, ContentSource.GameContent);
+                                        seasonTexture = Helper.GameContent.Load<Texture2D>(sFilename);
                                     }
                                     catch
                                     {
                                         try
                                         {
-                                            seasonTexture = Helper.Content.Load<Texture2D>(sFilenameMaps, ContentSource.GameContent);
+                                            seasonTexture = Helper.GameContent.Load<Texture2D>(sFilenameMaps);
                                         }
                                         catch
                                         {

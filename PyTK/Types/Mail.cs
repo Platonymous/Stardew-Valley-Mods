@@ -50,7 +50,7 @@ namespace PyTK.Types
         }
 
 
-        public AssetInjector<IDictionary<string, string>, IDictionary<string, string>> injectIntoMail()
+        public AssetEditInjector<IDictionary<string, string>, IDictionary<string, string>> injectIntoMail()
         {
             Func<IDictionary<string, string>, IDictionary<string, string>> merger = new Func<IDictionary<string, string>, IDictionary<string, string>>(delegate (IDictionary<string, string> asset)
             {
@@ -62,7 +62,7 @@ namespace PyTK.Types
                 return asset.AddOrReplace(id, t);
             });
 
-            return new AssetInjector<IDictionary<string, string>, IDictionary<string, string>>($"Data/mail", merger).injectEdit();
+            return new AssetEditInjector<IDictionary<string, string>, IDictionary<string, string>>($"Data/mail", merger).injectEdit();
         }
 
     }

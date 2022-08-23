@@ -36,9 +36,9 @@ namespace Arcade2048
                 name: "2048",
                 objectName: "2048 Arcade Machine",
                 start: () => Machine2048.start(Helper),
-                sprite: Helper.Content.GetActualAssetKey(@"assets/arcade.png"),
-                iconForMobilePhone: Helper.Content.GetActualAssetKey(@"assets/mobile_app_icon.png"));
-
+                sprite: Helper.ModContent.GetInternalAssetName("assets/arcade.png").Name,
+                iconForMobilePhone: Helper.ModContent.GetInternalAssetName("assets/mobile_app_icon.png").Name
+            );
         }
     }
 }

@@ -91,7 +91,7 @@ namespace Portraiture
                     if (extention == "xnb")
                         fileName = name;
 
-                    Texture2D texture = PortraitureMod.helper.Content.Load<Texture2D>($"Portraits/{folderName}/{fileName}");
+                    Texture2D texture = PortraitureMod.helper.ModContent.Load<Texture2D>($"Portraits/{folderName}/{fileName}");
 
                     Texture2D frame = texture;
                     int fps = 12;
@@ -147,7 +147,7 @@ namespace Portraiture
 
                     if (extention == "xnb")
                         fileName = name;
-                    Texture2D texture = pack.LoadAsset<Texture2D>($"{fileName}");
+                    Texture2D texture = pack.ModContent.Load<Texture2D>(fileName);
                     int tileWith = Math.Max(texture.Width / 2, 64);
                     float scale = tileWith / 64;
                     ScaledTexture2D scaled;

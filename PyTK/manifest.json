@@ -5,7 +5,7 @@
   "Description": "Platonymous Toolkit",
   "UniqueID": "Platonymous.Toolkit",
   "EntryDll": "PyTK.dll",
-  "MinimumApiVersion": "3.4.0",
+  "MinimumApiVersion": "3.14.0",
   "UpdateKeys": [ "Nexus:1726" ],
   "Dependencies": [
     {

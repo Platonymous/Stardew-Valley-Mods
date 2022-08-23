@@ -40,15 +40,15 @@ namespace JoJaBan
 
             helper.Events.GameLoop.GameLaunched += (o, e) =>
             {
-                arcadeTexture = helper.Content.Load<Texture2D>(@"assets/arcade.png");
+                arcadeTexture = helper.ModContent.Load<Texture2D>("assets/arcade.png");
                 arcadeData = new CustomObjectData("JoJaBan", "JoJaBan/0/-300/Crafting -9/Play 'JoJaBan by Platonymous' at home!/true/true/0/JoJaBan", arcadeTexture, Color.White, bigCraftable: true, type: typeof(JoJaBanMachine));
-                Texture2D townInterior = Helper.Content.Load<Texture2D>(@"Maps/townInterior", ContentSource.GameContent);
+                Texture2D townInterior = Helper.GameContent.Load<Texture2D>("Maps/townInterior");
                 boxTexture = townInterior.getArea(new Rectangle(304, 1024, 16, 32));
                 boxData = new CustomObjectData("JoJa Box", "JoJa Box/0/-300/Crafting -9/JoJa Box/true/true/0/JoJa Box", boxTexture, Color.White, bigCraftable: true, type: typeof(JoJaBox));
                 
                 if (Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone") is IMobilePhoneApi api)
                 {
-                    Texture2D appIcon = Helper.Content.Load<Texture2D>(Path.Combine("assets", "mobile_app_icon.png"));
+                    Texture2D appIcon = Helper.ModContent.Load<Texture2D>("assets/mobile_app_icon.png");
                     bool success = api.AddApp(Helper.ModRegistry.ModID + "MobileJoJaBan", "JoJaBan", () =>
                     {
                         startGame("", null, Vector2.Zero, "");

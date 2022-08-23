@@ -145,7 +145,7 @@ namespace PyTK.Types
         public virtual void LoadTileSheet2(TileSheet tileSheet, bool invalidated = false)
         {
            if(invalidated)
-                PyTKMod._instance.Helper.Content.InvalidateCache(tileSheet.ImageSource);
+                PyTKMod._instance.Helper.GameContent.InvalidateCache(tileSheet.ImageSource);
 
             try
             {

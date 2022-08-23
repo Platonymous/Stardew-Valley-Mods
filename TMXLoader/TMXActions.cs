@@ -157,28 +157,28 @@ namespace TMXLoader
                 if (index != -1)
                     item = new Hat(index);
                 else if (name != "none")
-                    item = new Hat(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/hats", ContentSource.GameContent).getIndexByName(name));
+                    item = new Hat(TMXLoaderMod.helper.GameContent.Load<Dictionary<int, string>>("Data/hats").getIndexByName(name));
             }
             else if (type == "Boots")
             {
                 if (index != -1)
                     item = new Boots(index);
                 else if (name != "none")
-                    item = new Boots(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Boots", ContentSource.GameContent).getIndexByName(name));
+                    item = new Boots(TMXLoaderMod.helper.GameContent.Load<Dictionary<int, string>>("Data/Boots").getIndexByName(name));
             }
             else if (type == "Clothing")
             {
                 if (index != -1)
                     item = new Clothing(index);
                 else if (name != "none")
-                    item = new Clothing(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/ClothingInformation", ContentSource.GameContent).getIndexByName(name));
+                    item = new Clothing(TMXLoaderMod.helper.GameContent.Load<Dictionary<int, string>>("Data/ClothingInformation").getIndexByName(name));
             }
             else if (type == "TV")
             {
                 if (index != -1)
                     item = new StardewValley.Objects.TV(index, Vector2.Zero);
                 else if (name != "none")
-                    item = new TV(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(name), Vector2.Zero);
+                    item = new TV(TMXLoaderMod.helper.GameContent.Load<Dictionary<int, string>>("Data/Furniture").getIndexByName(name), Vector2.Zero);
             }
             else if (type == "IndoorPot")
                 item = new StardewValley.Objects.IndoorPot(Vector2.Zero);
@@ -195,7 +195,7 @@ namespace TMXLoader
                 if (index != -1)
                     item = new StardewValley.Objects.Furniture(index, Vector2.Zero);
                 else if (name != "none")
-                    item = new Furniture(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(name), Vector2.Zero);
+                    item = new Furniture(TMXLoaderMod.helper.GameContent.Load<Dictionary<int, string>>("Data/Furniture").getIndexByName(name), Vector2.Zero);
             }
             else if (type == "Sign")
                 item = new StardewValley.Objects.Sign(Vector2.Zero, index);
@@ -208,7 +208,7 @@ namespace TMXLoader
                 if (index != -1)
                     item = new MeleeWeapon(index);
                 else if (name != "none")
-                    item = new MeleeWeapon(TMXLoaderMod.helper.Content.Load<Dictionary<int, string>>(@"Data/weapons", ContentSource.GameContent).getIndexByName(name));
+                    item = new MeleeWeapon(TMXLoaderMod.helper.GameContent.Load<Dictionary<int, string>>("Data/weapons").getIndexByName(name));
 
             }
             else if (type == "CustomObject" && PyTK.CustomElementHandler.CustomObjectData.collection.ContainsKey(name))
@@ -326,7 +326,7 @@ namespace TMXLoader
                         }
                         else
                         {
-                            var npc = new NPC(null, Vector2.Zero, "Town", 0, text[2].Split('.')[0], false, null, TMXLoaderMod.helper.Content.Load<Texture2D>(@"Portraits/" + text[2], ContentSource.GameContent));
+                            var npc = new NPC(null, Vector2.Zero, "Town", 0, text[2].Split('.')[0], false, null, TMXLoaderMod.helper.GameContent.Load<Texture2D>($"Portraits/{text[2]}"));
                             shop.portraitPerson = npc;
                             Game1.removeThisCharacterFromAllLocations(npc);
                         }

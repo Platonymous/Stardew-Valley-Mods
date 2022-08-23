@@ -212,9 +212,9 @@ namespace CustomFarmingRedux
                 else
                 {
                     if (mBlueprint.pack.baseFolder != "ContentPack")
-                        texture2d = Helper.Content.Load<Texture2D>($"{mBlueprint.pack.baseFolder}/{mBlueprint.folder}/{texture}");
+                        texture2d = Helper.ModContent.Load<Texture2D>($"{mBlueprint.pack.baseFolder}/{mBlueprint.folder}/{texture}");
                     else
-                        texture2d = mBlueprint.pack.contentPack.LoadAsset<Texture2D>(texture);
+                        texture2d = mBlueprint.pack.contentPack.ModContent.Load<Texture2D>(texture);
                 }
             return texture2d;
         }

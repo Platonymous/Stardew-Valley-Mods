@@ -50,8 +50,8 @@ namespace PyTK.CustomElementHandler
         public Texture2D texture;
         public Color color;
         public int tileIndex;
-        public static AssetInjector< IDictionary<int, string>,IDictionary<int,string>> injector;
-        public static AssetInjector<IDictionary<int, string>, IDictionary<int, string>> injectorBig;
+        public static AssetEditInjector<IDictionary<int, string>,IDictionary<int,string>> injector;
+        public static AssetEditInjector<IDictionary<int, string>, IDictionary<int, string>> injectorBig;
 
 
         public Texture2D sdvTexture
@@ -186,7 +186,7 @@ namespace PyTK.CustomElementHandler
             return newIndex;
         }
 
-        public static AssetInjector<IDictionary<int, string>, IDictionary<int, string>> setupBigCraftableInjector()
+        public static AssetEditInjector<IDictionary<int, string>, IDictionary<int, string>> setupBigCraftableInjector()
         {
             Func<IDictionary<int, string>, IDictionary<int, string>> merger = new Func<IDictionary<int, string>, IDictionary<int, string>>(delegate (IDictionary<int, string> asset)
             {
@@ -196,10 +196,10 @@ namespace PyTK.CustomElementHandler
                 return asset;
             });
 
-            return new AssetInjector<IDictionary<int, string>, IDictionary<int, string>>("Data\\BigCraftablesInformation", merger).injectEdit();
+            return new AssetEditInjector<IDictionary<int, string>, IDictionary<int, string>>("Data\\BigCraftablesInformation", merger).injectEdit();
         }
 
-        public static AssetInjector<IDictionary<int, string>, IDictionary<int, string>> setupObjectInjector()
+        public static AssetEditInjector<IDictionary<int, string>, IDictionary<int, string>> setupObjectInjector()
         {
             Func<IDictionary<int, string>, IDictionary<int, string>> merger = new Func<IDictionary<int, string>, IDictionary<int, string>>(delegate (IDictionary<int, string> asset)
             {
@@ -209,7 +209,7 @@ namespace PyTK.CustomElementHandler
                 return asset;
             });
 
-            return new AssetInjector<IDictionary<int, string>, IDictionary<int, string>>("Data\\ObjectInformation", merger).injectEdit();
+            return new AssetEditInjector<IDictionary<int, string>, IDictionary<int, string>>("Data\\ObjectInformation", merger).injectEdit();
         }
 
         public void forceNewSDVId(int newIndex)

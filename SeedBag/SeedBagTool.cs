@@ -31,9 +31,9 @@ namespace SeedBag
         {
             if (Texture == null)
             {
-                Texture = helper.ModHelper.Content.Load<Texture2D>(@"Assets/seedbag.png");
-                AttTexture = helper.ModHelper.Content.Load<Texture2D>(@"Assets/seedattachment.png");
-                Att2Texture = helper.ModHelper.Content.Load<Texture2D>(@"Assets/fertilizerattachment.png");
+                Texture = helper.ModHelper.ModContent.Load<Texture2D>("Assets/seedbag.png");
+                AttTexture = helper.ModHelper.ModContent.Load<Texture2D>("Assets/seedattachment.png");
+                Att2Texture = helper.ModHelper.ModContent.Load<Texture2D>("Assets/fertilizerattachment.png");
             }
         }
 

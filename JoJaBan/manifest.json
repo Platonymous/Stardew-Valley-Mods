@@ -5,7 +5,7 @@
   "Description": "Help JoJa clean up",
   "UniqueID": "Platonymous.JoJaBan",
   "EntryDll": "JoJaBan.dll",
-  "MinimumApiVersion": "3.0.0",
+  "MinimumApiVersion": "3.14.0",
   "UpdateKeys": [ "Nexus:3118" ],
   "Dependencies": [
     {

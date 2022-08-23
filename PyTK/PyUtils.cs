@@ -130,20 +130,12 @@ namespace PyTK
 
         public static string getContentFolder()
         {
-            string folder = Path.Combine(Constants.ExecutionPath, Game1.content.RootDirectory);
-            DirectoryInfo directoryInfo = new DirectoryInfo(folder);
+            string folder = Constants.ContentPath;
 
-            if (directoryInfo.Exists)
+            if (Directory.Exists(folder))
                 return folder;
 
-            folder = folder.Replace("MacOS", "Resources").Replace("smapi-internal/","");
-
-            directoryInfo = new DirectoryInfo(folder);
-            if (directoryInfo.Exists)
-                return folder;
-            else
-                Monitor.Log("DebugF:" + folder);
-
+            Monitor.Log("DebugF:" + folder);
             return @"failed";
         }
 
@@ -422,21 +414,21 @@ namespace PyTK
                 if (index != -1)
                     item = new Hat(index);
                 else if (name != "none")
-                    item = new Hat(Helper.Content.Load<Dictionary<int, string>>(@"Data/hats", ContentSource.GameContent).getIndexByName(name));
+                    item = new Hat(Helper.GameContent.Load<Dictionary<int, string>>("Data/hats").getIndexByName(name));
             }
             else if (type == "Boots")
             {
                 if (index != -1)
                     item = new Boots(index);
                 else if (name != "none")
-                    item = new Boots(Helper.Content.Load<Dictionary<int, string>>(@"Data/Boots", ContentSource.GameContent).getIndexByName(name));
+                    item = new Boots(Helper.GameContent.Load<Dictionary<int, string>>("Data/Boots").getIndexByName(name));
             }
             else if (type == "TV")
             {
                 if (index != -1)
                     item = new StardewValley.Objects.TV(index, Vector2.Zero);
                 else if (name != "none")
-                    item = new TV(Helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(name), Vector2.Zero);
+                    item = new TV(Helper.GameContent.Load<Dictionary<int, string>>("Data/Furniture").getIndexByName(name), Vector2.Zero);
             }
             else if (type == "IndoorPot")
                 item = new StardewValley.Objects.IndoorPot(Vector2.Zero);
@@ -453,7 +445,7 @@ namespace PyTK
                 if (index != -1)
                     item = new StardewValley.Objects.Furniture(index, Vector2.Zero);
                 else if (name != "none")
-                    item = new Furniture(Helper.Content.Load<Dictionary<int, string>>(@"Data/Furniture", ContentSource.GameContent).getIndexByName(name), Vector2.Zero);
+                    item = new Furniture(Helper.GameContent.Load<Dictionary<int, string>>("Data/Furniture").getIndexByName(name), Vector2.Zero);
             }
             else if (type == "Sign")
                 item = new StardewValley.Objects.Sign(Vector2.Zero, index);
@@ -466,7 +458,7 @@ namespace PyTK
                 if (index != -1)
                     item = new MeleeWeapon(index);
                 else if (name != "none")
-                    item = new MeleeWeapon(Helper.Content.Load<Dictionary<int, string>>(@"Data/weapons", ContentSource.GameContent).getIndexByName(name));
+                    item = new MeleeWeapon(Helper.GameContent.Load<Dictionary<int, string>>("Data/weapons").getIndexByName(name));
 
             }
             else if (type == "CustomObject" && PyTK.CustomElementHandler.CustomObjectData.collection.ContainsKey(name))
