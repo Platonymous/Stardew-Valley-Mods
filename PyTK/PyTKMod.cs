@@ -26,6 +26,7 @@ using TMXTile;
 using xTile.Layers;
 using xTile.Tiles;
 using StardewValley.Objects;
+using PyTK.Events;
 
 namespace PyTK
 {
@@ -380,17 +381,22 @@ namespace PyTK
         private void harmonyFix()
         {
             OvSpritebatchNew.initializePatch(instance);
-            Monitor.Log("Patching: Assembly", LogLevel.Trace);
 
             instance.PatchAll(Assembly.GetExecutingAssembly());
             
-            Monitor.Log("Patching: Load", LogLevel.Trace);
             instance.Patch(typeof(SaveGame).GetMethod("Load", BindingFlags.Static | BindingFlags.Public), prefix: new HarmonyMethod(typeof(PyTKMod).GetMethod("saveLoadedXMLFix", BindingFlags.Static | BindingFlags.Public)));
 
-            Monitor.Log("Patching: Serializers", LogLevel.Trace);
+            try
+            {
+                instance.Patch(AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "answerDialogue"), new HarmonyMethod(this.GetType(), nameof(AnswerDialoguePrefix)));
+            }
+            catch
+            {
+
+            }
+
             PatchGeneratedSerializers(new Assembly[] { Assembly.GetExecutingAssembly() });
 
-            Monitor.Log("Patching: GameLocation Constructors", LogLevel.Trace);
             foreach (ConstructorInfo mc in typeof(GameLocation).GetConstructors())
                 instance.Patch(mc, postfix: new HarmonyMethod(typeof(OvLocations).GetMethod("GameLocationConstructor", BindingFlags.Static | BindingFlags.Public)));
 
@@ -398,7 +404,6 @@ namespace PyTK
 
             if (Constants.TargetPlatform != GamePlatform.Android)
             {
-                Monitor.Log("Patching: Serializers Assembly", LogLevel.Trace);
                 try
                 {
                     SetUpAssemblyPatch(hInstance, new XmlSerializer[] { SaveGame.farmerSerializer, SaveGame.locationSerializer, SaveGame.serializer });
@@ -423,19 +428,22 @@ namespace PyTK
 
             setupLoadIntercepter(instance);
         }
-       
+
+        public static void AnswerDialoguePrefix(GameLocation __instance, ref Response answer)
+        {
+            if (__instance.lastQuestionKey == null || answer == null || answer.responseKey == null)
+                return;
+
+            if (__instance.lastQuestionKey.ToLower() == "sleep" && answer.responseKey.ToLower() == "yes")
+                PyTimeEvents.CallBeforeSleepEvents(null, new PyTimeEvents.EventArgsBeforeSleep(STime.CURRENT, false, ref answer));
+        }
+
         private void setupLoadIntercepter(Harmony harmony)
         {
-             Monitor.Log("Patching: FromStream", LogLevel.Trace);
 
             if (!Config.Options.Contains("DisableFSPatch"))
             {
                 int fsc = 0;
-                foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance))
-                {
-                    Monitor.Log($"{m.Name}({string.Join(",",m.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"))})", LogLevel.Info);
-                }
-                    
 
                     foreach (MethodBase m in typeof(Texture2D).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(gm => gm.Name.Contains("FromStream") && gm.GetParameters().ToList().Exists(p => p.Name == "stream")))
                 {
@@ -451,11 +459,9 @@ namespace PyTK
                         Monitor.Log("Failed to Patch: FromStream, this Error may not be critical", LogLevel.Info);
                     }
                 }
-                Monitor.Log($"Patched: FromStream ({fsc})", LogLevel.Info);
 
             }
 
-            Monitor.Log("Patching: PatchImage", LogLevel.Trace);
 
             try
             {
@@ -473,7 +479,6 @@ namespace PyTK
                 Monitor.Log("Failed to Patch: PatchImage, this Error may not be critical", LogLevel.Info);
             }
 
-            Monitor.Log("Patching: ExtendImage", LogLevel.Trace);
 
             try
             {

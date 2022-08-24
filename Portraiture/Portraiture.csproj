@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Portraiture</AssemblyName>
     <RootNamespace>Portraiture</RootNamespace>
-    <Version>1.8.2</Version>
+    <Version>1.9.1</Version>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 

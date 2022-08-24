@@ -9,9 +9,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System;
 using Microsoft.Xna.Framework.Audio;
-using System.Linq;
-using OggSharp;
 using System.Threading.Tasks;
+using NAudio.Wave;
 
 namespace PelicanTTS
 {
@@ -74,77 +73,98 @@ namespace PelicanTTS
         internal static void configSay(string name, string voice, string text, int rate = -1, float pitch = -1, float volume = -1)
         {
             Task.Run(() =>
-           {
-               currentVoice = VoiceId.FindValue(voice);
-               tmppath = Path.Combine(PelicanTTSMod._helper.DirectoryPath, "TTS");
+            {
+                currentVoice = VoiceId.FindValue(voice);
+                tmppath = Path.Combine(PelicanTTSMod._helper.DirectoryPath, "TTS");
+                if (pc == null)
+                    pc = AWSHandler.getPollyClient();
 
-               if (pc == null)
-                   pc = AWSHandler.getPollyClient();
+                bool mumbling = PelicanTTSMod.config.MumbleDialogues;
+                string language1 = "<lang xml:lang=\"" + getLanguageCode() + "\">";
+                string language2 = "</lang>";
 
-               bool mumbling = PelicanTTSMod.config.MumbleDialogues;
-               string language1 = "<lang xml:lang=\""+getLanguageCode()+"\">";
-               string language2 = "</lang>";
+                text = text.Replace("0g", "0 gold").Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
+                text = language1 + text + language2;
 
-               text = text.Replace("0g","0 gold").Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
-               text = language1 + text + language2;
+                bool neural = shouldUseNeuralEngine(voice, out string v);
 
-               bool neural = shouldUseNeuralEngine(voice, out string v);
+                if (!neural && voice != v)
+                    currentVoice = VoiceId.FindValue(v);
 
-               if (!neural && voice != v)
-                   currentVoice = VoiceId.FindValue(v);
+                bool useNeuralEngine = !mumbling && neural;
 
-               bool useNeuralEngine = !mumbling && neural;
+                var amzeffectIn = mumbling ? "<amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" : "<amazon:auto-breaths><amazon:effect phonation='soft'>";
+                var amzeffectOut = mumbling ? "</amazon:effect></amazon:effect>" : "</amazon:effect></amazon:auto-breaths>";
 
-               var amzeffectIn = mumbling ? "<amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" : "<amazon:auto-breaths><amazon:effect phonation='soft'>";
-               var amzeffectOut = mumbling ? "</amazon:effect></amazon:effect>" : "</amazon:effect></amazon:auto-breaths>";
-               
-               if (mumbling)
-                   text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + Dialogue.convertToDwarvish(text) + (useNeuralEngine ? "" : amzeffectOut) + @"</speak>";
-               else
-                   text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (rate == -1 ? PelicanTTSMod.config.Rate : rate) + "%'>" + text + @"</prosody>"+ (useNeuralEngine ? "" : amzeffectOut) + "</speak>";
+                if (mumbling)
+                    text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + Dialogue.convertToDwarvish(text) + (useNeuralEngine ? "" : amzeffectOut) + "<break time=\"1s\"/></speak>";
+                else
+                    text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (rate == -1 ? PelicanTTSMod.config.Rate : rate) + "%'>" + text + @"</prosody>" + (useNeuralEngine ? "" : amzeffectOut) + "<break time=\"1s\"/></speak>";
 
-               int hash = (text + (useNeuralEngine ? "-neural" : "")).GetHashCode();
-               if (!Directory.Exists(Path.Combine(tmppath, name)))
-                   Directory.CreateDirectory(Path.Combine(tmppath, name));
+                int hash = (text + (useNeuralEngine ? "-neural" : "")).GetHashCode();
+                if (!Directory.Exists(Path.Combine(tmppath, name)))
+                    Directory.CreateDirectory(Path.Combine(tmppath, name));
 
-               string file = Path.Combine(Path.Combine(tmppath, name), "speech_" + currentVoice.Value + (mumbling ? "_mumble_" : "_") + hash + ".wav");
-               SoundEffect nextSpeech = null;
+                string file = Path.Combine(Path.Combine(tmppath, name), "speech_" + currentVoice.Value + (mumbling ? "_mumble_" : "_") + hash + ".wav");
+                SoundEffect nextSpeech = null;
 
-               if (!File.Exists(file))
-               {
-                   SynthesizeSpeechRequest sreq = new SynthesizeSpeechRequest();
-                   sreq.Text = text;
-                   sreq.TextType = TextType.Ssml;
-                   sreq.OutputFormat = OutputFormat.Ogg_vorbis;
-                   sreq.Engine = useNeuralEngine ? Engine.Neural : Engine.Standard;
-                   sreq.VoiceId = currentVoice;
-                   SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
-                   using (var memStream = new MemoryStream())
-                   {
-                       sres.AudioStream.CopyTo(memStream);
-                       nextSpeech = Convert(memStream, file);
-                   }
-               }
-               using (FileStream stream = new FileStream(file, FileMode.Open))
-                   nextSpeech = SoundEffect.FromStream(stream);
+                if (!File.Exists(file))
+                {
+                    SynthesizeSpeechRequest sreq = new SynthesizeSpeechRequest();
+                    sreq.Text = text;
+                    sreq.TextType = TextType.Ssml;
+                    sreq.OutputFormat = OutputFormat.Ogg_vorbis;
+                    sreq.Engine = useNeuralEngine ? Engine.Neural : Engine.Standard;
+                    sreq.VoiceId = currentVoice;
+                    var srestask = pc.SynthesizeSpeechAsync(sreq);
+                    SynthesizeSpeechResponse sres = null;
+                    srestask.ContinueWith(t =>
+                    {
+                        sres = t.Result;
+                        sres = t.Result;
 
-               if (currentSpeech != null)
-                   currentSpeech.Stop();
+                        using (var vwr = new NAudio.Vorbis.VorbisWaveReader(t.Result.AudioStream, true))
+                            WaveFileWriter.CreateWaveFile(file, vwr.ToWaveProvider());
 
-               currentSpeech = nextSpeech.CreateInstance();
+                        nextSpeech = SoundEffect.FromFile(file);
 
-               speak = false;
-               currentSpeech.Pitch =  (mumbling ? 0.5f : pitch == -1 ? PelicanTTSMod.config.Voices[name].Pitch : pitch);
-               currentSpeech.Volume = volume == -1 ? PelicanTTSMod.config.Volume : volume;
-               currentSpeech.Play();
-           });
+                        if (currentSpeech != null)
+                            currentSpeech.Stop();
+
+                        currentSpeech = nextSpeech.CreateInstance();
+
+                        speak = false;
+                        currentSpeech.Pitch = (mumbling ? 0.5f : pitch == -1 ? PelicanTTSMod.config.Voices[name].Pitch : pitch);
+                        currentSpeech.Volume = volume == -1 ? PelicanTTSMod.config.Volume : volume;
+                        currentSpeech.Play();
+                    });
+
+                    srestask.RunSynchronously();
+
+                }
+                else
+                {
+                    using (FileStream stream = new FileStream(file, FileMode.Open))
+                        nextSpeech = SoundEffect.FromStream(stream);
+
+                    if (currentSpeech != null)
+                        currentSpeech.Stop();
+
+                    currentSpeech = nextSpeech.CreateInstance();
+
+                    speak = false;
+                    currentSpeech.Pitch = (mumbling ? 0.5f : pitch == -1 ? PelicanTTSMod.config.Voices[name].Pitch : pitch);
+                    currentSpeech.Volume = volume == -1 ? PelicanTTSMod.config.Volume : volume;
+                    currentSpeech.Play();
+                }
+            });
         }
 
         public static void start(IModHelper h)
         {
             Helper = h;
             currentText = "";
-            tmppath = Path.Combine(Helper.DirectoryPath,"TTS");
+            tmppath = Path.Combine(Helper.DirectoryPath, "TTS");
 
             if (!Directory.Exists(tmppath))
                 Directory.CreateDirectory(tmppath);
@@ -331,13 +351,13 @@ namespace PelicanTTS
 
                     if (currentText.StartsWith("+"))
                         continue;
-                    currentText = currentText.Replace("0g","0 gold").Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
+                    currentText = currentText.Replace("0g", "0 gold").Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
 
                     string language1 = "<lang xml:lang=\"" + getLanguageCode() + "\">";
                     string language2 = "</lang>";
 
                     currentText = language1 + currentText + language2;
-                    
+
                     bool neural = shouldUseNeuralEngine(currentVoiceString, out string v);
 
                     if (!neural && currentVoiceString != v)
@@ -355,9 +375,9 @@ namespace PelicanTTS
                     var amzeffectOut = mumbling ? "</amazon:effect></amazon:effect>" : "</amazon:effect></amazon:auto-breaths>";
 
                     if (mumbling)
-                        currentText = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + Dialogue.convertToDwarvish(currentText) + (useNeuralEngine ? "" : amzeffectOut) + @"</speak>";
+                        currentText = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + Dialogue.convertToDwarvish(currentText) + (useNeuralEngine ? "" : amzeffectOut) + "<break time=\"1s\"/></speak>";
                     else
-                        currentText = @"<speak>" + style + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (PelicanTTSMod.config.Rate) + "%'>" + currentText + @"</prosody>" + (useNeuralEngine ? "" : amzeffectOut) + style2 + "</speak>";
+                        currentText = @"<speak>" + style + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (PelicanTTSMod.config.Rate) + "%'>" + currentText + @"</prosody>" + (useNeuralEngine ? "" : amzeffectOut) + style2 + "<break time=\"1s\"/></speak>";
 
                     int hash = (currentText + (useNeuralEngine ? "-neural" : "")).GetHashCode();
                     if (!Directory.Exists(Path.Combine(tmppath, speakerName)))
@@ -374,33 +394,58 @@ namespace PelicanTTS
                         sreq.OutputFormat = OutputFormat.Ogg_vorbis;
                         sreq.VoiceId = currentVoice;
                         sreq.Engine = useNeuralEngine ? Engine.Neural : Engine.Standard;
-                        SynthesizeSpeechResponse sres = pc.SynthesizeSpeech(sreq);
-                        using (var memStream = new MemoryStream())
+                        var srestask = pc.SynthesizeSpeechAsync(sreq);
+                        srestask.ContinueWith(t =>
                         {
-                            sres.AudioStream.CopyTo(memStream);
-                            nextSpeech = Convert(memStream, file);
-                        }
+                            using (var vwr = new NAudio.Vorbis.VorbisWaveReader(t.Result.AudioStream, true))
+                                WaveFileWriter.CreateWaveFile(file, vwr.ToWaveProvider());
+
+                            nextSpeech = SoundEffect.FromFile(file);
+
+                            if (currentSpeech != null)
+                                currentSpeech.Stop();
+
+                            currentSpeech = nextSpeech.CreateInstance();
+
+                            if (Game1.activeClickableMenu is LetterViewerMenu || Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
+                            {
+                                speak = false;
+                                currentSpeech.Pitch = (mumbling ? 0.5f : PelicanTTSMod.config.Pitch);
+                                currentSpeech.Volume = PelicanTTSMod.config.Volume;
+
+                                if (PelicanTTSMod.config.Voices.ContainsKey(speakerName))
+                                    currentSpeech.Pitch = (mumbling ? 0.5f : PelicanTTSMod.config.Voices[speakerName].Pitch);
+
+                                currentSpeech.Play();
+                            }
+                            lastText = currentText;
+                        });
+
+                        srestask.RunSynchronously();
                     }
-                    using (FileStream stream = new FileStream(file, FileMode.Open))
-                        nextSpeech = SoundEffect.FromStream(stream);
-
-                    if (currentSpeech != null)
-                        currentSpeech.Stop();
-
-                    currentSpeech = nextSpeech.CreateInstance();
-
-                    if (Game1.activeClickableMenu is LetterViewerMenu || Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
+                    else
                     {
-                        speak = false;
-                        currentSpeech.Pitch = (mumbling ? 0.5f : PelicanTTSMod.config.Pitch);
-                        currentSpeech.Volume = PelicanTTSMod.config.Volume;
+                        nextSpeech = SoundEffect.FromFile(file);
 
-                        if (PelicanTTSMod.config.Voices.ContainsKey(speakerName))
-                            currentSpeech.Pitch = (mumbling ? 0.5f : PelicanTTSMod.config.Voices[speakerName].Pitch);
 
-                        currentSpeech.Play();
+                        if (currentSpeech != null)
+                            currentSpeech.Stop();
+
+                        currentSpeech = nextSpeech.CreateInstance();
+
+                        if (Game1.activeClickableMenu is LetterViewerMenu || Game1.activeClickableMenu is DialogueBox || Game1.hudMessages.Count > 0 || speak)
+                        {
+                            speak = false;
+                            currentSpeech.Pitch = (mumbling ? 0.5f : PelicanTTSMod.config.Pitch);
+                            currentSpeech.Volume = PelicanTTSMod.config.Volume;
+
+                            if (PelicanTTSMod.config.Voices.ContainsKey(speakerName))
+                                currentSpeech.Pitch = (mumbling ? 0.5f : PelicanTTSMod.config.Voices[speakerName].Pitch);
+
+                            currentSpeech.Play();
+                        }
+                        lastText = currentText;
                     }
-                    lastText = currentText;
                 }
                 catch
                 {
@@ -411,41 +456,5 @@ namespace PelicanTTS
             }
         }
 
-        public static SoundEffect Convert(Stream inputStream, string wavPath)
-        {
-            SoundEffect soundEffect = null;
-
-            using (FileStream stream = new FileStream(wavPath, FileMode.Create))
-            using (BinaryWriter writer = new BinaryWriter(stream))
-            {
-                OggDecoder decoder = new OggDecoder();
-                decoder.Initialize(inputStream);
-                byte[] data = decoder.SelectMany(chunk => chunk.Bytes.Take(chunk.Length)).ToArray();
-                WriteWave(writer, decoder.Stereo ? 2 : 1, decoder.SampleRate, data);
-            }
-
-            using (FileStream stream = new FileStream(wavPath, FileMode.Open))
-                soundEffect = SoundEffect.FromStream(stream);
-
-            return soundEffect;
-        }
-
-        private static void WriteWave(BinaryWriter writer, int channels, int rate, byte[] data)
-        {
-            writer.Write(new char[4] { 'R', 'I', 'F', 'F' });
-            writer.Write((36 + data.Length));
-            writer.Write(new char[4] { 'W', 'A', 'V', 'E' });
-            writer.Write(new char[4] { 'f', 'm', 't', ' ' });
-            writer.Write(16);
-            writer.Write((short)1);
-            writer.Write((short)channels);
-            writer.Write(rate);
-            writer.Write((rate * ((16 * channels) / 8)));
-            writer.Write((short)((16 * channels) / 8));
-            writer.Write((short)16);
-            writer.Write(new char[4] { 'd', 'a', 't', 'a' });
-            writer.Write(data.Length);
-            writer.Write(data);
-        }
     }
 }
