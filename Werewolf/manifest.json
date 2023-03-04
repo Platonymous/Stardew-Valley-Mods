@@ -1,0 +1,22 @@
+{
+  "Name": "Werewolf in the Valley",
+  "Author": "Platonymous",
+  "Version": "0.8.3",
+  "Description": "Play Werewolf in Pelican Town",
+  "UniqueID": "Platonymous.Werewolf",
+  "EntryDll": "Werewolf.dll",
+  "UpdateKeys": [ "Nexus:15724" ],
+  "MinimumApiVersion": "3.18.0",
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.ModUpdater",
+      "IsRequired": false
+    }
+  ],
+  "ModUpdater": {
+    "Repository": "Stardew-Valley-Mods",
+    "User": "Platonymous",
+    "Directory": "_releases",
+    "ModFolder": "Werewolf"
+  }
+}

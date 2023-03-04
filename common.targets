@@ -64,6 +64,10 @@
     <ModZipPath>$(SolutionDir)_releases_android</ModZipPath>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Android|AnyCPU' ">
     <DefineConstants>ANDROID;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
