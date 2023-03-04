@@ -3,12 +3,12 @@
   <PropertyGroup>
     <AssemblyName>PlatoWarpMenu</AssemblyName>
     <RootNamespace>PlatoWarpMenu</RootNamespace>
-    <Version>1.10.1</Version>
+    <Version>1.11.0</Version>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
    <ItemGroup>
-    <Reference Include="Platonymous.PlatoTK" HintPath="$(GamePath)\Mods\PlatoTK\PlatoTK.dll" Private="False" />
+    <Reference Include="Platonymous.PlatoUI" HintPath="$(GamePath)\Mods\PlatoUI\PlatoUI.dll" Private="False" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,8 +8,8 @@ using Microsoft.Xna.Framework;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Locations;
 using StardewModdingAPI;
-using PlatoTK;
-using PlatoTK.Reflection;
+using PlatoUI;
+using PlatoUI.Reflection;
 using System.Reflection;
 
 namespace PlatoWarpMenu
@@ -165,13 +165,13 @@ namespace PlatoWarpMenu
                     for (int c = 0; c < cols; c++)
                     {
                         next = textureMap[r, c];
-                        bitmap = PlatoWarpMenuMod.instance.Helper.GetPlatoHelper().Content.Textures.GetPatched(bitmap, new Point(cx, cy), next);
+                        bitmap = PlatoWarpMenuMod.instance.Helper.GetPlatoUIHelper().Content.Textures.GetPatched(bitmap, new Point(cx, cy), next);
                         cx += next.Width;
                     }
                     cy += next.Height;
                 }
 
-                bitmap = PlatoWarpMenuMod.instance.Helper.GetPlatoHelper().Content.Textures.GetTrimed(bitmap);
+                bitmap = PlatoWarpMenuMod.instance.Helper.GetPlatoUIHelper().Content.Textures.GetTrimed(bitmap);
 
                 string filename = Path.Combine(PlatoWarpMenuMod.tempFolder, path2_1);
 

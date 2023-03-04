@@ -8,12 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using PlatoTK;
-using PlatoTK.UI.Components;
-using PlatoTK.UI;
+using PlatoUI;
+using PlatoUI.UI.Components;
+using PlatoUI.UI;
 using Microsoft.Xna.Framework;
 using StardewValley.Locations;
 using System.Reflection;
+using xTile.ObjectModel;
 
 namespace PlatoWarpMenu
 {
@@ -39,8 +40,11 @@ namespace PlatoWarpMenu
         internal static string tempFolder;
 
         internal static IMapAPI pytk = null;
+
+        internal static IMonitor _monitor; 
         public override void Entry(IModHelper helper)
         {
+            _monitor = Monitor;
             instance = this;
             _helper = helper;
             tempFolder = Path.Combine(helper.DirectoryPath, "Temp");
@@ -68,14 +72,12 @@ namespace PlatoWarpMenu
             };
 
             var harmony = new Harmony("Platonymous.PlatoWarpMenu");
-            bool patched = false;
 
             if (!config.CompatibilityMode || Constants.TargetPlatform == GamePlatform.Android)
             {
                 try
                 {
                     harmony.Patch(Type.GetType("System.Drawing.Image, System.Drawing").GetMethod("Save", new Type[] { typeof(string), Type.GetType("System.Drawing.Imaging.ImageFormat, System.Drawing") }), prefix: new HarmonyMethod(this.GetType().GetMethod("InterceptScreenshot", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)));
-                    patched = true;
                 }
                 catch
                 {
@@ -104,12 +106,11 @@ namespace PlatoWarpMenu
 
         public void OpenUpMenu()
         {
-            IWrapper wrapper = Helper.GetPlatoHelper().UI.LoadFromFile(Path.Combine(Helper.DirectoryPath, "menu.xml"), "PlatoWarpMenu");
+            IWrapper wrapper = Helper.GetPlatoUIHelper().UI.LoadFromFile(Path.Combine(Helper.DirectoryPath, "menu.xml"), "PlatoWarpMenu");
 
             List<string> sets = GetSets();
             Dictionary<string, Texture2D> locationShots = new Dictionary<string, Texture2D>();
-            locationShots.Add("Placeholder", Helper.GetPlatoHelper().Content.Textures.GetRectangle(200, 200, Color.Transparent));
-            int rightX = 780;
+            locationShots.Add("Placeholder", Helper.GetPlatoUIHelper().Content.Textures.GetRectangle(200, 200, Color.Transparent));
 
             string activeSet = (Game1.currentLocation.IsFarm || Game1.currentLocation.IsGreenhouse) ? i18n.Get("menu.farm") : Game1.currentLocation.isStructure.Value ? i18n.Get("menu.buildings") : Game1.currentLocation.IsOutdoors ? i18n.Get("menu.outdoors") : i18n.Get("menu.indoors");
             
@@ -227,6 +228,31 @@ namespace PlatoWarpMenu
                                     }
                                     catch { }
 
+
+                                if (screen is Texture2D)
+                                {
+
+                                    try
+                                    {
+                                        PropertyValue screenshot_region_value = null;
+                                        if (location.map.Properties.TryGetValue("ScreenshotRegion", out screenshot_region_value))
+                                        {
+                                            string[] array = screenshot_region_value.ToString().Split(' ');
+                                            int start_x = int.Parse(array[0]) * 64;
+                                            int start_y = int.Parse(array[1]) * 64;
+                                            int width = (int.Parse(array[2]) + 1) * 64 - start_x;
+                                            int height = (int.Parse(array[3]) + 1) * 64 - start_y;
+                                            screen = Helper.GetPlatoUIHelper().Content.Textures.ExtractArea(screen, new Rectangle(0, 0, Math.Min(screen.Width, (int)(width * 0.25f)), Math.Min(screen.Height, (int)(height * 0.25f))));
+                                        }else
+                                            screen = Helper.GetPlatoUIHelper().Content.Textures.ExtractArea(screen, new Rectangle(0, 0, Math.Min(screen.Width, (int)(location.map.DisplayWidth * 0.25f)), Math.Min(screen.Height, (int)(location.map.DisplayHeight * 0.25f))));
+                                    }
+                                    catch
+                                    {
+                                        screen = Helper.GetPlatoUIHelper().Content.Textures.ExtractArea(screen, new Rectangle(0, 0, Math.Min(screen.Width, (int)(location.map.DisplayWidth * 0.25f)), Math.Min(screen.Height, (int)(location.map.DisplayHeight * 0.25f))));
+                                    }
+                                }
+
+
                                 if (!locationShots.ContainsKey(locationName))
                                     locationShots.Add(locationName, screen);
 
@@ -273,8 +299,8 @@ namespace PlatoWarpMenu
 
             wrapper.Set("RightX", getRightX);
             wrapper.Set("RightWidth", getRightWidth);
-            wrapper.Set("menufont1", new Font(Helper.GetPlatoHelper(), @"fonts/" + config.MenuFont1 + ".fnt"));
-            wrapper.Set("menufont2", new Font(Helper.GetPlatoHelper(), @"fonts/" + config.MenuFont2 + ".fnt"));
+            wrapper.Set("menufont1", new Font(Helper.GetPlatoUIHelper(), @"fonts/" + config.MenuFont1 + ".fnt"));
+            wrapper.Set("menufont2", new Font(Helper.GetPlatoUIHelper(), @"fonts/" + config.MenuFont2 + ".fnt"));
             wrapper.Set("LocationName", activeLocation);
             wrapper.Set("PickSet", pickSet);
             wrapper.Set("PickLocation", pickLocation);
@@ -288,7 +314,7 @@ namespace PlatoWarpMenu
             wrapper.Set("CloseMenu", closeMenu);
 
 
-            Game1.activeClickableMenu = Helper.GetPlatoHelper().UI.OpenMenu(wrapper);
+            Game1.activeClickableMenu = Helper.GetPlatoUIHelper().UI.OpenMenu(wrapper);
         }
 
         public List<string> GetSets()
@@ -315,7 +341,7 @@ namespace PlatoWarpMenu
             List<IComponent> components = new List<IComponent>();
             if (!loaded)
             {
-                Helper.GetPlatoHelper().SetDelayedAction(1, () =>
+                Helper.GetPlatoUIHelper().SetDelayedAction(1, () =>
                 {
                     template.Parent.Repopulate();
                     template.Parent.Recompose();
@@ -343,7 +369,7 @@ namespace PlatoWarpMenu
                     bool high = highlights.Any(p => p.X == tx && p.Y == ty);
                     if (clear || high)
                     {
-                        var t = template.Clone(Helper.GetPlatoHelper());
+                        var t = template.Clone(Helper.GetPlatoUIHelper());
                         t.ParseAttribute("Width", ((int)tilesize).ToString());
                         t.ParseAttribute("Height", ((int)tilesize).ToString());
                         t.ParseAttribute("X", ((int)(sx + tx * tilesize)).ToString());
@@ -370,7 +396,7 @@ namespace PlatoWarpMenu
             int y = margin * 2;
             foreach (string menu in sets)
             {
-                var m = template.Clone(Helper.GetPlatoHelper(), menu);
+                var m = template.Clone(Helper.GetPlatoUIHelper(), menu);
                 if (menu.Equals(activeSet))
                     m.Select();
 
@@ -436,7 +462,7 @@ namespace PlatoWarpMenu
             cols = 1;
             foreach (string menu in locations.OrderBy(l => l))
             {
-                var m = template.Clone(Helper.GetPlatoHelper(), menu);
+                var m = template.Clone(Helper.GetPlatoUIHelper(), menu);
                 if (m.GetComponentsByTag("caption").FirstOrDefault() is TextComponent t)
                 {
                     t.ParseAttribute("content", menu);
@@ -478,7 +504,7 @@ namespace PlatoWarpMenu
             CurrentLocation = location;
             Callback = callback;
 
-            _helper.GetPlatoHelper().SetTickDelayedUpdateAction(1, () =>
+            _helper.GetPlatoUIHelper().SetTickDelayedUpdateAction(1, () =>
             {
                 _helper.Events.Display.Rendered += Display_Rendered;
             });
@@ -493,7 +519,7 @@ namespace PlatoWarpMenu
             bool priorLight = Game1.drawLighting;
             Game1.ambientLight = Microsoft.Xna.Framework.Color.White;
             Game1.drawLighting = false;
-            _helper.GetPlatoHelper().SetTickDelayedUpdateAction(2, () => {
+            _helper.GetPlatoUIHelper().SetTickDelayedUpdateAction(2, () => {
                 Game1.ambientLight = priorColor;
                 Game1.drawLighting = priorLight;
             }
@@ -589,7 +615,7 @@ namespace PlatoWarpMenu
             if (!Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu"))
                 return;
 
-            var api = Helper.ModRegistry.GetApi<PlatoTK.APIs.IGMCM>("spacechase0.GenericModConfigMenu");
+            var api = Helper.ModRegistry.GetApi<PlatoUI.APIs.IGMCM>("spacechase0.GenericModConfigMenu");
 
 
             api.RegisterModConfig(ModManifest, () =>
