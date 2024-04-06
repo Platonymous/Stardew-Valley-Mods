@@ -3,8 +3,8 @@
   <PropertyGroup>
     <AssemblyName>Werewolf</AssemblyName>
     <RootNamespace>Werewolf</RootNamespace>
-    <Version>0.8.3</Version>
-    <TargetFramework>net5.0</TargetFramework>
+    <Version>0.8.5-alpha.20240226</Version>
+<Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

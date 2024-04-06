@@ -1,0 +1,15 @@
+{
+  "Name": "NormalizeAI",
+  "Author": "Platonymous",
+  "Version": "0.9.0",
+  "Description": "Make AI Villages more vanilla friendly",
+  "UniqueID": "Platonymous.NormalizeAI",
+  "EntryDll": "NormalizeAI.dll",
+  "MinimumApiVersion": "3.0.0",
+  "UpdateKeys": [ "Nexus:19334" ],
+  "Dependencies": [
+    {
+      "UniqueID": "PogDerson.Inworld"
+    }
+  ]
+}

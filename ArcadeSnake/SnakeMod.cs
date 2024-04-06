@@ -48,26 +48,11 @@ namespace Snake
 
         private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
         {
-            if (Helper.ModRegistry.GetApi<PlatoTK.APIs.ISerializerAPI>("Platonymous.Toolkit") is PlatoTK.APIs.ISerializerAPI pytk)
-            {
-                pytk.AddPostDeserialization(ModManifest, (o) =>
-                {
-                    var data = pytk.ParseDataString(o);
-
-                    if (o is Chest c && data.ContainsKey("@Type") && data["@Type"].Contains("SnakeMachine"))
-                    {
-                        return SnakeMachine.GetNew(c);
-                    }
-
-                    return o;
-                });
-            }
-
             Helper.GetPlatoHelper().Presets.RegisterArcade(
                 id: "Snake",
                 name: "Snake",
                 objectName: "Snake Arcade Machine",
-                start: () => SnakeMachine.start(Helper),
+                start: () => Game1.currentMinigame = new SnakeMinigame(Helper),
                 sprite: Helper.ModContent.GetInternalAssetName("assets/arcade.png").Name,
                 iconForMobilePhone: Helper.ModContent.GetInternalAssetName("assets/mobile_app_icon.png").Name
             );

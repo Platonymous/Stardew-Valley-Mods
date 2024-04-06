@@ -17,7 +17,7 @@ namespace HarpOfYobaRedux
 
             foreach (NPC ch in gl.characters)
 
-                if (ch.isBirthday(Game1.currentSeason, Game1.dayOfMonth))
+                if (ch.isBirthday())
                     if (lastBirthday == null || lastBirthday != ch)
                     {
                         Game1.player.changeFriendship(250, ch);

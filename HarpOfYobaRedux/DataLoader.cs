@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using StardewModdingAPI;
-using PyTK.Extensions;
-using PyTK.CustomElementHandler;
 using Microsoft.Xna.Framework;
 
 namespace HarpOfYobaRedux
@@ -29,36 +27,48 @@ namespace HarpOfYobaRedux
             sheets.Add(new SheetMusic("adventure", texture, "Adventurer's Allegro", "An energizing tune", Microsoft.Xna.Framework.Color.LightCoral, !cm ? "aerobics" : "cm:HOY-AdventurersAllegro:aerobics", 11000, new BoosterMagic()));
             sheets.Add(new SheetMusic("granpa", texture, "Farmer's Lullaby", "Stand on fertile ground", Microsoft.Xna.Framework.Color.Magenta, !cm ? "grandpas_theme" : "cm:HOY-FarmersLullaby:grandpas_theme", 12000, new SeedMagic()));
             sheets.Add(new SheetMusic("time", texture, "Rondo of Time", "Play ahead to pass the time", Microsoft.Xna.Framework.Color.LightCyan, !cm ? "50s" : "cm:HOY-RondoOfTime:50s", 30000, new TimeMagic()));
-            sheets.Add(new SheetMusic("lua", texture, "Lua Crescendo", "Play lua", Microsoft.Xna.Framework.Color.BlueViolet, HarpOfYobaReduxMod.config.luamusic, 10000, new LuaMagic(helper)));
 
-            Texture2D sheetTexture = texture.getArea(new Rectangle(0, 0, 16, 16));
-            Texture2D harpTexture = texture.getArea(new Rectangle(32, 0, 16, 16));
+            Texture2D sheetTexture = GetArea(texture,new Rectangle(0, 0, 16, 16));
+            Texture2D harpTexture = GetArea(texture, new Rectangle(32, 0, 16, 16));
 
-            CustomObjectData.newObject("Platonymous.HarpOfYoba." + harpOfYoba.instrumentID, harpTexture, Color.White, "Harp of Yoba", "Add Sheet Music to play.",customType:typeof(Instrument));
-
-            foreach(SheetMusic sheet in sheets)
-                CustomObjectData.newObject("Platonymous.HarpOfYoba." + sheet.sheetMusicID, sheetTexture, Color.White, sheet.Name, sheet.getDescription(), customType: typeof(SheetMusic));
-
-            loadLetters();
+            loadLetters(helper);
         }
 
-        public static Dictionary<string, Letter> loadLetters()
+        public static Dictionary<string, Letter> loadLetters(IModHelper helper)
         {
             letters = new Dictionary<string, Letter>();
             Instrument harp = new Instrument("harp");
             harp.attach(new SheetMusic("birthday"));
-            letters.Add("hoy_birthday", new Letter("birthday", "Dear @,^  I hope you are doing well. Your Grandpa would have wanted me to give you his old Harp. Maybe you can play for him from time to time. I didn't get to play it much, since you left.^  Love, Dad  ^  P.S. I wrote the notes to your favorite birthday tune on the back.", harp));
-            letters.Add("hoy_dark", new Letter("dark", "Greetings, young adept.^I have enclosed in this package an item of arcane significance. Use it wisely.   ^   -M. Rasmodius, Wizard"));
-            letters.Add("hoy_yoba", new Letter("yoba", "Dear @,^  Congratulations to your wedding. I wish we could have been there, but you two have to visit us soon.^  Love, Dad  ^  P.S. Did you play our family wedding song during the ceremony?"));
-            letters.Add("hoy_thunder", new Letter("thunder", "Hey @,^ I loved playing with you in the rain. We should do that again some time. I wrote the notes to our song on the back of this letter. See you soon!   ^   -Abigail"));
-            letters.Add("hoy_wanderer", new Letter("wanderer", "Dear @,^Thank you for rebuilding our community center and for becoming such a valuable part of our little town! ^   -Mayor Lewis  ^  P.S. We found this inside the community vault, is it one of your songs?"));
-            letters.Add("hoy_fisher", new Letter("fisher", "Thank you @ for playing all those melodies to an old fisherman.   ^   "));
-            letters.Add("hoy_animals", new Letter("animals", "@,^ I wrote a song for your animals. I hope they like it.  ^   -Haley"));
-            letters.Add("hoy_adventure", new Letter("adventure", "You killed more than 100 Monsters, well done! Here's the song of our guild. Play it with pride.  ^   -Marlon"));
-            letters.Add("hoy_granpa", new Letter("granpa", "It's an empty letter with notes scribbled on the back.  ^   "));
-            letters.Add("hoy_time", new Letter("time", "Dear @,^Thank you for listening to an old fool like me. I found the melody of one of the songs we used to sing in the mines to pass the time. Sadly I can't play it anymore.   ^   -George  ^  "));
-            letters.Add("hoy_lua", new Letter("lua", "Huh, an empty piece of sheetpaper, could be used to write music for the harp.  ^   "));
-            return letters;
+            letters.Add("hoy_birthday", new Letter(helper, "birthday", "Dear @,^  I hope you are doing well. Your Grandpa would have wanted me to give you his old Harp. Maybe you can play for him from time to time. I didn't get to play it much, since you left.^  Love, Dad  ^  P.S. I wrote the notes to your favorite birthday tune on the back.", harp));
+            letters.Add("hoy_dark", new Letter(helper, "dark", "Greetings, young adept.^I have enclosed in this package an item of arcane significance. Use it wisely.   ^   -M. Rasmodius, Wizard"));
+            letters.Add("hoy_yoba", new Letter(helper, "yoba", "Dear @,^  Congratulations to your wedding. I wish we could have been there, but you two have to visit us soon.^  Love, Dad  ^  P.S. Did you play our family wedding song during the ceremony?"));
+            letters.Add("hoy_thunder", new Letter(helper, "thunder", "Hey @,^ I loved playing with you in the rain. We should do that again some time. I wrote the notes to our song on the back of this letter. See you soon!   ^   -Abigail"));
+            letters.Add("hoy_wanderer", new Letter(helper, "wanderer", "Dear @,^Thank you for rebuilding our community center and for becoming such a valuable part of our little town! ^   -Mayor Lewis  ^  P.S. We found this inside the community vault, is it one of your songs?"));
+            letters.Add("hoy_fisher", new Letter(helper, "fisher", "Thank you @ for playing all those melodies to an old fisherman.   ^   "));
+            letters.Add("hoy_animals", new Letter(helper, "animals", "@,^ I wrote a song for your animals. I hope they like it.  ^   -Haley"));
+            letters.Add("hoy_adventure", new Letter(helper, "adventure", "You killed more than 100 Monsters, well done! Here's the song of our guild. Play it with pride.  ^   -Marlon"));
+            letters.Add("hoy_granpa", new Letter(helper, "granpa", "It's an empty letter with notes scribbled on the back.  ^   "));
+            letters.Add("hoy_time", new Letter(helper, "time", "Dear @,^Thank you for listening to an old fool like me. I found the melody of one of the songs we used to sing in the mines to pass the time. Sadly I can't play it anymore.   ^   -George  ^  "));
+           return letters;
+        }
+        public static Texture2D GetArea(Texture2D t, Rectangle area)
+        {
+            Color[] data = new Color[t.Width * t.Height];
+            t.GetData(data);
+            int w = area.Width;
+            int h = area.Height;
+            Color[] data2 = new Color[w * h];
+
+            int x2 = area.X;
+            int y2 = area.Y;
+
+            for (int x = x2; x < w + x2; x++)
+                for (int y = y2; y < h + y2; y++)
+                    data2[(y - y2) * w + (x - x2)] = data[y * t.Width + x];
+
+            Texture2D result = new Texture2D(t.GraphicsDevice, w, h);
+            result.SetData(data2);
+            return result;
         }
 
         public static Letter getLetter(string id)

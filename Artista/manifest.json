@@ -1,0 +1,16 @@
+{
+  "Name": "Artista",
+  "Author": "Platonymous",
+  "Version": "1.4.4-alpha.20240226",
+  "Description": "Play as an Artist",
+  "UniqueID": "Platonymous.Artista",
+  "EntryDll": "Artista.dll",
+  "MinimumApiVersion": "3.14.0",
+  "UpdateKeys": [ "Nexus:18697" ],
+  "Dependencies": [
+    {
+      "UniqueID": "spacechase0.SpaceCore",
+      "IsRequired": true
+    }
+  ]
+}

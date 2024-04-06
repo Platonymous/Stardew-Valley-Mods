@@ -1,12 +1,13 @@
 ﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
-using PyTK.Extensions;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.GameData.Movies;
 using StardewValley.Locations;
 using StardewValley.Minigames;
+using StardewValley.Objects;
+using StardewValley.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,11 +27,14 @@ namespace CustomMovies
             cmHelper = helper;
             helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
             helper.Events.Content.AssetRequested += CMVAssetEditor.OnAssetRequested;
+
+            helper.Events.GameLoop.UpdateTicked += (s, e) => AnimatedTexture2D.ticked = e.Ticks;
+            OvSpritebatchNew.initializePatch(new Harmony("Platonymous.CustomMovies"));
         }
 
         public static CraneGame.Prize getCustomMoviePrize(CustomMovieData movieData, CraneGame game, Vector2 pos, float z)
         {
-            if (PyTK.PyUtils.getItem(movieData.CranePrizeType, name: movieData.CranePrizeName) is Item prize)
+            if (getItem(movieData.CranePrizeType, name: movieData.CranePrizeName) is Item prize)
                 return new CraneGame.Prize(game, prize)
                 {
                     position = pos,
@@ -47,6 +51,123 @@ namespace CustomMovies
             harmonyFix();
         }
 
+        public static Type getTypeSDV(string type)
+        {
+            string prefix = "StardewValley.";
+            Type defaulSDV = Type.GetType(prefix + type + ", Stardew Valley");
+
+            if (defaulSDV != null)
+                return defaulSDV;
+            else
+                return Type.GetType(prefix + type + ", StardewValley");
+        }
+
+        public static Item getItem(string type, int index = -1, string name = "none")
+        {
+            Item item = null;
+
+            if (type == "Object")
+            {
+                if (index != -1)
+                    item = new StardewValley.Object(index, 1);
+                else if (name != "none")
+                    item = new StardewValley.Object(Game1.objectInformation.getIndexByName(name), 1);
+            }
+            else if (type == "BigObject")
+            {
+                if (index != -1)
+                    item = new StardewValley.Object(Vector2.Zero, index);
+                else if (name != "none")
+                    item = new StardewValley.Object(Vector2.Zero, Game1.bigCraftablesInformation.getIndexByName(name));
+            }
+            else if (type == "Ring")
+            {
+                if (index != -1)
+                    item = new Ring(index);
+                else if (name != "none")
+                    item = new Ring(Game1.objectInformation.getIndexByName(name));
+            }
+            else if (type == "Hat")
+            {
+                if (index != -1)
+                    item = new Hat(index);
+                else if (name != "none")
+                    item = new Hat(cmHelper.GameContent.Load<Dictionary<int, string>>("Data/hats").getIndexByName(name));
+            }
+            else if (type == "Boots")
+            {
+                if (index != -1)
+                    item = new Boots(index);
+                else if (name != "none")
+                    item = new Boots(cmHelper.GameContent.Load<Dictionary<int, string>>("Data/Boots").getIndexByName(name));
+            }
+            else if (type == "TV")
+            {
+                if (index != -1)
+                    item = new StardewValley.Objects.TV(index, Vector2.Zero);
+                else if (name != "none")
+                    item = new TV(cmHelper.GameContent.Load<Dictionary<int, string>>("Data/Furniture").getIndexByName(name), Vector2.Zero);
+            }
+            else if (type == "IndoorPot")
+                item = new StardewValley.Objects.IndoorPot(Vector2.Zero);
+            else if (type == "CrabPot")
+                item = new StardewValley.Objects.CrabPot(Vector2.Zero);
+            else if (type == "Chest")
+                item = new StardewValley.Objects.Chest(true);
+            else if (type == "Cask")
+                item = new StardewValley.Objects.Cask(Vector2.Zero);
+            else if (type == "Cask")
+                item = new StardewValley.Objects.Cask(Vector2.Zero);
+            else if (type == "Furniture")
+            {
+                if (index != -1)
+                    item = new StardewValley.Objects.Furniture(index, Vector2.Zero);
+                else if (name != "none")
+                    item = new Furniture(cmHelper.GameContent.Load<Dictionary<int, string>>("Data/Furniture").getIndexByName(name), Vector2.Zero);
+            }
+            else if (type == "Sign")
+                item = new StardewValley.Objects.Sign(Vector2.Zero, index);
+            else if (type == "Wallpaper")
+                item = new StardewValley.Objects.Wallpaper(Math.Abs(index), false);
+            else if (type == "Floors")
+                item = new StardewValley.Objects.Wallpaper(Math.Abs(index), true);
+            else if (type == "MeleeWeapon")
+            {
+                if (index != -1)
+                    item = new MeleeWeapon(index);
+                else if (name != "none")
+                    item = new MeleeWeapon(cmHelper.GameContent.Load<Dictionary<int, string>>("Data/weapons").getIndexByName(name));
+
+            }
+            else if (type == "SDVType")
+            {
+                try
+                {
+                    if (index == -1)
+                        item = Activator.CreateInstance(getTypeSDV(name)) is Item i ? i : null;
+                    else
+                        item = Activator.CreateInstance(getTypeSDV(name), index) is Item i ? i : null;
+                }
+                catch
+                {
+                }
+            }
+            else if (type == "ByType")
+            {
+                try
+                {
+                    if (index == -1)
+                        item = Activator.CreateInstance(Type.GetType(name)) is Item i ? i : null;
+                    else
+                        item = Activator.CreateInstance(Type.GetType(name), index) is Item i ? i : null;
+                }
+                catch
+                {
+                }
+            }
+
+            return item;
+        }
         public void loadContentPacks()
         {
             Dictionary<string, MovieData> movieData = MovieTheater.GetMovieData();
@@ -54,7 +175,7 @@ namespace CustomMovies
             foreach (var pack in Helper.ContentPacks.GetOwned())
             {
                 CustomMoviePack cPack = pack.ReadJsonFile<CustomMoviePack>("content.json");
-                foreach(var movie in cPack.Movies)
+                foreach (var movie in cPack.Movies)
                 {
                     movie.LoadTexture(pack);
                     movie._pack = pack;
@@ -68,8 +189,10 @@ namespace CustomMovies
                     Monitor.Log("Added " + movie.Title + " as " + movie.FixedMovieID);
                     MovieData fixedData = movie.GetData(y);
                     fixedData.ID = movie.FixedMovieID;
-                    movieData.AddOrReplace(fixedData.ID, fixedData);
-                    allTheMovies.AddOrReplace(movie.Id, movie);
+                    movieData.Remove(fixedData.ID);
+                    movieData.Add(fixedData.ID, fixedData);
+                    allTheMovies.Remove(movie.Id);
+                    allTheMovies.Add(movie.Id, movie);
                 }
 
                 typeof(MovieTheater).GetField("_movieData", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, movieData);
@@ -80,7 +203,8 @@ namespace CustomMovies
                         if (r.Tag != null && allTheMovies.ContainsKey(r.Tag))
                             r.Tag = "CMovieID:" + r.Tag;
 
-                    allTheReactions.AddOrReplace(new TranslatableMovieReactions(reaction,pack));
+                    allTheReactions.Remove(new TranslatableMovieReactions(reaction, pack));
+                    allTheReactions.Add(new TranslatableMovieReactions(reaction, pack));
                 }
 
             }
@@ -103,7 +227,7 @@ namespace CustomMovies
             var game = __instance;
             List<CraneGame.CraneGameObject> gameObjects = new List<CraneGame.CraneGameObject>((List<CraneGame.CraneGameObject>)game.GetType().GetField("_gameObjects", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(game));
             Random rnd = new Random();
-            
+
             foreach (CraneGame.Prize prize in gameObjects.Where(go => go is CraneGame.Prize p && !p.isLargeItem))
             {
                 if (rnd.NextDouble() < 0.2)
@@ -119,7 +243,10 @@ namespace CustomMovies
         public static void GetMovieReactions(ref List<MovieCharacterReaction> __result)
         {
             foreach (var reaction in allTheReactions)
-                __result.AddOrReplace(translateReactions(reaction).Reaction);
+            {
+                __result.Remove(translateReactions(reaction).Reaction);
+                __result.Add(translateReactions(reaction).Reaction);
+            }
         }
 
         public static CustomMovieData translateMovie(CustomMovieData movie)
@@ -188,18 +315,18 @@ namespace CustomMovies
             var data = MovieTheater.GetMovieData();
 
             string season = Game1.currentSeason;
-           
-            if(next && Game1.dayOfMonth > 21)
+
+            if (next && Game1.dayOfMonth > 21)
                 switch (season)
                 {
-                    case "spring" : season = "summer";break;
-                    case "summer": season = "fall";break;
-                    case "fall": season = "winter";break;
-                    case "winter": season = "spring";break;
+                    case "spring": season = "summer"; break;
+                    case "summer": season = "fall"; break;
+                    case "fall": season = "winter"; break;
+                    case "winter": season = "spring"; break;
                 }
 
             List<MovieData> movies = data.Values.Where(m => m.ID.StartsWith(season)).ToList();
-            
+
             __result = movies[r % movies.Count];
 
             if (__result.Tags.Contains("CustomMovie"))
@@ -212,31 +339,148 @@ namespace CustomMovies
 
             lastMovie = CMVAssetEditor.CurrentMovie;
 
+
+
         }
 
-            public static void GetMovieData(ref Dictionary<string, MovieData> __result)
+        public static bool checkPlayerConditions(string conditions)
+        {
+            return cmHelper.Reflection.GetField<bool>(Game1.player, conditions).GetValue();
+        }
+
+        public static bool checkEventConditions(string conditions, object caller, GameLocation location)
+        {
+            bool result = false;
+            bool comparer = true;
+
+            if (conditions == null || conditions == "")
+                return true;
+
+            if (conditions.StartsWith("NOT "))
+            {
+                conditions = conditions.Replace("NOT ", "");
+                comparer = false;
+            }
+
+            if (!Context.IsWorldReady)
+            {
+                if (conditions.StartsWith("r "))
+                {
+                    string[] cond = conditions.Split(' ');
+                    return comparer == Game1.random.NextDouble() <= double.Parse(cond[1]);
+                }
+
+                if (conditions.StartsWith("LC ") || conditions.StartsWith("!LC "))
+                {
+                    try
+                    {
+                        result =false;
+                    }
+                    catch
+                    {
+                        result = false;
+                    }
+                    return result == comparer;
+                }
+
+                return result;
+            }
+
+            if (conditions.StartsWith("PC "))
+                result = checkPlayerConditions(conditions.Replace("PC ", ""));
+            else if (conditions.StartsWith("LC ") || conditions.StartsWith("!LC "))
+                result = false;
+            else
+            {
+                if (location == null)
+                    location = Game1.currentLocation;
+
+                if (!(location is GameLocation))
+                    location = Game1.getFarm();
+
+                if (location == null)
+                {
+                    if (conditions.StartsWith("r "))
+                    {
+                        string[] cond = conditions.Split(' ');
+                        return comparer == Game1.random.NextDouble() <= double.Parse(cond[1]);
+                    }
+
+                    if (conditions.StartsWith("LC ") || conditions.StartsWith("!LC "))
+                    {
+                        result = false;
+                        return result == comparer;
+                    }
+
+                    result = false;
+                }
+                else
+                {
+                    try
+                    {
+                        result = cmHelper.Reflection.GetMethod(location, "checkEventPrecondition").Invoke<int>("9999999/" + conditions) > 0;
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            var m = typeof(GameLocation).GetMethod("checkEventPrecondition", BindingFlags.NonPublic | BindingFlags.Instance);
+                            result = (int)m.Invoke(location, new string[] { ("9999999/" + conditions) }) > 0;
+                        }
+                        catch
+                        {
+                            result = false;
+                        }
+                    }
+                }
+            }
+
+            return result == comparer;
+        }
+
+        public static void GetMovieData(ref Dictionary<string, MovieData> __result)
         {
             foreach (var movie in allTheMovies.Values)
             {
-                if (__result.Exists(d => d.Value.Tags.Contains("CMovieID:" + movie.Id)) )
+                if (__result.Any(d => d.Value.Tags.Contains("CMovieID:" + movie.Id)))
                 {
-                    if (__result.Find(d => d.Value.Tags.Contains("CMovieID:" + movie.Id)) is KeyValuePair<string, MovieData> md && !PyTK.PyUtils.checkEventConditions(movie.Conditions, Game1.MasterPlayer))
+                    if (__result.FirstOrDefault(d => d.Value.Tags.Contains("CMovieID:" + movie.Id)) is KeyValuePair<string, MovieData> md && !checkEventConditions(movie.Conditions, Game1.MasterPlayer, Game1.currentLocation))
                         __result.Remove(md.Key);
 
                     continue;
                 }
 
-                if (!PyTK.PyUtils.checkEventConditions(movie.Conditions, Game1.MasterPlayer))
+                if (!checkEventConditions(movie.Conditions, Game1.MasterPlayer, Game1.currentLocation))
                     continue;
 
-                if(movie.FixedMovieID != null)
+                if (movie.FixedMovieID != null)
                 {
                     MovieData fixedData = movie.GetFixedData();
                     fixedData.ID = movie.FixedMovieID;
-                    __result.AddOrReplace(fixedData.ID, fixedData);
+                    __result.Remove(fixedData.ID);
+                    __result.Add(fixedData.ID, fixedData);
                     continue;
                 }
             }
+        }
+
+    }
+
+    public static class CustomMovieExtensions{
+        public static int getIndexByName(this IDictionary<int, string> dictionary, string name)
+        {
+            int found = 0;
+
+            if (name.StartsWith("startswith:"))
+                found = (dictionary.Where(d => d.Value.Split('/')[0].StartsWith(name.Split(':')[1])).FirstOrDefault()).Key;
+            else if (name.StartsWith("endswith:"))
+                found = (dictionary.Where(d => d.Value.Split('/')[0].EndsWith(name.Split(':')[1])).FirstOrDefault()).Key;
+            else if (name.StartsWith("contains:"))
+                found = (dictionary.Where(d => d.Value.Split('/')[0].Contains(name.Split(':')[1])).FirstOrDefault()).Key;
+            else
+                found = (dictionary.Where(d => d.Value.Split('/')[0] == name).FirstOrDefault()).Key;
+
+            return found;
         }
 
     }

@@ -4,9 +4,9 @@ using StardewValley.Quests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Werewolf.Roles;
+using LandGrants.Roles;
 
-namespace Werewolf.Game
+namespace LandGrants.Game
 {
     public class WerwolfGame
     {
@@ -109,7 +109,7 @@ namespace Werewolf.Game
             Helper = helper;
             GameIsActive = true;
             Monitor = monitor;
-            GameID = "Platonymous.Werewolf." + Game1.stats.DaysPlayed + "." + Game1.stats.stepsTaken;
+            GameID = "Platonymous.Werewolf." + Game1.stats.DaysPlayed + "." + (Game1.stats.MonstersKilled + Game1.stats.ItemsShipped + Game1.stats.StepsTaken);
             Host = host;
             Phases = new List<Action>() { () => {
                 Round = Math.Max(Round,0);
@@ -394,7 +394,7 @@ namespace Werewolf.Game
                         if (characters.Contains("Lewis"))
                             chr = "Lewis";
                         characters.Remove(chr);
-                        npc = Game1.getCharacterFromName(chr, true, true);
+                        npc = Game1.getCharacterFromName(chr, true);
                     }
                     var wp = new WerwolfPlayer(Game1.player.UniqueMultiplayerID == p ? Game1.player.Name : "???", p, npc, false, new List<IWerwolfRoleDescription>());
                     Players.Add(wp);
@@ -409,7 +409,7 @@ namespace Werewolf.Game
                     {
                         var chr = characters.Last();
                         characters.Remove(chr);
-                        npc = Game1.getCharacterFromName(chr, true, true);
+                        npc = Game1.getCharacterFromName(chr, true);
                     }
                     var wp = new WerwolfPlayer($"{npc.Name}-Bot", Helper.Multiplayer.GetNewID(), npc, true, new List<IWerwolfRoleDescription>());
                     Players.Add(wp);

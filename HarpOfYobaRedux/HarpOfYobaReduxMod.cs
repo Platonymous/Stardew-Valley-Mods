@@ -1,39 +1,49 @@
 ﻿using System;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using PyTK.Types;
-using PyTK.Extensions;
 using StardewValley.Menus;
 using System.Collections.Generic;
 using StardewValley;
-using StardewValley.TerrainFeatures;
-using StardewValley.Characters;
-using StardewValley.Monsters;
-using StardewValley.Quests;
-using System.Xml.Serialization;
-using StardewValley.Objects;
+using System.Linq;
+using SpaceShared.APIs;
+using static StardewValley.Minigames.BoatJourney;
 
 namespace HarpOfYobaRedux
 {
     public class HarpOfYobaReduxMod : Mod
     {
         public static Config config;
+        public static IModHelper modHelper;
 
         public override void Entry(IModHelper helper)
         {
+            modHelper = helper;
             config = Helper.ReadConfig<Config>();
-            new ConsoleCommand("hoy_cheat", "Get all sheets without doing anything.", (c, p) => cheat(p)).register();
+            Helper.ConsoleCommands.Add("hoy_cheat", "Get all sheets without doing anything.", (c, p) => cheat(p));
             helper.Events.Display.MenuChanged += OnMenuChanged;
             helper.Events.GameLoop.Saving += OnSaving;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
         }
+
+        private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+        {
+            try {
+                Instrument.allAdditionalSaveData = Helper.Data.ReadSaveData<SaveData>("hoy.savedata")?.Data ?? new Dictionary<string, string>();
+            }
+            catch
+            {
+                Instrument.allAdditionalSaveData = new Dictionary<string, string>();
+            }
+       }
 
         private void cheat(string[] p)
         {
             if (p == null || p.Length < 1)
             {
-                List<string> list = SheetMusic.allSheets.toList(d => d.Key);
+                List<string> list = SheetMusic.allSheets.Select(d => d.Key).ToList();
                 list.Add("harp");
+                list.Add("all");
                 Monitor.Log(String.Join(" - ", list),LogLevel.Info);
             }
 
@@ -43,12 +53,30 @@ namespace HarpOfYobaRedux
             {
                 Monitor.Log(s);
                 if (s == "harp")
-                    items.AddOrReplace(new Instrument("harp"));
+                {
+                    items.RemoveAll(i => i is Instrument inst && inst.instrumentID == "harp");
+                    items.Add(new Instrument("harp"));
+                }
                 else if (SheetMusic.allSheets.ContainsKey(s))
-                    items.AddOrReplace(new SheetMusic(s));
+                {
+                    items.RemoveAll(i => i is SheetMusic inst && inst.sheetMusicID == s);
+                    items.Add(new SheetMusic(s));
+                }
                 else if (s == "allsheets")
-                    foreach(string sheet in SheetMusic.allSheets.Keys)
-                        items.AddOrReplace(new SheetMusic(sheet));
+                {
+                    foreach (string sheet in SheetMusic.allSheets.Keys)
+                    {
+                        items.RemoveAll(i => i is SheetMusic inst && inst.sheetMusicID == sheet);
+                        items.Add(new SheetMusic(sheet));
+                    }
+                }
+                else if (s == "all")
+                {
+                    items.Clear();
+                    items.Add(new Instrument("harp"));
+                    foreach (string sheet in SheetMusic.allSheets.Keys)
+                        items.Add(new SheetMusic(sheet));
+                }
             }
             if(items.Count > 0)
                 Game1.activeClickableMenu = new ItemGrabMenu(items);
@@ -56,11 +84,18 @@ namespace HarpOfYobaRedux
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
+            var spaceCore = this.Helper.ModRegistry.GetApi<ISpaceCoreApi>("spacechase0.SpaceCore");
+            spaceCore.RegisterSerializerType(typeof(Instrument));
+            spaceCore.RegisterSerializerType(typeof(SheetMusic));
             DataLoader.load(Helper, Helper.ModRegistry.IsLoaded("Platonymous.CustomMusic"));
         }
 
         private void OnSaving(object sender, SavingEventArgs e)
         {
+            var save = new SaveData() { Data = Instrument.allAdditionalSaveData };
+            if (Context.IsMainPlayer)
+                Helper.Data.WriteSaveData("hoy.savedata", save);
+
             Delivery.checkMail();
         }
 

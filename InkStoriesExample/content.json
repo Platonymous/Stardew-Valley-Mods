@@ -1,0 +1,65 @@
+{
+  "Format": "1.28.0",
+  "ConfigSchema": {
+    "SecondNPC": {
+      "AllowValues": "Alex, Sam, Leah, Maru",
+      "Default": "Alex"
+    }
+  },
+  "DynamicTokens": [
+    {
+      "Name": "ExampleStory1",
+      "Value": "Platonymous.InkStories.Example.Default"
+    },
+    {
+      "Name": "ExampleStory2",
+      "Value": "Platonymous.InkStories.ExampleDance.Default"
+    }
+  ],
+  "Changes": [
+    {
+      "LogName": "Load Source of InkStories Example Dialogue Story",
+      "Action": "Load",
+      "Target": "{{Platonymous.InkStories/Story:{{ExampleStory1}}}}",
+      "FromFile": "{{i18n:file1}}"
+    },
+    {
+      "LogName": "Load Source of InkStories Example Dance Story",
+      "Action": "Load",
+      "Target": "{{Platonymous.InkStories/Story:{{ExampleStory2}}}}",
+      "FromFile": "{{i18n:file2}}"
+    },
+    {
+      "LogName": "Store InkStories Example Store Data",
+      "Action": "EditData",
+      "Target": "{{Platonymous.InkStories/Store:{{ExampleStory1}}}}",
+      "Entries": {
+        "npc": "{{SecondNPC}}"
+      }
+    },
+    {
+      "LogName": "InkStories Example Dialogue CP",
+      "Action": "EditData",
+      "Target": "Characters/Dialogue/Emily",
+      "Entries": {
+        "spring_13": "INK {{ExampleStory1}}"
+      }
+    },
+    {
+      "LogName": "InkStories Example Dialogue",
+      "Action": "EditData",
+      "Target": "Characters/Dialogue/Emily",
+      "Entries": {
+        "spring_14": "INK {{ExampleStory1}}"
+      }
+    },
+    {
+      "LogName": "InkStories Example Event/Festival",
+      "Action": "EditData",
+      "Target": "Data/Festivals/spring24",
+      "Entries": {
+        "mainEvent": "speak Lewis \"INK {{ExampleStory2}}\"/pause 200/INKCALL {{ExampleStory2}} Girl1 Girl2 Girl3 Girl4 Girl5 Girl6 Guy1 Guy2 Guy3 Guy4 Guy5 Guy6 farmer1 farmer2 farmer3 farmer4"
+      }
+    }
+  ]
+}

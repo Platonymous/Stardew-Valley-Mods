@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>InkStoriesExample</AssemblyName>
+    <RootNamespace>InkStoriesExample</RootNamespace>
+    <Version>1.4.1-alpha.20231122</Version>
+    <TargetFramework>net6.0</TargetFramework>
+    <ModFolderName>[INK] InkStoriesExample</ModFolderName>
+    <Configurations>Debug;Release;Android;Prealphadebug</Configurations>
+</PropertyGroup>
+
+  <Import Project="$(SolutionDir)\contentpacks.targets" />
+
+  <ItemGroup>
+    <None Update="i18n\default.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

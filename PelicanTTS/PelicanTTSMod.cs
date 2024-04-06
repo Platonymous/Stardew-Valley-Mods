@@ -41,6 +41,11 @@ namespace PelicanTTS
 
         public override void Entry(IModHelper helper)
         {
+            SpeechHandlerPolly.Monitor = Monitor;
+            _helper = helper;
+
+            SpeechHandlerPolly.LoadMinionDictionary();
+
             endPoints = new Dictionary<string, Amazon.RegionEndpoint>()
             {
                { "USA",Amazon.RegionEndpoint.USEast1},
@@ -63,6 +68,7 @@ namespace PelicanTTS
                 config = new ModConfig();
                 Helper.WriteConfig(config);
             }
+
             activeEndpoint = endPoints[config.Server];
             screenGraber = new Screengraber();
             Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
@@ -161,6 +167,8 @@ namespace PelicanTTS
 
 
             others.AddRange(typeof(VoiceId).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Select(f => f.Name).Where(v => !voices.Any(vc => vc.Value.Contains(v))));
+
+
         }
 
         private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
@@ -677,7 +685,6 @@ namespace PelicanTTS
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             Helper.Events.GameLoop.DayStarted += OnDayStarted;
-            SpeechHandlerPolly.Monitor = Monitor;
             SpeechHandlerPolly.start(Helper);
 
             Helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;

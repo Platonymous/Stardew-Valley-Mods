@@ -52,16 +52,36 @@
     <PlatformTarget>anycpu</PlatformTarget>
     <EnableHarmony>true</EnableHarmony>
     <ModZipPath>$(SolutionDir)_releases</ModZipPath>
-    <Configurations>Debug;Release;Android</Configurations>
-    <IgnoreModFilePatterns Condition="'$(MSBuildProjectName)' != 'PyTK'">PlatoTK\.(?:dll|pdb), Newtonsoft.Json.Bson\.(?:dll|pdb), DotNetZip\.(?:dll|pdb),PyTK\.(?:dll|pdb),0Harmony\.(?:dll|pdb), MoonSharp.Interpreter\.(?:dll|pdb), NCalc\.(?:dll|pdb),TMXTile\.(?:dll|pdb)</IgnoreModFilePatterns>
+    <Configurations>Debug;Release;Android;Prealpharelease;Prealphadebug</Configurations>
+    <!--<IgnoreModFilePatterns Condition="'$(MSBuildProjectName)' != 'PyTK'">PlatoTK\.(?:dll|pdb), Newtonsoft.Json.Bson\.(?:dll|pdb), DotNetZip\.(?:dll|pdb),PyTK\.(?:dll|pdb),0Harmony\.(?:dll|pdb), MoonSharp.Interpreter\.(?:dll|pdb), NCalc\.(?:dll|pdb),TMXTile\.(?:dll|pdb)</IgnoreModFilePatterns>-->
     <Authors>Platonymous</Authors>
     <RepositoryUrl>https://github.com/Platonymous/Stardew-Valley-Mods</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Android' ">
     <GamePath>C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\SDV 1.4</GamePath>
     <ModZipPath>$(SolutionDir)_releases_android</ModZipPath>
+  </PropertyGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Prealpharelease' ">
+    <GamePath>C:\Program Files (x86)\Steam\steamapps\common\SDV15</GamePath>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Prealphadebug' ">
+    <GamePath>C:\Program Files (x86)\Steam\steamapps\common\SDV15</GamePath>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' ">
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug' ">
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>

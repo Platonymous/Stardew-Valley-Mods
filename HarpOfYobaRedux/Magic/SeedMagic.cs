@@ -17,8 +17,8 @@ namespace HarpOfYobaRedux
         {
             if (!playedToday)
             {
-               List<Vector2> tiles =  Utility.getAdjacentTileLocations(Game1.player.getTileLocation());
-                Vector2 playerTile = Game1.player.getTileLocation();
+               List<Vector2> tiles =  Utility.getAdjacentTileLocations(Game1.player.Tile);
+                Vector2 playerTile = Game1.player.Tile;
                 tiles.Add(playerTile);
                 tiles.Add(playerTile + new Vector2(1f, 1f));
                 tiles.Add(playerTile + new Vector2(-1f, -1f));
@@ -37,14 +37,16 @@ namespace HarpOfYobaRedux
                             if (Game1.IsWinter)
                                 seeds = 498;
 
-                            hd.plant(seeds,(int)tile.X, (int)tile.Y,Game1.player, false, Game1.currentLocation);
+                            hd.plant(seeds.ToString(),Game1.player, false);
 
-                            if(hd.crop != null)
+                            hd.tickUpdate(Game1.currentGameTime);
+                            if (hd.crop != null)
                             {
-                                hd.crop.newDay(1, 0, (int)tile.X, (int)tile.Y, Game1.currentLocation);
+                                hd.crop.newDay(1);
                                 Game1.playSound("leafrustle");
                             }
-                            
+                            hd.tickUpdate(Game1.currentGameTime);
+
                         }
                         
                     }

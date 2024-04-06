@@ -5,6 +5,7 @@
     <RootNamespace>CustomMusic</RootNamespace>
     <TargetFramework>net5.0</TargetFramework>
     <Version>1.8.1</Version>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

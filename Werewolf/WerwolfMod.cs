@@ -7,9 +7,9 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Werewolf.Game;
+using LandGrants.Game;
 
-namespace Werewolf
+namespace LandGrants
 {
     public class WerwolfMod : Mod
     {
@@ -61,7 +61,7 @@ namespace Werewolf
             {
 
                 var oldAfterQ = Game1.currentLocation.afterQuestion;
-                Game1.activeClickableMenu = new DialogueBox("???: Do you want to play a game?", new List<Response>() { new Response("yes", "Yes"), new Response("no", "No") });
+                Game1.activeClickableMenu = new DialogueBox("???: Do you want to play a game?", new Response[] { new Response("yes", "Yes"), new Response("no", "No") });
                 Game1.currentLocation.afterQuestion = (who, answer) =>
                 {
 
@@ -103,7 +103,7 @@ namespace Werewolf
                 {
                     NPC npc = null;
                     Farmer farmer = null;
-                    if (Game1.currentLocation.getCharacters().Where(c => c.Name != wcg.LocalPlayer.Charakter && wcg.Players.Any(p => p.Alive && p.Charakter == c.Name))
+                    if (Game1.currentLocation.characters.Where(c => c.Name != wcg.LocalPlayer.Charakter && wcg.Players.Any(p => p.Alive && p.Charakter == c.Name))
                     .ToList().OrderBy(npc => GetSquaredDistance(npc.Position, Game1.player.Position))
                     .ToList() is List<NPC> npcs && npcs.Count > 0)
                         npc = npcs.FirstOrDefault(n => GetSquaredDistance(n.Position, Game1.player.Position) < 30000);
@@ -164,7 +164,7 @@ namespace Werewolf
        {
            wcg.NextTask.Add(() =>
            {
-               Game1.activeClickableMenu = new DialogueBox($"{name}: {(wcg.Players.FirstOrDefault(p => p.ID == target) is WerwolfClientPlayer wcp ? (wcp.Name + "/" + wcp.Charakter) : "???" )}", new List<Response>() { new Response("yes", "Yes"), new Response("no", "No") });
+               Game1.activeClickableMenu = new DialogueBox($"{name}: {(wcg.Players.FirstOrDefault(p => p.ID == target) is WerwolfClientPlayer wcp ? (wcp.Name + "/" + wcp.Charakter) : "???" )}", new Response[] { new Response("yes", "Yes"), new Response("no", "No") });
                var oldAfterQ = Game1.currentLocation.afterQuestion;
                Game1.currentLocation.afterQuestion = (who, answer) =>
                {
@@ -184,7 +184,7 @@ namespace Werewolf
            else
                wcg.NextTask.Add(() =>
                {
-                   Game1.activeClickableMenu = new DialogueBox("What do you want to do?", actions.Select(o => new Response($"{o.ID}", o.Name)).ToList());
+                   Game1.activeClickableMenu = new DialogueBox("What do you want to do?", actions.Select(o => new Response($"{o.ID}", o.Name)).ToArray());
                    var oldAfterQ = Game1.currentLocation.afterQuestion;
                    Game1.currentLocation.afterQuestion = (who, answer) =>
                    {
@@ -204,7 +204,7 @@ namespace Werewolf
            {
                NPC npc = null;
                Farmer farmer = null;
-               if (Game1.currentLocation.getCharacters().Where(c => c.Name != wcg.LocalPlayer.Charakter && wcg.Players.Any(p => p.Alive && p.Charakter == c.Name))
+               if (Game1.currentLocation.characters.Where(c => c.Name != wcg.LocalPlayer.Charakter && wcg.Players.Any(p => p.Alive && p.Charakter == c.Name))
                .ToList().OrderBy(npc => GetSquaredDistance(npc.Position, Game1.player.Position))
                .ToList() is List<NPC> npcs && npcs.Count > 0)
                    npc = npcs.FirstOrDefault(n => GetSquaredDistance(n.Position, Game1.player.Position) < 30000);
@@ -273,12 +273,12 @@ namespace Werewolf
             if (config.FillWithBots || WerwolfGame.GetAllPeers(helper,config).Count >= config.MinPlayers)
                 _ = new WerwolfGame(helper, monitor, Game1.player.UniqueMultiplayerID, config);
             else
-                Game1.addHUDMessage(new HUDMessage("Could not start Werewolf: Not enough players!", Color.DarkRed, 5000));
+                Game1.addHUDMessage(new HUDMessage("Could not start Werewolf: Not enough players!", 5000));
         }
 
         private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
         {
-            WerwolfGame.Fenris = new NPC(new AnimatedSprite("Characters\\Krobus", 0, 16, 24), new Vector2(31f, 17f) * 64f, "Sewer", 2, "Fenris", datable: false, null, Game1.content.Load<Texture2D>("Portraits\\Krobus"));
+            WerwolfGame.Fenris = new NPC(new AnimatedSprite("Characters\\Krobus", 0, 16, 24), new Vector2(31f, 17f) * 64f, "Sewer", 2, "Fenris", false, Helper.ModContent.Load<Texture2D>("assets/Fenris"));
         }
 
         private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)

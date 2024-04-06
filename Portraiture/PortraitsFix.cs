@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.Types;
+
 using StardewValley;
 using StardewValley.Menus;
 
@@ -31,55 +32,27 @@ namespace Portraiture
             return FixHelper.getTypeFullSDV("StardewValley.NPC").GetProperty("Portrait").GetMethod;
         }
 
-        internal static bool Prefix(NPC __instance, ref Texture2D __result)
+
+        internal static void Postfix(NPC __instance, ref Texture2D __result, ref bool __state)
         {
-            __result = TextureLoader.getPortrait(__instance.Name);
+            var load = TextureLoader.getPortrait(__instance, __result);
+            __result = load ?? __result;
 
-            return __result == null;
-        }
-
-
-    }
-
-    /*
-    [HarmonyPatch]
-    internal class DialogueBoxFix
-    {
-        internal static MethodInfo TargetMethod()
-        {
-            return AccessTools.Method(FixHelper.getTypeFullSDV("StardewValley.Menus.DialogueBox"), "drawPortrait");
-        }
-
-        internal static bool Prefix(DialogueBox __instance, SpriteBatch b)
-        {
-            Dialogue characterDialogue = PortraitureMod.helper.Reflection.GetField<Dialogue>(__instance, "characterDialogue").GetValue();
-            Texture2D texture = TextureLoader.getPortrait(characterDialogue.speaker.Name);
-            characterDialogue.speaker.Portrait = texture;
-            return true;
-        }
-
-       
-    }
-
-    [HarmonyPatch]
-    internal class ShopMenuFix
-    {
-        internal static MethodInfo TargetMethod()
-        {
-            return AccessTools.Method(FixHelper.getTypeFullSDV("StardewValley.Menus.ShopMenu"), "draw");
-        }
-
-        internal static void Postfix(ShopMenu __instance, SpriteBatch b)
-        {
-            if (__instance.portraitPerson == null || !(Game1.viewport.Width > 800 && Game1.options.showMerchantPortraits))
+            if (load == null)
+            {
+                if (PortraitureMod.config.ShowPortraitsAboveBox)
+                    __result = ScaledTexture2D.FromTexture(__result, __result, 1);
                 return;
+            }
 
-            Texture2D texture = TextureLoader.getPortrait(__instance.portraitPerson.Name);
-            __instance.portraitPerson.Portrait = texture;
-            return;
+            if (__state && __result.Width > 128)
+                __result = ScaledTexture2D.FromTexture(__result, __result, __result.Width == 256 && __result.Height == 256 ? __result.Width / 64f : (__result.Width / 2) / 64f);
+
+            if (!(__result is ScaledTexture2D) && __state && PortraitureMod.config.ShowPortraitsAboveBox)
+                    __result = ScaledTexture2D.FromTexture(__result, __result, 1);
         }
-        
+
+
     }
-    */
 
 }

@@ -219,14 +219,7 @@ namespace PyTK.Extensions
             return t.changeColor(manipulation);
         }
 
-        public static Color changeColor(this Color t, ColorManipulation manipulation)
-        {
-            t = t.setLight(manipulation.light);
-            t = t.setSaturation(manipulation.saturation);
-            if (manipulation.palette.Count > 0)
-                t = t.applyPalette(manipulation.palette);
-            return t;
-        }
+      
 
         public static Color multiplyWith(this Color color1, Color color2)
         {
@@ -237,7 +230,14 @@ namespace PyTK.Extensions
 
             return color1;
         }
-
+        public static Color changeColor(this Color t, ColorManipulation manipulation)
+        {
+            t = t.setLight(manipulation.light);
+            t = t.setSaturation(manipulation.saturation);
+            if (manipulation.palette.Count > 0)
+                t = t.applyPalette(manipulation.palette);
+            return t;
+        }
         public static Color setSaturation(this Color t, float saturation, Vector3? saturationMultiplier = null)
         {
             Vector3 m = saturationMultiplier.HasValue ? saturationMultiplier.Value : new Vector3(0.2125f, 0.7154f, 0.0721f);

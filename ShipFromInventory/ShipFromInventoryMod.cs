@@ -4,7 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Monsters;
 using System;
+using System.Threading;
 
 namespace ShipFromInventory
 {
@@ -13,7 +15,7 @@ namespace ShipFromInventory
         public bool LidAnimation { get; set; } = true;
         public bool LidSound { get; set; } = true;
 
-        public SButton ShortcutKey { get; set; } = SButton.OemPlus;
+        public SButton ShortcutKey { get; set; } = SButton.Add;
     }
 
     public class ShipFromInventoryMod : Mod
@@ -31,6 +33,10 @@ namespace ShipFromInventory
         public override void Entry(IModHelper helper)
         {
             config = helper.ReadConfig<Config>();
+
+            helper.Events.Input.ButtonPressed += Input_ButtonPressed;
+            helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
+
             shippingBinTexture = helper.GameContent.Load<Texture2D>("Buildings/Shipping Bin");
             shippingBinLidRectangle = new Rectangle(134, 226, 30, 25);
             var instance = new Harmony("Platonymous.ShipFromInventory");
@@ -48,13 +54,17 @@ namespace ShipFromInventory
             if (config.LidAnimation)
                 helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
 
-            helper.Events.Input.ButtonPressed += Input_ButtonPressed;
-            
+        }
+
+
+        private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
+        {
+            shippingBinTexture = Helper.GameContent.Load<Texture2D>("Buildings/Shipping Bin");
         }
 
         private void Input_ButtonPressed(object sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
         {
-            if (e.Button.Equals(config.ShortcutKey) && Game1.activeClickableMenu is GameMenu menu && Game1.player.CursorSlotItem is StardewValley.Object obj && obj.canBeShipped())
+            if ((e.Button == config.ShortcutKey || (config.ShortcutKey == SButton.Add && e.Button == SButton.OemPlus) || (config.ShortcutKey == SButton.OemPlus && e.Button == SButton.Add)) && Game1.activeClickableMenu is GameMenu && Game1.player.CursorSlotItem is StardewValley.Object obj && obj.canBeShipped())
                 ShipObject(obj);
         }
 
@@ -123,7 +133,10 @@ namespace ShipFromInventory
             farm.getShippingBin(Game1.player).Add(shipment);
             farm.lastItemShipped = shipment;
             Game1.playSound("Ship");
-            Game1.player.CursorSlotItem = null;
+            if (obj == Game1.player.CursorSlotItem)
+                Game1.player.CursorSlotItem = null;
+            else if (Game1.player.Items.Contains(obj))
+                Game1.player.Items.Remove(obj);
             return false;
         }
     }

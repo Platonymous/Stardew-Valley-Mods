@@ -1,5 +1,4 @@
-﻿using PyTK;
-using StardewValley;
+﻿using StardewValley;
 
 namespace HarpOfYobaRedux
 {
@@ -30,7 +29,7 @@ namespace HarpOfYobaRedux
 
         public void doMagic(bool playedToday)
         {
-            PyUtils.setDelayedAction(6000, petAnimals);
+            Game1.delayedActions.Add(new DelayedAction(6000, petAnimals));
         }       
     }
 }

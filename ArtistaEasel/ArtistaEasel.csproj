@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>ArtistaEasel</AssemblyName>
+    <RootNamespace>ArtistaEasel</RootNamespace>
+    <Version>1.0.0</Version>
+    <TargetFramework>net5.0</TargetFramework>
+    <ModFolderName>[JA] ArtistaEasel</ModFolderName>
+    <Configurations>Debug;Release;Android;Prealphadebug</Configurations>
+  </PropertyGroup>
+  
+  <Import Project="$(SolutionDir)\contentpacks.targets" />
+
+</Project>

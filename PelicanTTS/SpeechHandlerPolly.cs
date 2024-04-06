@@ -11,6 +11,8 @@ using System;
 using Microsoft.Xna.Framework.Audio;
 using System.Threading.Tasks;
 using NAudio.Wave;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PelicanTTS
 {
@@ -21,12 +23,12 @@ namespace PelicanTTS
         private static string lastDialog;
         private static string lastLetter;
         private static string lastHud;
-        private static string lastChat;
         public static Queue<string> chats = new Queue<string>();
         public static string currentText;
         private static Thread speechThread;
         private static bool runSpeech;
         private static IModHelper Helper;
+        private static Dictionary<string, string> MinionDictionary = null;
 
 
         internal static AmazonPollyClient pc;
@@ -70,6 +72,21 @@ namespace PelicanTTS
             return "en-US";
         }
 
+        internal static void LoadMinionDictionary()
+        {
+            if (MinionDictionary != null)
+                return;
+
+            MinionDictionary = new Dictionary<string, string>();
+            string[] raw = File.ReadAllText(Path.Combine(PelicanTTSMod._helper.DirectoryPath, "minion.txt")).Split(";",StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in raw)
+            {
+                var entry = line.Split(":", StringSplitOptions.TrimEntries);
+                if (!MinionDictionary.ContainsKey(entry[0].Trim()))
+                    MinionDictionary.Add(entry[0].Trim(), entry[1].Trim());
+            }
+        }
+
         internal static void configSay(string name, string voice, string text, int rate = -1, float pitch = -1, float volume = -1)
         {
             Task.Run(() =>
@@ -84,7 +101,6 @@ namespace PelicanTTS
                 string language2 = "</lang>";
 
                 text = text.Replace("0g", "0 gold").Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
-                text = language1 + text + language2;
 
                 bool neural = shouldUseNeuralEngine(voice, out string v);
 
@@ -97,9 +113,11 @@ namespace PelicanTTS
                 var amzeffectOut = mumbling ? "</amazon:effect></amazon:effect>" : "</amazon:effect></amazon:auto-breaths>";
 
                 if (mumbling)
-                    text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + Dialogue.convertToDwarvish(text) + (useNeuralEngine ? "" : amzeffectOut) + "<break time=\"1s\"/></speak>";
+                    text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + language1 + Dialogue.convertToDwarvish(text) + language2 + (useNeuralEngine ? "" : amzeffectOut) + "<break time=\"1s\"/></speak>";
                 else
-                    text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (rate == -1 ? PelicanTTSMod.config.Rate : rate) + "%'>" + text + @"</prosody>" + (useNeuralEngine ? "" : amzeffectOut) + "<break time=\"1s\"/></speak>";
+                    text = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (rate == -1 ? PelicanTTSMod.config.Rate : rate) + "%'>" + language1 + text + language2 + @"</prosody>" + (useNeuralEngine ? "" : amzeffectOut) + "<break time=\"1s\"/></speak>";
+
+                Monitor.Log(text, LogLevel.Info);
 
                 int hash = (text + (useNeuralEngine ? "-neural" : "")).GetHashCode();
                 if (!Directory.Exists(Path.Combine(tmppath, name)))
@@ -351,12 +369,11 @@ namespace PelicanTTS
 
                     if (currentText.StartsWith("+"))
                         continue;
+
                     currentText = currentText.Replace("0g", "0 gold").Replace("< ", " ").Replace("` ", "  ").Replace("> ", " ").Replace('^', ' ').Replace(Environment.NewLine, " ").Replace("$s", "").Replace("$h", "").Replace("$g", "").Replace("$e", "").Replace("$u", "").Replace("$b", "").Replace("$8", "").Replace("$l", "").Replace("$q", "").Replace("$9", "").Replace("$a", "").Replace("$7", "").Replace("<", "").Replace("$r", "").Replace("[", "<").Replace("]", ">");
 
                     string language1 = "<lang xml:lang=\"" + getLanguageCode() + "\">";
                     string language2 = "</lang>";
-
-                    currentText = language1 + currentText + language2;
 
                     bool neural = shouldUseNeuralEngine(currentVoiceString, out string v);
 
@@ -370,14 +387,16 @@ namespace PelicanTTS
                     var style = news ? "<amazon:domain name=\"news\">" : "";
                     var style2 = news ? "</amazon:domain>" : "";
 
-
                     var amzeffectIn = mumbling ? "<amazon:effect phonation='soft'><amazon:effect vocal-tract-length='-20%'>" : "<amazon:auto-breaths><amazon:effect phonation='soft'>";
                     var amzeffectOut = mumbling ? "</amazon:effect></amazon:effect>" : "</amazon:effect></amazon:auto-breaths>";
 
                     if (mumbling)
-                        currentText = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + Dialogue.convertToDwarvish(currentText) + (useNeuralEngine ? "" : amzeffectOut) + "<break time=\"1s\"/></speak>";
+                        currentText = @"<speak>" + (useNeuralEngine ? "" : amzeffectIn) + language1 + Dialogue.convertToDwarvish(currentText) + language2 + (useNeuralEngine ? "" : amzeffectOut) + "<break time=\"1s\"/></speak>";
                     else
-                        currentText = @"<speak>" + style + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (PelicanTTSMod.config.Rate) + "%'>" + currentText + @"</prosody>" + (useNeuralEngine ? "" : amzeffectOut) + style2 + "<break time=\"1s\"/></speak>";
+                        currentText = @"<speak>" + style + (useNeuralEngine ? "" : amzeffectIn) + "<prosody rate='" + (PelicanTTSMod.config.Rate) + "%'>" + language1 + currentText + language2 + @"</prosody>" + (useNeuralEngine ? "" : amzeffectOut) + style2 + "<break time=\"1s\"/></speak>";
+
+
+                    Monitor.Log(currentText, LogLevel.Info);
 
                     int hash = (currentText + (useNeuralEngine ? "-neural" : "")).GetHashCode();
                     if (!Directory.Exists(Path.Combine(tmppath, speakerName)))

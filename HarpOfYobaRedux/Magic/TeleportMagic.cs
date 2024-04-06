@@ -1,8 +1,6 @@
-﻿using System;
-using StardewValley;
+﻿using StardewValley;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using PyTK;
 
 namespace HarpOfYobaRedux
 {
@@ -43,10 +41,10 @@ namespace HarpOfYobaRedux
 
             int num1 = 0;
 
-            for (int index = Game1.player.getTileX() + 8; index >= Game1.player.getTileX() - 8; --index)
+            for (int index = (int)Game1.player.getStandingPosition().X + 8; index >= (int)Game1.player.getStandingPosition().X - 8; --index)
             {
-                List<TemporaryAnimatedSprite> temporarySprites = Game1.player.currentLocation.temporarySprites;
-                TemporaryAnimatedSprite temporaryAnimatedSprite = new TemporaryAnimatedSprite(6, new Vector2((float)index, (float)Game1.player.getTileY()) * (float)Game1.tileSize, Microsoft.Xna.Framework.Color.White, 8, false, 50f, 0, -1, -1f, -1, 0);
+                var temporarySprites = Game1.player.currentLocation.temporarySprites;
+                TemporaryAnimatedSprite temporaryAnimatedSprite = new TemporaryAnimatedSprite(6, new Vector2((float)index, (float)Game1.player.getStandingPosition().Y) * (float)Game1.tileSize, Microsoft.Xna.Framework.Color.White, 8, false, 50f, 0, -1, -1f, -1, 0);
                 temporaryAnimatedSprite.layerDepth = 1f;
                 int num2 = num1 * 25;
                 temporaryAnimatedSprite.delayBeforeAnimationStart = num2;
@@ -68,10 +66,10 @@ namespace HarpOfYobaRedux
             targetLocation = Game1.getLocationFromName(lastLocation.Name);
             targetPosition = new Vector2(lastPosition.X, lastPosition.Y);
             lastLocation = Game1.currentLocation;
-            lastPosition = new Vector2(Game1.player.getTileX(), Game1.player.getTileY());
+            lastPosition = new Vector2(Game1.player.getStandingPosition().X, Game1.player.getStandingPosition().Y);
 
-            PyUtils.setDelayedAction(6000, start);
-            PyUtils.setDelayedAction(7000, teleport);
+            Game1.delayedActions.Add(new DelayedAction(6000, start));
+            Game1.delayedActions.Add(new DelayedAction(7000, teleport));
         }
     }
 }

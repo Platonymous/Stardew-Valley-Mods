@@ -1,0 +1,50 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "ink_compiler/1.0.0": {
+        "dependencies": {
+          "Inkle.Ink.Engine": "1.1.1",
+          "ink-engine-runtime": "1.1.1.0"
+        },
+        "runtime": {
+          "ink_compiler.dll": {}
+        }
+      },
+      "Inkle.Ink.Engine/1.1.1": {
+        "runtime": {
+          "ink-engine-runtime.dll": {}
+        }
+      },
+      "ink-engine-runtime/1.1.1.0": {
+        "runtime": {
+          "ink-engine-runtime.dll": {
+            "assemblyVersion": "1.1.1.0",
+            "fileVersion": "1.1.1.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ink_compiler/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Inkle.Ink.Engine/1.1.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ink-engine-runtime/1.1.1.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

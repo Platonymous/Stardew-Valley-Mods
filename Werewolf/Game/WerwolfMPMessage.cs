@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Werewolf.Game
+namespace LandGrants.Game
 {
     public abstract class WerwolfMPMessage
     {

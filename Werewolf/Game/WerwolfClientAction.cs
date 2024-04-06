@@ -1,4 +1,4 @@
-﻿namespace Werewolf.Game
+﻿namespace LandGrants.Game
 {
     public class WerwolfClientAction
     {

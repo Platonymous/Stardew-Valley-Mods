@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Werewolf.Game;
-using Werewolf.Roles.Actions;
+using LandGrants.Game;
+using LandGrants.Roles.Actions;
 
-namespace Werewolf.Roles
+namespace LandGrants.Roles
 {
     public abstract class WerwolfRoleDescriptionBase : IWerwolfRoleDescription
     {

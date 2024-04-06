@@ -1,0 +1,17 @@
+{
+  "Name": "InkStories Example CP",
+  "Author": "Platonymous",
+  "Version": "1.4.1-alpha.20231122",
+  "Description": "InkStories Example",
+  "UniqueID": "Platonymous.InkStoriesExample.ContentPatcher",
+  "MinimumApiVersion": "3.18.0",
+  "UpdateKeys": [ "Nexus:15987" ],
+  "ContentPackFor": {
+    "UniqueID": "Pathoschild.ContentPatcher"
+  },
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.InkStories"
+    }
+  ]
+}

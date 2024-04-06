@@ -13,7 +13,7 @@ using PlatoUI.Reflection;
 using System.Reflection;
 
 namespace PlatoWarpMenu
-{
+{/*
     public class ScreenshotAndroidFix
     {
 
@@ -280,11 +280,11 @@ namespace PlatoWarpMenu
                                         if (currentLightSource.PlayerID != 0L && currentLightSource.PlayerID != Game1.player.UniqueMultiplayerID)
                                         {
                                             Farmer farmerMaybeOffline = Game1.getFarmerMaybeOffline(currentLightSource.PlayerID);
-                                            if (farmerMaybeOffline == null || farmerMaybeOffline.currentLocation != null && farmerMaybeOffline.currentLocation.Name != Game1.currentLocation.Name || (bool)(NetFieldBase<bool, NetBool>)farmerMaybeOffline.hidden)
+                                            if (farmerMaybeOffline == null || farmerMaybeOffline.currentLocation != null && farmerMaybeOffline.currentLocation.Name != Game1.currentLocation.Name || farmerMaybeOffline.hidden.Value)
                                                 continue;
                                         }
-                                        if (Utility.isOnScreen((Vector2)(NetFieldBase<Vector2, NetVector2>)currentLightSource.position, (int)((double)(float)(NetFieldBase<float, NetFloat>)currentLightSource.radius * 64.0 * 4.0)))
-                                            Game1.spriteBatch.Draw(currentLightSource.lightTexture, Game1.GlobalToLocal(Game1.viewport, (Vector2)(NetFieldBase<Vector2, NetVector2>)currentLightSource.position) / (float)(Game1.options.lightingQuality / 2), new Microsoft.Xna.Framework.Rectangle?(currentLightSource.lightTexture.Bounds), (Microsoft.Xna.Framework.Color)(NetFieldBase<Microsoft.Xna.Framework.Color, NetColor>)currentLightSource.color, 0.0f, new Vector2((float)currentLightSource.lightTexture.Bounds.Center.X, (float)currentLightSource.lightTexture.Bounds.Center.Y), (float)(NetFieldBase<float, NetFloat>)currentLightSource.radius / (float)(Game1.options.lightingQuality / 2), SpriteEffects.None, 0.9f);
+                                        if (Utility.isOnScreen(currentLightSource.position.Value, (int)(currentLightSource.radius.Value * 64.0 * 4.0)))
+                                            Game1.spriteBatch.Draw(currentLightSource.lightTexture, Game1.GlobalToLocal(Game1.viewport, currentLightSource.position.Value) / (float)(Game1.options.lightingQuality / 2), new Microsoft.Xna.Framework.Rectangle?(currentLightSource.lightTexture.Bounds),currentLightSource.color.Value, 0.0f, new Vector2((float)currentLightSource.lightTexture.Bounds.Center.X, (float)currentLightSource.lightTexture.Bounds.Center.Y), currentLightSource.radius.Value / (float)(Game1.options.lightingQuality / 2), SpriteEffects.None, 0.9f);
                                     }
                                 }
                                 Game1.spriteBatch.End();
@@ -306,16 +306,16 @@ namespace PlatoWarpMenu
                                 {
                                     foreach (NPC character in Game1.currentLocation.characters)
                                     {
-                                        if (!(bool)(NetFieldBase<bool, NetBool>)character.swimming && !character.HideShadow && (!character.IsInvisible && !Game1.currentLocation.shouldShadowBeDrawnAboveBuildingsLayer(character.getTileLocation())))
-                                            Game1.spriteBatch.Draw(Game1.shadowTexture, Game1.GlobalToLocal(Game1.viewport, character.Position + new Vector2((float)(character.Sprite.SpriteWidth * 4) / 2f, (float)(character.GetBoundingBox().Height + (character.IsMonster ? 0 : 12)))), new Microsoft.Xna.Framework.Rectangle?(Game1.shadowTexture.Bounds), Microsoft.Xna.Framework.Color.White, 0.0f, new Vector2((float)Game1.shadowTexture.Bounds.Center.X, (float)Game1.shadowTexture.Bounds.Center.Y), (float)(4.0 + (double)character.yJumpOffset / 40.0) * (float)(NetFieldBase<float, NetFloat>)character.scale, SpriteEffects.None, Math.Max(0.0f, (float)character.getStandingY() / 10000f) - 1E-06f);
+                                        if (!character.swimming.Value && !character.HideShadow && (!character.IsInvisible && !Game1.currentLocation.shouldShadowBeDrawnAboveBuildingsLayer(character.getTileLocation())))
+                                            Game1.spriteBatch.Draw(Game1.shadowTexture, Game1.GlobalToLocal(Game1.viewport, character.Position + new Vector2((float)(character.Sprite.SpriteWidth * 4) / 2f, (float)(character.GetBoundingBox().Height + (character.IsMonster ? 0 : 12)))), new Microsoft.Xna.Framework.Rectangle?(Game1.shadowTexture.Bounds), Microsoft.Xna.Framework.Color.White, 0.0f, new Vector2((float)Game1.shadowTexture.Bounds.Center.X, (float)Game1.shadowTexture.Bounds.Center.Y), (float)(4.0 + (double)character.yJumpOffset / 40.0) * character.scale.Value, SpriteEffects.None, Math.Max(0.0f, character.getStandingPosition().Y / 10000f) - 1E-06f);
                                     }
                                 }
                                 else
                                 {
                                     foreach (NPC actor in Game1.CurrentEvent.actors)
                                     {
-                                        if (!(bool)(NetFieldBase<bool, NetBool>)actor.swimming && !actor.HideShadow && !Game1.currentLocation.shouldShadowBeDrawnAboveBuildingsLayer(actor.getTileLocation()))
-                                            Game1.spriteBatch.Draw(Game1.shadowTexture, Game1.GlobalToLocal(Game1.viewport, actor.Position + new Vector2((float)(actor.Sprite.SpriteWidth * 4) / 2f, (float)(actor.GetBoundingBox().Height + (actor.IsMonster ? 0 : (actor.Sprite.SpriteHeight <= 16 ? -4 : 12))))), new Microsoft.Xna.Framework.Rectangle?(Game1.shadowTexture.Bounds), Microsoft.Xna.Framework.Color.White, 0.0f, new Vector2((float)Game1.shadowTexture.Bounds.Center.X, (float)Game1.shadowTexture.Bounds.Center.Y), (float)(4.0 + (double)actor.yJumpOffset / 40.0) * (float)(NetFieldBase<float, NetFloat>)actor.scale, SpriteEffects.None, Math.Max(0.0f, (float)actor.getStandingY() / 10000f) - 1E-06f);
+                                        if (!actor.swimming.Value && !actor.HideShadow && !Game1.currentLocation.shouldShadowBeDrawnAboveBuildingsLayer(actor.getTileLocation()))
+                                            Game1.spriteBatch.Draw(Game1.shadowTexture, Game1.GlobalToLocal(Game1.viewport, actor.Position + new Vector2((float)(actor.Sprite.SpriteWidth * 4) / 2f, (float)(actor.GetBoundingBox().Height + (actor.IsMonster ? 0 : (actor.Sprite.SpriteHeight <= 16 ? -4 : 12))))), new Microsoft.Xna.Framework.Rectangle?(Game1.shadowTexture.Bounds), Microsoft.Xna.Framework.Color.White, 0.0f, new Vector2((float)Game1.shadowTexture.Bounds.Center.X, (float)Game1.shadowTexture.Bounds.Center.Y), (float)(4.0 + (double)actor.yJumpOffset / 40.0) * actor.scale.Value, SpriteEffects.None, Math.Max(0.0f, (float)actor.getStandingY() / 10000f) - 1E-06f);
                                     }
                                 }
                             }
@@ -525,5 +525,5 @@ namespace PlatoWarpMenu
                 }
             }
         }
-    }
+    }*/
 }

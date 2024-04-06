@@ -1,5 +1,4 @@
-﻿using PyTK.Lua;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using System.IO;
 
 namespace HarpOfYobaRedux
@@ -16,8 +15,8 @@ namespace HarpOfYobaRedux
 
         public void doMagic(bool playedToday)
         {
-            PyLua.loadScriptFromFile(Path.Combine(helper.DirectoryPath, "Assets", "luamagic.lua"), "luaMagic");
-            PyLua.callFunction("luaMagic", "doMagic", playedToday);
+            //PyLua.loadScriptFromFile(Path.Combine(helper.DirectoryPath, "Assets", "luamagic.lua"), "luaMagic");
+            //PyLua.callFunction("luaMagic", "doMagic", playedToday);
         }
 
        

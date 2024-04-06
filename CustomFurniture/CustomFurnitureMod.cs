@@ -11,8 +11,8 @@ using System;
 using HarmonyLib;
 using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.Extensions;
-using PyTK.Types;
+using SpaceShared.APIs;
+using System.Threading.Tasks;
 
 namespace CustomFurniture
 {
@@ -38,11 +38,59 @@ namespace CustomFurniture
             helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
-            helper.ConsoleCommands.Add("replace_custom_furniture", "Triggers Custom Furniture Replacement", replaceCustomFurniture);
+            helper.ConsoleCommands.Add("cfreplace", "Triggers Custom Furniture Replacement", (s,p) => MigrateFurniture());
+            helper.Events.GameLoop.DayStarted += (s, p) => MigrateFurniture();
+            helper.Events.GameLoop.Saving += (s, p) =>
+            {
+                if(Context.IsMainPlayer)
+                    Helper.Data.WriteSaveData<string>("cfreplace", "true");
+            };
+        }
+
+        private void MigrateFurniture()
+        {
+            if (!Context.IsMainPlayer || Helper.Data.ReadSaveData<string>("cfreplace") == "true")
+                return;
+
+            Monitor.Log("Replacing Custom Furniture", LogLevel.Info);
+
+            PyTkMigrator.MigrateItems("CustomFurniture.CustomFurniture,  CustomFurniture", (i, obj) =>
+            {
+                if (furniturePile.ContainsKey(i["id"]))
+                {
+                    var replacement = furniture[i["id"]].getOne();
+                    if (replacement is CustomFurniture cf)
+                    {
+                        var data = new Dictionary<string, string>(i);
+                        cf.rebuild(data, obj);
+                        return cf;
+                    }
+                }
+
+                return null;
+            });
+           
+            PyTkMigrator.MigrateFurniture("CustomFurniture.CustomFurniture,  CustomFurniture", (i,obj) => { 
+                if (furniturePile.ContainsKey(i["id"]))
+                {
+                    var replacement = furniture[i["id"]].getOne();
+                    if(replacement is CustomFurniture cf)
+                    {
+                        var data = new Dictionary<string, string>(i);
+                        cf.rebuild(data, obj);
+                        return cf;
+                    }
+                }
+
+                return null;
+            });
+
         }
 
         private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
         {
+            var spaceCore = this.Helper.ModRegistry.GetApi<ISpaceCoreApi>("spacechase0.SpaceCore");
+            spaceCore.RegisterSerializerType(typeof(CustomFurniture));
             helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
         }
 
@@ -189,8 +237,10 @@ namespace CustomFurniture
                         if (!CustomFurniture.Textures.ContainsKey(tkey))
                             CustomFurniture.Textures.Add(tkey, data.fromContent ? data.texture : cpack.ModContent.GetInternalAssetName(data.texture).Name);
                         CustomFurniture f = new CustomFurniture(data, objectID, Vector2.Zero);
-                        furniturePile.AddOrReplace(pileID, f);
-                        furniture.AddOrReplace(objectID, f);
+                        furniturePile.Remove(pileID);
+                        furniture.Remove(objectID);
+                        furniturePile.Add(pileID, f);
+                        furniture.Add(objectID, f);
                         furnitureByContentPack[cpack.Manifest].Add(f.name);
                     }
                 }

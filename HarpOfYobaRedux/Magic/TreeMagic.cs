@@ -2,10 +2,6 @@
 using StardewValley;
 using StardewValley.TerrainFeatures;
 using System;
-using System.Collections.Generic;
-using PyTK.Types;
-using PyTK;
-using PyTK.Extensions;
 
 namespace HarpOfYobaRedux
 {
@@ -31,7 +27,7 @@ namespace HarpOfYobaRedux
                         if (!playedToday)
                             tree.growthStage.Value = (tree.growthStage.Value < 5) ? tree.growthStage.Value + 1 : tree.growthStage.Value;
 
-                        tree.performUseAction(entry.Key, Game1.currentLocation);
+                        tree.performUseAction(entry.Key);
                         continue;
                     }
 
@@ -42,7 +38,7 @@ namespace HarpOfYobaRedux
                             ftree.growthStage.Value = (ftree.growthStage.Value <= 5) ? ftree.growthStage.Value + 1 : ftree.growthStage.Value;
                             ftree.daysUntilMature.Value = ftree.daysUntilMature.Value - 7;
                         }
-                        ftree.performUseAction(entry.Key, Game1.currentLocation);
+                        ftree.performUseAction(entry.Key);
                         continue;
                     }
 
@@ -50,20 +46,31 @@ namespace HarpOfYobaRedux
                     {
                         if (!playedToday)
                             grass.numberOfWeeds.Value = Math.Min(grass.numberOfWeeds.Value + Game1.random.Next(1, 4), 4);
-                        grass.doCollisionAction(gls.terrainFeatures[entry.Key].getBoundingBox(entry.Key), 3, entry.Key, Game1.player, Game1.currentLocation);
+                        grass.doCollisionAction(gls.terrainFeatures[entry.Key].getBoundingBox(), 3, entry.Key, Game1.player);
                         continue;
                     }
 
                     if (entry.Value.Value is Bush bush)
                     {
-                        bush.performUseAction(entry.Key, Game1.currentLocation);
+                        bush.performUseAction(entry.Key);
                         continue;
                     }
                 }
-                priorRadius = Game1.player.MagneticRadius;
-                Game1.player.MagneticRadius += 2000;
+                Buff magneticBuff = new Buff("hoy.magnetic", displayName: "Magnetism", duration: 8000 + Game1.random.Next(2000), description: "");
 
-                PyUtils.setDelayedAction(8000, () => Game1.player.MagneticRadius = priorRadius);
+                magneticBuff.millisecondsDuration = 35000 + Game1.random.Next(30000);
+                magneticBuff.iconSheetIndex = 1;
+                magneticBuff.iconTexture = Game1.buffsIcons;
+
+                magneticBuff.effects.FarmingLevel.Value = 1;
+                    magneticBuff.description = "";
+                    magneticBuff.displayName = "Magnetism";
+                    magneticBuff.millisecondsDuration = 8000 + Game1.random.Next(2000);
+                    magneticBuff.effects.MagneticRadius.Value = 2000;
+
+                magneticBuff.glow = Color.YellowGreen;
+                if (!Game1.player.hasBuff("hoy.magnetic"))
+                    Game1.player.applyBuff(magneticBuff);
             }
         }
     }

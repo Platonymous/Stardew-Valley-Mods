@@ -5,6 +5,7 @@
     <RootNamespace>Notes</RootNamespace>
     <Version>1.1.0</Version>
     <TargetFramework>net5.0</TargetFramework>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

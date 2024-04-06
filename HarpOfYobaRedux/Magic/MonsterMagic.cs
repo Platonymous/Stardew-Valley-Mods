@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using PyTK;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Monsters;
@@ -41,17 +40,24 @@ namespace HarpOfYobaRedux
                 if (monster == pickMonster)
                     continue;
 
-                if (Game1.currentLocation is MineShaft)
+                try
                 {
-                    MineShaft gl = (MineShaft)Game1.currentLocation;
+                    if (Game1.currentLocation is MineShaft)
+                    {
+                        MineShaft gl = (MineShaft)Game1.currentLocation;
 
-                    if (pickMonster is GreenSlime || pickMonster is Bat)
-                        monster = (Monster)Activator.CreateInstance(t, new object[] { monster.position, gl.mineLevel });
-                    else
-                        monster = (Monster)Activator.CreateInstance(t, new object[] { monster.position });
+                        if (pickMonster is GreenSlime || pickMonster is Bat)
+                            monster = (Monster)Activator.CreateInstance(t, new object[] { new Vector2(monster.position.X, monster.position.Y), gl.mineLevel });
+                        else
+                            monster = (Monster)Activator.CreateInstance(t, new object[] { new Vector2(monster.position.X, monster.position.Y) });
+                    }
+                    else if (Game1.currentLocation is SlimeHutch && pickMonster is GreenSlime)
+                        monster = (Monster)Activator.CreateInstance(t, new object[] { new Vector2(monster.position.X, monster.position.Y), (pickMonster as GreenSlime).color.Value });
                 }
-                else if (Game1.currentLocation is SlimeHutch && pickMonster is GreenSlime)
-                    monster = (Monster)Activator.CreateInstance(t, new object[] { monster.position, (pickMonster as GreenSlime).color.Value });
+                catch
+                {
+
+                }
 
                 Game1.currentLocation.characters[glMonster[j]] = monster;
             }
@@ -60,7 +66,7 @@ namespace HarpOfYobaRedux
             Game1.currentLocation.damageMonster(new Rectangle(0, 0, Game1.currentLocation.map.DisplayWidth, Game1.currentLocation.map.DisplayHeight), 0, 0, false, 1.5f, 100, 0f, 1f, false, Game1.player);
             pickMonster.doEmote(20);
 
-            PyUtils.setDelayedAction(500, secondHit);
+            Game1.delayedActions.Add(new DelayedAction(500, secondHit));
         }
 
         public void secondHit()
@@ -71,7 +77,7 @@ namespace HarpOfYobaRedux
 
         public void doMagic(bool playedToday)
         {
-            PyUtils.setDelayedAction(5000, switchMonsters);
+            Game1.delayedActions.Add(new DelayedAction(5000, switchMonsters));
         }
     }
 }

@@ -3,10 +3,12 @@
   <PropertyGroup>
     <AssemblyName>PelicanTTS</AssemblyName>
     <RootNamespace>PelicanTTS</RootNamespace>
-    <Version>1.13.1</Version>
+    <Version>1.14.0</Version>
     <TargetFramework>net5.0</TargetFramework>
 
     <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
+
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
@@ -16,6 +18,12 @@
     <PackageReference Include="AWSSDK.Polly" Version="3.7.0.9" />
     <PackageReference Include="NAudio.Core" Version="2.0.0" />
     <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="minion.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

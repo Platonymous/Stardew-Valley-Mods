@@ -326,7 +326,7 @@ namespace PyTK
 
             if (e.NewLocation is GameLocation loc && loc.waterTiles == null && loc.Map.Properties.TryGetValue("@LoadWater", out xTile.ObjectModel.PropertyValue value) && (value == true || value.ToString() == "T"))
             {
-                loc.waterTiles = new bool[loc.map.Layers[0].LayerWidth, loc.map.Layers[0].LayerHeight];
+                loc.waterTiles = new WaterTiles(new bool[loc.map.Layers[0].LayerWidth, loc.map.Layers[0].LayerHeight]);
                 bool flag = false;
                 for (int xTile = 0; xTile < loc.map.Layers[0].LayerWidth; ++xTile)
                 {
@@ -340,13 +340,13 @@ namespace PyTK
                     }
                 }
                 if (!flag)
-                    loc.waterTiles = (bool[,])null;
+                    loc.waterTiles = new WaterTiles((bool[,])null);
             }
 
             if (e.NewLocation is GameLocation g && g.map is Map m)
             {
-                int forceX = Game1.player.getTileX();
-                int forceY = Game1.player.getTileY();
+                int forceX = Game1.player.TilePoint.X;
+                int forceY = Game1.player.TilePoint.Y;
                 int forceF = Game1.player.FacingDirection;
                 if (e.OldLocation is GameLocation og && m.Properties.ContainsKey("ForceEntry_" + og.Name)){
                     string[] pos = m.Properties["ForceEntry_" + og.Name].ToString().Split(' ');
@@ -388,7 +388,7 @@ namespace PyTK
 
             try
             {
-                instance.Patch(AccessTools.Method(PyUtils.getTypeSDV("GameLocation"), "answerDialogue"), new HarmonyMethod(this.GetType(), nameof(AnswerDialoguePrefix)));
+                instance.Patch(AccessTools.Method(typeof(GameLocation), nameof(GameLocation.answerDialogue)), new HarmonyMethod(this.GetType(), nameof(AnswerDialoguePrefix)));
             }
             catch
             {
@@ -947,10 +947,10 @@ namespace PyTK
                 var x = int.Parse(v[1]);
 
                 if (v.Length == 2)
-                    return Game1.getCharacterFromName(name) is NPC npcx && npcx.currentLocation == location && npcx.getTileX() == x;
+                    return Game1.getCharacterFromName(name) is NPC npcx && npcx.currentLocation == location && npcx.TilePoint.X == x;
 
                 var y = int.Parse(v[2]);
-                return Game1.getCharacterFromName(name) is NPC npc && npc.currentLocation == location && (x == -1 || npc.getTileX() == x) && (y == -1 || npc.getTileY() == y);
+                return Game1.getCharacterFromName(name) is NPC npc && npc.currentLocation == location && (x == -1 || npc.TilePoint.X == x) && (y == -1 || npc.TilePoint.Y == y);
             });
 
             PyUtils.addEventPrecondition("items", (key, values, location) =>

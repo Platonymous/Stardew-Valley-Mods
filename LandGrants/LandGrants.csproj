@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>LandGrants</AssemblyName>
+    <RootNamespace>LandGrants</RootNamespace>
+    <Version>0.5.2-beta</Version>
+    <TargetFramework>net5.0</TargetFramework>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
+  </PropertyGroup>
+
+  <Import Project="$(SolutionDir)\common.targets" />
+
+  <ItemGroup>
+    <PackageReference Update="Pathoschild.Stardew.ModBuildConfig" Version="4.1.0" />
+  </ItemGroup>
+
+</Project>

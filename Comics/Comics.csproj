@@ -5,6 +5,7 @@
     <RootNamespace>Comics</RootNamespace>
     <TargetFramework>net5.0</TargetFramework>
     <Version>2.3.0</Version>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

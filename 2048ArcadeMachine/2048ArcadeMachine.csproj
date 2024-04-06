@@ -6,6 +6,7 @@
     <Version>1.0.0</Version>
     <TargetFramework>net5.0</TargetFramework>
     <ModFolderName>[JA] Arcade2048</ModFolderName>
+    <Configurations>Debug;Release;Android;Prealphadebug</Configurations>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\contentpacks.targets" />

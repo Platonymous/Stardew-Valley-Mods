@@ -1,115 +1,114 @@
 ﻿using StardewValley;
 using StardewValley.TerrainFeatures;
-using SObject = StardewValley.Object;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
-using Microsoft.Xna.Framework;
+using HarmonyLib;
 using System.Collections.Generic;
-using System.Linq;
-using StardewValley.Locations;
-using StardewValley.Buildings;
+using Microsoft.Xna.Framework;
 
 namespace NoSoilDecayRedux
 {
     public class NoSoilDecayReduxMod : Mod
     {
-        private static SaveData savedata;
-        private static Config config;
+        private static CodeInstruction replacement = null;
+        private static bool IsDayUpdate = false;
 
         public override void Entry(IModHelper helper)
         {
-            config = Helper.ReadConfig<Config>();
-            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-            helper.Events.GameLoop.DayStarted += (s,e) => restoreHoeDirt();
-            helper.Events.GameLoop.DayEnding += (s, e) => saveHoeDirt();
-            helper.Events.GameLoop.GameLaunched += (s, e) => addConfig();
+            var harmony = new Harmony("Platonymous.NoSoilDecay");
+
+            harmony.Patch(AccessTools.Method(typeof(NoSoilDecayReduxMod), nameof(NoSoilDecayReduxMod.SpawnWeedsAndStonesReplacer)),
+                transpiler: new HarmonyMethod(typeof(NoSoilDecayReduxMod), nameof(SpawnWeedsAndStonesReplacerTranspiler)));
+
+            harmony.Patch(AccessTools.Method(typeof(GameLocation), nameof(GameLocation.spawnWeedsAndStones)),
+                transpiler: new HarmonyMethod(typeof(NoSoilDecayReduxMod), nameof(SpawnWeedsAndStones)));
+
+            harmony.Patch(AccessTools.Method(typeof(Farm), nameof(Farm.DayUpdate)),
+                prefix: new HarmonyMethod(typeof(NoSoilDecayReduxMod), nameof(DayUpdateFarm1)),
+                postfix: new HarmonyMethod(typeof(NoSoilDecayReduxMod), nameof(DayUpdateFarm2)));
+
+            harmony.Patch(AccessTools.PropertyGetter(typeof(HoeDirt), nameof(HoeDirt.crop)),
+                postfix: new HarmonyMethod(typeof(NoSoilDecayReduxMod), nameof(GetCrop)));
+
         }
 
-        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        public static void GetCrop(HoeDirt __instance, ref Crop __result)
         {
-            if (Game1.IsMasterGame)
-            {
-                savedata = Helper.Data.ReadSaveData<SaveData>("nsd.save");
-                if (savedata == null)
-                    savedata = new SaveData();
-                restoreHoeDirt();
-            }
-        }
-
-        private void restoreHoeDirt()
-        {
-            if (Game1.IsMasterGame)
-            {
-                foreach (SaveTiles st in savedata.data)
-                    foreach (GameLocation l in getAllLocationsAndBuidlings().Where(lb => lb.Name == st.location))
-                    {
-                        if (config.farmonly && !(l is Farm || l.IsGreenhouse || l is BuildableGameLocation))
-                            continue;
-
-                        foreach (Vector2 v in st.tiles)
-                            if (!l.terrainFeatures.ContainsKey(v) || !(l.terrainFeatures[v] is HoeDirt))
-                            {
-                                l.terrainFeatures.Remove(v);
-                                l.terrainFeatures.Add(v, Game1.isRaining ? new HoeDirt(1) : new HoeDirt(0));
-
-                                if (l.objects.Keys.Contains(v) && l.objects[v] is SObject o && (o.Name.Equals("Weeds") || o.Name.Equals("Stone") || o.Name.Equals("Twig")))
-                                    l.objects.Remove(v);
-                            }
-
-                        foreach (SObject o in l.objects.Values.Where(obj => obj.name.Contains("Sprinkler")))
-                            o.DayUpdate(l);
-                    }
-            }
-        }
-
-        private IEnumerable<GameLocation> getAllLocationsAndBuidlings()
-        {
-            foreach (GameLocation location in Game1.locations)
-            {
-                yield return location;
-                if (location is BuildableGameLocation bgl)
-                    foreach (Building building in bgl.buildings)
-                        if (building.indoors.Value != null)
-                            yield return building.indoors.Value;
-            }
-        }
-
-        private void saveHoeDirt()
-        {
-            if (Game1.IsMasterGame)
-            {
-                var hoeDirtChache = new Dictionary<GameLocation, List<Vector2>>();
-                foreach (GameLocation location in getAllLocationsAndBuidlings())
-                {
-                    if (location is GameLocation l)
-                    {
-                        if (config.farmonly && !(l is Farm || l.IsGreenhouse || l is BuildableGameLocation))
-                            continue;
-
-                        if (!hoeDirtChache.ContainsKey(location))
-                            hoeDirtChache.Add(location, new List<Vector2>());
-
-                        hoeDirtChache[location] = location.terrainFeatures.Keys
-                            .Where(t => location.terrainFeatures[t] is HoeDirt)
-                            .ToList();
-                    }
-                }
-
-                savedata = new SaveData(hoeDirtChache);
-                Helper.Data.WriteSaveData("nsd.save", savedata);
-            }
-        }
-
-        private void addConfig()
-        {
-            if (!Helper.ModRegistry.IsLoaded("spacechase0.GenericModConfigMenu"))
+            if (!IsDayUpdate || __result != null)
                 return;
 
-            var api = Helper.ModRegistry.GetApi<IGMCMAPI>("spacechase0.GenericModConfigMenu");
+                __result = new FakeCrop();
+        }
 
-            api.RegisterModConfig(ModManifest, () => config = new Config(), () => Helper.WriteConfig<Config>(config));
-            api.RegisterSimpleOption(ModManifest, "Only on Farm-Locations", "", () => config.farmonly, (value) => config.farmonly = value);
+        public static void DayUpdateFarm1()
+        {
+            IsDayUpdate = true;
+        }
+
+        public static void DayUpdateFarm2()
+        {
+            IsDayUpdate = false;
+        }
+        public static IEnumerable<CodeInstruction> SpawnWeedsAndStonesReplacerTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            string search = "callvirt:111:Boolean ContainsKey(Microsoft.Xna.Framework.Vector2)";
+            foreach (var instruction in instructions)
+            {
+                var line = instruction.opcode.Name + ":" + instruction.opcode.Value + ":" + instruction.operand?.ToString();
+
+                if (line == search)
+                    replacement = instruction;
+
+                yield return instruction;
+            }
+        }
+
+        public static void SpawnWeedsAndStonesReplacer()
+        {
+            var terrainFeatures = Game1.currentLocation.terrainFeatures;
+            var vector = Vector2.One;
+            var vector2 = Vector2.One;
+
+            terrainFeatures.ContainsKey(vector + vector2);
+        }
+
+        public static IEnumerable<CodeInstruction> SpawnWeedsAndStones(IEnumerable<CodeInstruction> instructions)
+        {
+            string initLine = "ldloca.s:18:StardewValley.TerrainFeatures.TerrainFeature (19)";
+            string foundLine = "callvirt:111:Boolean Remove(Microsoft.Xna.Framework.Vector2)";
+            bool init = false;
+                foreach (var instruction in instructions)
+                {
+                    bool skip = false;
+
+                        var line = instruction.opcode.Name + ":" + instruction.opcode.Value + ":" + instruction.operand?.ToString();
+
+                        if (line == initLine)
+                            init = true;
+
+                        if (init && line == foundLine)
+                            skip = true;
+
+                    if (!skip)
+                    {
+                        yield return instruction;
+                    }
+                    else
+                    {
+                        if (replacement != null)
+                        {
+                            yield return replacement;
+                        }
+                    }
+                }
         }
     }
-    
+
+    public class FakeCrop : Crop
+    {
+        public FakeCrop()
+        {
+
+        }
+    }
+
 }

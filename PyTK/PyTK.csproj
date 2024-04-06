@@ -22,6 +22,8 @@
     <Product>Platonymous.PyTK</Product>
 
     <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
+
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

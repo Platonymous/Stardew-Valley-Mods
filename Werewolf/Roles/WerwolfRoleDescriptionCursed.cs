@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Werewolf.Game;
+using LandGrants.Game;
 
-namespace Werewolf.Roles
+namespace LandGrants.Roles
 {
     public class WerwolfRoleDescriptionCursed : WerwolfRoleDescriptionBase
     {

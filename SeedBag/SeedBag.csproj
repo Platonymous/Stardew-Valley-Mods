@@ -3,12 +3,13 @@
   <PropertyGroup>
     <AssemblyName>SeedBag</AssemblyName>
     <RootNamespace>SeedBag</RootNamespace>
-    <Version>1.7.4</Version>
-    <TargetFramework>net5.0</TargetFramework>
+    <Version>1.8.3-alpha.20240226</Version>
+    <TargetFramework>net6.0</TargetFramework>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Platonymous.PlatoTK" HintPath="$(GamePath)\Mods\PlatoTK\PlatoTK.dll" Private="False" />
+    <Reference Include="spacechase0.SpaceCore" HintPath="$(GamePath)\Mods\SpaceCore\SpaceCore.dll" Private="False" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />

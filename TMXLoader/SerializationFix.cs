@@ -14,31 +14,10 @@ namespace TMXLoader
     internal static class SerializationFix
     {
         // This list must be kept in sync with StardewValley.SaveGame.locationSerializer.
-        public static Type[] ExtraTypes = new Type[24]
+        public static Type[] ExtraTypes = new Type[3]
         {
-            typeof(Tool),
-            typeof(Duggy),
-            typeof(Ghost),
-            typeof(GreenSlime),
-            typeof(LavaCrab),
-            typeof(RockCrab),
-            typeof(ShadowGuy),
-            typeof(Child),
-            typeof(Pet),
-            typeof(Dog),
-            typeof(Cat),
-            typeof(Horse),
-            typeof(SquidKid),
-            typeof(Grub),
-            typeof(Fly),
-            typeof(DustSpirit),
-            typeof(Bug),
-            typeof(BigSlime),
-            typeof(BreakableContainer),
-            typeof(MetalHead),
-            typeof(ShadowGirl),
-            typeof(Monster),
-            typeof(JunimoHarvester),
+            typeof(Character),
+            typeof(Item),
             typeof(TerrainFeature)
         };
 
@@ -54,22 +33,7 @@ namespace TMXLoader
                 return;
             }
 
-            bool IsUnsafe = location is BuildableGameLocation || location is IAnimalLocation;
-
             var xmlOverrides = new XmlAttributeOverrides();
-
-            if (!IsUnsafe)
-            {
-                // Move the base type out of the way to make its name available.
-                var baseAttribs = new XmlAttributes();
-                baseAttribs.XmlType = new XmlTypeAttribute("GameLocation1");
-                xmlOverrides.Add(baseType, baseAttribs);
-
-                // Make sure the custom type saves with the base name so it will deserialize correctly.
-                var customAttribs = new XmlAttributes();
-                customAttribs.XmlType = new XmlTypeAttribute("GameLocation");
-                xmlOverrides.Add(customType, customAttribs);
-            }
 
             XmlSerializer serializer = new XmlSerializer(customType, xmlOverrides, ExtraTypes, null, null);
             serializer.Serialize(writer, location);
@@ -79,12 +43,6 @@ namespace TMXLoader
         {
             Type baseType = typeof(GameLocation);
             Type customType = location.GetType();
-
-            bool IsUnsafe = location is BuildableGameLocation || location is IAnimalLocation || location is DecoratableLocation;
-
-            // No need to fix types from the base game.
-            if (!IsUnsafe || object.ReferenceEquals(customType.Assembly, baseType.Assembly))
-                return SaveGame.locationSerializer.Deserialize(reader);
 
             var xmlOverrides = new XmlAttributeOverrides();
             XmlSerializer serializer = new XmlSerializer(customType, xmlOverrides, ExtraTypes, null, null);

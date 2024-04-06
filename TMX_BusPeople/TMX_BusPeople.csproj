@@ -6,6 +6,7 @@
     <Version>1.3.0</Version>
     <TargetFramework>net5.0</TargetFramework>
     <ModFolderName>[TMX]JungleTempleAndCityBus</ModFolderName>
+    <Configurations>Debug;Release;Android;Prealphadebug</Configurations>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\contentpacks.targets" />

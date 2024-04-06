@@ -1,4 +1,4 @@
-﻿namespace Werewolf.Roles
+﻿namespace LandGrants.Roles
 {
     public enum WerewolfRoleType
     {

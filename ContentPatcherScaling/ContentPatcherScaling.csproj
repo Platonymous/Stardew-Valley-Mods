@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>PyTKLite</AssemblyName>
+    <RootNamespace>PyTKLite</RootNamespace>
+    <TargetFramework>net5.0</TargetFramework>
+    <ModFolderName>C_PyTKLite</ModFolderName>
+    <Version>1.24.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json" HintPath="$(GamePath)\smapi-internal\Newtonsoft.Json.dll" Private="False" />
+  </ItemGroup>
+
+  <Import Project="$(SolutionDir)\commonnopytk.targets" />
+
+</Project>

@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>VisualizeTK</AssemblyName>
+    <RootNamespace>VisualizeTK</RootNamespace>
+    <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Prealpharelease' ">
+    <Version>1.2.0</Version>
+
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Prealphadebug' ">
+    <Version>1.2.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' ">
+    <Version>1.2.2-alpha.20240226</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug' ">
+    <Version>1.2.2-alpha.20240226</Version>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Update="visualizetk.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="visualizetk.ogl.mgfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Import Project="$(SolutionDir)\common.targets" />
+
+  <ItemGroup>
+    <PackageReference Update="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+  </ItemGroup>
+
+</Project>

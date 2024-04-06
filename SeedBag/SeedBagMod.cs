@@ -1,12 +1,15 @@
 ﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using PlatoTK;
 using StardewValley;
 using StardewValley.Menus;
 using System.Linq;
-using StardewValley.Objects;
+using SpaceShared.APIs;
+using HarmonyLib;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using System;
 
-namespace SeedBag
+namespace Portraiture2
 {
     public class SeedBagMod : Mod
     {
@@ -14,99 +17,59 @@ namespace SeedBag
         internal static IModHelper _helper => _instance.Helper;
         internal static ITranslationHelper i18n => _helper.Translation;
         internal static Config config;
-        internal static string seedBagToolData;
+        internal static Harmony HarmonyInstance;
 
+        internal static bool DrawingTool = false;
 
         public override void Entry(IModHelper helper)
         {
             _instance = this;
             config = helper.ReadConfig<Config>();
-
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-            helper.Events.Player.InventoryChanged += Player_InventoryChanged;
-            helper.Events.GameLoop.SaveLoaded += (s,e) => FixItems();
-            helper.Events.GameLoop.DayStarted += (s, e) => FixItems();
+            helper.Events.Display.MenuChanged += Display_MenuChanged;
+            HarmonyInstance = new Harmony("Platonymous.SeedBag");
+
+            HarmonyInstance.Patch(
+                AccessTools.Method(typeof(SpriteBatch), "Draw", new Type[] { typeof(Texture2D), typeof(Vector2), typeof(Rectangle?), typeof(Color), typeof(float), typeof(Vector2), typeof(float), typeof(SpriteEffects), typeof(float) })
+                ,new HarmonyMethod(this.GetType(),nameof(Draw)));
+
+            HarmonyInstance.Patch(
+                AccessTools.Method(typeof(Game1), nameof(Game1.drawTool), new Type[] {typeof(Farmer), typeof(int)})
+                ,new HarmonyMethod(this.GetType(), nameof(BeforeTool))
+                , new HarmonyMethod(this.GetType(), nameof(AfterTool)));
         }
 
-        private void FixItems()
+        public static void BeforeTool(Farmer f)
         {
-            Game1.player.items.Where(i => i is StardewValley.Tools.GenericTool).ToList().ForEach(i =>
-            {
-                if (i is Tool t && ((t?.netName?.Value?.Contains("Plato:IsSeedBag") ?? false) || (t?.netName?.Value?.Contains(i18n.Get("Name")) ?? false)))
-                {
-                    int index = Game1.player.items.IndexOf(i);
-                    try
-                    {
-                        Game1.player.items[index] = SeedBagTool.GetNew(Helper.GetPlatoHelper(), t.attachments[0], t.attachments[1]);
-                    }
-                    catch
-                    {
-
-                    }
-                    }
-            });
+            if(f == Game1.player)
+                DrawingTool = true;
         }
 
-        private void Player_InventoryChanged(object sender, InventoryChangedEventArgs e)
+        public static void AfterTool()
         {
-            e.Added.Where(a => e.IsLocalPlayer && !(a is Tool) && (a?.netName?.Value?.Contains("SeedBag") ?? false) || (a?.netName?.Value?.Contains(i18n.Get("Name")) ?? false)).ToList().ForEach(s =>
+            DrawingTool = false;
+        }
+
+        public static void Draw(ref Texture2D texture, ref Rectangle? sourceRectangle)
+        {
+            if (DrawingTool && Game1.player?.CurrentTool is SeedBagTool && texture == Game1.toolSpriteSheet)
             {
-               e.Player.removeItemFromInventory(s);
-               e.Player.addItemToInventory(SeedBagTool.GetNew(Helper.GetPlatoHelper()));
-            });
+                texture = SeedBagTool.Texture;
+                sourceRectangle = new Rectangle(0, 0, 16, 16);
+            }
+        }
+
+        private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
+        {
+            if (e.NewMenu is ShopMenu { ShopId: "SeedShop" } menu && new SeedBagTool() is SeedBagTool tool)
+                menu.AddForSale(tool , new ItemStockInformation(tool.salePrice(),1));
         }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
-            var platoHelper = Helper.GetPlatoHelper();
-
-            platoHelper.Harmony.LinkContruction<StardewValley.Tools.GenericTool, SeedBagTool>();
-            platoHelper.Harmony.LinkTypes(typeof(StardewValley.Tools.GenericTool), typeof(SeedBagTool));
-            SeedBagTool.LoadTextures(platoHelper);
-            seedBagToolData = "SeedBag/"+ config.Price +"/-300/Crafting/"+i18n.Get("Name")+"/"+ i18n.Get("Empty");
-
-            SeedBagTool.SaveIndex = platoHelper.Content.GetSaveIndex("Plato.SeedBagTool", () => Game1.objectInformation, (s) => s.Value.StartsWith("SeedBag"), (s) =>
-            {
-                platoHelper.Content.Injections.InjectDataInsert("Data/ObjectInformation", s.Index, seedBagToolData);
-                Helper.GameContent.InvalidateCache("Data/ObjectInformation");
-                platoHelper.Harmony.PatchTileDraw("Plato.SeedBagObjectTile", Game1.objectSpriteSheet, (t) => t.Name == @"Maps\springobjects" || t.Equals(Game1.objectSpriteSheet), SeedBagTool.Texture, null, s.Index);
-                platoHelper.Harmony.PatchTileDraw("Plato.SeedBagToolTile", Game1.toolSpriteSheet, (t) => t.Equals(Game1.toolSpriteSheet), SeedBagTool.Texture, null, s.Index);
-            });
-
-            Helper.Events.Display.MenuChanged += (s, ev) =>
-            {
-                if (ev.NewMenu is ShopMenu shop && shop.portraitPerson.Name == config.Shop)
-                {
-                    var sale = SeedBagTool.GetNew(platoHelper);
-
-                    if (!shop.itemPriceAndStock.Keys.Any(k => k is Tool t && t.netName.Value.Contains("SeedBag") || k.DisplayName == sale.DisplayName || k.DisplayName == i18n.Get("Name")))
-                    {
-                        shop.itemPriceAndStock.Add(sale, new int[2] { config.Price, 1 });
-                        shop.forSale.Add(sale);
-                    }
-                }
-            };
-
-            if (Helper.ModRegistry.GetApi<PlatoTK.APIs.ISerializerAPI>("Platonymous.Toolkit") is PlatoTK.APIs.ISerializerAPI pytk)
-            {
-                pytk.AddPostDeserialization(ModManifest, (o) =>
-                {
-                    if (o is Chest c)
-                    {
-                        var data = pytk.ParseDataString(o);
-
-                        if (data.ContainsKey("@Type") && data["@Type"].Contains("SeedBagTool"))
-                        {
-                            StardewValley.Object seed = (StardewValley.Object)c.items.FirstOrDefault(i => i.Category == -74);
-                            StardewValley.Object fertilizer = (StardewValley.Object)c.items.FirstOrDefault(i => i.Category == -19);
-                            return SeedBagTool.GetNew(platoHelper, seed, fertilizer);
-                        }
-                    }
-
-                    return o;
-                });
-            }
-
+            SeedBagTool.LoadTextures(Helper);
+            var spaceCore = this.Helper.ModRegistry.GetApi<ISpaceCoreApi>("spacechase0.SpaceCore");
+            spaceCore.RegisterSerializerType(typeof(SeedBagTool));
         }
 
     }

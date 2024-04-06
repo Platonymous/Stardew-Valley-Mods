@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Artista</AssemblyName>
+    <RootNamespace>Artista</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Version>1.4.4-alpha.20240226</Version>
+    <TargetFramework>net6.0</TargetFramework>
+    <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
+  </PropertyGroup>
+
+  <Import Project="$(SolutionDir)\common.targets" />
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RestSharp" Version="105.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="spacechase0.SpaceCore" HintPath="$(GamePath)\Mods\SpaceCore\SpaceCore.dll" Private="False" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+  </ItemGroup>
+
+</Project>

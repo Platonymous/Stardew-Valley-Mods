@@ -19,7 +19,7 @@ namespace TMXLoader
         {
             internal static MethodInfo TargetMethod()
             {
-               return PyTK.PyUtils.getTypeSDV("Locations.FarmHouse").GetMethod("loadSpouseRoom");
+               return PyUtils.getTypeSDV("Locations.FarmHouse").GetMethod("loadSpouseRoom");
             }
 
             internal static bool Prefix(FarmHouse __instance)
@@ -32,22 +32,5 @@ namespace TMXLoader
         }
 
 
-        [HarmonyPatch]
-        internal class PathFinderFix
-        {
-            internal static MethodInfo TargetMethod()
-            {
-                return PyTK.PyUtils.getTypeSDV("NPC").GetMethod("populateRoutesFromLocationToLocationList", BindingFlags.Public | BindingFlags.Static);
-            }
-
-            internal static void Prefix()
-            {
-                foreach (var edit in TMXLoaderMod.addedLocations)
-                    if (Game1.getLocationFromName(edit.name) == null)
-                        TMXLoaderMod.addLocation(edit);
-
-            }
-
-        }
     }
 }

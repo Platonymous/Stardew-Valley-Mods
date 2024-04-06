@@ -1,7 +1,7 @@
 {
   "Name": "ShipFromInventory",
   "Author": "Platonymous",
-  "Version": "1.4.1",
+  "Version": "1.5.1-alpha.20231104",
   "Description": "Ship from the Inventory Menu",
   "UniqueID": "Platonymous.ShipFromInventory",
   "EntryDll": "ShipFromInventory.dll",

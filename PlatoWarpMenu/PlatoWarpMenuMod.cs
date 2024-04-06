@@ -15,6 +15,8 @@ using Microsoft.Xna.Framework;
 using StardewValley.Locations;
 using System.Reflection;
 using xTile.ObjectModel;
+using System.Net.NetworkInformation;
+using StardewValley.GameData.HomeRenovations;
 
 namespace PlatoWarpMenu
 {
@@ -29,9 +31,7 @@ namespace PlatoWarpMenu
 
         internal static GameLocation CurrentLocation;
 
-        internal static Action Callback;
-
-        public static Texture2D LastScreen = null;
+        internal static Action<Texture2D> Callback;
 
         internal static PlatoWarpMenuMod instance;
 
@@ -72,18 +72,10 @@ namespace PlatoWarpMenu
             };
 
             var harmony = new Harmony("Platonymous.PlatoWarpMenu");
-
-            if (!config.CompatibilityMode || Constants.TargetPlatform == GamePlatform.Android)
-            {
-                try
-                {
-                    harmony.Patch(Type.GetType("System.Drawing.Image, System.Drawing").GetMethod("Save", new Type[] { typeof(string), Type.GetType("System.Drawing.Imaging.ImageFormat, System.Drawing") }), prefix: new HarmonyMethod(this.GetType().GetMethod("InterceptScreenshot", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)));
-                }
-                catch
-                {
-
-                }
-            }
+            harmony.Patch(Type.GetType("SkiaSharp.SKData, SkiaSharp").GetMethod("SaveTo"), 
+                prefix: new HarmonyMethod(this.GetType().GetMethod("InterceptScreenshot", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)),
+                postfix: new HarmonyMethod(this.GetType().GetMethod("InterceptScreenshot2", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)));
+        
 
             var displayDevice = Game1.mapDisplayDevice;
 
@@ -194,7 +186,7 @@ namespace PlatoWarpMenu
             string locationName = !character ? activeLocation : Game1.locations.FirstOrDefault(l => l.characters.Any(a => a.Name == activeLocation))?.Name;
                 highlights.Clear();
             if (character && Game1.locations.SelectMany(l => l.characters.Where(a => a.Name == activeLocation))?.FirstOrDefault() is NPC npc)
-                    highlights.Add(npc.getTileLocation() is Vector2 v ? new Point((int)v.X, (int)v.Y) : Point.Zero);
+                    highlights.Add(npc.TilePoint is Point v ? new Point((int)v.X, (int)v.Y) : Point.Zero);
                 else if (activeSet == i18n.Get("menu.artifacts") && Game1.getLocationFromName(locationName) is GameLocation aLoc)
                 {
                     foreach (var vec in aLoc.Objects.Keys.Where(k => aLoc.Objects[k].ParentSheetIndex == 590))
@@ -218,16 +210,8 @@ namespace PlatoWarpMenu
                         if (inprocess != location)
                         {
                             inprocess = location;
-                            GetLocationShot(location, () =>
+                            GetLocationShot(location, (screen) =>
                             {
-                                Texture2D screen = LastScreen;
-                                if (PlatoWarpMenuMod.instance.config.UseTempFolder)
-                                    try
-                                    {
-                                        screen = Helper.ModContent.Load<Texture2D>($"Temp/{(location.isStructure.Value ? location.uniqueName.Value : location.Name)}.png");
-                                    }
-                                    catch { }
-
 
                                 if (screen is Texture2D)
                                 {
@@ -277,7 +261,7 @@ namespace PlatoWarpMenu
                 if (locationShots.ContainsKey(locationName) && locationShots[locationName] is Texture2D)
                 {
                     loaded = true;
-                    tBounds = new Rectangle(0, 0, locationShots[locationName].Width, locationShots[locationName].Height);
+                    tBounds = new Microsoft.Xna.Framework.Rectangle(0, 0, locationShots[locationName].Width, locationShots[locationName].Height);
                     tLocation = Game1.getLocationFromName(locationName) ?? Game1.getLocationFromName(locationName, true);
 
                     return locationShots[locationName];
@@ -336,7 +320,7 @@ namespace PlatoWarpMenu
             return sets;
         }
 
-        public IEnumerable<IComponent> GetTiles(Rectangle tBounds, GameLocation tLocation, List<Point> highlights, bool loaded, IComponent template)
+        public IEnumerable<IComponent> GetTiles(Microsoft.Xna.Framework.Rectangle tBounds, GameLocation tLocation, List<Point> highlights, bool loaded, IComponent template)
         {
             List<IComponent> components = new List<IComponent>();
             if (!loaded)
@@ -365,7 +349,7 @@ namespace PlatoWarpMenu
             for (int tx = 0; tx <= tilesx; tx++)
                 for (int ty = 0; ty <= tilesy; ty++)
                 {
-                    bool clear = tLocation?.isTileLocationTotallyClearAndPlaceableIgnoreFloors(new Vector2(tx, ty)) ?? false;
+                    bool clear = tLocation?.CanItemBePlacedHere(new Vector2(tx, ty)) ?? false;
                     bool high = highlights.Any(p => p.X == tx && p.Y == ty);
                     if (clear || high)
                     {
@@ -432,8 +416,8 @@ namespace PlatoWarpMenu
                 locations = Game1.locations.Where(l => !inGroup(l) && !l.IsOutdoors && !(l.IsFarm || l.IsGreenhouse)).Select(g => g.NameOrUniqueName).ToList();
             else if (set == i18n.Get("menu.buildings"))
             {
-                locations = Game1.locations.Where(l => l is BuildableGameLocation)
-                    .SelectMany(bgl => (bgl as BuildableGameLocation).buildings)
+                locations = Game1.locations.Where(l => l.buildings.Count > 0)
+                    .SelectMany(bgl => bgl.buildings)
                     .Where(b => b.indoors.Value is GameLocation)
                     .Select(b => b.indoors.Value.NameOrUniqueName)
                     .ToList();
@@ -499,100 +483,40 @@ namespace PlatoWarpMenu
             return menuItems;
         }
 
-        public static void GetLocationShot(GameLocation location, Action callback)
+        public static void GetLocationShot(GameLocation location, Action<Texture2D> callback)
         {
-            CurrentLocation = location;
+            CurrentLocation = Game1.currentLocation;
             Callback = callback;
-
-            _helper.GetPlatoUIHelper().SetTickDelayedUpdateAction(1, () =>
-            {
-                _helper.Events.Display.Rendered += Display_Rendered;
-            });
-        }
-
-        public static void Display_Rendered(object sender, EventArgs e)
-        {
             intercept = true;
-           var g = Game1.currentLocation;
-
-            var priorColor = Game1.ambientLight;
-            bool priorLight = Game1.drawLighting;
-            Game1.ambientLight = Microsoft.Xna.Framework.Color.White;
-            Game1.drawLighting = false;
-            _helper.GetPlatoUIHelper().SetTickDelayedUpdateAction(2, () => {
-                Game1.ambientLight = priorColor;
-                Game1.drawLighting = priorLight;
-            }
-            );
-
-            Game1.currentLocation = CurrentLocation; 
-            Game1.currentLocation.resetForPlayerEntry();
-            pytk?.EnableMoreMapLayers(Game1.currentLocation.Map);
-
+            Game1.currentLocation = location;
             try
             {
-                try { 
-                    Game1.spriteBatch.End();
-                }
-                catch {
-                }
+                Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name, () => _monitor.Log("ScreenshotTaken", LogLevel.Warn));
 
-                if (instance.config.CompatibilityMode || Constants.TargetPlatform == GamePlatform.Android)
-                {
-                    var fix = new ScreenshotAndroidFix();
-                    fix.takeMapScreenshot(Game1.game1, 0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name);
-                }
-                else
-                {
-#if ANDROID
-                    if (Game1.game1.GetType().GetMethod("takeMapScreenshot") is MethodInfo minfo)
-                        if (minfo.GetParameters().Length == 2)
-                            minfo.Invoke(Game1.game1, new object[] { 0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name });
-                        else {
-                            Action c = () => Console.WriteLine("Screenshot taken");
-                            minfo.Invoke(Game1.game1, new object[] { 0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name, c });
-                        }
-#else
-                    Game1.game1.takeMapScreenshot(0.25f, CurrentLocation.isStructure.Value ? CurrentLocation.uniqueName.Value : CurrentLocation.Name, () => Console.WriteLine("Screenshot taken"));
-#endif
-                }
-                try { 
-                    Game1.spriteBatch.Begin();
-                }
-                catch { }
+                intercept = false;
             }
             catch
             {
-
+                GetLocationShot(location, callback);
             }
 
-            Game1.currentLocation = g;
-            _helper.Events.Display.Rendered -= Display_Rendered;
-            intercept = false;
-            Callback?.Invoke();
         }
 
-        public static bool InterceptScreenshot(object __instance, ref string filename)
+        public static void InterceptScreenshot(ref Stream target)
         {
             if (!intercept)
-                return true;
+                return;
+            target = new MemoryStream();
+        }
 
-            if (!Directory.Exists(Path.Combine(_helper.DirectoryPath, "Temp")))
-                Directory.CreateDirectory(Path.Combine(_helper.DirectoryPath, "Temp"));
+        public static void InterceptScreenshot2(ref Stream target)
+        {
+            if (!intercept)
+                return;
 
-            filename = Path.Combine(_helper.DirectoryPath, "Temp", Path.GetFileName(filename));
-
-            if (instance.config.UseTempFolder)
-                return true;
-
-            using (var mem = new MemoryStream())
-            {
-                var pngFormat = Type.GetType("System.Drawing.Imaging.ImageFormat, System.Drawing").GetProperty("Png", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).GetValue(null);
-                AccessTools.DeclaredMethod(Type.GetType("System.Drawing.Bitmap, System.Drawing"),"Save",new Type[] { typeof(Stream), Type.GetType("System.Drawing.Imaging.ImageFormat, System.Drawing") }).Invoke(__instance, new object[] { mem, pngFormat });
-                LastScreen = Texture2D.FromStream(Game1.graphics.GraphicsDevice, mem);
-            }
-
-            return false;
+            target.Position = 0;
+            Game1.currentLocation = CurrentLocation;
+            Callback?.Invoke(Texture2D.FromStream(Game1.graphics.GraphicsDevice, target));
         }
 
         private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)

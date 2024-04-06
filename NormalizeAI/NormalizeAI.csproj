@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>NormalizeAI</AssemblyName>
+    <RootNamespace>NormalizeAI</RootNamespace>
+    <Version>0.9.0</Version>
+    <Configurations>Debug;Release;Android;Prealphadebug</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json" HintPath="$(GamePath)\smapi-internal\Newtonsoft.Json.dll" Private="False" />
+  </ItemGroup>
+
+  <Import Project="$(SolutionDir)\common.targets" />
+
+</Project>

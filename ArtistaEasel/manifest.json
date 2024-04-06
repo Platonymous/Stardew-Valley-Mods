@@ -1,0 +1,17 @@
+{
+  "Name": "ArtistaEasel",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "Paint!",
+  "UniqueID": "Platonymous.Artista.Easel",
+  "MinimumApiVersion": "3.0.0",
+  "ContentPackFor": {
+    "UniqueID": "spacechase0.JsonAssets"
+  },
+  "Dependencies": [
+    {
+      "UniqueID": "Platonymous.Artista",
+      "IsRequired": false
+    }
+  ]
+}

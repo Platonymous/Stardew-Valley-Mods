@@ -88,11 +88,13 @@ namespace ModUpdater
                 catch (RateLimitExceededException e)
                 {
                     Console.WriteLine("[ModUpdater] [" + mod.UniqueID + "] Updater failed: " + "API Rate Limit exceeded. Please try again later.");
+                    Console.WriteLine(e.Limit);
                     continue;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("[ModUpdater] [" + mod.UniqueID + "] Updater failed. Please try again later.");
+                    Console.WriteLine(e.StackTrace);
                     continue;
                 }
             }

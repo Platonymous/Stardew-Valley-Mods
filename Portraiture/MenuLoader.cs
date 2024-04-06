@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK;
-using PyTK.Extensions;
-using PyTK.PlatoUI;
-using PyTK.Types;
+
+
+using Portraiture.PlatoUI;
+
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
@@ -28,7 +28,10 @@ namespace Portraiture
             PlatoUIMenu menu = null;
             List<UIElement> folders = new List<UIElement>();
             foreach (string folder in TextureLoader.folders)
-                folders.AddOrReplace(GetElementForFolder(folder));
+            {
+                folders.Remove(GetElementForFolder(folder));
+                folders.Add(GetElementForFolder(folder));
+            }
 
             int f = folders.Count;
 
@@ -223,7 +226,7 @@ namespace Portraiture
             var scaleSize = (Game1.smallFont.MeasureString("XX") * 0.5f).toPoint();
             int sIBSize = Math.Max(scaleSize.X, scaleSize.Y) + margin * 2;
             Point bgSize = new Point(size.X + margin * 4, size.Y + margin * 2);
-            Texture2D bgName = PyTK.PyDraw.getFade(bgSize.X * 4, bgSize.Y * 4, Color.White * 0.8f, Color.Transparent);
+            Texture2D bgName = PyDraw.getFade(bgSize.X * 4, bgSize.Y * 4, Color.White * 0.8f, Color.Transparent);
 
             UIElement nameBg = UIElement.GetImage(bgName, active ? Color.DarkCyan : Color.Black, folder + "_BgName", 1, 1, UIHelper.GetTopLeft(0, 0, bgSize.X));
             UIElement scaleInfoText = new UITextElement(scaleText, Game1.smallFont, Color.White, 0.5f, 1, folder + "_Scale", 2, UIHelper.GetCentered());

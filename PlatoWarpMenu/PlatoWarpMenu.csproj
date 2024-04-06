@@ -3,8 +3,9 @@
   <PropertyGroup>
     <AssemblyName>PlatoWarpMenu</AssemblyName>
     <RootNamespace>PlatoWarpMenu</RootNamespace>
-    <Version>1.11.0</Version>
-    <TargetFramework>net5.0</TargetFramework>
+    <Version>1.11.1-alpha.20231105</Version>
+    <TargetFramework>net6.0</TargetFramework>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
    <ItemGroup>

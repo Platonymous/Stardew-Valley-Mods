@@ -4,36 +4,37 @@ using StardewValley;
 using StardewValley.Objects;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using PyTK.CustomElementHandler;
 using System.Collections.Generic;
 using System.Linq;
 using StardewValley.Locations;
 using Netcode;
+using System.Xml.Serialization;
 
 namespace CustomFurniture
 {
 #if ANDROID
     public class CustomFurniture : Furniture, ISaveElement
 #else
-    public class CustomFurniture : Furniture, ISaveElement, ISittable
+    [XmlType("Mods_platonymous_CustomFurniture")]
+    public class CustomFurniture : Furniture, ISittable
 #endif
     {
-        public Texture2D texture;
-        public Texture2D textureOverlay;
-        public Texture2D textureUnderlay;
+        internal Texture2D texture;
+        internal Texture2D textureOverlay;
+        internal Texture2D textureUnderlay;
 
         public static Dictionary<string, string> Textures = new Dictionary<string, string>();
-        private int animationFrames;
-        private int frame;
-        private Rectangle animatedSourceRect;
-        private int frameWidth;
-        private int skipFrame;
-        private int counter;
-        private int rotatedHeight;
-        private int rotatedWidth;
-        private int rotatedBoxWidth;
-        private int rotatedBoxHeight;
-        private bool isStool = false;
+        public int animationFrames;
+        public int frame;
+        public Rectangle animatedSourceRect;
+        public int frameWidth;
+        public int skipFrame;
+        public int counter;
+        public int rotatedHeight;
+        public int rotatedWidth;
+        public int rotatedBoxWidth;
+        public int rotatedBoxHeight;
+        public bool isStool = false;
         public FurnitureRotation fRotation;
         public CustomFurnitureData data;
         public string id;
@@ -128,7 +129,7 @@ namespace CustomFurniture
             base.DayUpdate(location);
         }
 
-        private void setTexture()
+        public void setTexture()
         {
             restore();
             string folder = new DirectoryInfo(data.folderName).Name;
@@ -185,7 +186,7 @@ namespace CustomFurniture
             return new CustomFurniture(data, id, Vector2.Zero);
         }
 
-        private float getScaleSize()
+        private new float getScaleSize()
         {
             int num1 = sourceRect.Width / 16;
             int num2 = sourceRect.Height / 16;
@@ -315,7 +316,11 @@ namespace CustomFurniture
         private void customDrawAtNonTileSpot(CustomFurniture ho, SpriteBatch spriteBatch, Vector2 location, float layerDepth, float alpha = 1f)
         {
             restore();
-            spriteBatch.Draw(ho.texture, location, new Rectangle?(ho.sourceRect.Value), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, this.Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, layerDepth);
+            if (ho.texture == null)
+                ho.setTexture();
+
+            if(ho.texture != null)
+                spriteBatch.Draw(ho.texture, location, new Rectangle?(ho.sourceRect.Value), Color.White * alpha, 0.0f, Vector2.Zero, (float)Game1.pixelZoom, this.Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, layerDepth);
         }
 
         public object getReplacement()

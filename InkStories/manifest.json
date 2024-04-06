@@ -1,0 +1,16 @@
+{
+  "Name": "Ink Stories",
+  "Author": "Platonymous",
+  "Version": "1.4.3-alpha.20240226",
+  "Description": "Ink Story Mod.",
+  "UniqueID": "Platonymous.InkStories",
+  "EntryDll": "InkStories.dll",
+  "MinimumApiVersion": "3.14.0",
+  "UpdateKeys": [ "Nexus:15987" ],
+  "Dependencies": [
+    {
+      "UniqueID": "Pathoschild.ContentPatcher",
+      "IsRequired": false
+    }
+  ]
+}

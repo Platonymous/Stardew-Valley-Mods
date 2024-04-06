@@ -1,0 +1,11 @@
+{
+  "Name": "PyTK Lite",
+  "Author": "Platonymous",
+  "Version": "1.24.0",
+  "Description": "Platonymous Toolkit (Lite Version)",
+  "UniqueID": "Platonymous.Toolkit",
+  "EntryDll": "PyTKLite.dll",
+  "MinimumApiVersion": "3.14.0",
+  "UpdateKeys": [ "Nexus:1726" ],
+  "Dependencies": []
+}

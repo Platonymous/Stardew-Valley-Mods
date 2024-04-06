@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>InkStories</AssemblyName>
+    <RootNamespace>InkStories</RootNamespace>
+    <Version>1.4.3-alpha.20240226</Version>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ink\**" />
+    <EmbeddedResource Remove="ink\**" />
+    <None Remove="ink\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BmFont" HintPath="$(GamePath)\BmFont.dll" Private="False" />
+    <Reference Include="ink-engine-runtime">
+      <HintPath>ink-engine-runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="ink_compiler">
+      <HintPath>ink_compiler.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json" HintPath="$(GamePath)\smapi-internal\Newtonsoft.Json.dll" Private="False" />
+  </ItemGroup>
+
+  <Import Project="$(SolutionDir)\common.targets" />
+
+  <ItemGroup>
+    <None Update="ink-engine-runtime.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ink-engine-runtime.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ink-engine-runtime.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ink_compiler.deps.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ink_compiler.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ink_compiler.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Pathoschild.Stardew.ModBuildConfig" Version="4.1.0" />
+  </ItemGroup>
+
+</Project>

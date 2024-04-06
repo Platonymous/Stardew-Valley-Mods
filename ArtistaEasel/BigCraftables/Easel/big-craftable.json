@@ -1,0 +1,8 @@
+{
+  "Name": "Artista Easel",
+  "Description": "Paint!",
+  "Price": 5000,
+  "PurchasePrice": 5000,
+  "CanPurchase": true,
+  "PurchaseFrom": "Pierre"
+}

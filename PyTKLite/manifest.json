@@ -1,0 +1,11 @@
+{
+  "Name": "PyTK Dummy",
+  "Author": "Platonymous",
+  "Version": "1.24.2-alpha.20231110",
+  "Description": "Platonymous Toolkit (Dummy Version)",
+  "UniqueID": "Platonymous.Toolkit",
+  "EntryDll": "PyTKDummy.dll",
+  "MinimumApiVersion": "3.14.0",
+  "UpdateKeys": [ "Nexus:1726" ],
+  "Dependencies": []
+}

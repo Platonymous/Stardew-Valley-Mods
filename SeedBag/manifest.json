@@ -1,7 +1,7 @@
 {
   "Name": "Seed Bag",
   "Author": "Platonymous",
-  "Version": "1.7.4",
+  "Version": "1.8.3-alpha.20240226",
   "Description": "Adds a Seed Bag to the Game",
   "UniqueID": "Platonymous.SeedBag",
   "EntryDll": "SeedBag.dll",
@@ -9,22 +9,7 @@
   "UpdateKeys": [ "Nexus:1133" ],
   "Dependencies": [
     {
-      "UniqueID": "Platonymous.PlatoTK",
-      "MinimumVersion": "1.8.0"
-    },
-    {
-      "UniqueID": "Platonymous.ModUpdater",
-      "IsRequired": false
-    },
-    {
-      "UniqueID": "Platonymous.Toolkit",
-      "IsRequired": false
+      "UniqueID": "spacechase0.SpaceCore"
     }
-  ],
-  "ModUpdater": {
-    "Repository": "Stardew-Valley-Mods",
-    "User": "Platonymous",
-    "Directory": "_releases",
-    "ModFolder": "SeedBag"
-  }
+  ]
 }

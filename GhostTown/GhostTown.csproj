@@ -3,14 +3,60 @@
   <PropertyGroup>
     <AssemblyName>GhostTown</AssemblyName>
     <RootNamespace>GhostTown</RootNamespace>
-    <TargetFramework>net5.0</TargetFramework>
-    <Version>1.0.4</Version>
+    <Version>1.1.1</Version>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\PyTK\PyTK.csproj" Private="false" />
-  </ItemGroup>
 
   <Import Project="$(SolutionDir)\common.targets" />
+
+
+  <ItemGroup>
+    <None Update="[TMX]GhostTown\assets\BathhouseExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\BeachExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\ForestExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\HospitalExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\JojaExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\MineExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\RailroadExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\SeedShopExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\SewerExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\TownExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\TrailerExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\villagers.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\assets\WizExt.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\content.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="[TMX]GhostTown\manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 {
   "Name": "Custom Furniture",
   "Author": "Platonymous",
-  "Version": "0.12.0",
+  "Version": "1.14.3",
   "Description": "Helper Mod for Custom Furniture creation.",
   "UniqueID": "Platonymous.CustomFurniture",
   "EntryDll": "CustomFurniture.dll",
@@ -9,8 +9,7 @@
   "UpdateKeys": [ "Nexus:1254" ],
   "Dependencies": [
     {
-      "UniqueID": "Platonymous.Toolkit",
-      "MinimumVersion": "1.5.1"
+      "UniqueID": "spacechase0.SpaceCore"
     }
   ]
 }

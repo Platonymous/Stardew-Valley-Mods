@@ -5,34 +5,27 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using PyTK.CustomElementHandler;
-using PyTK;
 using System.Xml.Serialization;
 
 namespace HarpOfYobaRedux
 {
-    internal class Instrument : Tool, ISaveElement, ICustomObject
+
+    [XmlType("Mods_platonymous_HarpOfYoba_Instrument")]
+    public class Instrument : Tool
     {
-        internal static Dictionary<string,Instrument> allInstruments;
-        public string instrumentID;
+        internal static Dictionary<string,Instrument> allInstruments = new Dictionary<string, Instrument>();
+        public string instrumentID { get; set; }
         private Texture2D texture;
         private bool readyToPlay;
         private int timeWhenReady;
         private int cooldownTime;
-        public IInstrumentAnimation animation;
+        internal IInstrumentAnimation animation;
         private string priorMusic;
         private GameLocation priorLocation;
-        public static Dictionary<string, string> allAdditionalSaveData;
-
+        public static Dictionary<string, string> allAdditionalSaveData { get; set; } = new Dictionary<string, string>();
         public Instrument()
         {
             build("harp");
-        }
-
-        public Instrument(CustomObjectData data)
-            : this(data.id.Split('.')[2])
-        {
-
         }
 
         public override bool canBeDropped()
@@ -107,10 +100,7 @@ namespace HarpOfYobaRedux
 
             if (attachments.Length > 0 && attachments[0] != null)
             {
-                if (!(attachments[0] is SheetMusic))
-                    SaveHandler.RebuildAll(attachments[0], attachments);
-
-                    priorAttachement = (SObject) attachments[0].getOne();
+                priorAttachement = (SObject) attachments[0].getOne();
             }
 
             if (o is SheetMusic)
@@ -130,48 +120,21 @@ namespace HarpOfYobaRedux
         }
 
 
-        public override Item getOne()
+        protected override Item GetOneNew()
         {
-            return this;
-        }
-
-        public Dictionary<string, string> getAdditionalSaveData()
-        {
-            Dictionary<string, string> additionalSaveData = new Dictionary<string, string>();
-            additionalSaveData.Add("id", instrumentID);
-
-            foreach (string key in allAdditionalSaveData.Keys)
-                additionalSaveData.Add(key, allAdditionalSaveData[key]);
-
-            return additionalSaveData;
-        }
-
-        public object getReplacement()
-        {
-            FishingRod replacement = new FishingRod(1);
-            replacement.UpgradeLevel = -1;
-            if (attachments.Count > 0)
+            var one = new Instrument(instrumentID);
+            foreach (var att in attachments)
             {
-                replacement.attachments.SetCount(1);
-                replacement.attachments[0] = attachments[0];
+                if (att is SheetMusic sm)
+                    one.attachments.Add(new SheetMusic(sm.sheetMusicID));
             }
-            return replacement;
+            return one;
         }
-            
-            public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
+
+        protected override void GetOneCopyFrom(Item source)
         {
-            if (replacement is Tool t && t.attachments.Count > 0)
-            {
-                if (!(t.attachments[0] is SheetMusic))
-                    SaveHandler.RebuildAll(t.attachments[0], t.attachments);
-
-                attachments[0] = t.attachments[0];
-            }
-
-            foreach (string key in additionalSaveData.Keys)
-                if (key != "id" && !allAdditionalSaveData.ContainsKey(key))
-                    allAdditionalSaveData.Add(key, additionalSaveData[key]);
         }
+
 
         public override string getDescription()
         {
@@ -228,10 +191,10 @@ namespace HarpOfYobaRedux
 
             SheetMusic sheet = (SheetMusic)attachments[0];
 
-            PyUtils.setDelayedAction(1000, animation.animate);
-            PyUtils.setDelayedAction(sheet.length / 2, doMagic);
-            PyUtils.setDelayedAction(sheet.length, resetMusic);
-            PyUtils.setDelayedAction(sheet.length + 1000, stop);
+            Game1.delayedActions.Add(new DelayedAction(1000, animation.animate));
+            Game1.delayedActions.Add(new DelayedAction(sheet.length / 2, doMagic));
+            Game1.delayedActions.Add(new DelayedAction(sheet.length, resetMusic));
+            Game1.delayedActions.Add(new DelayedAction(sheet.length + 1000, stop));
 
             animation.preAnimation();
             sheet.play();
@@ -311,9 +274,5 @@ namespace HarpOfYobaRedux
             return description;
         }
 
-        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
-        {
-           return new Instrument(additionalSaveData["id"]);
-        }
     }
 }

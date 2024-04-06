@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Werewolf.Game
+namespace LandGrants.Game
 {
     public class WerwolfCallbackRequest
     {

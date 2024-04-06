@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static StardewValley.GameLocation;
 
-namespace Werewolf.Game
+namespace LandGrants.Game
 {
     public class WerwolfClientGame
     {
@@ -169,7 +169,7 @@ namespace Werewolf.Game
 
         private void ShowDialog(string message, string npc)
         {
-            NextTask.Add(() => Game1.activeClickableMenu = new DialogueBox(new Dialogue(message, npc == "Fenris" ? WerwolfGame.Fenris :  Game1.getCharacterFromName(npc, true, true))));
+            NextTask.Add(() => Game1.activeClickableMenu = new DialogueBox(new Dialogue(npc == "Fenris" ? WerwolfGame.Fenris : Game1.getCharacterFromName(npc, true), "Werwolf.ShowDialogue", message )));
         }
 
         public bool TryParseColorFromString(string value, out Color color)
@@ -305,7 +305,7 @@ namespace Werewolf.Game
 
                 NextTask.Add(() =>
                 {
-                    Game1.activeClickableMenu = new DialogueBox(choice.Question, choice.Options.Select(o => new Response($"{o.ID}", o.Name)).ToList());
+                    Game1.activeClickableMenu = new DialogueBox(choice.Question, choice.Options.Select(o => new Response($"{o.ID}", o.Name)).ToArray());
                     OldAfterQ = Game1.currentLocation.afterQuestion;
                     Game1.currentLocation.afterQuestion = (who, answer) => {
 

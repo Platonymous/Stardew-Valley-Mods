@@ -1,9 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using PyTK;
-using PyTK.Extensions;
-using PyTK.Lua;
-using PyTK.Tiled;
-using PyTK.Types;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -19,7 +14,6 @@ using System.Xml;
 using xTile.ObjectModel;
 using System;
 using xTile.Tiles;
-using PyTK.PlatoUI;
 using xTile.Dimensions;
 using StardewValley.TerrainFeatures;
 using xTile.Layers;
@@ -34,6 +28,9 @@ using StardewValley.Network;
 using StardewValley.Characters;
 using StardewValley.Tools;
 using StardewValley.Objects;
+using StardewValley.GameData.Objects;
+using StardewValley.GameData.Crops;
+using Newtonsoft.Json.Linq;
 
 namespace TMXLoader
 {
@@ -57,6 +54,8 @@ namespace TMXLoader
         internal static List<TMXContentPack> latePacks = new List<TMXContentPack>(); 
         internal static TMXLoaderMod _instance;
         internal static Mod faInstance;
+        internal static List<IPyResponder> responders;
+        internal static PyTKSaveData pytksaveData = new PyTKSaveData();
 
         private readonly List<TMXAssetEditor> AssetEditors = new();
 
@@ -76,11 +75,11 @@ namespace TMXLoader
         internal PyReceiver<SaveBuildable> BuildableRemover;
         internal bool resetRain = false;
         internal bool resetRainValue = true;
+
         public override void Entry(IModHelper helper)
         {
             config = Helper.ReadConfig<Config>();
             config = Helper.ReadConfig<Config>();
-            
             TMXLoaderMod.helper = Helper;
             monitor = Monitor;
 
@@ -184,6 +183,8 @@ namespace TMXLoader
 
             helper.Events.GameLoop.SaveCreated += (s, e) => afterSave();
             helper.Events.GameLoop.Saved += (s, e) => afterSave();
+            helper.Events.Player.Warped += Player_WarpedPyTK;
+            helper.Events.GameLoop.DayStarted += PYTKGameLoop_DayStarted;
 
             helper.Events.GameLoop.DayStarted += (s, e) =>
             {
@@ -214,6 +215,424 @@ namespace TMXLoader
             };
 
             helper.Events.Display.MenuChanged += TMXActions.updateItemListAfterShop;
+
+            PyTKEntry();
+        }
+
+
+        private void PyTKEntry()
+        {
+            Harmony instance = new Harmony("Platonymous.TMXLoader.Entry");
+            instance.PatchAll(this.GetType().Assembly);
+
+            helper.Events.Display.RenderingWorld += (s, e) =>
+            {
+                if (Game1.currentLocation is GameLocation location && location.Map is Map map && map.GetBackgroundColor() is TMXColor tmxColor)
+                    Game1.graphics.GraphicsDevice.Clear(tmxColor.toColor());
+            };
+            
+            initializeResponders();
+            startResponder();
+            PyLua.init();
+            registerTileActions();
+            registerEventPreconditions();
+            bool adjustForCompat2 = false;
+            bool hasMapTK = false;
+            helper.Events.GameLoop.GameLaunched += (s, e) =>
+            {
+
+                if (xTile.Format.FormatManager.Instance.GetMapFormatByExtension("tmx") is TMXFormat tmxf)
+                    tmxf.DrawImageLayer = PyMaps.drawImageLayer;
+
+                hasMapTK = helper.ModRegistry.IsLoaded("Platonymous.MapTK");
+                adjustForCompat2 = helper.ModRegistry.IsLoaded("DigitalCarbide.SpriteMaster");
+                Game1.mapDisplayDevice = hasMapTK ? Game1.mapDisplayDevice : new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
+            };
+
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
+            {
+                if (!(Game1.mapDisplayDevice is PyDisplayDevice || (Game1.mapDisplayDevice != null && Game1.mapDisplayDevice.GetType().Name.Contains("PyDisplayDevice"))))
+                    Game1.mapDisplayDevice = hasMapTK ? Game1.mapDisplayDevice : PyDisplayDevice.Instance ?? new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
+            };
+
+            helper.Events.GameLoop.SaveCreated += (s, e) =>
+            {
+                if (!(Game1.mapDisplayDevice is PyDisplayDevice || (Game1.mapDisplayDevice != null && Game1.mapDisplayDevice.GetType().Name.Contains("PyDisplayDevice"))))
+                    Game1.mapDisplayDevice = hasMapTK ? Game1.mapDisplayDevice : PyDisplayDevice.Instance ?? new PyDisplayDevice(Game1.content, Game1.graphics.GraphicsDevice, adjustForCompat2);
+            };
+
+          
+            helper.Events.GameLoop.ReturnedToTitle += (s, e) =>
+            {
+                foreach (Layer l in PyMaps.LayerHandlerList.Keys)
+                {
+                    foreach (var h in PyMaps.LayerHandlerList[l])
+                    {
+                        l.AfterDraw -= h;
+                        l.BeforeDraw -= h;
+                    }
+                }
+
+                PyMaps.LayerHandlerList.Clear();
+            };
+
+            this.Helper.Events.Multiplayer.PeerContextReceived += (s, e) =>
+            {
+                if (Game1.IsMasterGame && Game1.IsServer)
+                {
+                    PyNet.sendDataToFarmer("PyTK.ModSavdDataReceiver", saveData, e.Peer.PlayerID, SerializationType.JSON);
+                }
+
+            };
+
+            Helper.Events.Display.RenderingHud += (s, e) =>
+            {
+                if (Game1.displayHUD && Context.IsWorldReady)
+                    UIHelper.DrawHud(e.SpriteBatch, true);
+
+            };
+
+            Helper.Events.Display.RenderedHud += (s, e) =>
+            {
+                if (Game1.displayHUD && Context.IsWorldReady)
+                    UIHelper.DrawHud(e.SpriteBatch, false);
+            };
+
+            Helper.Events.Input.ButtonPressed += (s, e) =>
+            {
+                if (Game1.displayHUD && Context.IsWorldReady)
+                {
+                    if (e.Button == SButton.MouseLeft || e.Button == SButton.MouseRight)
+                        UIHelper.BaseHud.PerformClick(e.Cursor.ScreenPixels.toPoint(), e.Button == SButton.MouseRight, false, false);
+                }
+            };
+
+            Helper.Events.Display.WindowResized += (s, e) =>
+            {
+                UIElement.Viewportbase.UpdateBounds();
+                UIHelper.BaseHud.UpdateBounds();
+            };
+
+            Helper.Events.Multiplayer.ModMessageReceived += PyNet.Multiplayer_ModMessageReceived;
+            helper.Events.GameLoop.Saving += (s, e) =>
+            {
+                if (Game1.IsMasterGame)
+                    try
+                    {
+                        helper.Data.WriteSaveData<PyTKSaveData>("TMX.PyTK.ModSaveData", pytksaveData);
+                    }
+                    catch
+                    {
+                    }
+            };
+
+            helper.Events.GameLoop.ReturnedToTitle += (s, e) =>
+            {
+                pytksaveData = new PyTKSaveData();
+            };
+
+            helper.Events.GameLoop.SaveLoaded += (s, e) =>
+            {
+                if (Game1.IsMasterGame)
+                {
+                    try
+                    {
+                        pytksaveData = helper.Data.ReadSaveData<PyTKSaveData>("TMX.PyTK.ModSaveData");
+                    }
+                    catch
+                    {
+                    }
+                    if (pytksaveData == null)
+                        pytksaveData = new PyTKSaveData();
+                }
+            };
+
+            helper.Events.GameLoop.OneSecondUpdateTicked += (s, e) =>
+            {
+                if (Context.IsWorldReady && Game1.currentLocation is GameLocation location && location.Map is Map map)
+                    PyUtils.checkDrawConditions(map);
+            };
+
+            helper.Events.GameLoop.UpdateTicked += (s, e) => AnimatedTexture2D.ticked = e.Ticks;
+        }
+
+        private void registerTileActions()
+        {
+            TileAction CC = new TileAction("CC", (action, location, tile, layer) =>
+            {
+                List<string> text = action.Split(' ').ToList();
+                string key = text[1];
+                text.RemoveAt(0);
+                text.RemoveAt(0);
+                action = String.Join(" ", text);
+                if (key == "cs")
+                    action += ";";
+
+                ICommandHelper commandHelper = Helper.ConsoleCommands;
+                object commandManager = commandHelper.GetType().GetField("CommandManager", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(commandHelper);
+                if (commandManager is null)
+                    throw new InvalidOperationException("Can't get SMAPI's underlying command manager.");
+
+                MethodInfo triggerCommand = commandManager.GetType().GetMethod("Trigger", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                if (triggerCommand is null)
+                    throw new InvalidOperationException("Can't get SMAPI's underlying CommandManager.Trigger method.");
+
+                triggerCommand.Invoke(commandManager, new object[] { key, action.Split(' ') });
+                return true;
+            }).register();
+
+            TileAction Game = new TileAction("Game", (action, location, tile, layer) =>
+            {
+                List<string> text = action.Split(' ').ToList();
+                text.RemoveAt(0);
+                action = String.Join(" ", text);
+                return location.performAction(action, Game1.player, new xTile.Dimensions.Location((int)tile.X, (int)tile.Y));
+            }).register();
+
+            TileAction Lua = new TileAction("Lua", (action, location, tile, layer) =>
+            {
+                string[] a = action.Split(' ');
+                if (a.Length > 2)
+                    if (a[1] == "this")
+                    {
+                        string id = location.Name + "." + layer + "." + tile.X + "." + tile.Y + "." + a[2];
+                        if (!PyLua.hasScript(id))
+                        {
+                            if (layer == "Map")
+                            {
+                                if (location.map.Properties.ContainsKey("Lua_" + a[2]))
+                                {
+                                    string script = @"
+                                function callthis(location,tile,layer)
+                                " + location.map.Properties["Lua_" + a[2]].ToString() + @"
+                                end";
+
+                                    PyLua.loadScriptFromString(script, id);
+                                }
+                            }
+                            else
+                            {
+                                if (location.doesTileHaveProperty((int)tile.X, (int)tile.Y, "Lua_" + a[2], layer) is string lua)
+                                    PyLua.loadScriptFromString(@"
+                                function callthis(location,tile,layer)
+                                " + lua + @"
+                                end", id);
+                            }
+                        }
+
+                        if (PyLua.hasScript(id))
+                            PyLua.callFunction(id, "callthis", new object[] { location, tile, layer });
+                    }
+                    else
+                    {
+                        try
+                        {
+                            PyLua.callFunction(a[1], a[2], new object[] { location, tile, layer });
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                return true;
+            }).register();
+
+        }
+
+        private void registerEventPreconditions()
+        {
+            PyUtils.addEventPrecondition("hasmod", (key, values, location) =>
+            {
+                string mod = values.Replace("hasmod ", "").Replace(" ", "");
+                bool result = LuaUtils.hasMod(mod);
+                return result;
+            });
+
+            PyUtils.addEventPrecondition("switch", (key, values, location) =>
+            {
+                return LuaUtils.switches(values.Replace("switch ", ""));
+            });
+
+            PyUtils.addEventPrecondition("npcxy", (key, values, location) =>
+            {
+                var v = values.Split(' ');
+                var name = v[0];
+
+                if (v.Length == 1)
+                    return Game1.getCharacterFromName(name) is NPC npcp && npcp.currentLocation == location;
+
+                var x = int.Parse(v[1]);
+
+                if (v.Length == 2)
+                    return Game1.getCharacterFromName(name) is NPC npcx && npcx.currentLocation == location && npcx.Tile.X == x;
+
+                var y = int.Parse(v[2]);
+                return Game1.getCharacterFromName(name) is NPC npc && npc.currentLocation == location && (x == -1 || npc.Tile.X == x) && (y == -1 || npc.Tile.Y == y);
+            });
+
+            PyUtils.addEventPrecondition("items", (key, values, location) =>
+            {
+                var v = values.Split(',');
+                List<Item> items = new List<Item>(Game1.player.Items);
+                foreach (string pair in v)
+                {
+                    var p = pair.Split(':');
+                    var name = p[0];
+                    var stack = p.Length == 1 ? 1 : int.Parse(p[1]);
+                    int count = 0;
+
+                    foreach (Item item in items)
+                    {
+                        if (item.Name == name)
+                            count += item.Stack;
+
+                        if (count >= stack)
+                            return true;
+                    }
+                }
+
+                return false;
+            });
+
+            PyUtils.addEventPrecondition("counter", (key, values, location) =>
+            {
+                var v = values.Split(' ');
+                var c = LuaUtils.counters(v[0]);
+
+                if (v.Length == 2)
+                    return c == int.Parse(v[1]);
+                else
+                    return PyUtils.calcBoolean("c " + values, new KeyValuePair<string, object>("c", c));
+            });
+
+            PyUtils.addEventPrecondition("LC", (key, values, location) =>
+            {
+                return PyUtils.checkEventConditions(values.Replace("%div", "/"), location, location);
+            });
+
+
+        }
+
+        private void PYTKGameLoop_DayStarted(object sender, DayStartedEventArgs e)
+        {
+            if (Game1.currentLocation is GameLocation g && g.map is Map m && m.Properties.ContainsKey("EntryAction"))
+                TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
+        }
+
+
+        private void startResponder()
+        {
+            responders.ForEach(r => r.start());
+        }
+
+        private void initializeResponders()
+        {
+
+            responders = new List<IPyResponder>();
+
+            responders.Add(new PyReceiver<PyTKSaveData>("PyTK.ModSavdDataReceiver", (sd) =>
+            {
+                pytksaveData.Counters = sd.Counters;
+            }, 60, SerializationType.JSON));
+
+            responders.Add(new PyReceiver<ValueChangeRequest<string, int>>("PyTK.ModSavdDataCounterChangeReceiver", (cr) =>
+            {
+                if (!pytksaveData.Counters.ContainsKey(cr.Key))
+                    pytksaveData.Counters.Add(cr.Key, cr.Fallback);
+                else
+                    pytksaveData.Counters[cr.Key] += cr.Value;
+            }, 60, SerializationType.JSON));
+
+            responders.Add(new PyResponder<int, int>("PytK.StaminaRequest", (s) =>
+            {
+                if (Game1.player == null)
+                    return -1;
+
+                if (s == -1)
+                    return (int)Game1.player.Stamina;
+                else
+                {
+                    Game1.player.Stamina = s;
+                    return s;
+                }
+
+            }, 8));
+
+            responders.Add(new PyResponder<bool, long>("PytK.Ping", (s) =>
+            {
+                return true;
+
+            }, 1));
+
+            responders.Add(new PyResponder<bool, WarpRequest>("PyTK.WarpFarmer", (w) =>
+            {
+                try
+                {
+                    Game1.warpFarmer(Game1.getLocationRequest(w.locationName, w.isStructure), w.x, w.y, w.facing < 0 ? Game1.player.FacingDirection : w.facing);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }, 16, SerializationType.PLAIN, SerializationType.JSON));
+        }
+
+        private void Player_WarpedPyTK(object sender, WarpedEventArgs e)
+        {
+            if (e.NewLocation.Map.Properties.ContainsKey("@WaterColor") && TMXColor.FromString(e.NewLocation.Map.Properties["@WaterColor"]) is TMXColor color)
+                e.NewLocation.waterColor.Value = new Color(color.R, color.G, color.B, color.A);
+
+            if (!e.IsLocalPlayer)
+                return;
+
+            e.NewLocation?.Map.enableMoreMapLayers();
+
+            if (e.NewLocation is GameLocation loc && loc.waterTiles == null && loc.Map.Properties.TryGetValue("@LoadWater", out xTile.ObjectModel.PropertyValue value) && (value == true || value.ToString() == "T"))
+            {
+                loc.waterTiles = new WaterTiles(new bool[loc.map.Layers[0].LayerWidth, loc.map.Layers[0].LayerHeight]);
+                bool flag = false;
+                for (int xTile = 0; xTile < loc.map.Layers[0].LayerWidth; ++xTile)
+                {
+                    for (int yTile = 0; yTile < loc.map.Layers[0].LayerHeight; ++yTile)
+                    {
+                        if (loc.doesTileHaveProperty(xTile, yTile, "Water", "Back") != null)
+                        {
+                            flag = true;
+                            loc.waterTiles[xTile, yTile] = true;
+                        }
+                    }
+                }
+                if (!flag)
+                    loc.waterTiles = new WaterTiles((bool[,])null);
+            }
+
+            if (e.NewLocation is GameLocation g && g.map is Map m)
+            {
+                int forceX = Game1.player.TilePoint.X;
+                int forceY = Game1.player.TilePoint.Y;
+                int forceF = Game1.player.FacingDirection;
+                if (e.OldLocation is GameLocation og && m.Properties.ContainsKey("ForceEntry_" + og.Name))
+                {
+                    string[] pos = m.Properties["ForceEntry_" + og.Name].ToString().Split(' ');
+                    if (pos.Length > 0 && pos[1] != "X")
+                        int.TryParse(pos[0], out forceX);
+
+                    if (pos.Length > 1 && pos[1] != "Y")
+                        int.TryParse(pos[1], out forceY);
+
+                    if (pos.Length > 2 && pos[2] != "F")
+                        int.TryParse(pos[2], out forceF);
+
+                    Game1.player.Position = new Vector2(forceX, forceY);
+                    Game1.player.FacingDirection = forceF;
+                }
+
+                if (m.Properties.ContainsKey("EntryAction"))
+                    TileAction.invokeCustomTileActions("EntryAction", g, Vector2.Zero, "Map");
+
+                PyUtils.checkDrawConditions(m);
+            }
         }
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
@@ -238,6 +657,12 @@ namespace TMXLoader
                         l.terrainFeatures.FieldDict.Values.Where(t => t.Value is HoeDirt h && h.state.Value == 1 ).Select(t => t.Value as HoeDirt).ToList().ForEach(h => h.state.Value = 0);
                     else if(rain.ToString() == "Always" && !Game1.isRaining)
                             l.terrainFeatures.FieldDict.Values.Where(t => t.Value is HoeDirt).Select(t => t.Value as HoeDirt).ToList().ForEach(h => h.state.Value = 1);
+        }
+
+        public static void syncCounter(string id, int value)
+        {
+            if (Game1.IsMultiplayer)
+                PyNet.sendRequestToAllFarmers<bool>("PyTK.ModSavdDataCounterChangeReceiver", new ValueChangeRequest<string, int>(id, value, pytksaveData.Counters[id]), null, SerializationType.JSON, -1);
         }
 
         private void updateRainDrops()
@@ -492,7 +917,6 @@ namespace TMXLoader
                 var e = edit.Clone();
                 e.name = getLocationName(uniqueId);
                 e._map = map;
-                Map m = null;
 
                 if (!map.Properties.ContainsKey("Warp"))
                     map.Properties["Warp"] = "0 0 Farm 0 0";
@@ -564,7 +988,7 @@ namespace TMXLoader
                                 List<LargeTerrainFeature> ltfToRemove = new List<LargeTerrainFeature>();
 
                                 foreach (var ltf in location.largeTerrainFeatures)
-                                    if (LuaUtils.getDistance(ltf.tilePosition.Value, key) < 4)
+                                    if (LuaUtils.getDistance(ltf.Tile, key) < 4)
                                         ltfToRemove.Add(ltf);
 
                                 foreach (var ltf in ltfToRemove)
@@ -648,7 +1072,7 @@ namespace TMXLoader
                         if ((item as StardewValley.Object).bigCraftable.Value)
                             continue;
 
-                        Game1.player.removeItemsFromInventory(item.ParentSheetIndex, tItem.stock);
+                        Game1.player.removeFirstOfThisItemFromInventory(item.ItemId, tItem.stock);
                     }
             }           
         }
@@ -657,7 +1081,7 @@ namespace TMXLoader
         {
             if ((location.IsOutdoors || location is Sewer || location is Submarine) && !(location is Desert))
             {
-                location.waterTiles = new bool[location.map.Layers[0].LayerWidth, location.map.Layers[0].LayerHeight];
+                location.waterTiles = new WaterTiles(new bool[location.map.Layers[0].LayerWidth, location.map.Layers[0].LayerHeight]);
                 bool flag = false;
                 for (int xTile = 0; xTile < location.map.Layers[0].LayerWidth; ++xTile)
                 {
@@ -671,7 +1095,7 @@ namespace TMXLoader
                     }
                 }
                 if (!flag)
-                    location.waterTiles = (bool[,])null;
+                    location.waterTiles = new WaterTiles((bool[,])null);
             }
         }
 
@@ -842,12 +1266,12 @@ namespace TMXLoader
                     }
                 }
 
-                if (inGame is BuildableGameLocation bgl && saved is BuildableGameLocation sbgl)
+                if (true)
                 {
-                    bgl.buildings.Clear();
-                    foreach (Building b in sbgl.buildings)
+                    inGame.buildings.Clear();
+                    foreach (Building b in inGame.buildings)
                     {
-                        bgl.buildings.Add(b);
+                        inGame.buildings.Add(b);
                         b.load();
                     }
                 }
@@ -939,7 +1363,7 @@ namespace TMXLoader
                     if (!getAssetNameWithoutFolder(mp).Equals(getAssetNameWithoutFolder(editor.assetName)))
                         continue;
 
-                    if (PyTK.PyUtils.checkEventConditions(editor.conditions) is bool c)
+                    if (PyUtils.checkEventConditions(editor.conditions) is bool c)
                     {
                         bool inlocation = (editor.inLocation == null || editor.inLocation == gl.Name);
                         bool r = c && inlocation;
@@ -1064,27 +1488,7 @@ namespace TMXLoader
             PyLua.registerType(typeof(Map), false, true);
             PyLua.registerType(typeof(TMXActions), false, false);
             PyLua.addGlobal("TMX", new TMXActions());
-            new ConsoleCommand("loadmap", "Teleport to a map", (s, st) =>
-            {
-                if (st.Length < 3)
-                    Monitor?.Log("Mising Parameter. Use: loadmap {Map} {x} {y}");
-                else
-                    Game1.player.warpFarmer(new Warp(int.Parse(st[1]), int.Parse(st[2]), st[0], int.Parse(st[1]), int.Parse(st[2]), false));
-            }).register();
-
-            new ConsoleCommand("removeNPC", "Removes an NPC", (s, st) =>
-            {
-                if (Game1.getCharacterFromName(st.Last()) == null)
-                    Monitor?.Log("Couldn't find NPC with that name!", LogLevel.Alert);
-                else
-                {
-                    Game1.removeThisCharacterFromAllLocations(Game1.getCharacterFromName(st.Last()));
-                    if (Game1.player.friendshipData.ContainsKey(st.Last()))
-                        Game1.player.friendshipData.Remove(st.Last());
-                    Monitor?.Log(st.Last() + " was removed!", LogLevel.Info);
-                }
-
-            }).register();
+            
 
             helper.ConsoleCommands.Add("export_map", "Exports current map as tmx file", (s, p) =>
              {
@@ -1131,7 +1535,8 @@ namespace TMXLoader
                 foreach (KeyValuePair<string, Map> map in mapsToSync)
                     PyNet.syncMap(map.Value, map.Key, farmer);
 
-                syncedFarmers.AddOrReplace(farmer);
+                syncedFarmers.Remove(farmer);
+                syncedFarmers.Add(farmer);
             }
         }
 
@@ -1143,26 +1548,24 @@ namespace TMXLoader
         private void harmonyFix()
         {
             Harmony instance = new Harmony("Platonymous.TMXLoader");
-            instance.PatchAll(Assembly.GetExecutingAssembly());
-            instance.Patch(typeof(SaveGame).GetMethod("loadDataToLocations"), postfix: new HarmonyMethod(this.GetType().GetMethod("SavePatch", BindingFlags.Public | BindingFlags.Static)));
-            instance.Patch(typeof(GameLocation).GetMethod("setMapTile"), prefix: new HarmonyMethod(this.GetType().GetMethod("trySetMapTile", BindingFlags.Public | BindingFlags.Static)));
+            instance.Patch(typeof(SaveGame).GetMethod(nameof(SaveGame.loadDataToLocations)), postfix: new HarmonyMethod(this.GetType().GetMethod(nameof(SavePatch), BindingFlags.Public | BindingFlags.Static)));
+            instance.Patch(typeof(GameLocation).GetMethod(nameof(GameLocation.setMapTile)), prefix: new HarmonyMethod(this.GetType().GetMethod(nameof(trySetMapTile), BindingFlags.Public | BindingFlags.Static)));
             
             instance.Patch(
-                original: AccessTools.Method(typeof(Crop), "harvest"),
-                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "harvest")),
-                postfix: new HarmonyMethod(AccessTools.Method(this.GetType(), "harvestPost"))
+                original: AccessTools.Method(typeof(Crop),nameof(Crop.harvest)),
+                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), nameof(harvest))),
+                postfix: new HarmonyMethod(AccessTools.Method(this.GetType(), nameof(harvestPost)))
                 );
 
 
             instance.Patch(
-                original: AccessTools.Method(typeof(HoeDirt), "performToolAction"),
-                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "performToolAction"))
+                original: AccessTools.Method(typeof(HoeDirt), nameof(HoeDirt.performToolAction)),
+                prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), nameof(performToolAction)))
                 );
-
             instance.Patch(
-               original: AccessTools.Method(typeof(HoeDirt), "draw", new Type[] { typeof(SpriteBatch),typeof(Vector2) }),
-               prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), "drawHoeDirt")),
-               postfix: new HarmonyMethod(AccessTools.Method(this.GetType(), "drawHoeDirtPost"))
+               original: AccessTools.Method(typeof(HoeDirt), nameof(HoeDirt.draw), new Type[] { typeof(SpriteBatch) }),
+               prefix: new HarmonyMethod(AccessTools.Method(this.GetType(), nameof(drawHoeDirt))),
+               postfix: new HarmonyMethod(AccessTools.Method(this.GetType(), nameof(drawHoeDirtPost)))
                );
 
             if (!helper.ModRegistry.IsLoaded("Entoarox.FurnitureAnywhere"))
@@ -1177,7 +1580,7 @@ namespace TMXLoader
         {
             __state = -1;
 
-            if (__instance.crop is Crop crop && !crop.forageCrop.Value && (crop.whichForageCrop.Value == -91 || crop.whichForageCrop.Value == -101))
+            if (__instance.crop is Crop crop && !crop.forageCrop.Value && (crop.whichForageCrop.Value == "-91" || crop.whichForageCrop.Value == "-101"))
             {
                 __state = __instance.state.Value;
                 __instance.state.Value = 2;
@@ -1193,7 +1596,7 @@ namespace TMXLoader
         public static bool performToolAction(HoeDirt __instance, ref bool __result)
         {
             if (__instance.crop is Crop crop && !crop.forageCrop.Value && 
-                (crop.whichForageCrop.Value == -90 || crop.whichForageCrop.Value == -91 || crop.whichForageCrop.Value == -100 || crop.whichForageCrop.Value == -101))
+                (crop.whichForageCrop.Value == "-90" || crop.whichForageCrop.Value == "-91" || crop.whichForageCrop.Value == "-100" || crop.whichForageCrop.Value == "-101"))
             {
                 __result = false;
                 return false;
@@ -1205,7 +1608,7 @@ namespace TMXLoader
         public static bool harvest(Crop __instance, int xTile, int yTile, JunimoHarvester junimoHarvester, ref bool __result, ref bool __state)
         {
             __state = false;
-            if (!__instance.forageCrop.Value && (__instance.whichForageCrop.Value == -91 || __instance.whichForageCrop.Value == -90))
+            if (!__instance.forageCrop.Value && (__instance.whichForageCrop.Value == "-91" || __instance.whichForageCrop.Value == "-90"))
             {
                 __result = false;
 
@@ -1237,13 +1640,12 @@ namespace TMXLoader
 
 
             if (!__instance.forageCrop.Value &&
-                (__instance.whichForageCrop.Value == -90 || __instance.whichForageCrop.Value == -91 || __instance.whichForageCrop.Value == -100 || __instance.whichForageCrop.Value == -101))
+                (__instance.whichForageCrop.Value == "-90" || __instance.whichForageCrop.Value == "-91" || __instance.whichForageCrop.Value == "-100" || __instance.whichForageCrop.Value == "-101"))
             {
-                Vector2 pos = new Vector2(xTile, yTile);
-
+                var pos = new Vector2(xTile, yTile);
                 if (Game1.currentLocation.terrainFeatures.TryGetValue(pos, out TerrainFeature f)
                     && f is HoeDirt h
-                    && (h.crop == null || (h.crop == __instance && __instance.regrowAfterHarvest.Value == -1)))
+                    && (h.crop == null || (h.crop == __instance && !__instance.RegrowsAfterHarvest())))
                 {
                     PyUtils.setDelayedAction(2,() => Game1.currentLocation.terrainFeatures.Remove(pos));
                 }
@@ -1399,7 +1801,7 @@ namespace TMXLoader
                 location = new Shed(Path.Combine("Maps", edit.name), edit.name);
             else if (edit.type.StartsWith("SDV:"))
             {
-                location = (GameLocation)PyTK.PyUtils.getTypeSDV(edit.type.Substring(4)).GetConstructor(new Type[] { typeof(string), typeof(string) }).Invoke(new object[] { Path.Combine("Maps", edit.name), edit.name });
+                location = (GameLocation)PyUtils.getTypeSDV(edit.type.Substring(4)).GetConstructor(new Type[] { typeof(string), typeof(string) }).Invoke(new object[] { Path.Combine("Maps", edit.name), edit.name });
                 monitor?.Log("Type:" + (edit.type.Substring(4)), LogLevel.Trace);
             }
             else if (edit.type.StartsWith("Custom:"))
@@ -1450,7 +1852,7 @@ namespace TMXLoader
 
         public static void setupCrops(GameLocation location)
         {
-            Dictionary<int, string> cropsDict = Game1.content.Load<Dictionary<int, string>>("Data\\Crops");
+            Dictionary<string, CropData> cropsDict = Game1.content.Load<Dictionary<string, CropData>>("Data\\Crops");
 
             foreach (Layer layer in location.Map.Layers)
                 if (layer.Id.ToLower().StartsWith(Game1.currentSeason.ToLower() + "_crops") || layer.Id.ToLower().StartsWith("all_crops"))
@@ -1487,33 +1889,58 @@ namespace TMXLoader
                             if (tile == null)
                                 continue;
 
-                            int index = tile.TileIndex;
+                            string index = tile.TileIndex.ToString();
 
-                            if (tile.Properties.TryGetValue("name", out PropertyValue name))
-                                if (name != null)
-                                    index = Game1.objectInformation.getIndexByName(name.ToString());
-
-                            if (tile.Properties.TryGetValue("Name", out PropertyValue name2))
-                                if (name2 != null)
-                                    index = Game1.objectInformation.getIndexByName(name2.ToString());
+                                if (tile.Properties.TryGetValue("name", out PropertyValue name))
+                                {
+                                    if (name != null)
+                                        if (Game1.objectData.Keys.FirstOrDefault(k => k == name || Game1.objectData[k].Name == name) is string key)
+                                            index = key;
+                                }
+                                else if (tile.Properties.TryGetValue("Name", out PropertyValue name2))
+                                {
+                                    if (name != null)
+                                        if (Game1.objectData.Keys.FirstOrDefault(k => k == name2 || Game1.objectData[k].Name == name2) is string key)
+                                            index = key;
+                                }
+                                else
+                                if (tile.Properties.TryGetValue("Id", out PropertyValue name3))
+                                {
+                                    if (name != null)
+                                        if (Game1.objectData.Keys.FirstOrDefault(k => k == name3 || Game1.objectData[k].Name == name3) is string key)
+                                            index = key;
+                                }
+                                else
+                                if (tile.Properties.TryGetValue("id", out PropertyValue name4))
+                                {
+                                    if (name != null)
+                                        if (Game1.objectData.Keys.FirstOrDefault(k => k == name4 || Game1.objectData[k].Name == name4) is string key)
+                                            index = key;
+                                }
 
                             Vector2 pos = new Vector2(x, y);
                             Crop crop = null;
 
-                            if (cropsDict.ContainsKey(index))
-                                crop = new Crop(index, x, y);
-                            else if (cropsDict.Exists(kv => int.TryParse(kv.Value.Split('/')[3], out int idx) && idx == index))
+                            if (index == "770")
                             {
-                                index = cropsDict.Where(kv => int.TryParse(kv.Value.Split('/')[3], out int idx) && idx == index).FirstOrDefault().Key;
-                                crop = new Crop(index, x, y);
+                                var season = Game1.currentSeason.ToCharArray();
+                                season[0] = season.ToString().ToUpper()[0];
+                                string s = new string(season);
+                                crop = new Crop(Crop.getRandomLowGradeCropForThisSeason(Enum.TryParse(s, out Season se) ? se : Season.Spring), x, y, location);
                             }
-                            else if (index == 770)
-                                crop = new Crop(Crop.getRandomLowGradeCropForThisSeason(Game1.currentSeason), x, y);
+                            else if (cropsDict.ContainsKey(index))
+                                crop = new Crop(index.ToString(), x, y, location);
+                            else if (cropsDict.Any(kv => kv.Value.HarvestItemId == index || kv.Key == index))
+                            {
+                                index = cropsDict.FirstOrDefault(kv => kv.Value.HarvestItemId == index || kv.Key == index).Key;
+                                crop = index != null ? new Crop(index.ToString(), x, y, location) : crop;
+                            }
+                            
                             
 
                                 if (crop != null)
                             {
-                                if (!crop.seasonsToGrowIn.Contains(Game1.currentSeason) && !ignoreSeason)
+                                if (!crop.IsInSeason(location) && !ignoreSeason)
                                 {
                                     if (location.terrainFeatures.ContainsKey(pos) && location.terrainFeatures[pos] is HoeDirt h)
                                         location.terrainFeatures.Remove(pos);
@@ -1522,9 +1949,9 @@ namespace TMXLoader
                                 }
 
                                 if (!canBeHarvested)
-                                    crop.whichForageCrop.Value = hideSoil ? -91 : -90;
+                                    crop.whichForageCrop.Value = hideSoil ? "-91" : "-90";
                                 else
-                                    crop.whichForageCrop.Value = hideSoil ? -101 : -100;
+                                    crop.whichForageCrop.Value = hideSoil ? "-101" : "-100";
 
                                 if (startPhase >= crop.phaseDays.Count - 1)
                                     crop.growCompletely();
@@ -1535,7 +1962,7 @@ namespace TMXLoader
                                 
                                 if (location.terrainFeatures.ContainsKey(pos))
                                 {
-                                    if (location.terrainFeatures[pos] is HoeDirt h && h.crop is Crop c && !c.dead.Value && (c.indexOfHarvest.Value == crop.indexOfHarvest.Value || (index == 770 && Game1.dayOfMonth != 1)))
+                                    if (location.terrainFeatures[pos] is HoeDirt h && h.crop is Crop c && !c.dead.Value && (c.indexOfHarvest.Value == crop.indexOfHarvest.Value || (index == "770" && Game1.dayOfMonth != 1)))
                                     {
                                         if(c.dead.Value)
                                             location.terrainFeatures.Remove(pos);
@@ -1547,23 +1974,27 @@ namespace TMXLoader
                                                 c.currentPhase.Value = startPhase;
 
                                             if (!canBeHarvested)
-                                                c.whichForageCrop.Value = hideSoil ? -91 : -90;
+                                                c.whichForageCrop.Value = hideSoil ? "-91" : "-90";
                                             else
-                                                c.whichForageCrop.Value = hideSoil ? -101 : -100;
+                                                c.whichForageCrop.Value = hideSoil ? "-101" : "-100";
                                         }
                                     }
                                     else
                                         location.terrainFeatures.Remove(pos);
                                 }
 
-                                if (location.isTileLocationTotallyClearAndPlaceable(pos))
+                                if (location.isTileLocationOpen(pos))
                                 {
                                     location.terrainFeatures.Add(pos, hoedirt);
                                     hoedirt.crop = crop;
+                                    hoedirt.tickUpdate(Game1.currentGameTime);
                                 }
 
                                 if (location.terrainFeatures.ContainsKey(pos) && location.terrainFeatures[pos] is HoeDirt hd && (Game1.isRaining || autoWater))
+                                {
                                     hd.state.Value = 1;
+                                    hd.tickUpdate(Game1.currentGameTime);
+                                }
                             }
                             
                         }
@@ -1650,14 +2081,16 @@ namespace TMXLoader
 
             foreach (TileShop shop in tmxPack.shops)
             {
-                tileShops.AddOrReplace(shop, shop.inventory);
+                tileShops.Remove(shop);
+                tileShops.Add(shop, shop.inventory);
                 foreach (string path in shop.portraits)
                     pack.ModContent.Load<Texture2D>(path).inject(@"Portraits/" + Path.GetFileNameWithoutExtension(path));
             }
 
             foreach (NPCPlacement edit in tmxPack.festivalSpots)
             {
-                festivals.AddOrReplace(edit.map);
+                festivals.Remove(edit.map);
+                festivals.Add(edit.map);
                 addAssetEditor(new TMXAssetEditor(packModId, edit, EditType.Festival));
                 // mapsToSync.AddOrReplace(edit.map, original);
             }
@@ -1667,7 +2100,10 @@ namespace TMXLoader
                 helper.Events.GameLoop.SaveLoaded += (s, e) =>
                 {
                     if (Game1.getCharacterFromName(edit.name) == null)
-                        Game1.locations.Where(gl => gl.Name == edit.map).First().addCharacter(new NPC(new AnimatedSprite("Characters\\" + edit.name, 0, 16, 32), new Vector2(edit.position[0], edit.position[1]), edit.map, 0, edit.name, edit.datable, (Dictionary<int, int[]>)null, Helper.GameContent.Load<Texture2D>($"Portraits/{edit.name}")));
+                    {
+                        Game1.locations.Where(gl => gl.Name == edit.map).First().addCharacter(new NPC(new AnimatedSprite("Characters\\" + edit.name, 0, 16, 32), new Vector2(edit.position[0], edit.position[1]), edit.map, 0, edit.name, edit.datable, Helper.GameContent.Load<Texture2D>($"Portraits/{edit.name}")));
+                        //Game1.locations.Where(gl => gl.Name == edit.map).First().addCharacter(new NPC(new AnimatedSprite("Characters\\" + edit.name, 0, 16, 32), new Vector2(edit.position[0], edit.position[1]), edit.map, 0, edit.name, Helper.GameContent.Load<Texture2D>($"Portraits/{edit.name}"),true));
+                    }
                 };
             }
 
@@ -1786,7 +2222,7 @@ namespace TMXLoader
             if (Directory.Exists(exportFolderPath))
                 Directory.CreateDirectory(exportFolderPath);
 
-            string contentPath = PyUtils.ContentPath;
+            string contentPath = Constants.ContentPath;
 
             if (contentPath == null || contentPath == "")
                 return;
@@ -2100,7 +2536,10 @@ namespace TMXLoader
                                         layer.Properties.Remove("tempOffsety");
 
                                     if (layer.Properties.ContainsKey("ColorId") && layer.Properties.ContainsKey("Color"))
-                                        colors.AddOrReplace(layer.Properties["ColorId"].ToString(), layer.Properties["Color"].ToString());
+                                    {
+                                        colors.Remove(layer.Properties["ColorId"].ToString());
+                                        colors.Add(layer.Properties["ColorId"].ToString(), layer.Properties["Color"].ToString());
+                                    }
                                 }
                                 catch (Exception ex)
                                 {
@@ -2142,7 +2581,7 @@ namespace TMXLoader
 
                     if (cColors.Count > 0)
                     {
-                        colorPicker = PyTK.PlatoUI.UIPresets.GetColorPicker(cColors, (index, color) =>
+                        colorPicker = UIPresets.GetColorPicker(cColors, (index, color) =>
                         {
                             foreach (xTile.Layers.Layer l in map.Layers.Where(ly => ly.Properties != null && ly.Properties.ContainsKey("ColorId") && ly.Properties.ContainsKey("Color") && ly.Properties["ColorId"] == cLayers[index]))
                                 l.Properties["Color"] = color.R + " " + color.G + " " + color.B + " " + color.A;
@@ -2275,8 +2714,9 @@ namespace TMXLoader
                         if ((item as StardewValley.Object).bigCraftable.Value)
                             continue;
 
-                        itemString += "  " + tItem.stock + " " + item.Name;
-                        if(!Game1.player.hasItemInInventory(item.ParentSheetIndex,tItem.stock))
+                        itemString += "  " + tItem.stock + " " + item?.Name;
+                        
+                        if (item != null && Game1.player.Items.CountId(tItem.index) < tItem.stock)
                             buildable = false;
                     }
 

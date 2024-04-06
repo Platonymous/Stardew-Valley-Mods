@@ -1,4 +1,4 @@
-﻿using PyTK.ConsoleCommands;
+﻿using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
 using System;
@@ -11,8 +11,12 @@ namespace SleepWorker
         internal static Config config;
         internal static bool canSleep = false;
         const int maxSkip = 2400;
+        internal static IModHelper MHelper;
+        internal static IMonitor MMonitor;
         public override void Entry(IModHelper helper)
         {
+            MMonitor = Monitor;
+            MHelper = helper;
             config = helper.ReadConfig<Config>();
             if (config.skiptime > 18 )
                 config.skiptime = 18;
@@ -22,32 +26,35 @@ namespace SleepWorker
 
             helper.WriteConfig(config);
 
-            PyTK.Events.PyTimeEvents.BeforeSleepEvents += (s, e) =>
-            {
-                if(!Game1.IsMultiplayer && !canSleep)
-                {
-                    e.Response.responseKey = "No";
-                    Game1.playSound("coin");
+            var instance = new Harmony("Platonymous.SleepWorker");
+            instance.Patch(AccessTools.Method(typeof(GameLocation), nameof(GameLocation.answerDialogueAction)), new HarmonyMethod(this.GetType(), nameof(AnswerDialoguePrefix)));
 
-                    if (Game1.timeOfDay >= 2400)
-                        return;
-
-                    Task.Run(() =>
-                    {
-                        CcTime.TimeSkip(Math.Min((config.skiptime * 100) + Game1.timeOfDay,2400), () =>
-                        {
-                            canSleep = true;
-                            Game1.playSound("coin");
-                            Game1.currentLocation.lastQuestionKey = "Sleep";
-                            Game1.currentLocation.answerDialogue(new Response("Yes", "Yes"));
-                            canSleep = false;
-                            Game1.hudMessages.Clear();
-                        });;
-                    });
-                }
-            };
 
             helper.Events.GameLoop.GameLaunched += (s, e) => SetUpConfigMenu();
+        }
+
+        public static void AnswerDialoguePrefix(GameLocation __instance, ref string questionAndAnswer)
+        {
+            if (questionAndAnswer != "Sleep_Yes" || Game1.IsMultiplayer || canSleep)
+                return;
+
+            questionAndAnswer = "Sleep_No";
+            Game1.playSound("coin");
+
+            if (Game1.timeOfDay >= 2400)
+                return;
+
+            Task.Run(() =>
+            {
+                CcTime.TimeSkip(MHelper, Math.Min((config.skiptime * 100) + Game1.timeOfDay, 2400), () =>
+                {
+                    canSleep = true;
+                    Game1.playSound("coin");
+                    Game1.currentLocation.answerDialogueAction("Sleep_Yes", null);
+                    canSleep = false;
+                    Game1.hudMessages.Clear();
+                }); ;
+            });
         }
 
         public class Config

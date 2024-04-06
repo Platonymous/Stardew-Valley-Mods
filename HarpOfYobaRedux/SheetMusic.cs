@@ -3,34 +3,29 @@ using System.Collections.Generic;
 using StardewValley;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using PyTK.CustomElementHandler;
-using PyTK.Extensions;
+using System.Xml.Serialization;
+using System.Diagnostics.Metrics;
+using System.Net.Mail;
 
 namespace HarpOfYobaRedux
 {
-    internal class SheetMusic : StardewValley.Object, ISaveElement, ICustomObject
+    [XmlType("Mods_platonymous_HarpOfYoba_SheetMusic")]
+    public class SheetMusic : StardewValley.Object
     {
         internal static Dictionary<string, SheetMusic> allSheets;
-        public string sheetMusicID;
+        public string sheetMusicID { get; set; }
         private string sheetDescription;
         private Texture2D texture;
         private Color color;
         private string music;
-        public int length;
-        public IMagic magic;
-        public bool playedToday = false;
+        public int length { get; set; }
+        internal IMagic magic;
+        internal bool playedToday = false;
+        internal bool wasBuild = false;
 
         public SheetMusic()
         {
-            
-        }
-
-        public SheetMusic(CustomObjectData data)
-            :this(data.id.Split('.')[2])
-        {
-
-
-
+            build(sheetMusicID);
         }
 
         public SheetMusic(string id, Texture2D texture, string name, string description, Color color, string music, int length, IMagic magic)
@@ -47,12 +42,17 @@ namespace HarpOfYobaRedux
             displayName = name;
             sheetDescription = description;
             sheetMusicID = id;
-            allSheets.AddOrReplace(id, this);
+            if (allSheets.ContainsKey(sheetMusicID))
+            {
+                allSheets[sheetMusicID] = this;
+            }
+            else
+                allSheets.Add(sheetMusicID, this);
         }
 
         public override string Name { get => name; }
 
-        public override string DisplayName { get => name; set => name = value; }
+        public override string DisplayName { get => name;}
 
         public SheetMusic(string id)
         {
@@ -61,23 +61,22 @@ namespace HarpOfYobaRedux
 
         private void build(string id)
         {
-            name = allSheets[id].name;
-            sheetDescription = allSheets[id].sheetDescription;
-            color = allSheets[id].color;
-            texture = allSheets[id].texture;
-            music = allSheets[id].music;
-            length = allSheets[id].length;
-            magic = allSheets[id].magic;
-            sheetMusicID = id;
-            playedToday = false;
+            if (!wasBuild && !string.IsNullOrEmpty(id) && allSheets.ContainsKey(id))
+            {
+                name = allSheets[id].name;
+                sheetDescription = allSheets[id].sheetDescription;
+                color = allSheets[id].color;
+                texture = allSheets[id].texture;
+                music = allSheets[id].music;
+                length = allSheets[id].length;
+                magic = allSheets[id].magic;
+                sheetMusicID = id;
+                playedToday = false;
+                wasBuild = true;
+            }
         }
 
-        public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
-        {
-            build(additionalSaveData["id"]);
-        }
-
-        public override void updateWhenCurrentLocation(GameTime time, GameLocation environment)
+        public override void updateWhenCurrentLocation(GameTime time)
         {
             restore();
         }
@@ -89,6 +88,9 @@ namespace HarpOfYobaRedux
 
         public void restore()
         {
+            if (!wasBuild)
+                build(sheetMusicID);
+
             if (texture == null)
                 foreach (var s in allSheets)
                     if (s.Value.Name == Name)
@@ -123,14 +125,13 @@ namespace HarpOfYobaRedux
             return additionalSaveData;
         }
 
-        public object getReplacement()
-        {
-            return new StardewValley.Object(685,1); 
-        }
-
-        public override Item getOne()
+        protected override Item GetOneNew()
         {
             return new SheetMusic(sheetMusicID);
+        }
+
+        protected override void GetOneCopyFrom(Item source)
+        {
         }
 
         public void doMagic()
@@ -164,14 +165,10 @@ namespace HarpOfYobaRedux
             if (texture == null)
                 return;
             Rectangle sourceRectangle = new Rectangle(0, 0, 16, 16);
-            spriteBatch.Draw(texture, objectPosition, new Rectangle?(sourceRectangle), Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 2) / 10000f));
+            spriteBatch.Draw(texture, objectPosition, new Rectangle?(sourceRectangle), Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingPosition().Y + 2) / 10000f));
             Rectangle sourceRectangleNote = new Rectangle(16, 0, 16, 16);
-            spriteBatch.Draw(texture, objectPosition, new Rectangle?(sourceRectangleNote), color, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingY() + 3) / 10000f));
+            spriteBatch.Draw(texture, objectPosition, new Rectangle?(sourceRectangleNote), color, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (float)(f.getStandingPosition().Y + 3) / 10000f));
         }
 
-        public ICustomObject recreate(Dictionary<string, string> additionalSaveData, object replacement)
-        {
-            return new SheetMusic(additionalSaveData["id"]);
-        }
     }
 }

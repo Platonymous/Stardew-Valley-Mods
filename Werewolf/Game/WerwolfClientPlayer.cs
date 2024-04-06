@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Werewolf.Roles;
+using LandGrants.Roles;
 
-namespace Werewolf.Game
+namespace LandGrants.Game
 {
     public class WerwolfClientPlayer
     {

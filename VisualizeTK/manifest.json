@@ -1,0 +1,10 @@
+{
+  "Name": "VisualizeTK",
+  "Author": "Platonymous",
+  "Version": "1.2.2-alpha.20240226",
+  "Description": "Visual Toolkit",
+  "UniqueID": "Platonymous.VisualizeTK",
+  "EntryDll": "VisualizeTK.dll",
+  "MinimumApiVersion": "3.14.0",
+  "UpdateKeys": [ "Nexus:19009" ]
+}

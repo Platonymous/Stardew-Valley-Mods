@@ -1,0 +1,8 @@
+{
+  "Stories": [
+    {
+      "Id": "Platonymous.InkStories.Example.Default",
+      "FromFile": "data/example.ink"
+    }
+  ]
+}

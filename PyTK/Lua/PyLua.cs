@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Interop;
 using Netcode;
 using PyTK.CustomElementHandler;
 using PyTK.Extensions;
@@ -10,8 +8,6 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using xTile;
 

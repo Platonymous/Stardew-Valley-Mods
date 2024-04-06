@@ -5,6 +5,7 @@
     <RootNamespace>PlanImporter</RootNamespace>
     <Version>0.8.12</Version>
     <TargetFramework>net5.0</TargetFramework>
+    <Configurations>Debug;Release;Android;PreAlphaRelease;PreAlphaDebug;Prealpharelease</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

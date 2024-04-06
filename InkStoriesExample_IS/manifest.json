@@ -1,0 +1,13 @@
+{
+  "Name": "InkStories Example INK",
+  "Author": "Platonymous",
+  "Version": "1.0.0",
+  "Description": "InkStories Example",
+  "UniqueID": "Platonymous.InkStoriesExample.InkStories",
+  "MinimumApiVersion": "3.18.0",
+  "UpdateKeys": [ "Nexus:15987" ],
+  "ContentPackFor": {
+    "UniqueID": "Platonymous.InkStories"
+  },
+  "Dependencies": []
+}

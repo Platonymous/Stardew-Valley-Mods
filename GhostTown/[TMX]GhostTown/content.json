@@ -1,0 +1,55 @@
+{
+  "mergeMaps": [
+	{
+      "name": "Town",
+	  "file": "assets/TownExt.tmx",
+    },
+	{
+      "name": "JojaMart",
+	  "file": "assets/JojaExt.tmx",
+    },
+	{
+      "name": "Forest",
+	  "file": "assets/ForestExt.tmx",
+    },
+	{
+      "name": "Hospital",
+	  "file": "assets/HospitalExt.tmx",
+    },
+	{
+      "name": "Bathhouse_Pool",
+	  "file": "assets/BathhouseExt.tmx",
+    },
+	{
+      "name": "Railroad",
+	  "file": "assets/RailroadExt.tmx",
+    },
+	{
+      "name": "WizardHouse",
+	  "removeEmpty": false,
+	  "file": "assets/WizExt.tmx",
+    },
+	{
+      "name": "Mine",
+	  "file": "assets/MineExt.tmx",
+    },
+	{
+      "name": "Trailer",
+	  "removeEmpty": false,
+	  "file": "assets/TrailerExt.tmx",
+    },
+	{
+      "name": "Beach",
+	  "file": "assets/BeachExt.tmx",
+    },
+	{
+      "name": "SeedShop",
+	  "removeEmpty": false,
+	  "file": "assets/SeedShopExt.tmx",
+    },
+	{
+      "name": "Sewer",
+	  "file": "assets/SewerExt.tmx",
+    }
+  ]
+}

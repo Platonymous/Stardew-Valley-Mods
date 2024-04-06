@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 
-namespace Werewolf.Game
+namespace LandGrants.Game
 {
     public class WerwolfVotes
     {

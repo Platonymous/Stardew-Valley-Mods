@@ -1,0 +1,12 @@
+{
+  "Name": "GhostTown Maps",
+  "Author": "Platonymous",
+  "Version": "1.1.1",
+  "Description": "Part of GhostTown Mod",
+  "UniqueID": "Platonymous.GhostTown.Maps",
+  "UpdateKeys": [ "Nexus:2992" ],
+  "ContentPackFor": {
+    "UniqueID": "Platonymous.TMXLoader",
+    "MinimumVersion": "1.3.4"
+  }
+}
