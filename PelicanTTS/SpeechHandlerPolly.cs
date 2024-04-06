@@ -19,6 +19,7 @@ namespace PelicanTTS
         internal static string lastText;
         internal static string lastSay;
         private static string lastDialog;
+        private static string lastDialogResponse;
         private static string lastLetter;
         private static string lastHud;
         private static string lastChat;
@@ -175,6 +176,7 @@ namespace PelicanTTS
             currentVoice = VoiceId.Salli;
             lastText = "";
             lastDialog = "";
+            lastDialogResponse = "";
             lastHud = "";
             speak = false;
             runSpeech = true;
@@ -193,6 +195,7 @@ namespace PelicanTTS
             {
                 lastText = "";
                 lastDialog = "";
+                lastDialogResponse = "";
                 lastLetter = "";
                 currentText = "";
                 currentSpeech?.Stop();
@@ -283,8 +286,26 @@ namespace PelicanTTS
                     {
                         currentText = dialogueBox.getCurrentString();
                         lastDialog = dialogueBox.getCurrentString();
+                        return;
                     }
 
+                    if (!PelicanTTSMod.config.ReadSelectedDialogueResponse)
+                    {
+                        return;
+                    }
+
+                    if (dialogueBox.selectedResponse < 0)
+                    {
+                        lastDialogResponse = "";
+                        return;
+                    }
+
+                    var response = dialogueBox.responses[dialogueBox.selectedResponse];
+                    if (response.responseText != lastDialogResponse)
+                    {
+                        currentText = response.responseText;
+                        lastDialogResponse = response.responseText;
+                    }
                 }
                 else if (Game1.activeClickableMenu is LetterViewerMenu lvm && !PelicanTTSMod.config.MumbleDialogues && PelicanTTSMod.config.ReadLetters)
                 {
@@ -299,11 +320,11 @@ namespace PelicanTTS
                 }
                 else if (Game1.hudMessages.Count > 0 && !PelicanTTSMod.config.MumbleDialogues && PelicanTTSMod.config.ReadHudMessages)
                 {
-                    if (Game1.hudMessages[Game1.hudMessages.Count - 1].Message != lastHud)
+                    if (Game1.hudMessages[Game1.hudMessages.Count - 1].message != lastHud)
                     {
                         setVoice("default");
-                        currentText = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
-                        lastHud = Game1.hudMessages[Game1.hudMessages.Count - 1].Message;
+                        currentText = Game1.hudMessages[Game1.hudMessages.Count - 1].message;
+                        lastHud = Game1.hudMessages[Game1.hudMessages.Count - 1].message;
                     }
                 }
                 /*else if(chats.Count > 0 && PelicanTTSMod.config.ReadChatMessages)

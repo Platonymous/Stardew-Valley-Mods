@@ -12,6 +12,8 @@ namespace PelicanTTS
 
         public bool ReadDialogues { get; set; } = true;
 
+        public bool ReadSelectedDialogueResponse { get; set; } = true;
+
         public bool ReadNonCharacterMessages{ get; set; } = true;
 
         public bool ReadLetters { get; set; } = true;

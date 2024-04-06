@@ -3,8 +3,8 @@
   <PropertyGroup>
     <AssemblyName>PelicanTTS</AssemblyName>
     <RootNamespace>PelicanTTS</RootNamespace>
-    <Version>1.13.1</Version>
-    <TargetFramework>net5.0</TargetFramework>
+    <Version>1.14.0</Version>
+    <TargetFramework>net6.0</TargetFramework>
 
     <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
   </PropertyGroup>
@@ -12,10 +12,14 @@
   <Import Project="$(SolutionDir)\common.targets" />
   
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Core" Version="3.7.0.10" />
-    <PackageReference Include="AWSSDK.Polly" Version="3.7.0.9" />
-    <PackageReference Include="NAudio.Core" Version="2.0.0" />
+    <PackageReference Include="AWSSDK.Core" Version="3.7.303.10" />
+    <PackageReference Include="AWSSDK.Polly" Version="3.7.302.19" />
+    <PackageReference Include="NAudio.Core" Version="2.2.1" />
     <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Update="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
   </ItemGroup>
 
 </Project>
