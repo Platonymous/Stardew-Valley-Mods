@@ -179,15 +179,15 @@ namespace PelicanTTS
 
         private void setUpNPCConfig()
         {
-            var npcs = Helper.GameContent.Load<Dictionary<string, string>>("Data/NPCDispositions");
+            var characters = Helper.GameContent.Load<Dictionary<string, StardewValley.GameData.Characters.CharacterData>>("Data/Characters");
 
             if (!config.Voices.ContainsKey("Default"))
                 config.Voices.Add("Default", new VoiceSetup() { Voice = SpeechHandlerPolly.getVoice("default", true) });
 
-            foreach (string npc in npcs.Keys)
+            foreach (string character in characters.Keys)
             {
-                if (!config.Voices.ContainsKey(npc))
-                    config.Voices.Add(npc, new VoiceSetup() { Voice = SpeechHandlerPolly.getVoice(npc, npcs[npc].Contains("female")) });
+                if (!config.Voices.ContainsKey(character))
+                    config.Voices.Add(character, new VoiceSetup() { Voice = SpeechHandlerPolly.getVoice(character, characters[character].Gender == StardewValley.Gender.Female) });
             }
             config.Rate = Math.Max(50, Math.Min(config.Rate, 200));
             Helper.WriteConfig<ModConfig>(config);
@@ -230,6 +230,7 @@ namespace PelicanTTS
                 config.Volume = 1;
                 config.Rate = 100;
                 config.ReadDialogues = true;
+                config.ReadSelectedDialogueResponse = true;
                 config.ReadHudMessages = true;
                 config.ReadLetters = true;
                 config.ReadNonCharacterMessages = true;
@@ -237,13 +238,13 @@ namespace PelicanTTS
                 config.LanguageCode = SpeechHandlerPolly.getLanguageCode(true);
                 //config.ReadChatMessages = true;
 
-                var npcs = Helper.GameContent.Load<Dictionary<string, string>>("Data/NPCDispositions");
+                var characters = Helper.GameContent.Load<Dictionary<string, StardewValley.GameData.Characters.CharacterData>>("Data/Characters");
 
                 foreach (var voice in config.Voices.Keys)
                 {
                     config.Voices[voice].Pitch = 0;
-                    if (npcs.ContainsKey(voice))
-                        config.Voices[voice].Voice = SpeechHandlerPolly.getVoice(voice, npcs[voice].Contains("female"));
+                    if (characters.ContainsKey(voice))
+                        config.Voices[voice].Voice = SpeechHandlerPolly.getVoice(voice, characters[voice].Gender == StardewValley.Gender.Female);
                 }
             }, () => Helper.WriteConfig<ModConfig>(config));
             api.RegisterLabel(ModManifest, MainLabelText, "");
@@ -252,6 +253,7 @@ namespace PelicanTTS
             api.RegisterSimpleOption(ModManifest, "Greeting", "Enables the morning greeting", () => config.Greeting, (s) => config.Greeting = s);
             api.RegisterSimpleOption(ModManifest, "Read Character Dialogues", "", () => config.ReadDialogues, (s) => config.ReadDialogues = s);
             api.RegisterSimpleOption(ModManifest, "Read Non-Character Messages", "", () => config.ReadNonCharacterMessages, (s) => config.ReadNonCharacterMessages = s);
+            api.RegisterSimpleOption(ModManifest, "Read Selected Dialogue Response", "", () => config.ReadSelectedDialogueResponse, (s) => config.ReadSelectedDialogueResponse = s);
             api.RegisterSimpleOption(ModManifest, "Read Letters", "", () => config.ReadLetters, (s) => config.ReadLetters = s);
             api.RegisterSimpleOption(ModManifest, "Read Hud Messages", "", () => config.ReadHudMessages, (s) => config.ReadHudMessages = s);
             api.RegisterSimpleOption(ModManifest, "Read Screen Key", "", () => config.ReadScreenKey, (s) => config.ReadScreenKey = s);
@@ -316,7 +318,7 @@ namespace PelicanTTS
                     npcVoices.AddRange(cVoices);
                     api.RegisterChoiceOption(ModManifest, npc + " Voice", "Choose a voice", () =>
                     {
-                        Game1.stopMusicTrack(Game1.MusicContext.Default);
+                        Game1.stopMusicTrack(StardewValley.GameData.MusicContext.Default);
                         if (config.Voices[npc].Voice.Contains("default"))
                             return npc + ":default";
 
@@ -624,7 +626,7 @@ namespace PelicanTTS
             if (!config.Greeting)
                 return;
 
-            NPC birthday = Utility.getTodaysBirthdayNPC(Game1.currentSeason, Game1.dayOfMonth);
+            NPC birthday = Utility.getTodaysBirthdayNPC();
             string day = Game1.dayOfMonth.ToString();
 
             string greeting = i18n.Get("Greeting").ToString().Replace("{Player}", Game1.player.Name).Replace("{DayName}", dayNameFromDayOfSeason(Game1.dayOfMonth)).Replace("{Day}", @"[say-as interpret-as='date']??????" + (day.Length < 2 ? "0"+day : day) + @"[/say-as]").Replace("{Season}", i18n.Get(Game1.currentSeason)) + " ";
@@ -640,7 +642,7 @@ namespace PelicanTTS
                 greeting += i18n.Get("BirthdayGreeting").ToString().Replace("{NPC}",person);
             }
 
-            if (Utility.isFestivalDay(Game1.dayOfMonth, Game1.currentSeason))
+            if (Utility.isFestivalDay())
             {
                 int festivalTime = Utility.getStartTimeOfFestival();
                 int ftHours = (int)Math.Floor((double)festivalTime / 100);
