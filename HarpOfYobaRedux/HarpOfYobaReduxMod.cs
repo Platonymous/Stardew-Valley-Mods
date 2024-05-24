@@ -20,6 +20,7 @@ namespace HarpOfYobaRedux
             modHelper = helper;
             config = Helper.ReadConfig<Config>();
             Helper.ConsoleCommands.Add("hoy_cheat", "Get all sheets without doing anything.", (c, p) => cheat(p));
+            helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.Display.MenuChanged += OnMenuChanged;
             helper.Events.GameLoop.Saving += OnSaving;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -28,14 +29,26 @@ namespace HarpOfYobaRedux
 
         private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
         {
-            try {
+            try
+            {
                 Instrument.allAdditionalSaveData = Helper.Data.ReadSaveData<SaveData>("hoy.savedata")?.Data ?? new Dictionary<string, string>();
             }
             catch
             {
                 Instrument.allAdditionalSaveData = new Dictionary<string, string>();
             }
-       }
+        }
+
+        /// <summary>The method called after a new day starts.</summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event arguments.</param>
+        private void OnDayStarted(object? sender, DayStartedEventArgs e)
+        {
+            foreach (var item in SheetMusic.allSheets)
+            {
+                item.Value.playedToday = false;
+            }
+        }
 
         private void cheat(string[] p)
         {
@@ -44,7 +57,7 @@ namespace HarpOfYobaRedux
                 List<string> list = SheetMusic.allSheets.Select(d => d.Key).ToList();
                 list.Add("harp");
                 list.Add("all");
-                Monitor.Log(String.Join(" - ", list),LogLevel.Info);
+                Monitor.Log(String.Join(" - ", list), LogLevel.Info);
             }
 
             List<Item> items = new List<Item>();
@@ -78,7 +91,7 @@ namespace HarpOfYobaRedux
                         items.Add(new SheetMusic(sheet));
                 }
             }
-            if(items.Count > 0)
+            if (items.Count > 0)
                 Game1.activeClickableMenu = new ItemGrabMenu(items);
         }
 
